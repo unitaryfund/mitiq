@@ -14,8 +14,6 @@ from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
 from mitiq.calibration import Calibrator, Settings, execute_with_mitigation
 from mitiq.calibration.calibrator import (
-    PEC_TABLE_HEADER_STR,
-    ZNE_TABLE_HEADER_STR,
     ExperimentResults,
     MissingResultsError,
     convert_to_expval_executor,
@@ -116,6 +114,9 @@ settings = Settings(
         },
     ],
 )
+
+strategies = settings.make_strategies()
+problems = settings.make_problems()
 
 
 def damping_execute(circuit, noise_level=0.001):
@@ -321,23 +322,25 @@ def test_double_run():
 
 
 def test_ExtrapolationResults_add_result():
-    er = ExperimentResults(5, 3)
+    er = ExperimentResults(strategies, problems)
     assert er.is_missing_data()
-    strat = Strategy(0, MitigationTechnique.ZNE, {})
-    problem = BenchmarkProblem(0, "circuit", "ghz", {})
     er.add_result(
-        strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
+        strategies[0],
+        problems[0],
+        ideal_val=1.0,
+        noisy_val=0.8,
+        mitigated_val=0.9,
     )
     assert er.is_missing_data()
-    er.mitigated = np.ones((5, 3))
-    er.ideal = np.ones((5, 3))
-    er.noisy = np.ones((5, 3))
+    er.mitigated = np.ones((2, 4))
+    er.ideal = np.ones((2, 4))
+    er.noisy = np.ones((2, 4))
     assert not er.is_missing_data()
 
 
 def test_ExtrapolationResults_errors():
-    num_strategies, num_problems = 5, 3
-    er = ExperimentResults(num_strategies, num_problems)
+    num_strategies, num_problems = 4, 2
+    er = ExperimentResults(strategies, problems)
     er.mitigated = np.random.random((num_strategies, num_problems))
     er.ideal = np.random.random((num_strategies, num_problems))
 
@@ -345,15 +348,15 @@ def test_ExtrapolationResults_errors():
 
 
 def test_ExtrapolationResults_best_strategy():
-    num_strategies, num_problems = 5, 3
-    er = ExperimentResults(num_strategies, num_problems)
+    num_strategies, num_problems = 4, 2
+    er = ExperimentResults(strategies, problems)
     er.mitigated = np.zeros((num_strategies, num_problems))
-    er.mitigated[4, 2] = 0.8
+    er.mitigated[3, 1] = 0.8
     er.ideal = np.ones((num_strategies, num_problems))
-    assert er.best_strategy_id() == 4
+    assert er.best_strategy_id() == 3
 
 
-light_combined_settings1 = Settings(
+light_combined_settings = Settings(
     benchmarks=light_zne_settings.benchmarks,
     strategies=[
         {
@@ -361,10 +364,6 @@ light_combined_settings1 = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
@@ -377,61 +376,26 @@ light_combined_settings1 = Settings(
     ],
 )
 
-light_combined_settings2 = Settings(
-    benchmarks=light_zne_settings.benchmarks,
-    strategies=[
-        {
-            "technique": "zne",
-            "scale_noise": fold_global,
-            "factory": LinearFactory([1.0, 2.0]),
-        },
-        {
-            "technique": "pec",
-            "representation_function": (
-                represent_operation_with_local_depolarizing_noise
-            ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
-            "is_qubit_dependent": False,
-            "noise_level": 0.001,
-            "num_samples": 200,
-        },
-    ],
-)
 
-
-@pytest.mark.parametrize(
-    "settings",
-    [
-        ZNESettings,
-        light_pec_settings,
-        light_combined_settings1,
-        light_combined_settings2,
-    ],
-)
-def test_logging(capfd, settings):
-    cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
+def test_logging(capfd):
+    cal = Calibrator(
+        damping_execute, frontend="cirq", settings=light_combined_settings
+    )
     cal.run(log=True)
     captured = capfd.readouterr()
-    assert "circuit" in captured.out
+    assert "ZNE results:" in captured.out
+    assert "PEC results:" in captured.out
     assert settings.get_strategy(0).technique.name in captured.out
-    if settings is ZNESettings:
-        assert ZNE_TABLE_HEADER_STR in captured.out
-    elif settings is light_pec_settings:
-        assert PEC_TABLE_HEADER_STR in captured.out
-    elif settings is [light_combined_settings1, light_combined_settings2]:
-        assert ZNE_TABLE_HEADER_STR, PEC_TABLE_HEADER_STR in captured.out
 
 
 def test_ExperimentResults_reset_data():
-    num_strategies, num_problems = 5, 3
-    er = ExperimentResults(num_strategies, num_problems)
-    strat = Strategy(0, MitigationTechnique.ZNE, {})
-    problem = BenchmarkProblem(0, "circuit", "ghz", {})
+    er = ExperimentResults(strategies, problems)
     er.add_result(
-        strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
+        strategies[1],
+        problems[1],
+        ideal_val=1.0,
+        noisy_val=0.8,
+        mitigated_val=0.9,
     )
     assert not np.isnan(er.mitigated).all()
     er.reset_data()
@@ -439,6 +403,6 @@ def test_ExperimentResults_reset_data():
 
 
 def test_ExperimentResults_ensure_full():
-    er = ExperimentResults(5, 3)
+    er = ExperimentResults(strategies, problems)
     with pytest.raises(MissingResultsError):
         er.ensure_full()

@@ -4,11 +4,24 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
-from typing import Callable, Dict, Optional, Sequence, Union, cast
+from itertools import product
+from typing import (
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+    cast,
+)
 
 import cirq
 import numpy as np
 import numpy.typing as npt
+from tabulate import tabulate
 
 from mitiq import (
     QPROGRAM,
@@ -26,20 +39,6 @@ from mitiq.calibration.settings import (
 )
 from mitiq.interface import convert_from_mitiq
 
-ZNE_TABLE_HEADER_STR = (
-    "| performance | circuit | method | extrapolation | scale factors "
-    "| scale_method         |\n"
-    "| ----------- | ------- | ------ | ------------- | ------------- "
-    "| -------------------- |"
-)
-
-PEC_TABLE_HEADER_STR = (
-    "| performance | circuit | method "
-    "| noise level | noise bias | representation function   | \n"
-    "| ----------- | ------- | ------ | ----------- | ---------- "
-    "| ------------------------- |"
-)
-
 
 class MissingResultsError(Exception):
     pass
@@ -49,9 +48,13 @@ class ExperimentResults:
     """Class to store calibration experiment data, and provide helper methods
     for computing results based on it."""
 
-    def __init__(self, num_strategies: int, num_problems: int) -> None:
-        self.num_strategies = num_strategies
-        self.num_problems = num_problems
+    def __init__(
+        self, strategies: List[Strategy], problems: List[BenchmarkProblem]
+    ) -> None:
+        self.strategies = strategies
+        self.problems = problems
+        self.num_strategies = len(strategies)
+        self.num_problems = len(problems)
         self.reset_data()
 
     def add_result(
@@ -62,20 +65,82 @@ class ExperimentResults:
         ideal_val: float,
         noisy_val: float,
         mitigated_val: float,
-        log: bool = False,
     ) -> None:
         """Add a single result from a (Strategy, BenchmarkProblem) pair and
         store the results."""
         self.mitigated[strategy.id, problem.id] = mitigated_val
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
-        if not log:
-            return
-        mitigated_better = abs(ideal_val - mitigated_val) < abs(
-            ideal_val - noisy_val
-        )
-        performance = "✅" if mitigated_better else "❌"
-        strategy.print_line(performance, problem.type)
+
+    def get_performance(self, strategy_id: int, problem_id: int) -> str:
+        mitigated = self.mitigated[strategy_id, problem_id]
+        noisy = self.noisy[strategy_id, problem_id]
+        ideal = self.ideal[strategy_id, problem_id]
+        mitigation_worked = abs(ideal - mitigated) < abs(ideal - noisy)
+        performance = "✔" if mitigation_worked else "✘"
+        return performance
+
+    def unique_techniques(self) -> Set[MitigationTechnique]:
+        return set(strategy.technique for strategy in self.strategies)
+
+    def technique_results(
+        self, technique: MitigationTechnique
+    ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str]]:
+        for strategy, problem in product(self.strategies, self.problems):
+            if strategy.technique is technique:
+                performance = self.get_performance(strategy.id, problem.id)
+                yield problem, strategy, performance
+
+    def log_technique(self, technique: MitigationTechnique) -> str:
+        table = []
+        for problem, strategy, performance in self.technique_results(
+            technique
+        ):
+            row = [performance, problem.type, technique.name]
+            summary_dict = strategy.to_pretty_dict()
+            if strategy.technique is MitigationTechnique.ZNE:
+                row.extend(
+                    [
+                        summary_dict["factory"],
+                        summary_dict["scale_factors"],
+                        summary_dict["scale_method"],
+                    ]
+                )
+            elif strategy.technique is MitigationTechnique.PEC:
+                row.extend(
+                    [
+                        summary_dict["noise_bias"],
+                        summary_dict["representation_function"],
+                    ]
+                )
+
+            table.append(row)
+
+        if technique is MitigationTechnique.ZNE:
+            headers = [
+                "performance",
+                "circuit type",
+                "method",
+                "extrapolation",
+                "scale_factors",
+                "scale method",
+            ]
+        elif technique is MitigationTechnique.PEC:
+            headers = [
+                "performance",
+                "circuit type",
+                "method",
+                "noise bias",
+                "noise representation",
+            ]
+
+        return tabulate(table, headers, tablefmt="simple_grid")
+
+    def log_results(self) -> None:
+        for mitigation_technique in self.unique_techniques():
+            print(f"{mitigation_technique.name} results:")
+            print(self.log_technique(mitigation_technique))
+            print()
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -140,7 +205,6 @@ class Calibrator:
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
     ):
-
         self.executor = (
             executor if isinstance(executor, Executor) else Executor(executor)
         )
@@ -153,8 +217,7 @@ class Calibrator:
         self.problems = settings.make_problems()
         self.strategies = settings.make_strategies()
         self.results = ExperimentResults(
-            num_strategies=len(self.strategies),
-            num_problems=len(self.problems),
+            strategies=self.strategies, problems=self.problems
         )
 
         # Build an executor of Cirq circuits
@@ -206,7 +269,6 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
-        prev_technique = None
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
@@ -223,26 +285,18 @@ class Calibrator:
                     mitigated_value = strategy.mitigation_function(
                         circuit, expval_executor
                     )
-                if (
-                    strategy.technique != prev_technique
-                    and strategy.technique is MitigationTechnique.ZNE
-                ):
-                    print(ZNE_TABLE_HEADER_STR)
-                elif (
-                    strategy.technique != prev_technique
-                    and strategy.technique is MitigationTechnique.PEC
-                ):
-                    print(PEC_TABLE_HEADER_STR)
                 self.results.add_result(
                     strategy,
                     problem,
                     ideal_val=problem.largest_probability(),
                     noisy_val=noisy_value,
                     mitigated_val=mitigated_value,
-                    log=log,
                 )
-                prev_technique = strategy.technique
+
         self.results.ensure_full()
+
+        if log:
+            self.results.log_results()
 
     def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the
