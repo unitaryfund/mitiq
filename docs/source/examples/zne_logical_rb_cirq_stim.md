@@ -99,7 +99,9 @@ for c in cirq_circuits:
 
 The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`: 
 
-$$\mathcal{P}_L\cong 0.03 (p/p_{th})^{(d + 1)/2}$$.
+$$
+p_L\cong 0.03(p/p_{th})^{(d+1)/2}.
+$$ 
 
 
 ```{code-cell} ipython3
