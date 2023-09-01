@@ -277,6 +277,18 @@ def tensor_product(
     return val
 
 
+def _safe_sqrt(
+    perfect_square: int,
+    error_str: str = "The input must be a square number.",
+) -> int:
+    """Takes the square root of the input integer and
+    raises an error if the input is not a perfect square."""
+    square_root = int(np.round(np.sqrt(perfect_square)))
+    if square_root**2 != perfect_square:
+        raise ValueError(error_str)
+    return square_root
+
+
 def matrix_to_vector(
     density_matrix: npt.NDArray[np.complex64],
 ) -> npt.NDArray[np.complex64]:
