@@ -15,6 +15,7 @@ from typing import List
 import numpy as np
 import numpy.typing as npt
 from cirq import CNOT, OP_TREE, Circuit, DensityMatrixSimulator, H, LineQubit
+from mitiq.utils import tensor_product
 
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
@@ -84,23 +85,6 @@ def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     """
     circuit = Circuit(operation_tree)
     return _circuit_to_choi(circuit)
-
-
-def tensor_product(
-    *args: npt.NDArray[np.complex64],
-) -> npt.NDArray[np.complex64]:
-    """Returns the Kronecker product of the input array-like arguments.
-    This is a generalization of the binary function
-    ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
-    arguments.
-    """
-    if args == ():
-        raise TypeError("tensor_product() requires at least one argument.")
-
-    val = args[0]
-    for term in args[1:]:
-        val = np.kron(val, term)
-    return val
 
 
 def matrix_to_vector(

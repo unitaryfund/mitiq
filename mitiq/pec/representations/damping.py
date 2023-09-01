@@ -11,7 +11,7 @@ import numpy as np
 import numpy.typing as npt
 from cirq import AmplitudeDampingChannel, Circuit, Z, kraus, reset
 
-from mitiq.pec.channels import tensor_product
+from mitiq.utils import tensor_product
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 

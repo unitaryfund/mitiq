@@ -258,3 +258,20 @@ def _cirq_pauli_to_string(pauli: cirq.PauliString[Any]) -> str:
     """
     gate_to_string_map = {cirq.I: "I", cirq.X: "X", cirq.Y: "Y", cirq.Z: "Z"}
     return "".join(gate_to_string_map[pauli[q]] for q in sorted(pauli.qubits))
+
+
+def tensor_product(
+    *args: npt.NDArray[np.complex64],
+) -> npt.NDArray[np.complex64]:
+    """Returns the Kronecker product of the input array-like arguments.
+    This is a generalization of the binary function
+    ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
+    arguments.
+    """
+    if args == ():
+        raise TypeError("tensor_product() requires at least one argument.")
+
+    val = args[0]
+    for term in args[1:]:
+        val = np.kron(val, term)
+    return val
