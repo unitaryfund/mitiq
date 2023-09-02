@@ -38,9 +38,6 @@ from mitiq.utils import (
     _simplify_gate_exponent,
     matrix_to_vector,
     tensor_product,
-)
-
-from mitiq.pec.channels import (
     vector_to_matrix,
 )
 
@@ -63,6 +60,13 @@ def test_matrix_to_vector():
         mat = np.random.rand(d, d)
         assert matrix_to_vector(mat).shape == (d**2,)
         assert (vector_to_matrix(matrix_to_vector(mat)) == mat).all
+
+
+def test_vector_to_matrix():
+    for d in [1, 2, 3, 4]:
+        vec = np.random.rand(d**2)
+        assert vector_to_matrix(vec).shape == (d, d)
+        assert (matrix_to_vector(vector_to_matrix(vec)) == vec).all
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])

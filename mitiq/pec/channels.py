@@ -98,21 +98,6 @@ def _safe_sqrt(
     return square_root
 
 
-def vector_to_matrix(
-    vector: npt.NDArray[np.complex64],
-) -> npt.NDArray[np.complex64]:
-    r"""Reshapes a :math:`d^2`-dimensional state vector into a
-    :math:`d \times d` density matrix, according to the rule:
-    :math:`|i,j \rangle \rightarrow |i \rangle\langle j|`.
-    """
-    error_str = (
-        "The expected dimension of the input vector must be a"
-        f" square number but is {vector.size}."
-    )
-    dim = _safe_sqrt(vector.size, error_str)
-    return vector.reshape(dim, dim)
-
-
 def kraus_to_super(
     kraus_ops: List[npt.NDArray[np.complex64]],
 ) -> npt.NDArray[np.complex64]:

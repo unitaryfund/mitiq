@@ -16,7 +16,7 @@ from cirq import (
 )
 from pytest import raises
 
-from mitiq import matrix_to_vector
+from mitiq import matrix_to_vector, vector_to_matrix
 from mitiq.pec.channels import (
     _circuit_to_choi,
     _max_ent_state_circuit,
@@ -25,7 +25,6 @@ from mitiq.pec.channels import (
     kraus_to_choi,
     kraus_to_super,
     super_to_choi,
-    vector_to_matrix,
 )
 from mitiq.pec.representations.damping import amplitude_damping_kraus
 
@@ -91,13 +90,6 @@ def test_circuit_to_choi():
         _operation_to_choi(noisy_sequence),
         _circuit_to_choi(Circuit(noisy_sequence)),
     )
-
-
-def test_vector_to_matrix():
-    for d in [1, 2, 3, 4]:
-        vec = np.random.rand(d**2)
-        assert vector_to_matrix(vec).shape == (d, d)
-        assert (matrix_to_vector(vector_to_matrix(vec)) == vec).all
 
 
 def test_non_squared_dimension():

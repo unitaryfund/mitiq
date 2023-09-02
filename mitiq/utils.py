@@ -25,6 +25,8 @@ from cirq import (
 )
 from cirq.ops.measurement_gate import MeasurementGate
 
+from mitiq.pec.channels import _safe_sqrt
+
 
 def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
     """Returns the input gate with a simplified exponent if possible,
@@ -285,3 +287,18 @@ def matrix_to_vector(
     :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
     """
     return density_matrix.flatten()
+
+
+def vector_to_matrix(
+    vector: npt.NDArray[np.complex64],
+) -> npt.NDArray[np.complex64]:
+    r"""Reshapes a :math:`d^2`-dimensional state vector into a
+    :math:`d \times d` density matrix, according to the rule:
+    :math:`|i,j \rangle \rightarrow |i \rangle\langle j|`.
+    """
+    error_str = (
+        "The expected dimension of the input vector must be a"
+        f" square number but is {vector.size}."
+    )
+    dim = _safe_sqrt(vector.size, error_str)
+    return vector.reshape(dim, dim)
