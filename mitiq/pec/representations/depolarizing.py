@@ -21,12 +21,11 @@ from cirq import (
     kraus,
 )
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, tensor_product
 from mitiq.interface.conversions import (
     append_cirq_circuit_to_qprogram,
     convert_to_mitiq,
 )
-from mitiq import tensor_product
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 

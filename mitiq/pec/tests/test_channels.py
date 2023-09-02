@@ -16,6 +16,7 @@ from cirq import (
 )
 from pytest import raises
 
+from mitiq import tensor_product
 from mitiq.pec.channels import (
     _circuit_to_choi,
     _max_ent_state_circuit,
@@ -27,7 +28,6 @@ from mitiq.pec.channels import (
     super_to_choi,
     vector_to_matrix,
 )
-from mitq import tensor_product
 from mitiq.pec.representations.damping import amplitude_damping_kraus
 
 
