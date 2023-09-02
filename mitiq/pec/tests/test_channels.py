@@ -27,7 +27,7 @@ from mitiq.pec.channels import (
     super_to_choi,
     vector_to_matrix,
 )
-from mitq.utils import tensor_product
+from mitq import tensor_product
 from mitiq.pec.representations.damping import amplitude_damping_kraus
 
 

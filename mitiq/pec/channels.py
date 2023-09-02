@@ -15,7 +15,6 @@ from typing import List
 import numpy as np
 import numpy.typing as npt
 from cirq import CNOT, OP_TREE, Circuit, DensityMatrixSimulator, H, LineQubit
-from mitiq.utils import tensor_product
 
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:

@@ -26,7 +26,7 @@ from mitiq.interface.conversions import (
     append_cirq_circuit_to_qprogram,
     convert_to_mitiq,
 )
-from mitiq.utils import tensor_product
+from mitiq import tensor_product
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 
