@@ -36,7 +36,33 @@ from mitiq.utils import (
     _pop_measurements,
     _simplify_circuit_exponents,
     _simplify_gate_exponent,
+    matrix_to_vector,
+    tensor_product,
 )
+
+from mitiq.pec.channels import (
+    vector_to_matrix,
+)
+
+
+def test_tensor_product():
+    terms = [np.random.rand(dim, dim) for dim in range(1, 4)]
+    expected = np.kron(np.kron(terms[0], terms[1]), terms[2])
+    assert np.allclose(tensor_product(*terms), expected)
+    # Check limit cases
+    one_term = np.random.rand(5, 5)
+    assert np.allclose(tensor_product(one_term), one_term)
+    assert np.allclose(tensor_product(2.0, one_term), 2.0 * one_term)
+    assert np.allclose(tensor_product(3.0, 4.0), 12.0)
+    with pytest.raises(TypeError, match="requires at least one argument"):
+        assert np.allclose(tensor_product(), one_term)
+
+
+def test_matrix_to_vector():
+    for d in [1, 2, 3, 4]:
+        mat = np.random.rand(d, d)
+        assert matrix_to_vector(mat).shape == (d**2,)
+        assert (vector_to_matrix(matrix_to_vector(mat)) == mat).all
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])

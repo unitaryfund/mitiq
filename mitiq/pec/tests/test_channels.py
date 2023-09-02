@@ -16,7 +16,7 @@ from cirq import (
 )
 from pytest import raises
 
-from mitiq import tensor_product
+from mitiq import matrix_to_vector
 from mitiq.pec.channels import (
     _circuit_to_choi,
     _max_ent_state_circuit,
@@ -24,7 +24,6 @@ from mitiq.pec.channels import (
     choi_to_super,
     kraus_to_choi,
     kraus_to_super,
-    matrix_to_vector,
     super_to_choi,
     vector_to_matrix,
 )
@@ -94,13 +93,6 @@ def test_circuit_to_choi():
     )
 
 
-def test_matrix_to_vector():
-    for d in [1, 2, 3, 4]:
-        mat = np.random.rand(d, d)
-        assert matrix_to_vector(mat).shape == (d**2,)
-        assert (vector_to_matrix(matrix_to_vector(mat)) == mat).all
-
-
 def test_vector_to_matrix():
     for d in [1, 2, 3, 4]:
         vec = np.random.rand(d**2)
@@ -165,16 +157,3 @@ def test_kraus_to_choi():
         super_op = kraus_to_super(rand_kraus_ops)
         expected_choi = super_to_choi(super_op)
         assert np.allclose(kraus_to_choi(rand_kraus_ops), expected_choi)
-
-
-def test_tensor_product():
-    terms = [np.random.rand(dim, dim) for dim in range(1, 4)]
-    expected = np.kron(np.kron(terms[0], terms[1]), terms[2])
-    assert np.allclose(tensor_product(*terms), expected)
-    # Check limit cases
-    one_term = np.random.rand(5, 5)
-    assert np.allclose(tensor_product(one_term), one_term)
-    assert np.allclose(tensor_product(2.0, one_term), 2.0 * one_term)
-    assert np.allclose(tensor_product(3.0, 4.0), 12.0)
-    with raises(TypeError, match="requires at least one argument"):
-        assert np.allclose(tensor_product(), one_term)

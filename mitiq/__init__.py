@@ -13,7 +13,7 @@ from mitiq.typing import (
     QuantumResult,
 )
 
-from mitiq.utils import tensor_product
+from mitiq.utils import tensor_product, matrix_to_vector
 
 # Executors and observables.
 from mitiq.executor import Executor

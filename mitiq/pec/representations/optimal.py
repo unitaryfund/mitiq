@@ -12,9 +12,9 @@ import numpy.typing as npt
 from cirq import kraus
 from scipy.optimize import LinearConstraint, minimize
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, matrix_to_vector
 from mitiq.interface import convert_to_mitiq
-from mitiq.pec.channels import kraus_to_super, matrix_to_vector
+from mitiq.pec.channels import kraus_to_super
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 

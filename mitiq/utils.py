@@ -275,3 +275,13 @@ def tensor_product(
     for term in args[1:]:
         val = np.kron(val, term)
     return val
+
+
+def matrix_to_vector(
+    density_matrix: npt.NDArray[np.complex64],
+) -> npt.NDArray[np.complex64]:
+    r"""Reshapes a :math:`d \times d` density matrix into a
+    :math:`d^2`-dimensional state vector, according to the rule:
+    :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
+    """
+    return density_matrix.flatten()

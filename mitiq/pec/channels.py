@@ -86,16 +86,6 @@ def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     return _circuit_to_choi(circuit)
 
 
-def matrix_to_vector(
-    density_matrix: npt.NDArray[np.complex64],
-) -> npt.NDArray[np.complex64]:
-    r"""Reshapes a :math:`d \times d` density matrix into a
-    :math:`d^2`-dimensional state vector, according to the rule:
-    :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
-    """
-    return density_matrix.flatten()
-
-
 def _safe_sqrt(
     perfect_square: int,
     error_str: str = "The input must be a square number.",
