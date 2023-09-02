@@ -210,6 +210,6 @@ For more information check out the [`bqskit`](https://bqskit.readthedocs.io/en/l
 ### References
 
 - BQSKit documentation: <https://bqskit.readthedocs.io/>
-- BQSKit whitepaper: <https://dl.acm.org/doi/abs/10.1145/3503222.3507739/>
+- BQSKit whitepaper: https://doi.org/10.1145/3503222.3507739
 - Mitiq documentation: <https://mitiq.readthedocs.io/>
 - Mitiq whitepaper: <https://quantum-journal.org/papers/q-2022-08-11-774/>
