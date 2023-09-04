@@ -25,8 +25,6 @@ from cirq import (
 )
 from cirq.ops.measurement_gate import MeasurementGate
 
-from mitiq.pec.channels import _safe_sqrt
-
 
 def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
     """Returns the input gate with a simplified exponent if possible,
@@ -260,6 +258,18 @@ def _cirq_pauli_to_string(pauli: cirq.PauliString[Any]) -> str:
     """
     gate_to_string_map = {cirq.I: "I", cirq.X: "X", cirq.Y: "Y", cirq.Z: "Z"}
     return "".join(gate_to_string_map[pauli[q]] for q in sorted(pauli.qubits))
+
+
+def _safe_sqrt(
+    perfect_square: int,
+    error_str: str = "The input must be a square number.",
+) -> int:
+    """Takes the square root of the input integer and
+    raises an error if the input is not a perfect square."""
+    square_root = int(np.round(np.sqrt(perfect_square)))
+    if square_root**2 != perfect_square:
+        raise ValueError(error_str)
+    return square_root
 
 
 def tensor_product(

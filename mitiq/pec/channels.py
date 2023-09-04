@@ -16,6 +16,8 @@ import numpy as np
 import numpy.typing as npt
 from cirq import CNOT, OP_TREE, Circuit, DensityMatrixSimulator, H, LineQubit
 
+from mitiq import _safe_sqrt
+
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
     r"""Generates a circuit which prepares the maximally entangled state
@@ -84,18 +86,6 @@ def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     """
     circuit = Circuit(operation_tree)
     return _circuit_to_choi(circuit)
-
-
-def _safe_sqrt(
-    perfect_square: int,
-    error_str: str = "The input must be a square number.",
-) -> int:
-    """Takes the square root of the input integer and
-    raises an error if the input is not a perfect square."""
-    square_root = int(np.round(np.sqrt(perfect_square)))
-    if square_root**2 != perfect_square:
-        raise ValueError(error_str)
-    return square_root
 
 
 def kraus_to_super(
