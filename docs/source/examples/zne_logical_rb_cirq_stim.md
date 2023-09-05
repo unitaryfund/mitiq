@@ -294,6 +294,10 @@ The effect is more pronounced at lower code distances, which correspond to a hig
 ```{note}
 Not all logical circuits can be folded, even at the circuit level.
 One alternative noise scaling method for logical qubits is scaling the code distance, which is referred to as distance-scaled ZNE or DS-ZNE {cite}`Wahl_2023_arXiv_ds_zne`.
+```
+
+## Additional information on DS-ZNE
+
 Modeling the noise as in Eq. (1), assuming the computation is operating in the fault tolerant regime, we see that logical error rate decreases as code distance increases.
 We can therefore scale the noise level (here the logical error rate) by scaling the code distance and extrapolate back to the zero noise limit, obtaining an error-mitigated expectation value with a reduced effective logical error rate {cite}`Wahl_2023_arXiv_ds_zne`.
-```
+The DS-ZNE workflow implementation is contained in notebooks in the [ds-zne folder](https://github.com/unitaryfund/research/tree/main/ds_zne) of the `unitaryfund/research` repository.
