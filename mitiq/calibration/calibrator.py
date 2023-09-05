@@ -75,6 +75,8 @@ class ExperimentResults:
     def _get_performance_symbol(
         self, strategy_id: int, problem_id: int
     ) -> str:
+        """Returns ✔ the strategy performed better than no mitigation on this
+        problem,  and ✘ otherwise."""
         mitigated = self.mitigated[strategy_id, problem_id]
         noisy = self.noisy[strategy_id, problem_id]
         ideal = self.ideal[strategy_id, problem_id]
@@ -83,11 +85,15 @@ class ExperimentResults:
         return performance
 
     def unique_techniques(self) -> Set[MitigationTechnique]:
+        """Returns the unique mitigation techniques used across this
+        collection of experiment results."""
         return set(strategy.technique for strategy in self.strategies)
 
     def _technique_results(
         self, technique: MitigationTechnique
     ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str]]:
+        """Yields the results from this collection of experiment results,
+        limited to a specific technique."""
         for strategy, problem in product(self.strategies, self.problems):
             if strategy.technique is technique:
                 performance = self._get_performance_symbol(
@@ -96,6 +102,8 @@ class ExperimentResults:
                 yield problem, strategy, performance
 
     def log_technique(self, technique: MitigationTechnique) -> str:
+        """Creates a table displaying all results of a given mitigation
+        technique."""
         table = []
         for problem, strategy, performance in self._technique_results(
             technique
@@ -141,6 +149,9 @@ class ExperimentResults:
         return tabulate(table, headers, tablefmt="simple_grid")
 
     def log_results(self) -> None:
+        """Log results from entire calibration run. Logging is performed on
+        each mitigation technique individually to avoid confusion when many
+        techniques are used."""
         for mitigation_technique in self.unique_techniques():
             print(f"{mitigation_technique.name} results:")
             print(self.log_technique(mitigation_technique))
