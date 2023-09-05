@@ -72,7 +72,7 @@ class ExperimentResults:
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
-    def get_performance(self, strategy_id: int, problem_id: int) -> str:
+    def get_performance_symbol(self, strategy_id: int, problem_id: int) -> str:
         mitigated = self.mitigated[strategy_id, problem_id]
         noisy = self.noisy[strategy_id, problem_id]
         ideal = self.ideal[strategy_id, problem_id]
@@ -88,7 +88,9 @@ class ExperimentResults:
     ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str]]:
         for strategy, problem in product(self.strategies, self.problems):
             if strategy.technique is technique:
-                performance = self.get_performance(strategy.id, problem.id)
+                performance = self.get_performance_symbol(
+                    strategy.id, problem.id
+                )
                 yield problem, strategy, performance
 
     def log_technique(self, technique: MitigationTechnique) -> str:
