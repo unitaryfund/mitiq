@@ -29,11 +29,13 @@ This tutorial also introduces the use of Mitiq's ZNE functions with Cirq as the 
 Since Stim is not a Mitiq-supported frontend, and the [stimcirq](https://pypi.org/project/stimcirq/) library has a conversion utility for Cirq and Stim circuits, we will use Cirq as the frontend for this example.
 
 ```{code-cell} ipython3
-import cirq
 import matplotlib as mpl
 import numpy as np
+
 import stim
 import stimcirq
+import cirq
+
 import mitiq
 ```
 
@@ -100,7 +102,7 @@ for c in cirq_circuits:
 The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`: 
 
 $$
-p_L\cong 0.03(p/p_{th})^{(d+1)/2}
+p_L\cong 0.03(\frac{p}{p_\mathrm{th}})^{(d+1)/2}
 $$ 
 
 
@@ -136,7 +138,7 @@ def add_noise_to_stim_circuit(circuit, p_err, p_th, d):
 
 +++
 
-The Stim executor accepts a Stim circuit, to which it applies the noise model, and then compiles and executes.
+The Stim executor defined below accepts a Stim circuit, to which it applies the noise model, and then compiles and executes.
 For more information on Mitiq-compatible executors, see the [Executors](../guide/executors.md) section of the Mitiq user guide.
 
 ```{code-cell} ipython3
@@ -177,7 +179,7 @@ stim_circuits = [
     stimcirq.cirq_circuit_to_stim_circuit(c) for c in filled_circuits
 ]
 
-for di in range(len(code_distances)):
+for i, code_distance in enumerate(code_distances):
     for t in range(trials):
         noisy_results[t, di] = stim_executor(
             stim_circuits[t],
@@ -188,7 +190,7 @@ for di in range(len(code_distances)):
         )
 ```
 
-Next we apply ZNE, with the noise scaling method of global unitary folding and scale factors {1, 3, 5, 7}, to each trial circuit and at each code distance simulated in the unmitigated case.
+Next we apply ZNE with the noise scaling method of global unitary folding and scale factors `[1, 3, 5, 7]`, to each trial circuit and at each code distance simulated in the unmitigated case.
 Unlike other Mitiq examples, here the lower-level scaling and extrapolation functions are called explicitly.
 The circuits used here are deeper than those of other Mitiq examples and therefore take longer to fold and convert (sampling time is less of a concern with Stim), so we want to fold and convert the circuit as few times as possible.
 
