@@ -72,7 +72,9 @@ class ExperimentResults:
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
-    def get_performance_symbol(self, strategy_id: int, problem_id: int) -> str:
+    def _get_performance_symbol(
+        self, strategy_id: int, problem_id: int
+    ) -> str:
         mitigated = self.mitigated[strategy_id, problem_id]
         noisy = self.noisy[strategy_id, problem_id]
         ideal = self.ideal[strategy_id, problem_id]
@@ -83,19 +85,19 @@ class ExperimentResults:
     def unique_techniques(self) -> Set[MitigationTechnique]:
         return set(strategy.technique for strategy in self.strategies)
 
-    def technique_results(
+    def _technique_results(
         self, technique: MitigationTechnique
     ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str]]:
         for strategy, problem in product(self.strategies, self.problems):
             if strategy.technique is technique:
-                performance = self.get_performance_symbol(
+                performance = self._get_performance_symbol(
                     strategy.id, problem.id
                 )
                 yield problem, strategy, performance
 
     def log_technique(self, technique: MitigationTechnique) -> str:
         table = []
-        for problem, strategy, performance in self.technique_results(
+        for problem, strategy, performance in self._technique_results(
             technique
         ):
             row = [performance, problem.type, technique.name]
