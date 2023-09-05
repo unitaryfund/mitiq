@@ -158,10 +158,10 @@ linkcheck_ignore = [
     r"https://doi.org/10.1088/0034-4885/74/10/104401",
     r"https://doi.org/10.1088/1367-2630/12/7/075008",
     r"https://doi.org/10.7566/JPSJ.90.032001",
-    r"https://doi.org/10.7566/jpsj.90.032001"
-    r"https://dl.acm.org/doi/10.1145/3466752.3480059"
+    r"https://doi.org/10.7566/jpsj.90.032001",
+    r"https://dl.acm.org/doi/10.1145/3466752.3480059",
     r"https://doi.org/10.1145/3466752.3480059",
-    r"https://doi.org/10.7566/jpsj.90.032001"
+    r"https://doi.org/10.7566/jpsj.90.032001",
 ]
 
 
