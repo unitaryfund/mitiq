@@ -24,6 +24,8 @@ conda activate myenv
 ```
 pip install -e .[development]
 ```
+**Note**: If the command above fails with the error: "zsh: no matches found: .[development]", this is a behavior of z shell and can be corrected by including quotes around .[development] like:
+pip install -e ".[development]"
 6. You should now have a development environment set up to work on Mitiq! 🎉 To go forward with making the desired changes, please consult the ["Making changes" section](https://www.asmeurer.com/git-workflow/#making-changes) of the `git` workflow article. If you've encountered any problems thus far, please let us know by opening an issue! More information about workflow can be found below in the [lifecycle](#lifecycle) section.
 
 What follows are recommendations/requirements to keep in mind while contributing.
