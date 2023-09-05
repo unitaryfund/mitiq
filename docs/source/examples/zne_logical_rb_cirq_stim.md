@@ -50,8 +50,8 @@ device_size = 1500
 
 Randomized benchmarking is typically performed at the physical level, but it can be applied at the logical level as shown in Ref {cite}`Combes_2017_arXiv_logical_rb`.
 The modularity of logical RB circuits allows for parallelization of circuit executions, as permitted by the size of the device and number of physical qubits required for the logical circuit.
-We use a built-in Mitiq function, {func}`.benchmarks.generate_rb_circuits()`, to generate the RB circuits,
-where the `n_cliffords` argument refers to the number of Clifford groups in the circuit, and therefore scales the depth of the circuit. 
+To generate the RB circuits, we use a built-in Mitiq function, 
+{func}`.benchmarks.randomized_benchmarking.generate_rb_circuits()`, where the `n_cliffords` argument refers to the number of Clifford groups in the circuit, and therefore scales the depth of the circuit. 
 In this example the Clifford depth is 100, which would be around the limit of classical simulability if the operations in the circuit were instead _non-Clifford_.
 
 ```{code-cell} ipython3
@@ -64,7 +64,7 @@ cirq_circuits = mitiq.benchmarks.generate_rb_circuits(
 ```
 
 ```{code-cell} ipython3
-:tags: [hide-cell]
+:tags: [remove-cell]
 
 # hidden cell for faster docs build
 trials = 5
@@ -99,7 +99,9 @@ for c in cirq_circuits:
 
 The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`: 
 
-$$\mathcal{P}_L\cong 0.03 (p/p_{th})^{(d + 1)/2}$$.
+$$
+p_L\cong 0.03(p/p_{th})^{(d+1)/2}
+$$ 
 
 
 ```{code-cell} ipython3
@@ -287,9 +289,9 @@ Plot of the unmitigated and ZNE-mitigated expectation values obtained from execu
 ```
 
 We can see from the above plot that the ZNE-mitigated expectation values are closer to the ideal value of 1.0 at every code distance simulated. 
-The effect is more pronounced at lower code distances, which correspond to a higher logical error rate, whereas by $d = 21$ both the mitigated and unmitigated expectation values approach 1.0. 
+The effect is more pronounced at lower code distances, which correspond to a higher logical error rate, whereas by $d = 21$ both the mitigated and unmitigated expectation values approach $1.0$. 
 
-```{note}  
+```{note}
 Not all logical circuits can be folded, even at the circuit level.
 One alternative noise scaling method for logical qubits is scaling the code distance, which is referred to as distance-scaled ZNE or DS-ZNE {cite}`Wahl_2023_arXiv_ds_zne`.
 Modeling the noise as in Eq. (1), assuming the computation is operating in the fault tolerant regime, we see that logical error rate decreases as code distance increases.
