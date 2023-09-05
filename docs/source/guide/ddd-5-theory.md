@@ -32,7 +32,7 @@ In the context of quantum computing, DD can be considered as an error mitigation
 With respect to other error mitigation techniques, DD has very peculiar features:
 
 - It maps a noisy quantum computation to a _single_ error-mitigated computation (no need to take linear combinations
-of noisy results as in [ZNE](zne-5-theory.md [PEC](pec-5-theory.md) and [CDR](cdr-5-theory.md)).
+of noisy results as in [ZNE](zne-5-theory.md), [PEC](pec-5-theory.md), and [CDR](cdr-5-theory.md)).
 
 - As a consequence of the previous point, there is not a fundamental error mitigation overhead or
 increase in statistical uncertainty in the final result.
