@@ -292,7 +292,7 @@ name: zne-stim-plot
 Plot of the unmitigated and ZNE-mitigated expectation values obtained from executing the logical RB circuits.
 ```
 
-We can see from the above plot that the ZNE-mitigated expectation values are closer to the ideal value of 1.0 at every code distance simulated. 
+We can see from the above plot that the ZNE-mitigated expectation values are closer to the ideal value of $1.0$ at every code distance simulated. 
 The effect is more pronounced at lower code distances, which correspond to a higher logical error rate, whereas by $d = 21$ both the mitigated and unmitigated expectation values approach $1.0$. 
 
 ```{note}
