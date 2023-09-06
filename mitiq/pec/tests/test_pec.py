@@ -466,7 +466,7 @@ def decorated_serial_executor(circuit: QPROGRAM) -> float:
         [1.0],
     )
 
-    @pec_decorator(representations=[rep])
+    @pec_decorator(representations=[rep], precision=0.08)
     def decorated_executor(qp):
         return serial_executor(qp)
 

@@ -23,7 +23,6 @@ from mitiq.calibration.calibrator import (
 from mitiq.calibration.settings import (
     BenchmarkProblem,
     MitigationTechnique,
-    PECSettings,
     Strategy,
     ZNESettings,
 )
@@ -167,10 +166,10 @@ def test_ZNE_workflow():
 
 def test_PEC_workflow():
     cal = Calibrator(
-        depolarizing_execute, frontend="cirq", settings=PECSettings
+        depolarizing_execute, frontend="cirq", settings=light_pec_settings
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 4 * 2 * 200, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 200, "ideal_executions": 0}
 
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
