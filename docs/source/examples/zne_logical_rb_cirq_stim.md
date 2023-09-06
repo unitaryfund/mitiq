@@ -101,9 +101,10 @@ for c in cirq_circuits:
 
 The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`: 
 
-$$
+```{math}
+:label: logical-err-equation
 p_L\cong 0.03(\frac{p}{p_\mathrm{th}})^{(d+1)/2}
-$$ 
+```
 
 
 ```{code-cell} ipython3
@@ -160,6 +161,7 @@ code_distances = range(21, 11, -2)
 ```
 
 Given a fixed (serial) sampling budget, here `base_shots = 10,000`, at code distances below the maximum available on the device, we can parallelize executions of each logical RB circuit and thereby take additional samples simultaneously.
+Note that we are not cutting the RB circuits but instead virtually splitting up the device to run the same logical RB circuit instance multiple times in parallel, with fewer qubits used for correction.
 The function `scale_shots` calculates how many total samples we can take, assuming lower code distance executions can be parallelized.
 Fixing a sampling budget across unmitigated and mitigated workflows provides a fair comparison of the results in terms of the resources required.
 
@@ -181,12 +183,12 @@ stim_circuits = [
 
 for i, code_distance in enumerate(code_distances):
     for t in range(trials):
-        noisy_results[t, di] = stim_executor(
+        noisy_results[t, i] = stim_executor(
             stim_circuits[t],
             p_err,
             p_th,
-            code_distances[di],
-            scale_shots(device_size, code_distances[di], 4 * base_shots, n_qubits),
+            code_distances[i],
+            scale_shots(device_size, code_distances[i], 4 * base_shots, n_qubits),
         )
 ```
 
@@ -215,7 +217,7 @@ for c in filled_circuits:
 ```{code-cell} ipython3
 mitigated_results = np.zeros((trials, len(code_distances)))
 
-for di in range(len(code_distances)):
+for i, _ in enumerate(code_distances):
     for t in range(trials):
         fac.reset()
         for s, f in zip(scale_factors, scaled_stim_circuits[t]):
@@ -225,13 +227,13 @@ for di in range(len(code_distances)):
                     f,
                     p_err,
                     p_th,
-                    code_distances[di],
+                    code_distances[i],
                     scale_shots(
-                        device_size, code_distances[di], base_shots, n_qubits
+                        device_size, code_distances[i], base_shots, n_qubits
                     ),
                 ),
             )
-        mitigated_results[t, di] = fac.reduce()
+        mitigated_results[t, i] = fac.reduce()
 ```
 
 ## Plot results
@@ -300,6 +302,6 @@ One alternative noise scaling method for logical qubits is scaling the code dist
 
 ## Additional information on DS-ZNE
 
-Modeling the noise as in Eq. (1), assuming the computation is operating in the fault tolerant regime, we see that logical error rate decreases as code distance increases.
+Modeling the noise as in [](logical-err-equation), assuming the computation is operating in the fault tolerant regime, we see that logical error rate decreases as code distance increases.
 We can therefore scale the noise level (here the logical error rate) by scaling the code distance and extrapolate back to the zero noise limit, obtaining an error-mitigated expectation value with a reduced effective logical error rate {cite}`Wahl_2023_arXiv_ds_zne`.
-The DS-ZNE workflow implementation is contained in notebooks in the [ds-zne folder](https://github.com/unitaryfund/research/tree/main/ds_zne) of the `unitaryfund/research` repository.
+The DS-ZNE workflow implementation is contained in notebooks in the [`ds-zne`](https://github.com/unitaryfund/research/tree/main/ds_zne) folder of the [`unitaryfund/research`](https://github.com/unitaryfund/research) repository.

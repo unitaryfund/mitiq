@@ -159,9 +159,9 @@ linkcheck_ignore = [
     r"https://doi.org/10.1088/1367-2630/12/7/075008",
     r"https://doi.org/10.7566/JPSJ.90.032001",
     r"https://doi.org/10.7566/jpsj.90.032001",
+    r"https://dl.acm.org/doi/10.1145/3466752.3480059",
     r"https://doi.org/10.1145/3466752.3480059",
-    r"https://dl.acm.org/doi/abs/10.1145/3503222.3507739",
-    r"https://www.sciencedirect.com/science/article/abs/pii/S037704271930344"
+    r"https://doi.org/10.7566/jpsj.90.032001",
 ]
 
 
