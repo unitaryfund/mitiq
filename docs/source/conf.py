@@ -358,6 +358,7 @@ nbsphinx_thumbnails = {
     "examples/calibration-tutorial": "_static/calibration.png",
     "examples/combine_rem_zne": "_static/combine_rem_zne.png",
     "examples/quantum_simulation_scars_ibmq": "_static/qmbs_ibmq.png",
+    "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
