@@ -21,12 +21,13 @@ from cirq import (
     kraus,
 )
 
-from mitiq import QPROGRAM, tensor_product
+from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
     append_cirq_circuit_to_qprogram,
     convert_to_mitiq,
 )
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
+from mitiq.utils import tensor_product
 
 
 def represent_operation_with_global_depolarizing_noise(

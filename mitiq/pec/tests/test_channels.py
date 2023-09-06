@@ -16,7 +16,6 @@ from cirq import (
 )
 from pytest import raises
 
-from mitiq import matrix_to_vector, vector_to_matrix
 from mitiq.pec.channels import (
     _circuit_to_choi,
     _max_ent_state_circuit,
@@ -27,6 +26,7 @@ from mitiq.pec.channels import (
     super_to_choi,
 )
 from mitiq.pec.representations.damping import amplitude_damping_kraus
+from mitiq.utils import matrix_to_vector, vector_to_matrix
 
 
 def test_max_ent_state_circuit():

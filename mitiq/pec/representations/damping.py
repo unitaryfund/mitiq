@@ -11,8 +11,8 @@ import numpy as np
 import numpy.typing as npt
 from cirq import AmplitudeDampingChannel, Circuit, Z, kraus, reset
 
-from mitiq import tensor_product
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
+from mitiq.utils import tensor_product
 
 
 # TODO: this may be extended to an arbitrary QPROGRAM (GitHub issue gh-702).

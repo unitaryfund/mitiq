@@ -16,7 +16,7 @@ import numpy as np
 import numpy.typing as npt
 from cirq import CNOT, OP_TREE, Circuit, DensityMatrixSimulator, H, LineQubit
 
-from mitiq import _safe_sqrt
+from mitiq.utils import _safe_sqrt
 
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
