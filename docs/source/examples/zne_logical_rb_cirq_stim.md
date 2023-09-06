@@ -157,7 +157,7 @@ We will simulate the RB circuits at six different code distances and correspondi
 The distance of the error correcting code parameterizes the size of the physical data block per logical qubit and is directly related to the number of errors the code can correct.
 
 ```{code-cell} ipython3
-code_distances = range(21, 11, -2)
+code_distances = range(21, 9, -2)
 ```
 
 Given a fixed (serial) sampling budget, here `base_shots = 10,000`, at code distances below the maximum available on the device, we can parallelize executions of each logical RB circuit and thereby take additional samples simultaneously.
@@ -182,13 +182,13 @@ stim_circuits = [
 ]
 
 for i, code_distance in enumerate(code_distances):
-    for t in range(trials):
-        noisy_results[t, i] = stim_executor(
-            stim_circuits[t],
+    for s, stim_circuit in enumerate(stim_circuits):
+        noisy_results[s, i] = stim_executor(
+            stim_circuit,
             p_err,
             p_th,
-            code_distances[i],
-            scale_shots(device_size, code_distances[i], 4 * base_shots, n_qubits),
+            code_distance,
+            scale_shots(device_size, code_distance, 4 * base_shots, n_qubits),
         )
 ```
 
@@ -217,23 +217,23 @@ for c in filled_circuits:
 ```{code-cell} ipython3
 mitigated_results = np.zeros((trials, len(code_distances)))
 
-for i, _ in enumerate(code_distances):
-    for t in range(trials):
+for i, code_distance in enumerate(code_distances):
+    for s, scaled_stim_circuit in enumerate(scaled_stim_circuits):
         fac.reset()
-        for s, f in zip(scale_factors, scaled_stim_circuits[t]):
+        for f, c in zip(scale_factors, scaled_stim_circuit):
             fac.push(
-                {"scale_factor": s},
+                {"scale_factor": f},
                 stim_executor(
-                    f,
+                    c,
                     p_err,
                     p_th,
-                    code_distances[i],
+                    code_distance,
                     scale_shots(
-                        device_size, code_distances[i], base_shots, n_qubits
+                        device_size, code_distance, base_shots, n_qubits
                     ),
                 ),
             )
-        mitigated_results[t, i] = fac.reduce()
+        mitigated_results[s, i] = fac.reduce()
 ```
 
 ## Plot results
@@ -275,7 +275,7 @@ mpl.pyplot.title(
     r"""Expectation value of $A=|00\rangle\langle00|$ from RB circuits acting on logical qubits""",
     fontsize=12,
 )
-mpl.pyplot.xticks(ticks = [11, 13, 15, 17, 19, 21])
+mpl.pyplot.xticks(ticks = code_distances)
 
 mpl.pyplot.xlabel(r"Maximum code distance, $d_{i,0}$")
 mpl.pyplot.ylabel(r"Expectation value, $E$")
