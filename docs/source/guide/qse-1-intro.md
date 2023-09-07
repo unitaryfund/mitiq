@@ -212,12 +212,11 @@ Now we can run QSE. We first compute the noiseless result then the noisy result 
 ```{code-cell} ipython3
 def demo_qse():
   circuit = prepare_logical_0_state_for_5_1_3_code()
-  executor = execute_with_depolarized_noise
   observable = get_observable_in_code_space(PauliString("ZZZZZ"))
   check_operators, code_hamiltonian = get_5_1_3_code_check_operators_and_code_hamiltonian()
   return qse.execute_with_qse(
         circuit,
-        executor,
+        execute_with_depolarized_noise,
         check_operators,
         code_hamiltonian,
         observable,
@@ -231,10 +230,9 @@ print(demo_qse())
 
 ### The noisy result
 ```{code-cell} ipython3
-executor = execute_with_depolarized_noise
 circuit = prepare_logical_0_state_for_5_1_3_code()
 observable = get_observable_in_code_space(PauliString("ZZZZZ"))
-print(observable.expectation(circuit, executor))
+print(observable.expectation(circuit, execute_with_depolarized_noise))
 ```
 
 ### The noiseless result
@@ -244,6 +242,5 @@ def execute_no_noise(circuit: QPROGRAM) -> np.ndarray:
         convert_to_mitiq(circuit)[0], noise_level=(0,)
     )
 
-executor = execute_no_noise
 print(observable.expectation(circuit, execute_no_noise))
 ```
