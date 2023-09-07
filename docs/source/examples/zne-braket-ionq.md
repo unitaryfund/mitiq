@@ -36,9 +36,7 @@ We import the zero-noise extrapolation module of Mitiq.
 
 ```{code-cell} ipython3
 from mitiq import zne
-```
 
-```{code-cell} ipython3
 USE_REAL_HARDWARE = False
 ```
 
