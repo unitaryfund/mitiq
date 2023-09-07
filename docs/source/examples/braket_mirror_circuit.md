@@ -255,7 +255,7 @@ plt.rcParams.update({"font.family": "serif", "font.size": 16})
 plt.figure(figsize=(9, 5))
 
 plt.plot(nlayers_values, average_zne_values, "--o", label="ZNE")
-plt.plot(nlayers_values, average_noisy_values, "--o", label="Raw")
+plt.plot(nlayers_values, average_noisy_values, "-.o", label="Raw")
 
 plt.xlabel("Circuit depth")
 plt.ylabel("Survival probability")
