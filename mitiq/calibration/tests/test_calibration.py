@@ -18,7 +18,7 @@ from mitiq.calibration.calibrator import (
     MissingResultsError,
     convert_to_expval_executor,
 )
-from mitiq.calibration.settings import PECSettings, Strategy
+from mitiq.calibration.settings import Strategy
 from mitiq.interface import convert_to_mitiq
 from mitiq.pec.representations import (
     represent_operation_with_local_biased_noise,
