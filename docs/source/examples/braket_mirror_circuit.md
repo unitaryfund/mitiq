@@ -16,7 +16,7 @@ kernelspec:
 This notebook shows improved performance on a mirror circuit benchmark with zero-noise extrapolation on Rigetti Aspen-9 via Amazon Braket.
 
 ```{note}
-This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to https://console.aws.amazon.com/braket/ and running from there.
+This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to <https://console.aws.amazon.com/braket/> and running from there.
 This requires an AWS account.
 **Without an AWS account, you can still run the notebook on a noisy simulator**.
 ```
@@ -63,7 +63,7 @@ on_aws = aws_device.name != "DensityMatrixSimulator"
 (examples/braket_mirror_circuit/define-the-circuit)=
 ## Define the circuit
 
-We use mirror circuits to benchmark the performance of the device. Mirror circuits, introduced in https://arxiv.org/abs/2008.11294, are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise. The frequency of the correct bitstring is our target metric.
+We use mirror circuits to benchmark the performance of the device. Mirror circuits, introduced in <https://arxiv.org/abs/2008.11294>, are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise. The frequency of the correct bitstring is our target metric.
 
 > Note: Mirror circuits build on Loschmidt echo circuits - i.e., circuits of the form $U U^\dagger$ for some unitary $U$. Loschmidt echo circuits are good benchmarks but have shortcomings - e.g., they are unable to detect coherent errors. Mirror circuits add new features to account for these shortcomings. For more background, see https://arxiv.org/abs/2008.11294.
 
