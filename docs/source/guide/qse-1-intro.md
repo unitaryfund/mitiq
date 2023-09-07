@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -26,9 +26,9 @@ To use QSE, we call `qse.execute_with_qse()` with five “ingredients”:
 ## 1. Define a quantum circuit
 The quantum circuit can be specified as any quantum circuit supported by Mitiq.
 
-In the next cell we define (as an example) a quantum circuit that prepares the logical 0 state in the \[\[5,1,3\]\] code. For simplicity, we use Gram Schmidt orthogonalization to form a unitary matrix that we use as a gate to prepare our state.
+In the next cell we define (as an example) a quantum circuit that prepares the logical 0 state in the [[5,1,3]] code. For simplicity, we use Gram Schmidt orthogonalization to form a unitary matrix that we use as a gate to prepare our state.
 
-```
+```{code-cell} ipython3
 def prepare_logical_0_state_for_5_1_3_code():
     """
     To simplify the testing logic. We hardcode the the logical 0 and logical 1
@@ -105,15 +105,18 @@ def prepare_logical_0_state_for_5_1_3_code():
 
     return circuit
 
-def main():
+def demo_qse():
   circuit = prepare_logical_0_state_for_5_1_3_code()
 ```
 
 ## 2. Define an executor
 We define an [executor](executors.md) function which inputs a circuit and returns a `QuantumResult`. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
 
-```
-Import cirq
+```{code-cell} ipython3
+from typing import List
+import numpy as np
+import cirq
+from mitiq import QPROGRAM, Observable, PauliString, qse
 from mitiq.interface import convert_to_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
@@ -121,11 +124,11 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(
         convert_to_mitiq(circuit)[0],
-        noise_model=cirq.depolarize,
+        noise_model_function=cirq.depolarize,
         noise_level=(0.01,),
     )
 
-def main():
+def demo_qse():
   circuit = prepare_logical_0_state_for_5_1_3_code()
   executor = execute_with_depolarized_noise
 ```
@@ -133,7 +136,7 @@ def main():
 ## 3. Observable
 We define an observable in the code subspace: $O = ZZZZZ$. As an example, assume that we wish to compute the expectation value $Tr[\rho O]$ of the observable O. 
 
-```
+```{code-cell} ipython3
 def get_observable_in_code_space(observable: List[cirq.PauliString]):
     FIVE_I = PauliString("IIIII")
     projector_onto_code_space = [
@@ -149,16 +152,16 @@ def get_observable_in_code_space(observable: List[cirq.PauliString]):
         observable_in_code_space *= 0.5 * Observable(FIVE_I, g)
     return observable_in_code_space
 
-def main():
+def demo_qse():
   circuit = prepare_logical_0_state_for_5_1_3_code()
   executor = execute_with_depolarized_noise
   observable = get_observable_in_code_space(PauliString("ZZZZZ"))
 ```
 
 ## 4. Check Operators and Code Hamiltonian
-We then assign the check operators as a list of pauli strings, and the code Hamiltonian as an Observable for the \[\[5,1,3\]\] code. The check operators of the \[\[5,1,3\]\] code are simply the expansion of the code’s 4 generators: $\[XZZXI, IXZZX, XIXZZ, ZXIXZ\]$
+We then assign the check operators as a list of pauli strings, and the code Hamiltonian as an Observable for the [[5,1,3]] code. The check operators of the [[5,1,3]] code are simply the expansion of the code’s 4 generators: $[XZZXI, IXZZX, XIXZZ, ZXIXZ]$
 
-```
+```{code-cell} ipython3
 def get_5_1_3_code_check_operators_and_code_hamiltonian() -> tuple:
     """
     Returns the check operators and code Hamiltonian for the [[5,1,3]] code
@@ -194,7 +197,7 @@ def get_5_1_3_code_check_operators_and_code_hamiltonian() -> tuple:
     return Ms_as_pauliStrings, Hc
 
 
-def main():
+def demo_qse():
   circuit = prepare_logical_0_state_for_5_1_3_code()
   executor = execute_with_depolarized_noise
   observable = get_observable_in_code_space(PauliString("ZZZZZ"))
@@ -206,13 +209,13 @@ def main():
 Now we can run QSE. We first compute the noiseless result then the noisy result to compare to the mitigated result from QSE.
 
 
-```
-def main():
-    circuit = prepare_logical_0_state_for_5_1_3_code()
+```{code-cell} ipython3
+def demo_qse():
+  circuit = prepare_logical_0_state_for_5_1_3_code()
   executor = execute_with_depolarized_noise
   observable = get_observable_in_code_space(PauliString("ZZZZZ"))
   check_operators, code_hamiltonian = get_5_1_3_code_check_operators_and_code_hamiltonian()
-  execute_with_qse(
+  return qse.execute_with_qse(
         circuit,
         executor,
         check_operators,
@@ -221,40 +224,26 @@ def main():
     )
 ```
 
-### The noiseless result
+### The mitigated result
+```{code-cell} ipython3
+print(demo_qse())
 ```
+
+### The noisy result
+```{code-cell} ipython3
+executor = execute_with_depolarized_noise
+circuit = prepare_logical_0_state_for_5_1_3_code()
+observable = get_observable_in_code_space(PauliString("ZZZZZ"))
+print(observable.expectation(circuit, executor))
+```
+
+### The noiseless result
+```{code-cell} ipython3
 def execute_no_noise(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(
         convert_to_mitiq(circuit)[0], noise_level=(0,)
     )
 
 executor = execute_no_noise
-​​observable.expectation(circuit, execute_no_noise)
-```
-```
-1.0
-```
-
-### The noisy result
-```
-executor = execute_with_depolarized_noise
-observable.expectation(circuit, executor)
-```
-```
-0.9509903192520142
-```
-
-### The mitigated result
-```
-executor = execute_with_depolarized_noise
-execute_with_qse(
-        circuit,
-        executor,
-        check_operators,
-        code_hamiltonian,
-        observable,
-    )
-```
-```
-0.9999992655115469
+print(observable.expectation(circuit, execute_no_noise))
 ```
