@@ -199,7 +199,7 @@ for j, c in enumerate(folded_circuits):
     print(f"Number of gates in folded circuit {j} scaled by: {length_out / length_in:.3f}")
 ```
 
-The number of gates has been scaled to approximate the input ``scale_factors``.
+The number of gates has been scaled to approximate the input `scale_factors`.
 
 +++
 
