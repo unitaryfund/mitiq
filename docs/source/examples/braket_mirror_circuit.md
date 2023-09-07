@@ -15,7 +15,11 @@ kernelspec:
 
 This notebook shows improved performance on a mirror circuit benchmark with zero-noise extrapolation on Rigetti Aspen-9 via Amazon Braket.
 
-> Note: This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to https://console.aws.amazon.com/braket/ and running from there. This requires an AWS account. **Without an AWS account, you can still run the notebook on a noisy simulator**.
+```{note}
+This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to https://console.aws.amazon.com/braket/ and running from there.
+This requires an AWS account.
+**Without an AWS account, you can still run the notebook on a noisy simulator**.
+```
 
 ## Setup
 
