@@ -47,7 +47,9 @@ from mitiq import benchmarks, zne
 
 We first choose a device to run on.
 
-> Note: Verbatim compiling in Braket - a necessary feature to perform zero-noise extrapolation - is currently only available on Rigetti devices.
+```{warning}
+Verbatim compiling in Braket - a necessary feature to perform zero-noise extrapolation - is currently only available on Rigetti devices.
+```
 
 ```{code-cell} ipython3
 try:
