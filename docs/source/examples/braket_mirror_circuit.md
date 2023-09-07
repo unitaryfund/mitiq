@@ -84,7 +84,7 @@ To pick good qubits, we pull the latest calibration report in the next two cells
 ```{code-cell} ipython3
 if on_aws:
     twoq_data = pd.DataFrame.from_dict(aws_device.properties.provider.specs["2Q"]).T
-    
+
 twoq_data.sort_values(by=["fCZ"], ascending=False).head() if on_aws else print()
 ```
 
@@ -93,7 +93,7 @@ And the next cell shows single-qubit calibration data sorted by best readout (RO
 ```{code-cell} ipython3
 if on_aws:
     oneq_data = pd.DataFrame.from_dict(aws_device.properties.provider.specs["1Q"]).T
-    
+
 oneq_data.sort_values(by=["fRO"], ascending=False).head() if on_aws else print()
 ```
 
@@ -110,7 +110,7 @@ Now that we have the device (sub)graph, we can generate a mirror circuit and the
 
 ```{code-cell} ipython3
 circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
-    nlayers=1, 
+    nlayers=1,
     two_qubit_gate_prob=1.0,
     two_qubit_gate_name="CZ",
     connectivity_graph=connectivity_graph,
@@ -152,7 +152,7 @@ def compile_to_rigetti_gateset(circuit: Circuit) -> Circuit:
             compiled.add_instruction(gates.Instruction(gates.Rz(-np.pi / 2), instr.target))
         else:
             compiled.add_instruction(instr)
-    
+
     return compiled
 ```
 
@@ -163,13 +163,13 @@ Now that we have a circuit, we define the `execute` function which inputs a circ
 ```{code-cell} ipython3
 def execute(
     circuit: Circuit,
-    shots: int = 1_000, 
+    shots: int = 1_000,
     s3_folder: Tuple[str, str] = ("bucket", "folder/"),
 ) -> float:
     # Add verbatim compiling so that zero-noise extrapolation can be used.
     if on_aws:
         circuit = Circuit().add_verbatim_box(compile_to_rigetti_gateset(circuit))
-    
+
     # Run the circuit and return the frequency of sampling the correct bitstring.
     if on_aws:
         aws_task = aws_device.run(circuit, s3_folder, disable_qubit_rewiring=True, shots=shots)
@@ -193,9 +193,9 @@ The result of running the example mirror circuit with zero-noise extrapolation i
 
 ```{code-cell} ipython3
 zne_value = zne.execute_with_zne(
-    circuit, 
-    execute, 
-    scale_noise=zne.scaling.fold_global, 
+    circuit,
+    execute,
+    scale_noise=zne.scaling.fold_global,
     factory=zne.inference.PolyFactory(scale_factors=[1, 3, 5], order=2)
 )
 print("ZNE value:", zne_value)
@@ -220,20 +220,20 @@ zne_values = []
 for nlayers in nlayers_values:
     for i in range(ntrials):
         circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
-            nlayers=nlayers, 
+            nlayers=nlayers,
             two_qubit_gate_prob=1.0,
             two_qubit_gate_name="CZ",
             connectivity_graph=connectivity_graph,
             seed=i,
             return_type="braket",
         )
-    
+
         noisy_values.append(execute(circuit))
         zne_values.append(
             zne.execute_with_zne(
-                circuit, 
-                execute, 
-                scale_noise=zne.scaling.fold_global, 
+                circuit,
+                execute,
+                scale_noise=zne.scaling.fold_global,
                 factory=zne.inference.PolyFactory(scale_factors=[1, 3, 5], order=2)),
         )
 ```
