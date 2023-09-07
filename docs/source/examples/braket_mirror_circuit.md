@@ -174,16 +174,27 @@ def execute(
     shots: int = 1_000,
     s3_folder: Tuple[str, str] = ("bucket", "folder/"),
 ) -> float:
-    # Add verbatim compiling so that zero-noise extrapolation can be used.
     if on_aws:
-        circuit = Circuit().add_verbatim_box(compile_to_rigetti_gateset(circuit))
+        # Add verbatim compiling so that ZNE can be used.
+        circuit = Circuit().add_verbatim_box(
+            compile_to_rigetti_gateset(circuit)
+        )
 
-    # Run the circuit and return the frequency of sampling the correct bitstring.
-    if on_aws:
-        aws_task = aws_device.run(circuit, s3_folder, disable_qubit_rewiring=True, shots=shots)
+        aws_task = aws_device.run(
+            circuit, s3_folder, disable_qubit_rewiring=True, shots=shots
+        )
+
     else:
-        aws_task = aws_device.run(circuit.copy().apply_gate_noise(Noise.Depolarizing(probability=0.002)), shots=shots)
-    return aws_task.result().measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0)
+        aws_task = aws_device.run(
+            circuit.copy().apply_gate_noise(
+                Noise.Depolarizing(probability=0.002)
+            ),
+            shots=shots,
+        )
+
+    return aws_task.result().measurement_probabilities.get(
+        "".join(map(str, correct_bitstring)), 0.0
+    )
 ```
 
 ## Noisy value
