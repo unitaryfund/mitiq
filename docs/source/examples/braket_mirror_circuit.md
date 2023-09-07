@@ -165,7 +165,8 @@ def compile_to_rigetti_gateset(circuit: Circuit) -> Circuit:
 
 ## Define the executor
 
-Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the frequency of sampling the correct bitstring.
+Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value.
+In this example we return the frequency of sampling the correct bitstring.
 
 ```{code-cell} ipython3
 def execute(
