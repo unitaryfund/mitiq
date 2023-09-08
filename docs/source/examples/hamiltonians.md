@@ -152,12 +152,12 @@ We include the true (noiseless) expectation value on the plot for comparison.
 plt.rcParams.update({"font.family": "serif", "font.size": 16})
 plt.figure(figsize=(9, 5))
 
-plt.axhline(y=expvals[0], lw=3., label="True", color="black")
-plt.plot(pvals, expvals, "--o", lw=3, markersize=10, markeredgecolor="black", alpha=0.7, label="Unmitigated")
-plt.plot(pvals, mitigated_expvals, "--o", lw=3, markersize=10, markeredgecolor="black", alpha=0.7, label="Mitigated")
+plt.axhline(y=expvals[0], label="True", color="black")
+plt.plot(pvals, expvals, "--o", label="Unmitigated")
+plt.plot(pvals, mitigated_expvals, "-.o", label="Mitigated")
 
-plt.xlabel("Noise level")
-plt.ylabel(r"$\langle H \rangle$")
+plt.xlabel("Noise strength $p$")
+plt.ylabel(r"Expecation value $\langle H \rangle$")
 plt.legend()
 plt.show()
 ```
