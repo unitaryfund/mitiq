@@ -145,6 +145,8 @@ for p in pvals:
 ```
 
 We can now visualize the effect that error mitigation has by running the following code for plotting.
+This produces a plot of expectation value (unmitigated and mitigated) $\langle H \rangle$ vs. noise strength $p$.
+We include the true (noiseless) expectation value on the plot for comparison.
 
 ```{code-cell} ipython3
 plt.rcParams.update({"font.family": "serif", "font.size": 16})
@@ -158,14 +160,6 @@ plt.xlabel("Noise level")
 plt.ylabel(r"$\langle H \rangle$")
 plt.legend()
 plt.show()
-```
-
-This produces a plot of expectation value (unmitigated and mitigated) $\langle H \rangle$ vs. noise strength
-$p$. We include the true (noiseless) expectation value on the plot for comparison.
-
-```{image} ../img/vqe-cirq-pauli-sum-mitigation-plot.png
-:alt: Mitigated vs unmitigated expectation values at different noise strengths.
-:width: 400
 ```
 
 As we can see, the mitigated expectation values are closer, on average, to the true expectation value.
