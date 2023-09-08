@@ -13,6 +13,7 @@ from mitiq.typing import (
     QuantumResult,
 )
 
+
 # Executors and observables.
 from mitiq.executor import Executor
 from mitiq.observable import PauliString, Observable
