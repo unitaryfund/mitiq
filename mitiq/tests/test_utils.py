@@ -428,3 +428,10 @@ def test_operator_ptm_vector_rep():
     np.testing.assert_array_almost_equal(
         operator_ptm_vector_rep(opt), expected_result
     )
+
+
+def test_operator_ptm_vector_rep_raised_error():
+    with pytest.raises(TypeError, match="Input must be a square matrix"):
+        assert np.allclose(
+            operator_ptm_vector_rep(np.array([1.0, 0.0, 0.0, 0.0]))
+        )
