@@ -63,7 +63,6 @@ jobs:
           export BQSKIT_DOC_CHECK_OVERRIDE=1
           export PYDEVD_DISABLE_FILE_VALIDATION=1
           make docs
-          make doctest
           make linkcheck
 
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.

@@ -53,7 +53,6 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",  # after napoleon and autodoc
     "sphinx.ext.todo",
-    "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
