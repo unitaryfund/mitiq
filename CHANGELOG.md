@@ -1,5 +1,67 @@
 # Changelog
 
+## Version 0.29.0
+
+### Summary
+
+#### Update Pauli Twirling
+Thanks to @purva-thakre for updating Mitiq's PT functions, clarifying that PT is a noise tailoring technique and for consolidating utilities to be shared between PT and other techniques.
+
+```py
+from mitiq.pt.pt import pauli_twirl_circuit
+
+pauli_twirl_circuit(circuit)
+```
+
+#### Classical Shadows
+
+Top-level functions and tests for classical shadows estimation are now available in Mitiq.
+Congrats @min-li on completing the main functionality for this technique!
+
+```py
+from mitiq.shadows.shadows import shadow_quantum_processing, classical_post_processing
+
+shadow_outcomes = shadow_quantum_processing(circuit, executor, num_total_measurements_shadow)
+results = classical_post_processing(shadow_outcomes)
+```
+
+#### Stim + Mitiq tutorial
+
+Added a tutorial demonstrating a method of combining quantum error mitigation (QEM) and quantum error correction (QEC), reducing the effective logical error rate of the computation.
+This tutorial also introduces the use of Mitiq’s ZNE functions with a new backend, the Stim stabilizer simulator.
+
+#### Calibration, Testing, and Documentation
+
+Streamlined formatting of calibration logs, removed redundant test cases, and fixed documentation issues. 
+Thanks @natestemen for these improvements and for reviewing many of the PRs in this release!
+
+Also, congrats to our new contributor @bdg221 for closing their first Mitiq PR! :tada:
+
+### All changes
+
+- Move functions to utils (#1989) [@purva-thakre]
+- remove unused import (#1999) [@natestemen]
+- Make robust `Calibrator` logging (#1985) [@natestemen]
+- Speed up a few tests (#1996) [@natestemen]
+- 1988 contributing doc note for zsh shell (#1997) [@bdg221]
+- ZNE Stim tutorial (#1967) [@Misty-W]
+- Fix typos in theory section of ddd guide (#1993) [@Misty-W]
+- Broken link in docs (#1991) [@purva-thakre]
+- Change the main function in Pauli Twirling (#1977) [@purva-thakre]
+- remove binder badge and other links binder (#1970) [@andreamari]
+- [Classical Shadows 4] Main function (#1921) [@min-li]
+- Ensure BQSKit example runs (#1962) [@natestemen]
+
+#### Dependency updates
+
+- Bump actions/checkout from 3 to 4 (#1994) [@dependabot]
+- Update pennylane requirement from ~=0.31.1 to ~=0.32.0 (#1978) [@dependabot]
+- Update qiskit-ibm-provider requirement from ~=0.6.3 to ~=0.7.0 (#1982) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.53.4 to ~=1.54.1 (#1972) [@dependabot]
+- Update qiskit requirement from ~=0.44.0 to ~=0.44.1 (#1969) [@dependabot]
+- Bump scipy + pyscf versions (#1968) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.53.3 to ~=1.53.4 (#1965) [@dependabot]
+
 ## Version 0.28.0
 
 ### Summary
@@ -38,14 +100,14 @@ The `shadows` module is not quite ready for use, but you can get a sneak peak of
 
 ### All changes
 
-- Fix docstring in qse.py (#1944) [@misty-w]
+- Fix docstring in qse.py (#1944) [@Misty-W]
 - Add QSE to API-doc (#1938) [@natestemen]
 - fix asv benchmarks (#1937) [@natestemen]
 - [Classical Shadows 1] classical postprocessing (#1908) [@min-li]
-- Add Calibration logging for PEC (#1873) [@misty-w]
+- Add Calibration logging for PEC (#1873) [@Misty-W]
 - [Classical Shadows 1] utils for shadows and unit test (#1907) [@min-li]
 - Clean up types (#1825) [@natestemen]
-- Relax test condition for `test_execute_with_pauli_twirling` (#1931) [@misty-w]
+- Relax test condition for `test_execute_with_pauli_twirling` (#1931) [@Misty-W]
 - loosen remaining core dependency versions (#1917) [@natestemen]
 - [Classical Shadows] quantum processing and test (#1906) [@min-li]
 - Make PEC calibration support all multi-qubit-gate (#1881) [@YuNariai]
@@ -376,7 +438,7 @@ There are also some minor bug fixes, documentation updates, and a new example co
 - remove badges from contributing to docs doc (#1571) [@natestemen]
 - Warn when unsupported gate fidelity is passed (#1542) [@natestemen]
 - remove gh-pages deploy action (#1566) [@natestemen]
-- First demo of learning function (#1514) [@misty-w]
+- First demo of learning function (#1514) [@Misty-W]
 - remove stale bot (#1558) [@natestemen]
 - Update scipy requirement from ~=1.9.2 to ~=1.9.3 (#1561) [@dependabot]
 - Docs infrastructure improvements (#1559) [@natestemen]
@@ -515,7 +577,7 @@ Along with the great contributions from hackers, this release focused on expandi
 - Deploy asv benchmark data to web (@natestemen, gh-1354)
 - Batched mitigate (@nylewong, gh-1286)
 - Update black requirement from ~=22.3 to ~=22.6 (@dependabot, gh-1370)
-- Add Error Mitigation example with Cirq (@misty-w, gh-1351)
+- Add Error Mitigation example with Cirq (@Misty-W, gh-1351)
 - Update amazon-braket-sdk requirement from ~=1.25.1 to ~=1.25.2 (@dependabot, gh-1367)
 - Update pennylane-qiskit requirement from ~=0.23.0 to ~=0.24.0 (@dependabot, gh-1361)
 - Update Mitiq paper code blocks based on paper review (@andreamari, gh-1357)
@@ -523,7 +585,7 @@ Along with the great contributions from hackers, this release focused on expandi
 - Update amazon-braket-sdk requirement from ~=1.25.0 to ~=1.25.1 (@dependabot, gh-1359)
 - Improving the H2 example (@obliviateandsurrender, gh-1337)
 - Test on windows and mac on each PR and add openfermion to dev requirements (@andreamari, gh-1348)
-- Loss function for learning biased noise (@misty-w, gh-1340)
+- Loss function for learning biased noise (@Misty-W, gh-1340)
 - Modify docstrings, documentation to use citations from refs.bib [unitaryhack] (@wingcode, gh-1325)
 - [unitaryhack] v2 Updated molecular hydrogen tutorial OpenFermion (@lockwo, gh-1349)
 - Update amazon-braket-sdk requirement from ~=1.24.0 to ~=1.25.0 (@dependabot, gh-1345)
