@@ -6,6 +6,7 @@
 
 #### Update Pauli Twirling
 Thanks to @purva-thakre for updating Mitiq's PT functions, clarifying that PT is a noise tailoring technique and for consolidating utilities to be shared between PT and other techniques.
+This release replaces the `execute_with_pt` function with `pauli_twirl_circuit`.
 
 ```py
 from mitiq.pt.pt import pauli_twirl_circuit
@@ -17,6 +18,7 @@ pauli_twirl_circuit(circuit)
 
 Top-level functions and tests for classical shadows estimation are now available in Mitiq.
 Congrats @min-li on completing the main functionality for this technique!
+Note that documentation for classical shadows estimation is not yet available but coming soon.
 
 ```py
 from mitiq.shadows.shadows import shadow_quantum_processing, classical_post_processing
@@ -53,7 +55,8 @@ Also, congrats to our new contributor @bdg221 for closing their first Mitiq PR! 
 - Ensure BQSKit example runs (#1962) [@natestemen]
 
 #### Dependency updates
-
+- Bump stimcirq from 1.11.0 to 1.12.0 (#2000) [@dependabot]
+- Bump stim from 1.11.0 to 1.12.0 (#2001) [@dependabot]
 - Bump actions/checkout from 3 to 4 (#1994) [@dependabot]
 - Update pennylane requirement from ~=0.31.1 to ~=0.32.0 (#1978) [@dependabot]
 - Update qiskit-ibm-provider requirement from ~=0.6.3 to ~=0.7.0 (#1982) [@dependabot]
