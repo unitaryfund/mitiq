@@ -27,7 +27,7 @@ from mitiq.interface.conversions import (
     convert_to_mitiq,
 )
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
-from mitiq.utils import tensor_product
+from mitiq.utils import arbitrary_tensor_product
 
 
 def represent_operation_with_global_depolarizing_noise(
@@ -369,6 +369,6 @@ def local_depolarizing_kraus(
     """
     local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
     return [
-        tensor_product(*kraus_string)
+        arbitrary_tensor_product(*kraus_string)
         for kraus_string in product(local_kraus, repeat=num_qubits)
     ]

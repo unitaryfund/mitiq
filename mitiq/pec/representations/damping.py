@@ -12,7 +12,7 @@ import numpy.typing as npt
 from cirq import AmplitudeDampingChannel, Circuit, Z, kraus, reset
 
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
-from mitiq.utils import tensor_product
+from mitiq.utils import arbitrary_tensor_product
 
 
 # TODO: this may be extended to an arbitrary QPROGRAM (GitHub issue gh-702).
@@ -95,6 +95,6 @@ def amplitude_damping_kraus(
     local_noisy_op = AmplitudeDampingChannel(noise_level)
     local_kraus = list(kraus(local_noisy_op))
     return [
-        tensor_product(*kraus_string)
+        arbitrary_tensor_product(*kraus_string)
         for kraus_string in product(local_kraus, repeat=num_qubits)
     ]

@@ -36,23 +36,25 @@ from mitiq.utils import (
     _pop_measurements,
     _simplify_circuit_exponents,
     _simplify_gate_exponent,
+    arbitrary_tensor_product,
+    matrix_kronecker_product,
     matrix_to_vector,
-    tensor_product,
+    operator_ptm_vector_rep,
     vector_to_matrix,
 )
 
 
-def test_tensor_product():
+def test_arbitrary_tensor_product():
     terms = [np.random.rand(dim, dim) for dim in range(1, 4)]
     expected = np.kron(np.kron(terms[0], terms[1]), terms[2])
-    assert np.allclose(tensor_product(*terms), expected)
+    assert np.allclose(arbitrary_tensor_product(*terms), expected)
     # Check limit cases
     one_term = np.random.rand(5, 5)
-    assert np.allclose(tensor_product(one_term), one_term)
-    assert np.allclose(tensor_product(2.0, one_term), 2.0 * one_term)
-    assert np.allclose(tensor_product(3.0, 4.0), 12.0)
+    assert np.allclose(arbitrary_tensor_product(one_term), one_term)
+    assert np.allclose(arbitrary_tensor_product(2.0, one_term), 2.0 * one_term)
+    assert np.allclose(arbitrary_tensor_product(3.0, 4.0), 12.0)
     with pytest.raises(TypeError, match="requires at least one argument"):
-        assert np.allclose(tensor_product(), one_term)
+        assert np.allclose(arbitrary_tensor_product(), one_term)
 
 
 def test_matrix_to_vector():
@@ -408,3 +410,21 @@ def test_circuit_to_choi_and_operation_to_choi():
     noisy_circuit_twice = Circuit(noisy_sequence)
     assert np.allclose(choi, _circuit_to_choi(noisy_circuit))
     assert np.allclose(choi_twice, _circuit_to_choi(noisy_circuit_twice))
+
+
+def test_kronecker_product():
+    matrices = [np.array([[1, 2], [3, 4]]), np.array([[0, 1], [1, 0]])]
+    expected_result = np.array(
+        [[0, 1, 0, 2], [1, 0, 2, 0], [0, 3, 0, 4], [3, 0, 4, 0]]
+    )
+    np.testing.assert_array_equal(
+        matrix_kronecker_product(matrices), expected_result
+    )
+
+
+def test_operator_ptm_vector_rep():
+    opt = cirq.I._unitary_() / np.sqrt(2)
+    expected_result = np.array([1.0, 0.0, 0.0, 0.0])
+    np.testing.assert_array_almost_equal(
+        operator_ptm_vector_rep(opt), expected_result
+    )

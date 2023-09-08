@@ -8,61 +8,14 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from itertools import product
-from typing import Any, List, Tuple
 
-import cirq
+from typing import List, Tuple
+
 import numpy as np
 from numpy.typing import NDArray
 from scipy.linalg import sqrtm
 
 import mitiq
-
-PAULIS = [
-    cirq.I._unitary_(),
-    cirq.X._unitary_(),
-    cirq.Y._unitary_(),
-    cirq.Z._unitary_(),
-]
-
-
-def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
-    """
-    Returns the Kronecker product of a list of matrices.
-    Args:
-        matrices: A list of matrices.
-    Returns:
-        The Kronecker product of the matrices in the list.
-    """
-    result = matrices[0]
-    for matrix in matrices[1:]:
-        result = np.kron(result, matrix)
-    return result
-
-
-def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
-    r"""
-    Returns the PTM vector representation of an operator.
-    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni \mathtt{opt}\rightarrow
-    |\mathtt{opt}\rangle\!\rangle\in \mathcal{H}_{4^n}`.
-
-    Args:
-        opt: A square matrix representing an operator.
-    Returns:
-        A Pauli transfer matrix (PTM) representation of the operator.
-    """
-    # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
-    # where P_i is the i-th Pauli matrix
-    if not (len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]):
-        raise TypeError("Input must be a square matrix")
-    num_qubits = int(np.log2(opt.shape[0]))
-    opt_vec = []
-    for pauli_combination in product(PAULIS, repeat=num_qubits):
-        kron_product = kronecker_product(pauli_combination)
-        opt_vec.append(
-            np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
-        )
-    return np.array(opt_vec)
 
 
 def eigenvalues_to_bitstring(values: List[int]) -> str:
