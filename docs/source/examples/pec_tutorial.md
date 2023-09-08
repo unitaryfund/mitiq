@@ -134,7 +134,7 @@ def get_circuit(depth: int, seed: int) -> Union[Tuple[cirq.Circuit, str], Tuple[
 
 PEC makes use of quasi-probability representations. We define these here in
 terms of CNOT operations. For more information about these representations in
-the context of PEC and usage within `mitiq`, refer to the ["What is the theory behind PEC"](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#quasi-probability-representations) page.
+the context of PEC and usage within `mitiq`, refer to the [](../guide/pec-5-theory.md) page.
 
 ```{code-cell} ipython3
 def get_cnot_representation(edge: Tuple[int, int]) -> pec.OperationRepresentation:

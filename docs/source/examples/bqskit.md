@@ -87,10 +87,10 @@ Now we mitigate them!
 
 ## Error Mitigation
 
-Using `mitiq`'s simplest, and easiest to use method of [Zero Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne-1-intro.html) (ZNE) we can obtain more accurate results than we would otherwise.
+Using `mitiq`'s simplest, and easiest to use method of [](../guide/zne.md) (ZNE) we can obtain more accurate results than we would otherwise.
 
 ```{note}
-There are multiple other techniques described in our [user guide](https://mitiq.readthedocs.io/en/stable/guide/guide.html) which could be used as well.
+There are multiple other techniques described in our [](../guide/guide.md) which could be used as well.
 ```
 
 In this tutorial we assume a simple error model of depolarizing noise on two-qubit gates.
@@ -203,13 +203,13 @@ These results show that using error mitigation improves the accuracy of both unc
 The [tutorial](https://github.com/unitaryfund/research/blob/main/ieee-quantum-week/compilation-with-error-mitigation-tutorial/bqskit.ipynb) in the research repository shows further that error mitigation both reduces the mean, and standard deviation of these distributions.
 
 In this tutorial we've seen how one can use error mitigation in conjunction with circuit compilation.
-For more information check out the [`bqskit`](https://bqskit.readthedocs.io/en/latest/) and [`mitiq`](https://mitiq.readthedocs.io/en/stable/) documentation.
+For more information check out the [BQSKit](https://bqskit.readthedocs.io/en/latest/) and [Mitiq](../index.md) documentation.
 
 +++
 
 ### References
 
 - BQSKit documentation: <https://bqskit.readthedocs.io/>
-- BQSKit whitepaper: https://doi.org/10.1145/3503222.3507739
+- BQSKit whitepaper: <https://doi.org/10.1145/3503222.3507739>
 - Mitiq documentation: <https://mitiq.readthedocs.io/>
 - Mitiq whitepaper: <https://quantum-journal.org/papers/q-2022-08-11-774/>
