@@ -93,7 +93,7 @@
    :members:
 ```
 
-See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
+See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 
 
 ## Mitiq - Braket
