@@ -489,12 +489,8 @@ the accuracy of the results and the execution time.
 
 ## References
 
-[1] Edward Farhi, Jeffrey Goldstone, Sam Gutmann, _A Quantum Approximate Optimization Algorithm_, {cite}`Farhi_2014_arXiv`.
-
-[2] [MaxCut tutorial in PennyLane.](https://pennylane.ai/qml/demos/tutorial_qaoa_maxcut.html)
-
-[3] [MaxCut tutorial in Qiskit.](https://qiskit.org/documentation/tutorials/optimization/6_examples_max_cut_and_tsp.html)
-
-[4] [MaxCut tutorial in PyQuil.](https://grove-docs.readthedocs.io/en/latest/qaoa.html)
-
-[5] [MaxCut tutorial in Cirq.](https://quantumai.google/cirq/experiments/qaoa/qaoa_maxcut)
+- Edward Farhi, Jeffrey Goldstone, Sam Gutmann, _A Quantum Approximate Optimization Algorithm_, {cite}`Farhi_2014_arXiv`
+- [MaxCut tutorial in PennyLane](https://pennylane.ai/qml/demos/tutorial_qaoa_maxcut.html)
+- [MaxCut tutorial in Qiskit](https://qiskit.org/documentation/tutorials/optimization/6_examples_max_cut_and_tsp.html)
+- [MaxCut tutorial in PyQuil](https://grove-docs.readthedocs.io/en/latest/qaoa.html)
+- [MaxCut tutorial in Cirq](https://quantumai.google/cirq/experiments/qaoa/qaoa_maxcut)
