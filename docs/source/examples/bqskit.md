@@ -193,11 +193,11 @@ Because compiling many large circuits is computationally expensive, we leave the
 
 Once the errors are computed for each circuit we can collect the results in a histogram to get an idea of how compilation and mitigation affects accuracy more generally.
 
-+++
-
-<img src="../img/bqskit.png" alt="Histograms of circuit accuracy with and without compilation, and error mitigation." width="600"/>
-
-+++
+```{image} ../img/bqskit.png
+:alt: Histograms of circuit accuracy with and without compilation, and error mitigation.
+:width: 90%
+:align: center
+```
 
 These results show that using error mitigation improves the accuracy of both uncompiled, and compiled circuits.
 The [tutorial](https://github.com/unitaryfund/research/blob/main/ieee-quantum-week/compilation-with-error-mitigation-tutorial/bqskit.ipynb) in the research repository shows further that error mitigation both reduces the mean, and standard deviation of these distributions.
