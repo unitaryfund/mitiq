@@ -33,17 +33,22 @@ def general_rule(
             decoupling gates, as a non-negative int. Negative int corresponds
             to default. Defaults to maximal spacing that fits a single sequence
             in the given slack window.
-            E.g. given slack_length = 8, gates = [X, X] the spacing defaults
-            to 2 and the rule returns the sequence:
-            ──I──I──X──I──I──X──I──I──
-            given slack_length = 9, gates [X, Y, X, Y] the spacing defaults
-            to 1 and the rule returns the sequence:
-            ──I──X──I──Y──I──X──I──Y──I──.
         gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X]
             is the xx sequence, [X, Y, X, Y] is the xyxy sequence.
             - Note: To repeat the sequence, specify a repeated gateset.
     Returns:
         A digital dynamical decoupling sequence, as a Cirq circuit.
+
+    Example:
+        When ``slack_length = 8`` and ``gates = [X, X]`` the spacing defaults
+        to 2 and the rule returns the sequence::
+
+            ──I──I──X──I──I──X──I──I──
+
+        When ``slack_length = 9`` and ``gates [X, Y, X, Y]`` the spacing
+        defaults to 1 and the rule returns the sequence::
+
+            ──I──X──I──Y──I──X──I──Y──I──
     """
     if len(gates) < 2:
         raise ValueError("Gateset too short to make a ddd sequence.")
