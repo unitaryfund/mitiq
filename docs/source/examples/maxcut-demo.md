@@ -27,8 +27,7 @@ In particular we are interested in investigating how Mitiq can help reduce error
 
 A **graph** is a mathematical object characterized by a set $V$ of **vertices (or nodes)** that we can
 enumerate with integers $V=\{0, 1, 2, \dots, n-1\}$ and a set $E$ of **edges** (pairs of nodes) which can be defined as
-$E=\{(a_1, b_1), (a_2, b_2), ...., (a_m, b_m)\}$, where $a_j\neq b_j$ and  $a_j, b_j \in V$.
-
+$E=\{(a_1, b_1), (a_2, b_2), ...., (a_m, b_m)\}$, where $a_j\neq b_j$ and $a_j, b_j \in V$.
 
 **Note:** If we are not interested in isolated nodes (not connected to any edge), the set of edges $E$ completely
 determine the graph $G=(V, E)$.
@@ -143,7 +142,7 @@ $$H = \sum_{(i,\, j) \in E}  \frac{1}{2} (1 - Z_i Z_j),$$
 where $Z_k$ is the Pauli-Z operator applied to the qubit $k$, such that $Z_k | 0 \rangle_k = +| 0 \rangle_k$ and $Z_k | 1 \rangle_k = - |1 \rangle_k$.
 
 Now we can associate each qubit of the system to a vertex of the graph. A potential solution of the MaxCut
-problem  (i.e., the partition $(V_A, V_B)$) can be represented by a quantum product state:
+problem (i.e., the partition $(V_A, V_B)$) can be represented by a quantum product state:
 
 $$|\psi \rangle = |s_n \rangle \cdots |s_2 \rangle |s_1\rangle, $$
 where $s_j=0$ if $j \in V_A$, while $s_j=1$ if $j \in V_B$.
@@ -151,7 +150,7 @@ where $s_j=0$ if $j \in V_A$, while $s_j=1$ if $j \in V_B$.
 In this case it is easy to check that the corresponding number of cuts is given by the opposite of the
 expectation value of the Hamiltonian $H$:
 
-$$ \text{number of cuts } =  - \langle \psi | H | \psi \rangle .$$
+$$ \text{number of cuts } = - \langle \psi | H | \psi \rangle .$$
 
 In this physical picture, the MaxCut problem corresponds to the problem of finding the ground state of $H$
 and the maximum number of cuts is equal to minus the ground state energy.
@@ -209,7 +208,7 @@ Which indeed correspond to the 2 optimal bipartitions of the original MaxCut pro
 +++
 
 The size of the previously introduced Hamiltonian is $2^n \times 2^n$. So, when the graph has many nodes,
-finding  the eigenvalues and or the eigenstates as we did above becomes exponentially hard.
+finding the eigenvalues and or the eigenstates as we did above becomes exponentially hard.
 
 ```{admonition} Question
 :class: attention
@@ -222,8 +221,7 @@ This method consists of generating a potential solution state through a variatio
 $U_{\vec \alpha, \vec \beta}$ which depends on two vectors of $p$ real parameters
 $\vec \alpha = (\alpha_1, .... \alpha_p)$, $\vec \beta= (\beta_1, .... \beta_p)$ and has the following structure:
 
-$$|\psi(\vec \alpha, \vec \beta) \rangle = U_{\vec \alpha, \vec \beta}|+\rangle ^{\otimes n}
-= R_{\alpha_p} W_{\beta_p} \cdots R_{\alpha_1} W_{\beta_1} |+\rangle ^{\otimes n},$$
+$$|\psi(\vec \alpha, \vec \beta) \rangle = U_{\vec \alpha, \vec \beta}|+\rangle^{\otimes n} = R_{\alpha_p} W_{\beta_p} \cdots R_{\alpha_1} W_{\beta_1} |+\rangle^{\otimes n},$$
 
 where $| + \rangle = (|0\rangle + |1\rangle)/\sqrt{2}$ and
 
@@ -303,7 +301,7 @@ qaoa_ansatz(square_graph, params)
 ### Defining an "executor" function to run or simulate the experiment
 
 QAOA requires the evaluation of quantum expectation values. Therefore, we define a function which inputs
-a generic  circuit and returns the expectation value of a generic observable.
+a generic circuit and returns the expectation value of a generic observable.
 
 ```{code-cell} ipython3
 from cirq import depolarize, DensityMatrixSimulator
