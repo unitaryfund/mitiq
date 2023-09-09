@@ -27,10 +27,11 @@ PAULIS = [
 
 
 def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
-    """
-    Returns the Kronecker product of a list of matrices.
+    """Returns the Kronecker product of a list of matrices.
+
     Args:
         matrices: A list of matrices.
+
     Returns:
         The Kronecker product of the matrices in the list.
     """
