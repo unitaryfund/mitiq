@@ -211,7 +211,10 @@ Which indeed correspond to the 2 optimal bipartitions of the original MaxCut pro
 The size of the previously introduced Hamiltonian is $2^n \times 2^n$. So, when the graph has many nodes,
 finding  the eigenvalues and or the eigenstates as we did above becomes exponentially hard.
 
-**Is there a way of finding the ground state of a Hamiltonian using a near-term quantum computer?**
+```{admonition} Question
+:class: attention
+Is there a way of finding the ground state of a Hamiltonian using a near-term quantum computer?
+```
 
 This is where Quantum Approximate Optimization Algorithm (QAOA)
 [[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028) comes into play.
