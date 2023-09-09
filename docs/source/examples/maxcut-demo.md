@@ -16,7 +16,7 @@ kernelspec:
 +++
 
 In this notebook we solve a simple [_MaxCut_ problem](https://en.wikipedia.org/wiki/Maximum_cut) with the
-_Quantum Approximate Optimization Algorithm_ (QAOA) [[1-5]](#references) executed on a simulated noisy backend.
+_Quantum Approximate Optimization Algorithm_ (QAOA) {cite}`Farhi_2014_arXiv` executed on a simulated noisy backend.
 In particular we are interested in investigating how Mitiq can help reduce errors and improve the results.
 
 +++
@@ -215,8 +215,7 @@ finding the eigenvalues and or the eigenstates as we did above becomes exponenti
 Is there a way of finding the ground state of a Hamiltonian using a near-term quantum computer?
 ```
 
-This is where Quantum Approximate Optimization Algorithm (QAOA)
-[[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028) comes into play.
+This is where Quantum Approximate Optimization Algorithm (QAOA) {cite}`Farhi_2014_arXiv` comes into play.
 This method consists of generating a potential solution state through a variational circuit
 $U_{\vec \alpha, \vec \beta}$ which depends on two vectors of $p$ real parameters
 $\vec \alpha = (\alpha_1, .... \alpha_p)$, $\vec \beta= (\beta_1, .... \beta_p)$ and has the following structure:
@@ -490,7 +489,7 @@ the accuracy of the results and the execution time.
 
 ## References
 
-[1] Edward Farhi, Jeffrey Goldstone, Sam Gutmann, _A Quantum Approximate Optimization Algorithm_, [arXiv:1411.4028](https://arxiv.org/abs/1411.4028), (2014).
+[1] Edward Farhi, Jeffrey Goldstone, Sam Gutmann, _A Quantum Approximate Optimization Algorithm_, {cite}`Farhi_2014_arXiv`.
 
 [2] [MaxCut tutorial in PennyLane.](https://pennylane.ai/qml/demos/tutorial_qaoa_maxcut.html)
 
