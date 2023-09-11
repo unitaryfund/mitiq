@@ -8,7 +8,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from itertools import product
+
 from typing import Iterable, List, Tuple
 
 import numpy as np
