@@ -87,43 +87,6 @@ jobs:
           pip install pytest
           pytest mitiq/tests/test_without_third_party_packages.py
 
-  test-linux-draft:
-    if: github.event.pull_request.draft == true
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Check out mitiq
-        uses: actions/checkout@v4
-        # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
-        with:
-          fetch-depth: 2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          make install requirements
-
-      - name: Get changed directories
-        id: changed_dirs
-        run: |
-          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
-          echo "Changed directories: $changed_directories"
-          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_ENV
-
-      - name: Run tests for changed directories
-        run: |
-          echo $CHANGED_DIRECTORIES
-          for dir in $CHANGED_DIRECTORIES; do
-            make test-$dir
-          done
-
   test-linux:
     if: github.event.pull_request.draft == false
     strategy:
