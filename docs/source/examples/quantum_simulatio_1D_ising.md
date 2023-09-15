@@ -47,19 +47,6 @@ U(\Delta t) \approx e^{-iH_{ZZ}\Delta t}e^{-iH_{Z}\Delta t}e^{-iH_{X}\Delta t},
 \end{equation}
 which is a product of different unitary operators. Finally, one can express each of these unitary operators as a gate sequence of single-qubit gates or two-qubit gates that are subsequently applied.
 
-+++ {"id": "Z4U83K3WjCMv"}
-
-For the first step we install Mitiq and import some packages.
-
-```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-id: VD4zpV9bR3YB
-outputId: 167eaf66-89de-4793-9230-412bc7d0d202
----
-!pip install mitiq --quiet
-```
 
 ```{code-cell}
 :id: 1ad9eeac
