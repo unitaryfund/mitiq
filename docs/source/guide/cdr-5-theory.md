@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Theory behind the Error Mitigation Method
+# What is the theory behind CDR?
 
 Clifford data regression (CDR) is a quantum error mitigation technique that has been introduced in Ref. {cite}`Czarnik_2021_Quantum` and extended to variable-noise CDR in Ref. {cite}`Lowe_2021_PRR`.
 . The presented error mitigation (EM) strategy is designed for gate-based quantum computers. This method primarily consists of creating a training data set $\{(X_{\phi_i}^{\text{error}}, X_{\phi_i}^{\text{exact}})\}$, where $X_{\phi_i}^{\text{error}}$ and $X_{\phi_i}^{\text{exact}}$ are the expectation values of an observable $X$ for a state $|\phi_i\rangle$ under error and error-free conditions, respectively. 
