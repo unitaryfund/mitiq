@@ -4,23 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 
 from collections import Counter
-from typing import (
-    Any,
-    cast,
-    Counter as TCounter,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Union,
-)
+from numbers import Number
+from typing import Any
+from typing import Counter as TCounter
+from typing import Dict, List, Optional, Sequence, Set, Union, cast
 
+import cirq
 import numpy as np
 import numpy.typing as npt
-import cirq
 
-from numbers import Number
 from mitiq import QPROGRAM, MeasurementResult
 from mitiq.interface import atomic_converter
 from mitiq.utils import _cirq_pauli_to_string
@@ -88,7 +80,7 @@ class PauliString:
 
     @property
     def coeff(self) -> complex:
-        return self._pauli.coefficient  # type: ignore
+        return cast(complex, self._pauli.coefficient)
 
     def matrix(
         self,

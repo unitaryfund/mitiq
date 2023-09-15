@@ -13,16 +13,13 @@
        a quantum program from which expectation values to be mitigated can be
        computed. Note this includes expectation values themselves.
 """
+from collections import Counter
 from dataclasses import dataclass
-from typing import cast, List, Optional, Tuple, Union, Sequence, Dict, Any
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
-
 from cirq import Circuit as _Circuit
-
-from collections import Counter
-
 
 # Supported quantum programs.
 SUPPORTED_PROGRAM_TYPES = {
@@ -104,7 +101,7 @@ class MeasurementResult:
             self.result: List[List[int]] = list(int_result)
 
         if isinstance(self.result, np.ndarray):
-            self.result = cast(List[Bitstring], self.result.tolist())
+            self.result = self.result.tolist()
 
         self._bitstrings = np.array(self.result)
 

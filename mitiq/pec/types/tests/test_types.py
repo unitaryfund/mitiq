@@ -3,20 +3,15 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-import numpy as np
-import pytest
-
 import cirq
-from cirq import Circuit
+import numpy as np
 import pyquil
+import pytest
 import qiskit
+from cirq import Circuit
 
+from mitiq.pec.types import NoisyBasis, NoisyOperation, OperationRepresentation
 from mitiq.utils import _equal
-from mitiq.pec.types import (
-    NoisyBasis,
-    NoisyOperation,
-    OperationRepresentation,
-)
 
 icirq = Circuit(cirq.I(cirq.LineQubit(0)))
 xcirq = Circuit(cirq.X(cirq.LineQubit(0)))
@@ -329,7 +324,7 @@ def test_representation_sample_seed():
 def test_representation_sample_bad_seed_type():
     _, _, _, decomp = get_test_representation()
     with pytest.raises(TypeError, match="should be of type"):
-        decomp.sample(random_state=7)
+        decomp.sample(random_state="8")
 
 
 def test_representation_sample_zero_coefficient():

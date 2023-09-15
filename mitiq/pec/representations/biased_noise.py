@@ -6,26 +6,21 @@
 import copy
 from typing import List
 
-from cirq import (
-    Circuit,
-    Operation,
-    X,
-    Y,
-    Z,
-)
+from cirq import Circuit, Operation, X, Y, Z
 
 from mitiq import QPROGRAM
-from mitiq.pec import OperationRepresentation, NoisyOperation
 from mitiq.interface.conversions import (
-    convert_to_mitiq,
     append_cirq_circuit_to_qprogram,
+    convert_to_mitiq,
 )
+from mitiq.pec import NoisyOperation, OperationRepresentation
 
 
 def represent_operation_with_local_biased_noise(
     ideal_operation: QPROGRAM,
     epsilon: float,
     eta: float,
+    is_qubit_dependent: bool = True,
 ) -> OperationRepresentation:
     r"""This function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
@@ -57,6 +52,11 @@ def represent_operation_with_local_biased_noise(
             channels with :math:`\eta = 0` describing a fully depolarizing
             channel and :math:`\eta = \infty` describing a fully dephasing
             channel.
+        is_qubit_dependent: If True, the representation corresponds to the
+            operation on the specific qubits defined in `ideal_operation`.
+            If False, the representation is valid for the same gate even if
+            acting on different qubits from those specified in
+            `ideal_operation`.
 
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
@@ -142,4 +142,6 @@ def represent_operation_with_local_biased_noise(
 
     # Build basis expansion.
     noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
-    return OperationRepresentation(ideal_operation, noisy_operations, alphas)
+    return OperationRepresentation(
+        ideal_operation, noisy_operations, alphas, is_qubit_dependent
+    )

@@ -6,22 +6,21 @@
 """Unit tests for high-level DDD tools."""
 
 from typing import List
+
+import cirq
 import numpy as np
 from pytest import mark
-import cirq
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Executor
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.ddd import ddd_decorator, execute_with_ddd, mitigate_executor
+from mitiq.ddd.rules import xx, xyxy, yy
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
-
-from mitiq.ddd.rules import xx, yy, xyxy
-from mitiq.ddd import execute_with_ddd, mitigate_executor, ddd_decorator
 from mitiq.pec.tests.test_pec import (
-    serial_executor,
     batched_executor,
     noiseless_serial_executor,
+    serial_executor,
 )
-
 
 # A layer of X gates is useful otherwise amplitude damping is not effective
 x_layer = cirq.Circuit(cirq.X.on_each(cirq.LineQubit.range(7)))
@@ -43,7 +42,7 @@ circuit_cirq_b += cirq.inverse(circuit_cirq_b)
 def amp_damp_executor(circuit: QPROGRAM, noise: float = 0.005) -> float:
     circuit, _ = convert_to_mitiq(circuit)
     return compute_density_matrix(
-        circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
+        circuit, noise_model_function=cirq.amplitude_damp, noise_level=(noise,)
     )[0, 0].real
 
 

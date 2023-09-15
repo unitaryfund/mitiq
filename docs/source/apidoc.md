@@ -47,6 +47,12 @@
    :members:
 ```
 
+### Mirror Quantum Volume Circuits
+```{eval-rst}
+.. automodule:: mitiq.benchmarks.mirror_qv_circuits
+   :members:
+```
+
 ## Circuit types and result types
 
 ```{eval-rst}
@@ -125,6 +131,33 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ### Qiskit Utils
 ```{eval-rst}
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
+   :members:
+```
+
+
+## Classical Shadows
+
+### Classical Shadows (High-Level Tools)
+```{eval-rst}
+.. automodule:: mitiq.shadows.shadows
+   :members:
+```
+
+### Quantum Processing
+```{eval-rst}
+.. automodule:: mitiq.shadows.quantum_processing
+   :members:
+```
+
+### Classical Post-Processing
+```{eval-rst}
+.. automodule:: mitiq.shadows.classical_postprocessing
+   :members:
+```
+
+### Utility Functions
+```{eval-rst}
+.. automodule:: mitiq.shadows.shadows_utils
    :members:
 ```
 
@@ -277,6 +310,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ## Pauli Twirling
 ```{eval-rst}
 .. automodule:: mitiq.pt.pt
+   :members:
+```
+
+## Quantum Subspace Expansion
+```{eval-rst}
+.. automodule:: mitiq.qse.qse
    :members:
 ```
 

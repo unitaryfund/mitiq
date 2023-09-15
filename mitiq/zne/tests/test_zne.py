@@ -4,19 +4,32 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for zero-noise extrapolation."""
-from typing import List
 import functools
-import pytest
+from typing import List
 
-import numpy as np
 import cirq
+import numpy as np
+import pytest
 import qiskit
+from qiskit_aer import AerSimulator
 
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq.interface import accept_any_qprogram_as_input, convert_from_mitiq
+from mitiq.interface.mitiq_cirq import (
+    compute_density_matrix,
+    sample_bitstrings,
+)
+from mitiq.interface.mitiq_qiskit import (
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
+)
+from mitiq.observable import Observable, PauliString
 from mitiq.zne import (
-    inference,
-    scaling,
     execute_with_zne,
+    inference,
     mitigate_executor,
+    scaling,
     zne_decorator,
 )
 from mitiq.zne.inference import (
@@ -26,27 +39,12 @@ from mitiq.zne.inference import (
     RichardsonFactory,
 )
 from mitiq.zne.scaling import (
+    fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,
-    fold_gates_at_random,
+    get_layer_folding,
     insert_id_layers,
 )
-from mitiq.zne.scaling import get_layer_folding
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
-
-from mitiq.interface.mitiq_qiskit import (
-    execute_with_shots_and_noise,
-    initialized_depolarizing_noise,
-)
-
-from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
-from mitiq.interface.mitiq_cirq import (
-    sample_bitstrings,
-    compute_density_matrix,
-)
-from mitiq.observable import Observable, PauliString
-
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -90,7 +88,9 @@ def test_with_observable_batched_factory(executor):
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
         circuit,
-        executor=functools.partial(executor, noise_model=cirq.depolarize),
+        executor=functools.partial(
+            executor, noise_model_function=cirq.depolarize
+        ),
         observable=observable,
         factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
     )
@@ -111,7 +111,9 @@ def test_with_observable_adaptive_factory(executor):
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
         circuit,
-        executor=functools.partial(executor, noise_model=cirq.amplitude_damp),
+        executor=functools.partial(
+            executor, noise_model_function=cirq.amplitude_damp
+        ),
         observable=observable,
         factory=AdaExpFactory(steps=4, asymptote=0.5),
     )
@@ -137,7 +139,9 @@ def test_with_observable_two_qubits(executor):
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
         circuit,
-        executor=functools.partial(executor, noise_model=cirq.depolarize),
+        executor=functools.partial(
+            executor, noise_model_function=cirq.depolarize
+        ),
         observable=observable,
         factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
     )
@@ -278,9 +282,7 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 10000) -> float:
 
 def get_counts(circuit: qiskit.QuantumCircuit):
     return (
-        qiskit.execute(
-            circuit, qiskit.Aer.get_backend("aer_simulator"), shots=100
-        )
+        qiskit.execute(circuit, AerSimulator(), shots=100)
         .result()
         .get_counts()
     )

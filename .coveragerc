@@ -1,7 +1,6 @@
 [run]
 omit =
     */tests/*
-    ./benchmarks/*
 
 [report]
 # Regexes for lines to exclude from consideration

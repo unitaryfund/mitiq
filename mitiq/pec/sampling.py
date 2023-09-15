@@ -5,16 +5,15 @@
 
 """Tools for sampling from the noisy representations of ideal operations."""
 
-from typing import List, Optional, Tuple, Sequence, Union
-from copy import deepcopy
 import warnings
-
-import numpy as np
+from copy import deepcopy
+from typing import List, Optional, Sequence, Tuple, Union
 
 import cirq
+import numpy as np
 
 from mitiq import QPROGRAM
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 from mitiq.pec.types import OperationRepresentation
 from mitiq.utils import _equal
 
@@ -91,9 +90,7 @@ def sample_sequence(
     sequences = []
     signs = []
     for _ in range(num_samples):
-        noisy_op, sign, _ = operation_representation.sample(
-            random_state  # type: ignore
-        )
+        noisy_op, sign, _ = operation_representation.sample(random_state)
         if operation_representation.is_qubit_dependent:
             native_circ = noisy_op.native_circuit
         else:

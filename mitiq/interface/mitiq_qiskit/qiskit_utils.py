@@ -4,29 +4,28 @@
 # LICENSE file in the root directory of this source tree.
 
 """Qiskit utility functions."""
-from typing import Tuple
 from functools import partial
+from typing import Optional, Tuple
+
 import numpy as np
 import numpy.typing as npt
 import qiskit
 from qiskit import QuantumCircuit
-from typing import Optional
+from qiskit.providers import Backend
+from qiskit_aer import AerSimulator
 
 # Noise simulation packages
-from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import (
-    depolarizing_error,
-)
-from qiskit.providers import Backend
+from qiskit_aer.noise import NoiseModel
+from qiskit_aer.noise.errors.standard_errors import depolarizing_error
 
-from mitiq import MeasurementResult, Observable, Executor
+from mitiq import Executor, MeasurementResult, Observable
 
 
 def initialized_depolarizing_noise(noise_level: float) -> NoiseModel:
     """Initializes a depolarizing noise Qiskit NoiseModel.
 
     Args:
-        noise_level: The noise strength as a float, e.g., 0.01 is 0.1%.
+        noise_level: The noise strength as a float, e.g., 0.01 is 1%.
 
     Returns:
         A Qiskit depolarizing NoiseModel.
@@ -111,8 +110,7 @@ def execute_with_noise(
     # execution of the experiment
     job = qiskit.execute(
         circ,
-        backend=qiskit.Aer.get_backend("aer_simulator_density_matrix"),
-        noise_model=noise_model,
+        backend=AerSimulator(method="density_matrix", noise_model=noise_model),
         basis_gates=basis_gates,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
@@ -138,7 +136,7 @@ def execute_with_shots_and_noise(
     Args:
         circuit: The input Qiskit circuit.
         obs: The observable to measure as a NumPy array.
-        noise: The input Qiskit noise model.
+        noise_model: The input Qiskit noise model.
         shots: The number of measurements.
         seed: Optional seed for qiskit simulator.
 
@@ -163,9 +161,7 @@ def execute_with_shots_and_noise(
     # execution of the experiment
     job = qiskit.execute(
         circ,
-        backend=qiskit.Aer.get_backend("aer_simulator"),
-        backend_options={"method": "density_matrix"},
-        noise_model=noise_model,
+        backend=AerSimulator(method="density_matrix", noise_model=noise_model),
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
         basis_gates=basis_gates,
@@ -186,7 +182,7 @@ def execute_with_shots_and_noise(
 def sample_bitstrings(
     circuit: QuantumCircuit,
     backend: Optional[Backend] = None,
-    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    noise_model: Optional[NoiseModel] = None,
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,
@@ -222,9 +218,9 @@ def sample_bitstrings(
     elif noise_model:
         job = qiskit.execute(
             circuit,
-            backend=qiskit.Aer.get_backend("aer_simulator"),
-            backend_options={"method": "density_matrix"},
-            noise_model=noise_model,
+            backend=AerSimulator(
+                method="density_matrix", noise_model=noise_model
+            ),
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
             basis_gates=noise_model.basis_gates,
@@ -252,7 +248,7 @@ def compute_expectation_value_on_noisy_backend(
     circuit: QuantumCircuit,
     obs: Observable,
     backend: Optional[Backend] = None,
-    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    noise_model: Optional[NoiseModel] = None,
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,

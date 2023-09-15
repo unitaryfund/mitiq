@@ -16,7 +16,7 @@ kernelspec:
 # Solution to hands-on lab on error mitigation with Mitiq.
 +++
 
-This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://www.ggi.infn.it/showevent.pl?id=436). 
+This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://sqmscenter.fnal.gov/opportunities/summer-schools/#2022). 
 
 It is a guided tutorial on error mitigation with Mitiq and is focused on the zero-noise extrapolation (ZNE) technique. As this is
 intended to be a hands-on exercise, the solutions to the examples are provided in this notebook.  
@@ -59,10 +59,6 @@ If you need to install Mitiq and/or Qiskit, you can uncomment and run the follow
 ```{code-cell} ipython3
 # !pip install qiskit==0.41.0
 ```
-
-If you encounter problems when installing Mitiq on your local machine,
-you can try creating a new notebook in the online Binder einvironment at [`this link`](https://mybinder.org/v2/gh/unitaryfund/mitiq/0da4965f3d80b9ee7ed9e93527c7e7c09d4b2f7e
-).
 
 You can check your locally installed version of Mitiq and of the associated frontend libraries by running the next cell.
 
@@ -113,7 +109,7 @@ Let's verify this fact, before applying any error mitigation.
 +++
 ### Run the circuit with a noiseless backend and with a noisy backend
 
-**Hint:** You can follow [this Qiskit example](https://qiskit.org/documentation/tutorials/simulators/2_device_noise_simulation.html) in which a (simulated) noiseless backend and a (simulated) noisy backend are compared.
+**Hint:** As a noiseless backend you can use the `AerSimulator` class. As a noisy backend you can use a _fake_ (simulated) device as shown [here](https://qiskit.org/documentation/apidoc/providers_fake_provider.html).
 
 ```{code-cell} ipython3
 from qiskit import QuantumCircuit

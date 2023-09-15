@@ -1,35 +1,23 @@
-# Copyright (C) 2023 Unitary Fund
+# Copyright (C) Unitary Fund
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
 
 """Functions for layer-wise unitary folding on supported circuits."""
 from copy import deepcopy
-import numpy as np
 from typing import Callable, List
+
 import cirq
+import numpy as np
 from cirq import Moment, inverse
 
 from mitiq import QPROGRAM
+from mitiq.interface import accept_qprogram_and_validate
+from mitiq.utils import _append_measurements, _pop_measurements
 from mitiq.zne.scaling.folding import _check_foldable
-from mitiq.interface import noise_scaling_converter
-from mitiq.utils import (
-    _append_measurements,
-    _pop_measurements,
-)
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def layer_folding(
     circuit: cirq.Circuit, layers_to_fold: List[int]
 ) -> cirq.Circuit:
@@ -81,7 +69,7 @@ def get_layer_folding(
         The function for folding the ith layer.
     """
 
-    @noise_scaling_converter
+    @accept_qprogram_and_validate
     def fold_ith_layer(
         circuit: cirq.Circuit, scale_factor: int
     ) -> cirq.Circuit:

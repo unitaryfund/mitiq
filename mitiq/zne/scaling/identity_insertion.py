@@ -5,14 +5,13 @@
 """Functions for scaling supported circuits by inserting layers of identity
 gates."""
 
-import numpy as np
 import random
 from typing import Tuple
-from cirq import Circuit, ops, Moment
-from mitiq.utils import (
-    _append_measurements,
-    _pop_measurements,
-)
+
+import numpy as np
+from cirq import Circuit, Moment, ops
+
+from mitiq.utils import _append_measurements, _pop_measurements
 
 
 class UnscalableCircuitError(Exception):

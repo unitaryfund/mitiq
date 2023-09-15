@@ -4,21 +4,20 @@
 # LICENSE file in the root directory of this source tree.
 
 """Types used in probabilistic error cancellation."""
-from copy import deepcopy
-from typing import Any, List, Optional, Tuple
 import warnings
-
-import numpy as np
-import numpy.typing as npt
+from copy import deepcopy
+from typing import Any, List, Optional, Tuple, Union
 
 import cirq
+import numpy as np
+import numpy.typing as npt
 from cirq.value.linear_dict import _format_coefficient
 
 from mitiq import QPROGRAM
 from mitiq.interface import (
-    convert_to_mitiq,
     CircuitConversionError,
     UnsupportedCircuitError,
+    convert_to_mitiq,
 )
 
 
@@ -126,7 +125,6 @@ class NoisyBasis:
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-
         raise NotImplementedError(
             "The NoisyBasis class has been removed since Mitiq v0.24.0."
             " Please replace it with a list of NoisyOperation objects."
@@ -227,7 +225,7 @@ class OperationRepresentation:
         return self._distribution
 
     def sample(
-        self, random_state: Optional[np.random.RandomState] = None
+        self, random_state: Optional[Union[int, np.random.RandomState]] = None
     ) -> Tuple[NoisyOperation, int, float]:
         """Returns a randomly sampled NoisyOperation from the basis expansion.
 
@@ -236,12 +234,14 @@ class OperationRepresentation:
         """
         if not random_state:
             rng = np.random
+        elif isinstance(random_state, int):
+            rng = np.random.RandomState(random_state)  # type: ignore
         elif isinstance(random_state, np.random.RandomState):
             rng = random_state  # type: ignore
         else:
             raise TypeError(
                 "Arg `random_state` should be of type `np.random.RandomState` "
-                f"but was {type(random_state)}."
+                f"or `int`, but was {type(random_state)}."
             )
 
         idx = rng.choice(len(self.coeffs), p=self.distribution)

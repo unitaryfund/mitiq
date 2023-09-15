@@ -5,18 +5,18 @@
 
 """Functions for finding optimal representations given a noisy basis."""
 
-from typing import cast, List, Optional
+from typing import List, Optional, cast
 
 import numpy as np
 import numpy.typing as npt
-from scipy.optimize import minimize, LinearConstraint
-
 from cirq import kraus
+from scipy.optimize import LinearConstraint, minimize
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq
+from mitiq.pec.channels import kraus_to_super
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
-from mitiq.pec.channels import matrix_to_vector, kraus_to_super
+from mitiq.utils import matrix_to_vector
 
 
 def minimize_one_norm(
@@ -91,6 +91,7 @@ def find_optimal_representation(
     noisy_operations: List[NoisyOperation],
     tol: float = 1.0e-8,
     initial_guess: Optional[npt.NDArray[np.float64]] = None,
+    is_qubit_dependent: bool = True,
 ) -> OperationRepresentation:
     r"""Returns the ``OperationRepresentation`` of the input ideal operation
     which minimizes the one-norm of the associated quasi-probability
@@ -114,6 +115,11 @@ def find_optimal_representation(
             of the represented operation.
         initial_guess: Optional initial guess for the coefficients
             :math:`\{ \eta_\alpha \}`.
+        is_qubit_dependent: If True, the representation corresponds to the
+            operation on the specific qubits defined in `ideal_operation`.
+            If False, the representation is valid for the same gate even if
+            acting on different qubits from those specified in
+            `ideal_operation`.
 
     Returns: The optimal OperationRepresentation.
     """
@@ -144,5 +150,8 @@ def find_optimal_representation(
     )
 
     return OperationRepresentation(
-        ideal_operation, noisy_operations, quasi_prob_dist.tolist()
+        ideal_operation,
+        noisy_operations,
+        quasi_prob_dist.tolist(),
+        is_qubit_dependent,
     )

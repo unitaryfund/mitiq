@@ -3,14 +3,13 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Callable, List, Optional, Union, cast
-
 import random
-import cirq
-import numpy as np
+from typing import List
 
-from mitiq import QPROGRAM, Executor, Observable, QuantumResult
-from mitiq.interface import noise_scaling_converter
+import cirq
+
+from mitiq import QPROGRAM
+from mitiq.interface import accept_qprogram_and_validate
 
 # P, Q, R, S from https://arxiv.org/pdf/2301.02690.pdf
 CNOT_twirling_gates = [
@@ -51,38 +50,30 @@ CZ_twirling_gates = [
 ]
 
 
-def execute_with_pt(
+
+def pauli_twirl_circuit(
     circuit: QPROGRAM,
-    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-    observable: Optional[Observable] = None,
-    *,
     num_circuits: int = 10,
-) -> float:
-    """Estimates the expectation value of the input circuit by averaging
-    expectation values obtained from Pauli twirled circuits.
+) -> List[QPROGRAM]:
+    r"""Return the Pauli twirled versions of the input circuit.
+
+    Only the $\mathrm{CZ}$ and $\mathrm{CNOT}$ gates in an
+    input circuit are Pauli twirled as specified in
+    :cite:`saki2023hypothesis`.
 
     Args:
         circuit: The input circuit to execute with twirling.
-        executor: A Mitiq executor that executes a circuit and returns the
-            unmitigated ``QuantumResult`` (e.g. an expectation value).
-        observable: Observable to compute the expectation value of. If
-            ``None``, the ``executor`` must return an expectation value
-            (float). Otherwise, the ``QuantumResult`` returned by ``executor``
-            is used to compute the expectation of the observable.
         num_circuits: Number of circuits to be twirled, and averaged.
 
     Returns:
         The expectation value estimated with Pauli twirling.
     """
-    executor = (
-        executor if isinstance(executor, Executor) else Executor(executor)
-    )
     CNOT_twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
     twirled_circuits = [
         twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
     ]
-    expvals = executor.evaluate(twirled_circuits, observable)
-    return cast(float, np.average(expvals))
+
+    return twirled_circuits
 
 
 def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
@@ -95,7 +86,7 @@ def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
     return [_twirl_CNOT_qprogram(circuit) for _ in range(num_circuits)]
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def _twirl_CNOT_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
     return circuit.map_operations(_twirl_single_CNOT_gate)
 
@@ -110,7 +101,7 @@ def twirl_CZ_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
     return [_twirl_CZ_qprogram(circuit) for _ in range(num_circuits)]
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def _twirl_CZ_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
     return circuit.map_operations(_twirl_single_CZ_gate)
 

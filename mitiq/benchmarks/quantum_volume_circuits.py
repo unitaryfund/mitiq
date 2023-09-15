@@ -13,21 +13,18 @@ Cirq implementation of quantum volume circuits:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume.py
 """
 
-from typing import Optional, Tuple, Sequence
-
-from numpy import random
+from typing import Optional, Sequence, Tuple
 
 from cirq import decompose as cirq_decompose
 from cirq.circuits import Circuit
 from cirq.contrib.quantum_volume import (
-    generate_model_circuit,
     compute_heavy_set,
+    generate_model_circuit,
 )
 from cirq.value import big_endian_int_to_bits
+from numpy import random
 
-
-from mitiq import QPROGRAM
-from mitiq import Bitstring
+from mitiq import QPROGRAM, Bitstring
 from mitiq.interface import convert_from_mitiq
 
 
@@ -47,7 +44,7 @@ def generate_quantum_volume_circuit(
 
     Args:
         num_qubits: The number of qubits in the generated circuit.
-        depth: The number of qubits in the generated circuit.
+        depth: The number of layers in the generated circuit.
         decompose: Recursively decomposes the randomly sampled (numerical)
             unitary matrix gates into simpler gates.
         seed: Seed for generating random circuit.

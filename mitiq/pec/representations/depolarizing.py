@@ -5,35 +5,35 @@
 """Functions related to representations with depolarizing noise."""
 
 import copy
-from typing import List
 from itertools import product
+from typing import List
+
 import numpy as np
 import numpy.typing as npt
-
 from cirq import (
+    Circuit,
+    DepolarizingChannel,
     Operation,
     X,
     Y,
     Z,
-    Circuit,
     is_measurement,
-    DepolarizingChannel,
     kraus,
 )
 
 from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
-    convert_to_mitiq,
     append_cirq_circuit_to_qprogram,
+    convert_to_mitiq,
 )
-from mitiq.pec.types import OperationRepresentation, NoisyOperation
-
-
-from mitiq.pec.channels import tensor_product
+from mitiq.pec.types import NoisyOperation, OperationRepresentation
+from mitiq.utils import arbitrary_tensor_product
 
 
 def represent_operation_with_global_depolarizing_noise(
-    ideal_operation: QPROGRAM, noise_level: float
+    ideal_operation: QPROGRAM,
+    noise_level: float,
+    is_qubit_dependent: bool = True,
 ) -> OperationRepresentation:
     r"""As described in :cite:`Temme_2017_PRL`, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
@@ -76,6 +76,11 @@ def represent_operation_with_global_depolarizing_noise(
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
         noise_level: The noise level (as a float) of the depolarizing channel.
+        is_qubit_dependent: If True, the representation corresponds to the
+            operation on the specific qubits defined in `ideal_operation`.
+            If False, the representation is valid for the same gate even if
+            acting on different qubits from those specified in
+            `ideal_operation`.
 
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
@@ -144,11 +149,15 @@ def represent_operation_with_global_depolarizing_noise(
 
     noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
 
-    return OperationRepresentation(ideal_operation, noisy_operations, alphas)
+    return OperationRepresentation(
+        ideal_operation, noisy_operations, alphas, is_qubit_dependent
+    )
 
 
 def represent_operation_with_local_depolarizing_noise(
-    ideal_operation: QPROGRAM, noise_level: float
+    ideal_operation: QPROGRAM,
+    noise_level: float,
+    is_qubit_dependent: bool = True,
 ) -> OperationRepresentation:
     r"""As described in :cite:`Temme_2017_PRL`, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
@@ -173,7 +182,11 @@ def represent_operation_with_local_depolarizing_noise(
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
         noise_level: The noise level of each depolarizing channel.
-
+        is_qubit_dependent: If True, the representation corresponds to the
+            operation on the specific qubits defined in `ideal_operation`.
+            If False, the representation is valid for the same gate even
+            if acting on different qubits from those specified in
+            `ideal_operation`.
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
 
@@ -239,7 +252,9 @@ def represent_operation_with_local_depolarizing_noise(
 
     noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
 
-    return OperationRepresentation(ideal_operation, noisy_operations, alphas)
+    return OperationRepresentation(
+        ideal_operation, noisy_operations, alphas, is_qubit_dependent
+    )
 
 
 def represent_operations_in_circuit_with_global_depolarizing_noise(
@@ -354,6 +369,6 @@ def local_depolarizing_kraus(
     """
     local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
     return [
-        tensor_product(*kraus_string)
+        arbitrary_tensor_product(*kraus_string)
         for kraus_string in product(local_kraus, repeat=num_qubits)
     ]

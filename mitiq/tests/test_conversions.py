@@ -5,31 +5,27 @@
 
 """Tests for circuit conversions."""
 
-import pytest
-
-import numpy as np
-
 import cirq
-from pyquil import Program, gates
-import qiskit
-from braket.circuits import (
-    Circuit as BKCircuit,
-    gates as braket_gates,
-    Instruction,
-)
+import numpy as np
 import pennylane as qml
+import pytest
+import qiskit
+from braket.circuits import Circuit as BKCircuit
+from braket.circuits import Instruction
+from braket.circuits import gates as braket_gates
+from pyquil import Program, gates
 
 from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import (
-    convert_to_mitiq,
-    convert_from_mitiq,
-    accept_any_qprogram_as_input,
-    atomic_one_to_many_converter,
-    noise_scaling_converter,
-    register_mitiq_converter,
     UnsupportedCircuitError,
+    accept_any_qprogram_as_input,
+    accept_qprogram_and_validate,
+    atomic_one_to_many_converter,
+    convert_from_mitiq,
+    convert_to_mitiq,
+    register_mitiq_converters,
 )
-from mitiq.interface.mitiq_qiskit import to_qasm, from_qasm
+from mitiq.interface.mitiq_qiskit import from_qasm, to_qasm
 from mitiq.utils import _equal
 
 QASMType = str
@@ -48,11 +44,6 @@ qiskit_circuit.cnot(*qiskit_qreg)
 qasm_str = qiskit_circuit.qasm()
 
 
-class CircuitStr(str):
-    __module__ = "qasm"
-
-
-qasm_circuit = CircuitStr(qasm_str)
 # pyQuil Bell circuit.
 pyquil_circuit = Program(gates.H(0), gates.CNOT(0, 1))
 
@@ -73,7 +64,7 @@ circuit_types = {
 }
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
     return circ
 
@@ -97,12 +88,22 @@ def test_to_mitiq(circuit):
     assert input_type in circuit.__module__
 
 
-def test_register_to_mitiq():
-    circuit = qasm_circuit
-    register_mitiq_converter(circuit.__module__, "from", from_qasm)
-    converted_circuit, input_type = convert_to_mitiq(circuit)
-    assert _equal(converted_circuit, cirq_circuit)
-    assert input_type in circuit.__module__
+def test_register_from_to_mitiq():
+    class CircuitStr(str):
+        __module__ = "qasm"
+
+    qasm_circuit = CircuitStr(qasm_str)
+
+    register_mitiq_converters(
+        qasm_circuit.__module__,
+        convert_to_function=to_qasm,
+        convert_from_function=from_qasm,
+    )
+    converted_circuit = convert_from_mitiq(cirq_circuit, "qasm")
+    converted_qasm = CircuitStr(converted_circuit)
+    circuit, input_type = convert_to_mitiq(converted_qasm)
+    assert _equal(circuit, cirq_circuit)
+    assert input_type == qasm_circuit.__module__
 
 
 @pytest.mark.parametrize("item", ("circuit", 1, None))
@@ -114,15 +115,6 @@ def test_to_mitiq_bad_types(item):
         convert_to_mitiq(item)
 
 
-def test_register_bad_args():
-    circuit = qasm_circuit
-    with pytest.raises(
-        ValueError,
-        match="Invalid direction. Expected 'to' or 'from'.",
-    ):
-        register_mitiq_converter(circuit.__module__, "mitiq", from_qasm)
-
-
 @pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_from_mitiq(to_type):
     converted_circuit = convert_from_mitiq(cirq_circuit, to_type)
@@ -131,12 +123,17 @@ def test_from_mitiq(to_type):
     assert input_type == to_type
 
 
-def test_register_from_mitiq():
-    circuit = qasm_circuit
-    register_mitiq_converter(circuit.__module__, "to", to_qasm)
-    converted_circuit, input_type = convert_to_mitiq(circuit)
-    assert _equal(converted_circuit, cirq_circuit)
-    assert input_type in circuit.__module__
+def test_unsupported_circuit_error():
+    class CircuitStr(str):
+        __module__ = "qasm"
+
+    mock_circuit = CircuitStr("mock")
+
+    with pytest.raises(
+        UnsupportedCircuitError,
+        match="Conversion to circuit type unsupported_circuit_type",
+    ):
+        convert_from_mitiq(mock_circuit, "unsupported_circuit_type")
 
 
 @pytest.mark.parametrize(

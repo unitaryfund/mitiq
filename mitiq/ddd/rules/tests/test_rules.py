@@ -4,9 +4,10 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for DDD rules."""
-from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy, repeated_rule
 import pytest
-from cirq import X, Y, Z, I, Circuit, LineQubit, CNOT, bit_flip
+from cirq import CNOT, Circuit, I, LineQubit, X, Y, Z, bit_flip
+
+from mitiq.ddd.rules.rules import general_rule, repeated_rule, xx, xyxy, yy
 from mitiq.utils import _equal
 
 

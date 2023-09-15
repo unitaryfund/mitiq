@@ -5,11 +5,11 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, cast, Iterable, Tuple, Dict, Union
+from typing import Any, Callable, Dict, Iterable, Tuple, cast
 
-from cirq import Circuit
+import cirq
 
-from mitiq import SUPPORTED_PROGRAM_TYPES, QPROGRAM
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 
 
 class UnsupportedCircuitError(Exception):
@@ -20,25 +20,24 @@ class CircuitConversionError(Exception):
     pass
 
 
-register_to_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]]
+FROM_MITIQ_DICT: Dict[str, Callable[[cirq.Circuit], Any]]
 try:
-    register_to_dict
+    FROM_MITIQ_DICT
 except NameError:
-    register_to_dict = {}
+    FROM_MITIQ_DICT = {}
 
-register_from_dict: Dict[Tuple[str, str], Callable[[Circuit], Any]]
+TO_MITIQ_DICT: Dict[str, Callable[[Any], cirq.Circuit]]
 try:
-    register_from_dict
+    TO_MITIQ_DICT
 except NameError:
-    register_from_dict = {}
+    TO_MITIQ_DICT = {}
 
 
-def register_mitiq_converter(
+def register_mitiq_converters(
     package_name: str,
-    direction: str,
-    convert_function: Union[
-        Callable[[Any], Circuit], Callable[[Circuit], Any]
-    ],
+    *,
+    convert_to_function: Callable[[cirq.Circuit], Any],
+    convert_from_function: Callable[[Any], cirq.Circuit],
 ) -> None:
     """Registers converters for unsupported circuit types.
 
@@ -47,25 +46,18 @@ def register_mitiq_converter(
             supported by Mitiq. Note: this name should be the same as the
             return from "circuit".__module__.
                  See mitiq.SUPPORTED_PROGRAM_TYPES.
-        direction: Specifies the conversion direction relative to the non-Mitiq
-            circuit. i.e. "from" returns a Mitiq/Cirq circuit, "to" returns a
-            Non-Mitiq circuit.
-        convert_function: User specified function to convert to and from an
-            unsupported circuit type. These functions should follow the
-            direction hint above: "from" returns a Mitiq/Cirq circuit,
-            "to" returns a Non-Mitiq circuit.
+        convert_to_function: User specified function to convert to an
+            unsupported circuit type. This function returns a Non-Mitiq
+            circuit.
+        convert_function: User specified function to convert from an
+            unsupported circuit type. This function returns a Mitiq/Cirq
+            circuit.
     """
-    if direction not in ["to", "from"]:
-        raise ValueError("Invalid direction. Expected 'to' or 'from'.")
-    elif direction == "to":
-        global register_to_dict
-        register_to_dict[(package_name, direction)] = convert_function
-    else:
-        global register_from_dict
-        register_from_dict[(package_name, direction)] = convert_function
+    FROM_MITIQ_DICT[package_name] = convert_to_function
+    TO_MITIQ_DICT[package_name] = convert_from_function
 
 
-def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
+def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[cirq.Circuit, str]:
     """Converts any valid input circuit to a mitiq circuit.
 
     Args:
@@ -79,7 +71,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         circuit: Mitiq circuit equivalent to input circuit.
         input_circuit_type: Type of input circuit represented by a string.
     """
-    conversion_function: Callable[[Any], Circuit]
+    conversion_function: Callable[[Any], cirq.Circuit]
 
     try:
         package = circuit.__module__
@@ -108,25 +100,24 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
         input_circuit_type = "pennylane"
         conversion_function = from_pennylane
-    elif isinstance(circuit, Circuit):
+
+    elif package in TO_MITIQ_DICT:
+        input_circuit_type = package
+        conversion_function = TO_MITIQ_DICT[package]
+
+    elif isinstance(circuit, cirq.Circuit):
         input_circuit_type = "cirq"
 
-        def conversion_function(circ: Circuit) -> Circuit:
+        def conversion_function(circ: cirq.Circuit) -> cirq.Circuit:
             return circ
 
     else:
-        for package_name, _ in register_from_dict:
-            if package_name in package:
-                input_circuit_type = package_name
-                conversion_function = register_from_dict[package_name, "from"]
-                break
-        else:
-            raise UnsupportedCircuitError(
-                f"Circuit from module {package} is not supported.\n\n"
-                f"Please define a converter with register_mitiq_converter(),"
-                f"\n or specify a supported Circuit type:"
-                f"\n {SUPPORTED_PROGRAM_TYPES}"
-            )
+        raise UnsupportedCircuitError(
+            f"Circuit from module {package} is not supported.\n\n"
+            f"Please register converters with register_mitiq_converters(),"
+            f"\n or specify a supported Circuit type:"
+            f"\n {SUPPORTED_PROGRAM_TYPES}"
+        )
 
     try:
         mitiq_circuit = conversion_function(circuit)
@@ -137,21 +128,23 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
             "(pyQuil). If you think this is a bug or that this circuit should "
             "be supported, you can open an issue at "
             "https://github.com/unitaryfund/mitiq. \n\n Provided circuit has "
-            f"type {type(circuit)} and is:\n\n{circuit}\n\n Circuit types "
+            f"type {type(circuit)} and is:\n\n{circuit}\n\nCircuit types "
             f"supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}."
         )
 
     return mitiq_circuit, input_circuit_type
 
 
-def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
+def convert_from_mitiq(
+    circuit: cirq.Circuit, conversion_type: str
+) -> QPROGRAM:
     """Converts a Mitiq circuit to a type specified by the conversion type.
 
     Args:
         circuit: Mitiq circuit to convert.
         conversion_type: String specifier for the converted circuit type.
     """
-    conversion_function: Callable[[Circuit], QPROGRAM]
+    conversion_function: Callable[[cirq.Circuit], QPROGRAM]
     if conversion_type == "qiskit":
         from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
@@ -168,24 +161,22 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         from mitiq.interface.mitiq_pennylane.conversions import to_pennylane
 
         conversion_function = to_pennylane
+    elif conversion_type in FROM_MITIQ_DICT:
+        conversion_function = FROM_MITIQ_DICT[conversion_type]
+
     elif conversion_type == "cirq":
 
-        def conversion_function(circ: Circuit) -> Circuit:
+        def conversion_function(circ: cirq.Circuit) -> cirq.Circuit:
             return circ
 
     else:
-        for package_name, _ in register_to_dict:
-            if package_name == conversion_type:
-                conversion_function = register_to_dict[package_name, "to"]
-                break
-        else:
-            raise UnsupportedCircuitError(
-                f"Conversion to circuit type {conversion_type} is unsupported."
-                f"\n\n Please register a converter with"
-                f"register_mitiq_converter(),"
-                f"\n or specify a supported Circuit type:"
-                f"\n {SUPPORTED_PROGRAM_TYPES}"
-            )
+        raise UnsupportedCircuitError(
+            f"Conversion to circuit type {conversion_type} is unsupported."
+            f"\n\n Please register converters with"
+            f"register_mitiq_converters(),"
+            f"\n or specify a supported Circuit type:"
+            f"\n {SUPPORTED_PROGRAM_TYPES}"
+        )
 
     try:
         converted_circuit = conversion_function(circuit)
@@ -199,16 +190,14 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
 
 
 def accept_any_qprogram_as_input(
-    accept_cirq_circuit_function: Callable[[Circuit], Any]
+    accept_cirq_circuit_function: Callable[[cirq.Circuit], Any]
 ) -> Callable[[QPROGRAM], Any]:
     @wraps(accept_cirq_circuit_function)
     def accept_any_qprogram_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> Any:
         cirq_circuit, _ = convert_to_mitiq(circuit)
-        return accept_cirq_circuit_function(  # type: ignore
-            cirq_circuit, *args, **kwargs
-        )
+        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)
 
     return accept_any_qprogram_function
 
@@ -246,7 +235,7 @@ def atomic_converter(
 
 
 def atomic_one_to_many_converter(
-    cirq_circuit_modifier: Callable[..., Iterable[Circuit]]
+    cirq_circuit_modifier: Callable[..., Iterable[cirq.Circuit]]
 ) -> Callable[..., Iterable[QPROGRAM]]:
     @wraps(cirq_circuit_modifier)
     def qprogram_modifier(
@@ -254,7 +243,7 @@ def atomic_one_to_many_converter(
     ) -> Iterable[QPROGRAM]:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
 
-        modified_circuits: Iterable[Circuit] = cirq_circuit_modifier(
+        modified_circuits: Iterable[cirq.Circuit] = cirq_circuit_modifier(
             mitiq_circuit, *args, **kwargs
         )
 
@@ -269,27 +258,35 @@ def atomic_one_to_many_converter(
     return qprogram_modifier
 
 
-def noise_scaling_converter(
-    noise_scaling_function: Callable[..., Any]
+def accept_qprogram_and_validate(
+    cirq_circuit_modifier: Callable[..., Any]
 ) -> Callable[..., Any]:
-    """Decorator for handling conversions with noise scaling functions.
+    """This decorator performs two functions:
+
+        1. Transforms a function of signature (cirq.Circuit -> Any) to
+        (QPROGRAM -> Any)
+        2. Validates the incoming QPROGRAM instance to ensure Mitiq's error
+        mitigation techniques can be applied to it.
 
     Args:
-        noise_scaling_function: Function which inputs a cirq.Circuit, modifies
-            it to scale noise, then returns a cirq.Circuit.
+        cirq_circuit_modifier: The function to scale.
+
+    Returns:
+        The transformed function which can take any QPROGRAM, and performs
+        circuit-level validation.
     """
 
-    @wraps(noise_scaling_function)
+    @wraps(cirq_circuit_modifier)
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
-
         # Pre atomic conversion
         if "qiskit" in circuit.__module__:
+            from qiskit.transpiler.passes import RemoveBarriers
+
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _add_identity_to_idle,
             )
-            from qiskit.transpiler.passes import RemoveBarriers
 
             # Avoid mutating the input circuit
             circuit = circuit.copy()
@@ -299,7 +296,7 @@ def noise_scaling_converter(
             # when converting to Cirq. Eventually, identities will be removed.
             idle_qubits = _add_identity_to_idle(circuit)
 
-        scaled_circuit = atomic_converter(noise_scaling_function)(
+        scaled_circuit = atomic_converter(cirq_circuit_modifier)(
             circuit, *args, **kwargs
         )
 
@@ -344,19 +341,16 @@ def noise_scaling_converter(
         # Qiskit: Keep the same register structure and measurement order.
         if "qiskit" in scaled_circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
-                _transform_registers,
                 _measurement_order,
                 _remove_identity_from_idle,
+                _transform_registers,
             )
 
             scaled_circuit.remove_final_measurements()
-            _transform_registers(
-                scaled_circuit,
-                new_qregs=circuit.qregs,  # type: ignore
-            )
+            _transform_registers(scaled_circuit, new_qregs=circuit.qregs)
             _remove_identity_from_idle(scaled_circuit, idle_qubits)
-            if circuit.cregs and not scaled_circuit.cregs:  # type: ignore
-                scaled_circuit.add_register(*circuit.cregs)  # type: ignore
+            if circuit.cregs and not scaled_circuit.cregs:
+                scaled_circuit.add_register(*circuit.cregs)
 
             for q, c in _measurement_order(circuit):
                 scaled_circuit.measure(q, c)
@@ -366,9 +360,9 @@ def noise_scaling_converter(
     return new_scaling_function
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def append_cirq_circuit_to_qprogram(
-    circuit: QPROGRAM, cirq_circuit: Circuit
+    circuit: QPROGRAM, cirq_circuit: cirq.Circuit
 ) -> QPROGRAM:
     """Appends a Cirq circuit to a QPROGRAM."""
     return circuit + cirq_circuit

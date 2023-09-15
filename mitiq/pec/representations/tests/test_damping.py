@@ -5,24 +5,14 @@
 
 import numpy as np
 import pytest
-from cirq import (
-    X,
-    Y,
-    Z,
-    H,
-    Gate,
-    LineQubit,
-    Circuit,
-    AmplitudeDampingChannel,
-)
+from cirq import AmplitudeDampingChannel, Circuit, Gate, H, LineQubit, X, Y, Z
 
+from mitiq.interface import convert_from_mitiq
+from mitiq.pec.channels import _circuit_to_choi, _operation_to_choi
 from mitiq.pec.representations.damping import (
     _represent_operation_with_amplitude_damping_noise,
     amplitude_damping_kraus,
 )
-
-from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
-from mitiq.interface import convert_from_mitiq
 
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])

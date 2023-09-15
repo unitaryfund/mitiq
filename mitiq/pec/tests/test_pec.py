@@ -5,21 +5,25 @@
 
 """Unit tests for PEC."""
 import warnings
-from typing import List, Optional
 from functools import partial
-import pytest
+from typing import List, Optional
 
-import numpy as np
 import cirq
+import numpy as np
 import pyquil
+import pytest
 import qiskit
 
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq, mitiq_cirq
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Observable, PauliString
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq, mitiq_cirq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
-
-from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
-from mitiq.pec import mitigate_executor, pec_decorator
+from mitiq.pec import (
+    NoisyOperation,
+    OperationRepresentation,
+    execute_with_pec,
+    mitigate_executor,
+    pec_decorator,
+)
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
@@ -30,7 +34,6 @@ def get_pauli_and_cnot_representations(
     base_noise: float,
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
-
     if qubits is None:
         qreg = cirq.LineQubit.range(2)
     else:
@@ -66,7 +69,7 @@ def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
     """
     circuit, _ = convert_to_mitiq(circuit)
     return compute_density_matrix(
-        circuit, noise_model=cirq.depolarize, noise_level=(noise,)
+        circuit, noise_model_function=cirq.depolarize, noise_level=(noise,)
     )[0, 0].real
 
 
@@ -278,7 +281,7 @@ def test_execute_with_pec_with_observable():
     obs = Observable(PauliString("ZZ"))
     executor = partial(
         mitiq_cirq.compute_density_matrix,
-        noise_model=cirq.depolarize,
+        noise_model_function=cirq.depolarize,
         noise_level=(BASE_NOISE,),
     )
     true_value = 1.0
@@ -305,7 +308,7 @@ def test_execute_with_pec_partial_representations():
         twoq_circ,
         executor=partial(
             mitiq_cirq.compute_density_matrix,
-            noise_model=cirq.depolarize,
+            noise_model_function=cirq.depolarize,
             noise_level=(BASE_NOISE,),
         ),
         observable=Observable(PauliString("ZZ")),
@@ -463,7 +466,7 @@ def decorated_serial_executor(circuit: QPROGRAM) -> float:
         [1.0],
     )
 
-    @pec_decorator(representations=[rep])
+    @pec_decorator(representations=[rep], precision=0.08)
     def decorated_executor(qp):
         return serial_executor(qp)
 
@@ -626,7 +629,6 @@ def test_doc_is_preserved():
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_executed_circuits_have_the_expected_type(circuit_type):
-
     circuit = convert_from_mitiq(oneq_circ, circuit_type)
     circuit_type = type(circuit)
 

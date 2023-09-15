@@ -3,49 +3,46 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from pytest import mark, raises
-import numpy as np
 from itertools import product
 
+import numpy as np
 from cirq import (
-    LineQubit,
+    CNOT,
+    CZ,
+    AmplitudeDampingChannel,
+    Circuit,
+    DepolarizingChannel,
+    H,
     I,
+    LineQubit,
+    ResetChannel,
     X,
     Y,
     Z,
-    H,
-    CNOT,
-    CZ,
-    Circuit,
-    DepolarizingChannel,
     kraus,
-    AmplitudeDampingChannel,
-    ResetChannel,
     reset,
 )
+from pytest import mark, raises
 
-from mitiq.pec.representations.optimal import (
-    minimize_one_norm,
-    find_optimal_representation,
-)
-
-from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise,
-    global_depolarizing_kraus,
-    amplitude_damping_kraus,
-    _represent_operation_with_amplitude_damping_noise,
-)
-
-from mitiq.pec.channels import (
-    _operation_to_choi,
-    _circuit_to_choi,
-    kraus_to_super,
-    kraus_to_choi,
-    choi_to_super,
-)
-
-from mitiq.pec.types import NoisyOperation
 from mitiq.interface import convert_from_mitiq
+from mitiq.pec.channels import (
+    _circuit_to_choi,
+    _operation_to_choi,
+    choi_to_super,
+    kraus_to_choi,
+    kraus_to_super,
+)
+from mitiq.pec.representations import (
+    _represent_operation_with_amplitude_damping_noise,
+    amplitude_damping_kraus,
+    global_depolarizing_kraus,
+    represent_operation_with_local_depolarizing_noise,
+)
+from mitiq.pec.representations.optimal import (
+    find_optimal_representation,
+    minimize_one_norm,
+)
+from mitiq.pec.types import NoisyOperation
 
 
 def test_minimize_one_norm_failure_error():

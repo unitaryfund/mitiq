@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -61,6 +61,7 @@ jobs:
       - name: Build and test Sphinx docs
         run: |
           export BQSKIT_DOC_CHECK_OVERRIDE=1
+          export PYDEVD_DISABLE_FILE_VALIDATION=1
           make docs
           make doctest
           make linkcheck
@@ -71,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -86,27 +87,6 @@ jobs:
           pip install pytest
           pytest mitiq/tests/test_without_third_party_packages.py
 
-  asv:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out mitiq
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - name: Install Mitiq
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
-
-      - name: Run ASV benchmarks
-        run: |
-          pip install asv virtualenv
-          export BENCHMARK_CI=1
-          asv machine --yes
-          asv run --quick --strict
-
   test-linux-draft:
     if: github.event.pull_request.draft == true
     strategy:
@@ -117,7 +97,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
         with:
           fetch-depth: 2
@@ -154,7 +134,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
         with:
           fetch-depth: 2
@@ -189,7 +169,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
         with:
           fetch-depth: 2
@@ -251,7 +231,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:

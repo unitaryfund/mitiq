@@ -5,13 +5,14 @@
 
 """Unit tests for scaling noise by inserting identity layers."""
 import pytest
+from cirq import Circuit, LineQubit, ops
+
+from mitiq.utils import _equal
 from mitiq.zne.scaling.identity_insertion import (
     UnscalableCircuitError,
     _calculate_id_layers,
     insert_id_layers,
 )
-from cirq import Circuit, ops, LineQubit
-from mitiq.utils import _equal
 
 
 @pytest.mark.parametrize("scale_factor", (1, 2, 3, 4, 5, 6))

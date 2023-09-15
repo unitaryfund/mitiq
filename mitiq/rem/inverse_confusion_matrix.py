@@ -5,11 +5,12 @@
 
 from functools import reduce
 from typing import List, Sequence
+
 import numpy as np
 import numpy.typing as npt
 import scipy
 
-from mitiq import MeasurementResult, Bitstring
+from mitiq import Bitstring, MeasurementResult
 
 
 def sample_probability_vector(

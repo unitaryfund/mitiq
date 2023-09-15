@@ -5,10 +5,10 @@
 
 """Readout Confusion Inversion."""
 
-from typing import Callable, Union, List, Sequence, cast
-from types import MethodType
-from copy import deepcopy
 from functools import wraps
+from types import MethodType
+from typing import Callable, List, Sequence, Union, cast
+
 import numpy as np
 import numpy.typing as npt
 
@@ -40,6 +40,8 @@ def execute_with_rem(
     """
     if not isinstance(executor, Executor):
         executor_obj = Executor(executor)
+    else:
+        executor_obj = executor
 
     executor_with_rem = mitigate_executor(
         executor_obj, inverse_confusion_matrix=inverse_confusion_matrix
@@ -74,7 +76,7 @@ def mitigate_executor(
     if not isinstance(executor, Executor):
         executor_obj = Executor(executor)
     else:
-        executor_obj = deepcopy(executor)
+        executor_obj = executor
 
     def post_run(
         self: Executor,

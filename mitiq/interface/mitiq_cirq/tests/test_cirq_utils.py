@@ -4,15 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 """ Tests for Cirq executors defined in cirq_utils.py"""
 
-import numpy as np
 import cirq
+import numpy as np
 
+from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq import (
-    sample_bitstrings,
     compute_density_matrix,
     execute_with_depolarizing_noise,
+    sample_bitstrings,
 )
-from mitiq import MeasurementResult
 
 
 def test_sample_bitstrings():
