@@ -134,7 +134,7 @@ def trotter_evolution_H(L: int, h_z: float, h_x: float, Jdt: float) -> cirq.Circ
 
 
 
-Here, we do not use a real hardware, such as IBM's, to obtain the simulation results. However, Mitiq has a built-in function to simulate the noisy results. Here, we use the depolarizing noise model as it is a good noise model for long-depth circuits.
+Instead of real hardware, we use a (Mitiq-wrapped) Cirq simulator to obtain the simulation results, and add depolarizing noise.
 
 If you are interested, you can check out the tutorial here to find out how to do the same using IBM hardware
 https://mitiq.readthedocs.io/en/stable/examples/cirq-ibmq-backends.html
