@@ -22,6 +22,7 @@ ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.md>
 ZNE with Cirq: Noise scaling methods <scaling.md>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.md>
 ZNE with BQSKit compiled circuits <bqskit.md>
+ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits <zne_logical_rb_cirq_stim.md>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.md>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.md>
 Classical Shadows with Cirq: State Reconstruction and Observable Estimation <shadows_tutorial.md>

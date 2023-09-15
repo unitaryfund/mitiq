@@ -211,10 +211,9 @@ class Strategy:
             ].__name__
 
         elif self.technique is MitigationTechnique.PEC:
-
             summary["representation_function"] = self.technique_params[
                 "representation_function"
-            ]
+            ].__name__
             summary["noise_level"] = self.technique_params["noise_level"]
             summary["noise_bias"] = self.technique_params.setdefault(
                 "noise_bias", 0
@@ -225,45 +224,17 @@ class Strategy:
             summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
-    def print_line(self, performance: str, circuit_type: str) -> None:
+    def to_pretty_dict(self) -> Dict[str, str]:
+        summary = self.to_dict()
         if self.technique is MitigationTechnique.ZNE:
-            summary = self.to_dict()
-            str_scale_factors = str(summary["scale_factors"])[1:-1]
-            row = (
-                performance,
-                circuit_type,
-                self.technique.name,
-                summary["factory"][:-7],
-                str_scale_factors,
-                summary["scale_method"],
-            )
-            print(
-                "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
-                    *row
-                )
-            )
+            summary["scale_factors"] = str(summary["scale_factors"])[1:-1]
+            summary["factory"] = summary["factory"][:-7]
         elif self.technique is MitigationTechnique.PEC:
-            summary = self.to_dict()
-            if (
-                summary["representation_function"]
-                == represent_operation_with_local_biased_noise
-            ):
-                bias = summary["noise_bias"]
-            else:
-                bias = "N/A"
-            row = (
-                performance,
-                circuit_type,
-                self.technique.name,
-                summary["noise_level"],
-                bias,
-                str(summary["representation_function"].__name__)[25:],
-            )
-            print(
-                "| {:^10} | {:^7} | {:^6} | {:<11} | {:<10} | {:<25} |".format(
-                    *row
-                )
-            )
+            summary["noise_bias"] = summary.get("noise_bias", "N/A")
+            summary["representation_function"] = summary[
+                "representation_function"
+            ][25:]
+        return summary
 
     def __repr__(self) -> str:
         return str(self.to_dict())
@@ -323,6 +294,9 @@ class Settings:
 
     def get_strategy(self, strategy_id: int) -> Strategy:
         return self.strategy_dict[strategy_id]
+
+    def get_problem(self, problem_id: int) -> BenchmarkProblem:
+        return self.problem_dict[problem_id]
 
     def make_problems(self) -> List[BenchmarkProblem]:
         """Generate the benchmark problems for the calibration experiment.

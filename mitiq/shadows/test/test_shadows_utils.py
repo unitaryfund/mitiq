@@ -5,7 +5,6 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-import cirq
 import numpy as np
 
 import mitiq
@@ -14,28 +13,11 @@ from mitiq.shadows.shadows_utils import (
     create_string,
     eigenvalues_to_bitstring,
     fidelity,
-    kronecker_product,
     n_measurements_opts_expectation_bound,
     n_measurements_tomography_bound,
-    operator_ptm_vector_rep,
 )
 
-
 # Tests start here
-def test_kronecker_product():
-    matrices = [np.array([[1, 2], [3, 4]]), np.array([[0, 1], [1, 0]])]
-    expected_result = np.array(
-        [[0, 1, 0, 2], [1, 0, 2, 0], [0, 3, 0, 4], [3, 0, 4, 0]]
-    )
-    np.testing.assert_array_equal(kronecker_product(matrices), expected_result)
-
-
-def test_operator_ptm_vector_rep():
-    opt = cirq.I._unitary_() / np.sqrt(2)
-    expected_result = np.array([1.0, 0.0, 0.0, 0.0])
-    np.testing.assert_array_almost_equal(
-        operator_ptm_vector_rep(opt), expected_result
-    )
 
 
 def test_eigenvalues_to_bitstring():

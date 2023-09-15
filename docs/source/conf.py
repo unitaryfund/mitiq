@@ -159,6 +159,9 @@ linkcheck_ignore = [
     r"https://doi.org/10.1088/1367-2630/12/7/075008",
     r"https://doi.org/10.7566/JPSJ.90.032001",
     r"https://doi.org/10.7566/jpsj.90.032001",
+    r"https://dl.acm.org/doi/10.1145/3466752.3480059",
+    r"https://doi.org/10.1145/3466752.3480059",
+    r"https://doi.org/10.7566/jpsj.90.032001",
 ]
 
 
@@ -357,6 +360,7 @@ nbsphinx_thumbnails = {
     "examples/calibration-tutorial": "_static/calibration.png",
     "examples/combine_rem_zne": "_static/combine_rem_zne.png",
     "examples/quantum_simulation_scars_ibmq": "_static/qmbs_ibmq.png",
+    "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

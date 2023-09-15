@@ -4,12 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 
 import random
-from typing import Callable, List, Optional, Union, cast
+from typing import List
 
 import cirq
-import numpy as np
 
-from mitiq import QPROGRAM, Executor, Observable, QuantumResult
+from mitiq import QPROGRAM
 from mitiq.interface import accept_qprogram_and_validate
 
 # P, Q, R, S from https://arxiv.org/pdf/2301.02690.pdf
@@ -51,38 +50,29 @@ CZ_twirling_gates = [
 ]
 
 
-def execute_with_pauli_twirling(
+def pauli_twirl_circuit(
     circuit: QPROGRAM,
-    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-    observable: Optional[Observable] = None,
-    *,
     num_circuits: int = 10,
-) -> float:
-    """Estimates the expectation value of the input circuit by averaging
-    expectation values obtained from Pauli twirled circuits.
+) -> List[QPROGRAM]:
+    r"""Return the Pauli twirled versions of the input circuit.
+
+    Only the $\mathrm{CZ}$ and $\mathrm{CNOT}$ gates in an
+    input circuit are Pauli twirled as specified in
+    :cite:`saki2023hypothesis`.
 
     Args:
         circuit: The input circuit to execute with twirling.
-        executor: A Mitiq executor that executes a circuit and returns the
-            unmitigated ``QuantumResult`` (e.g. an expectation value).
-        observable: Observable to compute the expectation value of. If
-            ``None``, the ``executor`` must return an expectation value
-            (float). Otherwise, the ``QuantumResult`` returned by ``executor``
-            is used to compute the expectation of the observable.
         num_circuits: Number of circuits to be twirled, and averaged.
 
     Returns:
         The expectation value estimated with Pauli twirling.
     """
-    executor = (
-        executor if isinstance(executor, Executor) else Executor(executor)
-    )
     CNOT_twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
     twirled_circuits = [
         twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
     ]
-    expvals = executor.evaluate(twirled_circuits, observable)
-    return cast(float, np.average(expvals))
+
+    return twirled_circuits
 
 
 def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
