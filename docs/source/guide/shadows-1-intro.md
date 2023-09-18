@@ -308,7 +308,7 @@ cal_est_corrs = classical_post_processing(
 Let's compare the fidelity between the reconstructed state and the ideal state.
 
 ```{code-cell} ipython3
-from mitiq.shadows.shadows_utils import operator_ptm_vector_rep
+from mitiq.utils import operator_ptm_vector_rep
 
 ghz_state = circuit.final_state_vector().reshape(-1, 1)
 ghz_true = ghz_state @ ghz_state.conj().T
