@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.15.1
+    jupytext_version: 1.15.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -47,6 +47,9 @@ U(\Delta t) \approx e^{-iH_{ZZ}\Delta t}e^{-iH_{Z}\Delta t}e^{-iH_{X}\Delta t},
 \end{equation}
 which is a product of different unitary operators. Finally, one can express each of these unitary operators as a gate sequence of single-qubit gates or two-qubit gates that are subsequently applied.
 
++++ {"id": "Z4U83K3WjCMv"}
+
+For the first step we import some packages.
 
 ```{code-cell}
 :id: 1ad9eeac
@@ -131,8 +134,6 @@ def trotter_evolution_H(L: int, h_z: float, h_x: float, Jdt: float) -> cirq.Circ
 ```
 
 +++ {"id": "PpB5FBVl6_YM"}
-
-
 
 Instead of real hardware, we use a (Mitiq-wrapped) Cirq simulator to obtain the simulation results, and add depolarizing noise.
 
@@ -654,28 +655,7 @@ plt.show()
 As one can see, the VNCDR method out performs the other methods and is much better than the unmitigated result.
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-  height: 36
-id: 9R1B3n0Dw3Yc
-outputId: a50ea387-9ee6-4323-edec-e8798c2954fc
----
-pwd
-```
-
-```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-id: npm5GYTOwAD5
-outputId: 88643ee8-b749-4b74-d5ff-9bb1ce80975d
----
-ls
-```
-
-```{code-cell}
-:id: qP7lcuAJwEpg
+:id: 9R1B3n0Dw3Yc
 
 
 ```
