@@ -138,6 +138,8 @@ The PTM (Pauli Transfer Matrix) or Liouville representation provides a vector re
 
 
 ```{code-cell} ipython3
+from mitiq.utils import operator_ptm_vector_rep
+
 operator_ptm_vector_rep(cirq.I._unitary_() / np.sqrt(2))
 ```
 
