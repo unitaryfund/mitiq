@@ -353,6 +353,8 @@ nbsphinx_thumbnails = {
     "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     "examples/pec_tutorial": "_static/pec-tutorial.png",
     "examples/scaling": "_static/scaling.png",
+    "examples/shadows_tutorial": "_static/shadow-tutorial.png",
+    "examples/rshadows_tutorial": "_static/rshadow_protocol.png",
     "examples/ddd_tutorial": "_static/ddd-tutorial.png",
     "examples/ddd_on_ibmq_ghz": "_static/ddd_qiskit_ghz_plot.png",
     "examples/calibration-tutorial": "_static/calibration.png",
