@@ -11,6 +11,12 @@ kernelspec:
   name: python3
 ---
 
+```{code-cell}
+:id: AepFa1vba3Bv
+
+
+```
+
 +++ {"id": "585e0a85"}
 
 # Use CDR, ZNE, and VNCDR to mitigate the errors in the simulation of 1-D Transverse-Longitudinal Ising model
@@ -76,6 +82,9 @@ import time
 import numpy as np
 
 import matplotlib.pyplot as plt
+
+import warnings
+warnings.filterwarnings('ignore')
 ```
 
 +++ {"id": "478f5fc8"}
@@ -173,7 +182,7 @@ n_dt = 6 #number of time steps
 colab:
   base_uri: https://localhost:8080/
 id: 0_30T42Xli1M
-outputId: 4a818b94-e3a6-4fed-971a-99dc3e728b83
+outputId: f67ed77c-3c2e-4653-d7fa-57d47ffa7304
 ---
 # Create qubits
 qubits = cirq.LineQubit.range(L)
@@ -214,6 +223,7 @@ for ii in range(n_dt):
     noisy_simulator,
     observable=obs,
 ).real)
+
   # this is to keep track of how fast the simulation is
   print(ii)
 
@@ -283,7 +293,7 @@ We repeat the same thing using a different initial state. this time the initial 
 colab:
   base_uri: https://localhost:8080/
 id: GCE-U8l57-li
-outputId: cb1654b4-5cd4-40f0-8248-01e92542b74f
+outputId: 28416ac0-e992-4639-ad7f-a32742aa7951
 ---
 # Create qubits
 qubits = cirq.LineQubit.range(L)
@@ -332,7 +342,14 @@ for ii in range(n_dt):
     observable=obs,
 ).real)
 
+  # this is to keep track of how fast the simulation is
   print(ii)
+
+```
+
+```{code-cell}
+:id: YEpsDGMeZH5g
+
 
 ```
 
@@ -391,9 +408,8 @@ Now, let's define observables as $\Delta_i=Z_i Z_{i+1}$, and assess the effectiv
 colab:
   base_uri: https://localhost:8080/
 id: 3qRgJgxeWOVW
-outputId: e084d5f2-a44f-4da4-953f-4f3389c8803f
+outputId: 75d515b8-5669-4d18-c746-780128a842e4
 ---
-
 
 delta=[1]*4
 
