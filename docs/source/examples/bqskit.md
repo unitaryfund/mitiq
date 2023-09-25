@@ -12,7 +12,7 @@ kernelspec:
 
 # Improving the accuracy of BQSKit compiled circuits with error mitigation
 
-In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/), a compiler for quantum circuits. BQSKit stands for Berkeley Quantum Synthesis Toolkit and it allows one "to compile quantum programs to efficient physical circuits for any QPU".
+In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/) {cite}`Patel_2022_ACM`, a compiler for quantum circuits. BQSKit stands for Berkeley Quantum Synthesis Toolkit and it allows one "to compile quantum programs to efficient physical circuits for any QPU".
 
 To get started, ensure you have the requisite python packages by running the following install commands.
 
@@ -210,6 +210,6 @@ For more information check out the [BQSKit](https://bqskit.readthedocs.io/en/lat
 ### References
 
 - BQSKit documentation: <https://bqskit.readthedocs.io/>
-- BQSKit whitepaper: <https://doi.org/10.1145/3503222.3507739>
+- BQSKit whitepaper: <https://doi.org/10.1145/3503222.3507739> {cite}`Patel_2022_ACM`
 - Mitiq documentation: <https://mitiq.readthedocs.io/>
 - Mitiq whitepaper: <https://quantum-journal.org/papers/q-2022-08-11-774/>
