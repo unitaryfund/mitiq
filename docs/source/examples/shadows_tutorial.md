@@ -104,6 +104,63 @@ In the main function, the quantum measurement process is encapsulated within the
 shadow_quantum_processing(test_circuits, cirq_executor, 2)
 ```
 
+## 3. Obtain Snapshot and Classical Shadows.
+
+This random measurement contains valuable information about $\rho$ in expectation:
+\begin{equation}
+    \mathbb{E}[U^\dagger |\hat{b}\rangle\langle\hat{b}|U]=\mathcal{M}(\rho),
+\end{equation}
+the expectation in the first expression has the form $\mathbf{Pr}[\hat{{b}}={b}]=\langle {b}|U\rho U^\dagger|b\rangle$. For any unitary ensemble $\mathcal{U}$, the expected value of the outer product of the classical snapshot corresponds to the operation of the quantum channel $\mathcal{M}$ on the quantum state $\rho$. If the measurements we sample from are tomographically complete, then the protocol $\mathcal{M}$ defines an invertible linear transformation $\mathcal{M}^{-1}$, which may not be a quantum channel, since it is not CP, which means that it could not be performed in the lab. But it will only be performed on the classical data stored in
+a classical memory. If we apply $\mathcal{M}$ to all the snapshots, the expected value of these inverted snapshots equations with the density operator as defined by the protocol,
+
+\begin{equation}
+\hat{\rho}=\mathcal{M}^{-1}\left(U^\dagger|\hat{b}\rangle\langle\hat{b}|U\right)
+\end{equation}
+which has been named a single copy of **classical shadow**. Based on *Schur's Lemma* the quantum channel $\mathcal{M}$ is a depolarizing channel $\mathcal{D}_p$ with $p=\frac{1}{2^n+1}$. It is easy to solve for the inverted map 
+
+\begin{equation}
+\mathcal{M}^{-1}(\cdot)=[(2^n +1)-\mathbb{I}\cdot\mathrm{Tr}](\cdot),
+\end{equation}
+ which is indeed unitary, however, not CP, so it is not a physical map as expected.
+
+In the case of random Pauli measurement, the unitary could be represented by the tensor product of all qubits, so it is with the state $|\hat{b}\rangle\in\{0,1\}^{\otimes n}$, i.e. $U^\dagger|\hat{b}\rangle=\bigotimes_{i\leq n}U_i|\hat{b}_i\rangle$. Therefore, based on Schur's Lemma, a snapshot would takes the form:
+\begin{equation}
+\hat{\rho}=\bigotimes_{i=1}^{n}\left(3U_i^\dagger|\hat{b}_i\rangle\langle\hat{b}_i|U_i-\mathbb{I}\right),\qquad|\hat{b}_i\rangle\in\{0,1\}.
+\end{equation}
+which is a tensor product of $n$ qubits, each of which is a classical state. This step is realized by `classical_snapshot` function. Repeating this procedure $N$ times results in an array of $N$ independent classical snapshots of $\rho$:
+\begin{equation}
+    S(\rho,\; N)=\left\{\hat{\rho}_1=\mathcal{M}^{-1}\left(U_1^\dagger |\hat{b}_1\rangle\langle\hat{b}_1| U_1\right),\dots,\mathcal{M}^{-1}\left(U_N^\dagger |\hat{b}_N\rangle\langle\hat{b}_N| U_N\right)\right\} .
+\end{equation}
+
+## 4. State Reconstruction from Classical Shadows
+### 4.1 State Reconstruction
+The classical shadows state reconstruction are then obtained by taking the average of the snapshots, this process is designed to reproduce the underlying state $\rho$ exactly in expectation:
+\begin{equation}
+   \rho= \mathbb{E}[\hat{\rho}],
+\end{equation}
+this is realized in the function `state_reconstruction`. In the main function `classical_post_processing`, we take the output of `shadow_quantum_processing`, then apply the inverse channel to obtain the snapshots, and finally take the average of the snapshots to obtain the reconstructed state if *state_reconstruction =* **True**. **In the current notebook, we don't preform Pauli twirling calibration, and we set** *rshadow* = **False**.
+
+#### 4.1.1 Error Analysis
+We can take a visualization of the elementwise difference between the reconstructed state and the original state. 
+\begin{equation}
+\Delta\rho_{ij}=|\rho^{\mathrm{shadow}}_{ij}-\rho_{ij}|
+\end{equation}
+The difference is very small, which means that the classical shadow is a good approximation of the original state even in the sence of state tomography. 
+
+It is anticipated that the fidelity will not necessarily be lower than 1, as the state reconstructed through classical shadow estimation is not guaranteed to be a physical quantum state, given that $\mathcal{M}^{-1}$ is not a quantum channel. 
+
+Fidelity is defined by $F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$, when $\rho=|v\rangle\langle v|$ is a pure state $F(\rho,\sigma)=\langle v|\sigma|v\rangle$.
+Based on the theorem, if the error rate of fedelity is $\epsilon$, i.e.
+\begin{equation}
+|F(\rho,\sigma)-1|\leq\epsilon,
+\end{equation}
+then the minimum number of measurements $N$ (number of snapshots) should be:
+\begin{equation}
+N = \frac{34}{\epsilon^2}\left\|\rho-\mathrm{Tr}(\rho)/{2^n}\mathbb{I}\right\|_{\mathrm{shadow}}^2
+\end{equation}
+with the shadow norm upper bound of the random Pauli measurement $\left\|\cdot\right\|_{\mathrm{shadow}}\leq 2^k\|\cdot\|_\infty$ when the operator acting on $k$ qubits, we have $N\leq 34\epsilon^{-2}2^{2n}+\mathcal{O}(e^{-n})$. Based on Fuchs–van de Graaf inequalities and properties of $L_p$ norm, $\|\rho-\sigma\|_2\leq \|\rho-\sigma\|_1 \leq (1-F(\rho,\sigma))^{1/2}$, the $L_2$ norm distance between the state reconstructed through classical shadow estimation and the state prepared by the circuit is upperbounded by the fidelity error rate $\epsilon$. The dependency of the bound number of measurements $N$ to achieve the error rate $\epsilon$ is depicked in function `n_measurements_tomography_bound`.
+
+
 ```{code-cell} ipython3
 # error rate of state reconstruction epsilon < 1.
 epsilon = 1
@@ -479,7 +536,6 @@ plt.legend()
 plt.xscale("log")
 plt.show()
 ```
-
 
 **Acknowledgements**
 
