@@ -120,8 +120,8 @@ class Executor:
         quantum results are stored in ``self.quantum_results``.
 
         Args:
-             circuits: A single circuit of list of circuits.
-             observable: Observable O in the expression Tr[ρ O]. If None,
+            circuits: A single circuit of list of circuits.
+            observable: Observable O in the expression Tr[ρ O]. If None,
                 the ``executor`` must return a float (which corresponds to
                 Tr[ρ O] for a specific, fixed observable O).
             force_run_all: If True, force every circuit in the input sequence

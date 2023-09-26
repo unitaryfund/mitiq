@@ -9,7 +9,7 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -18,42 +18,49 @@ from scipy.linalg import sqrtm
 import mitiq
 
 
-def eigenvalues_to_bitstring(values: List[int]) -> str:
-    """Converts eigenvalues to bitstring. e.g., [-1,1,1] -> '100'
+def eigenvalues_to_bitstring(values: Iterable[int]) -> str:
+    """Converts eigenvalues to bitstring. e.g., ``[-1,1,1] -> "100"``
 
     Args:
-        values: A list of eigenvalues.
+        values: A list of eigenvalues (must be $-1$ and $1$).
+
     Returns:
         A string of 1s and 0s corresponding to the states associated to
-            eigenvalues.
+        eigenvalues.
     """
     return "".join(["1" if v == -1 else "0" for v in values])
 
 
 def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
-    """Converts bitstring to eigenvalues. e.g., '100' -> [-1,1,1]
+    """Converts bitstring to eigenvalues. e.g., ``"100" -> [-1,1,1]``
 
     Args:
         bitstring: A string of 1s and 0s.
+
     Returns:
-        A list of eigenvalues corresponding to the bitstring.
+        A list of eigenvalues (either $-1$ or $1$) corresponding to the
+        bitstring.
     """
     return [1 if b == "0" else -1 for b in bitstring]
 
 
 def create_string(str_len: int, loc_list: List[int]) -> str:
     """
-    This function returns a string of length str_len with 1s at the locations
-    specified by loc_list and 0s elsewhere.
+    This function returns a string of length ``str_len`` with 1s at the
+    locations specified by ``loc_list`` and 0s elsewhere.
 
     Args:
         str_len: The length of the string.
-        loc_list: A list of integers specifying the locations of 1s in the
-            string.
+        loc_list: A list of integers indices specifying the locations of 1s in
+            the string.
     Returns:
-        A string of length str_len with 1s at the locations specified by
-        loc_list and 0s elsewhere.
-        e.g. if str_len = 5, loc_list = [1,3], return '01010'
+        A bitstring constructed as above.
+
+    Example:
+        A basic example::
+
+            create_string(5, [1, 3])
+            >>> "01010"
     """
     return "".join(
         map(lambda i: "1" if i in set(loc_list) else "0", range(str_len))
@@ -131,8 +138,7 @@ def n_measurements_opts_expectation_bound(
 
 
 def fidelity(
-    sigma: NDArray[np.complex64],
-    rho: NDArray[np.complex64],
+    sigma: NDArray[np.complex64], rho: NDArray[np.complex64]
 ) -> float:
     """
     Calculate the fidelity between two states.
