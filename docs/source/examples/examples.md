@@ -32,5 +32,4 @@ DDD with Qiskit: GHZ circuits <ddd_on_ibmq_ghz.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>
 Composing techniques: REM + ZNE <combine_rem_zne.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
-Benchmarking ZNE on random circuits with expecation values other than 0 or 1 <benchmarking_qem.md>
 ```
