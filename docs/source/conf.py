@@ -161,6 +161,9 @@ linkcheck_ignore = [
     r"https://dl.acm.org/doi/10.1145/3466752.3480059",
     r"https://doi.org/10.1145/3466752.3480059",
     r"https://doi.org/10.7566/jpsj.90.032001",
+    r"https://arxiv.org/abs/1612.02058",
+    r"https://arxiv.org/abs/1805.04492",
+    r"https://arxiv.org/abs/1807.05572",
 ]
 
 
