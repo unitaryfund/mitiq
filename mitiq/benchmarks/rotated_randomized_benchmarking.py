@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for generating rotated randomized benchmarking circuits."""
-from typing import List, Optional
+from typing import List, Optional, cast
 
 import cirq
 import numpy as np
@@ -63,22 +63,17 @@ def generate_rotated_rb_circuits(
         A list of rotated randomized benchmarking circuits.
     """
 
-    circuits = generate_rb_circuits(n_qubits, num_cliffords, 2 * trials)
-    rotated_circuits = []
+    circuits = cast(
+        List[cirq.Circuit],
+        generate_rb_circuits(n_qubits, num_cliffords, 2 * trials),
+    )
 
     if theta is None:
         theta = 2 * np.pi * np.random.rand()
 
     for circ in circuits:
-        rotated_circ, _ = convert_to_mitiq(circ)
-        qubits = rotated_circ.all_qubits()
-        rotated_circ.insert(
-            len(circ) // 2, cirq.Rz(rads=theta).on_each(*qubits)
-        )
-        rotated_circuits.append(rotated_circ)
+        qubits = circ.all_qubits()
+        circ.insert(len(circ) // 2, cirq.Rz(rads=theta).on_each(*qubits))
 
     return_type = "cirq" if not return_type else return_type
-    return [
-        convert_from_mitiq(circuit, return_type)
-        for circuit in rotated_circuits
-    ]
+    return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
