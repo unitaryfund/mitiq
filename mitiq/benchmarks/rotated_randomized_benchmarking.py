@@ -7,7 +7,6 @@
 from typing import List, Optional
 
 import cirq
-import numpy as np
 
 from mitiq import QPROGRAM
 from mitiq.benchmarks import generate_rb_circuits
@@ -17,6 +16,7 @@ from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 def generate_rotated_rb_circuits(
     n_qubits: int,
     num_cliffords: int,
+    theta: float,
     trials: int = 1,
     return_type: Optional[str] = None,
     seed: Optional[int] = None,
@@ -50,13 +50,13 @@ def generate_rotated_rb_circuits(
         n_qubits: The number of qubits. Can be either 1 or 2.
         num_cliffords: The number of Clifford group elements in the
             random circuits. This is proportional to the depth per circuit.
+        theta: The rotation angle about the :math:`Z` axis.
         trials: The number of random circuits to return.
         return_type: String which specifies the type of the
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
             returned circuits have type ``cirq.Circuit``.
-        seed: An optional seed for reproducibility of :math:`\theta` in
-            :math:`R_z(\theta)`.
+
 
     Returns:
         A list of rotated randomized benchmarking circuits.
@@ -65,14 +65,11 @@ def generate_rotated_rb_circuits(
     circuits = generate_rb_circuits(n_qubits, num_cliffords, 2 * trials)
     rotated_circuits = []
 
-    rng = np.random.default_rng(seed=seed)
-
     for circ in circuits:
         rotated_circ, _ = convert_to_mitiq(circ)
         qubits = rotated_circ.all_qubits()
-        rads = rng.random() * np.pi
         rotated_circ.insert(
-            len(circ) // 2, cirq.Rz(rads=rads).on_each(*qubits)
+            len(circ) // 2, cirq.Rz(rads=theta).on_each(*qubits)
         )
         rotated_circuits.append(rotated_circ)
 
