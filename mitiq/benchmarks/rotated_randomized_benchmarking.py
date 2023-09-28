@@ -28,33 +28,35 @@ def generate_rotated_rb_circuits(
     can take arbitrary values.
 
     Rotated randomized bencmarking circuits are randomized benchmarking
-    circuits in which an $R_z(\theta)$ rotation is inserted in the middle, such
-    that:
+    circuits in which an :math:`R_z(\theta)` rotation is inserted in the
+    middle, such that:
 
-    $$ C(\theta) =    G_n \dots G_{n/2 +1} R_z(\theta)G_{n/2} \dots G_2 G_1 $$
+    .. math::
+        C(\theta) =    G_n \dots G_{n/2 +1} R_z(\theta)G_{n/2} \dots G_2 G_1
 
-    where $G_j$ are Clifford elements or Clifford gates.
+    where :math:`G_j` are Clifford elements or Clifford gates.
 
     The circuits generate expectation values which are sinusoidal functions of
-    $\theta$, which in the ideal (noiseless) case vary in a continuous interval
-    of $ E_{\rm ideal} \in  [-1, 1] $.
+    :math:`\theta`, which in the ideal (noiseless) case vary in a continuous
+    interval of :math:`E_{\rm ideal} \in  [-1, 1]`.
 
     Since (up to factors of 2) we have
-    $R_z(\theta) =cos(\theta) I +  i \ sin(\theta) Z$, the rotated Clifford
-    circuit $C(\theta)$ can be written as a linear combination of just two
-    Clifford circuits and, therefore, it is still easy to classically simulate.
+    :math:`R_z(\theta) =cos(\theta) I +  i \ sin(\theta) Z`, the rotated
+    Clifford circuit :math:`C(\theta)` can be written as a linear combination
+    of just two Clifford circuits, and therefore it is still easy to
+    classically simulate.
 
     Args:
         n_qubits: The number of qubits. Can be either 1 or 2.
         num_cliffords: The number of Clifford group elements in the
             random circuits. This is proportional to the depth per circuit.
-        trials: The number of random circuits at each num_cfd.
+        trials: The number of random circuits to return.
         return_type: String which specifies the type of the
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
             returned circuits have type ``cirq.Circuit``.
-        seed: An optional seed for reproducibility of $\theta$ in
-            $R_z(\theta)$.
+        seed: An optional seed for reproducibility of :math:`\theta` in
+            :math:`R_z(\theta)`.
 
     Returns:
         A list of rotated randomized benchmarking circuits.
