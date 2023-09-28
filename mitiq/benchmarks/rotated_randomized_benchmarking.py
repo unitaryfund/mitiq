@@ -11,7 +11,7 @@ import numpy as np
 
 from mitiq import QPROGRAM
 from mitiq.benchmarks import generate_rb_circuits
-from mitiq.interface import convert_from_mitiq, convert_to_mitiq
+from mitiq.interface import convert_from_mitiq
 
 
 def generate_rotated_rb_circuits(
