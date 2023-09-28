@@ -7,6 +7,7 @@
 from typing import List, Optional
 
 import cirq
+import numpy as np
 
 from mitiq import QPROGRAM
 from mitiq.benchmarks import generate_rb_circuits
@@ -16,7 +17,7 @@ from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 def generate_rotated_rb_circuits(
     n_qubits: int,
     num_cliffords: int,
-    theta: float,
+    theta: Optional[float] = None,
     trials: int = 1,
     return_type: Optional[str] = None,
     seed: Optional[int] = None,
@@ -64,6 +65,9 @@ def generate_rotated_rb_circuits(
 
     circuits = generate_rb_circuits(n_qubits, num_cliffords, 2 * trials)
     rotated_circuits = []
+
+    if theta is None:
+        theta = 2 * np.pi * np.random.rand()
 
     for circ in circuits:
         rotated_circ, _ = convert_to_mitiq(circ)
