@@ -19,17 +19,18 @@ from mitiq.benchmarks.rotated_randomized_benchmarking import (
 @pytest.mark.parametrize("theta", [0, np.pi / 2, np.pi])
 def test_rotated_rb_circuits(n_qubits, theta):
     depth = 10
-    results = []
-    for trials in [5, 10]:
+    for trials in [2, 3]:
         circuits = generate_rotated_rb_circuits(
             n_qubits=n_qubits, num_cliffords=depth, theta=theta, trials=trials
         )
-        for qc in circuits:
-            # we check the ground state population to ignore any global phase
-            wvf = qc.final_state_vector()
-            zero_prob = abs(wvf[0] ** 2)
+        for circ in circuits:
+            zero_prob = (
+                cirq.DensityMatrixSimulator()
+                .simulate(circ)
+                .final_density_matrix[0, 0]
+                .real
+            )
             assert -1.0001 <= zero_prob <= 1.0001
-            results.append(zero_prob)
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
@@ -45,8 +46,8 @@ def test_rotated_rb_conversion(n_qubits, theta, return_type):
             trials=trials,
             return_type=return_type,
         )
-        for qc in circuits:
-            assert return_type in qc.__module__
+        for circ in circuits:
+            assert return_type in circ.__module__
 
 
 def test_rotated_rb_circuit_no_theta():

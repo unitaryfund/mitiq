@@ -20,7 +20,6 @@ def generate_rotated_rb_circuits(
     theta: Optional[float] = None,
     trials: int = 1,
     return_type: Optional[str] = None,
-    seed: Optional[int] = None,
 ) -> List[QPROGRAM]:
     r"""
     Generates a list of "rotated" randomized benchmarking circuits.
@@ -29,8 +28,8 @@ def generate_rotated_rb_circuits(
     can take arbitrary values.
 
     Rotated randomized bencmarking circuits are randomized benchmarking
-    circuits in which an :math:`R_z(\theta)` rotation is inserted in the
-    middle, such that:
+    circuits with an :math:`R_z(\theta)` rotation inserted in the middle, such
+    that:
 
     .. math::
         C(\theta) =    G_n \dots G_{n/2 +1} R_z(\theta)G_{n/2} \dots G_2 G_1
@@ -65,7 +64,7 @@ def generate_rotated_rb_circuits(
 
     circuits = cast(
         List[cirq.Circuit],
-        generate_rb_circuits(n_qubits, num_cliffords, 2 * trials),
+        generate_rb_circuits(n_qubits, num_cliffords, trials),
     )
 
     if theta is None:
@@ -74,6 +73,18 @@ def generate_rotated_rb_circuits(
     for circ in circuits:
         qubits = list(circ.all_qubits())
         circ.insert(len(circ) // 2, cirq.Rz(rads=theta).on(qubits[0]))
+        if (
+            theta != 0
+            and cirq.DensityMatrixSimulator()
+            .simulate(circ)
+            .final_density_matrix[0, 0]
+            .real
+            == 1
+        ):
+            circ = cast(
+                cirq.Circuit,
+                generate_rotated_rb_circuits(n_qubits, num_cliffords)[0],
+            )
 
     return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
