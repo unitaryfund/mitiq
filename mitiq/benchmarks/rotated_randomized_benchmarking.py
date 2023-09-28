@@ -72,8 +72,8 @@ def generate_rotated_rb_circuits(
         theta = 2 * np.pi * np.random.rand()
 
     for circ in circuits:
-        qubits = circ.all_qubits()
-        circ.insert(len(circ) // 2, cirq.Rz(rads=theta).on_each(*qubits))
+        qubits = list(circ.all_qubits())
+        circ.insert(len(circ) // 2, cirq.Rz(rads=theta).on(qubits[0]))
 
     return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
