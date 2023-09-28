@@ -15,7 +15,7 @@ from mitiq.benchmarks.rotated_randomized_benchmarking import (
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
-@pytest.mark.parametrize("theta", np.pi * np.random.rand(3))
+@pytest.mark.parametrize("theta", [0, np.pi/2, np.pi])
 def test_rotated_rb_circuits(n_qubits, theta):
     depth = 10
     results = []
@@ -32,7 +32,7 @@ def test_rotated_rb_circuits(n_qubits, theta):
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
-@pytest.mark.parametrize("theta", np.pi * np.random.rand(3))
+@pytest.mark.parametrize("theta", [0, np.pi/2, np.pi])
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_rotated_rb_conversion(n_qubits, theta, return_type):
     depth = 10
