@@ -50,7 +50,6 @@ CZ_twirling_gates = [
 ]
 
 
-
 def pauli_twirl_circuit(
     circuit: QPROGRAM,
     num_circuits: int = 10,

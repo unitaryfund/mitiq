@@ -118,7 +118,6 @@ def test_twirl_CNOT_increases_layer_count():
         assert num_gates_after == num_gates_before
 
 
-
 def test_pauli_twirl_circuit():
     num_qubits = 3
     num_layers = 20
@@ -145,4 +144,3 @@ def test_no_CNOT_CZ_circuit(twirl_func):
 
     for i in range(5):
         assert _equal(circuit, twirled_output[i])
-
