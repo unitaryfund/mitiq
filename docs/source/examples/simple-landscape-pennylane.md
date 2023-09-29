@@ -17,7 +17,7 @@ kernelspec:
 ### This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
 
 
-```python
+```{code-cell} ipython3
 import pennylane as qml
 from pennylane import numpy as np
 import matplotlib.pyplot as plt
@@ -32,7 +32,7 @@ import pennylane_qiskit
 We define a function which returns a simple two-qubit variational circuit depending on a single parameter $\gamma$ (“gamma”).
 
 
-```python
+```{code-cell} ipython3
 # Describe noise
 noise_gate = qml.PhaseDamping
 noise_strength = 0.4
@@ -42,7 +42,7 @@ dev_noisy = qml.transforms.insert(noise_gate, noise_strength)(dev)#with noise
 ```
 
 
-```python
+```{code-cell} ipython3
 def variational_circuit(gamma: float):
     """Returns a two-qubit circuit for a given variational parameter.
 
@@ -62,7 +62,7 @@ def variational_circuit(gamma: float):
 #### We can visualize the circuit for a particular $\gamma$ as follows.
 
 
-```python
+```{code-cell} ipython3
 drawer = qml.draw(variational_circuit)
 print(drawer(np.pi))
 ```
@@ -77,7 +77,7 @@ To use error mitigation methods in Mitiq, we define an executor function which c
 
 
 
-```python
+```{code-cell} ipython3
 # Observable to measure
 z = np.diag([1, -1])
 hamiltonian = np.kron(z, z)
@@ -119,13 +119,13 @@ We now compute the energy landscape $\langle H \rangle(\gamma) =\langle Z \otime
 The remaining code in this tutorial is generic and does not depend on a particular frontend.
 
 
-```python
+```{code-cell} ipython3
 gammas = np.linspace(0, 2 * np.pi, 50)
 noiseless_expectations = [np.real(np.trace(noiseless_executor(g)@ hamiltonian)) for g in gammas]
 ```
 
 
-```python
+```{code-cell} ipython3
 plt.figure(figsize=(8, 6))
 plt.plot(gammas, noiseless_expectations, color="g", linewidth=3, label="Noiseless")
 plt.title("Energy landscape", fontsize=16)
@@ -147,7 +147,7 @@ in the following code block.
 
 
 
-```python
+```{code-cell} ipython3
 gammas = np.linspace(0, 2 * np.pi, 50)
 expectations = [np.real(np.trace(executor_with_noise(g)@ hamiltonian)) for g in gammas]
 ```
@@ -155,7 +155,7 @@ expectations = [np.real(np.trace(executor_with_noise(g)@ hamiltonian)) for g in 
 The following code plots these values for visualization along with the noiseless landscape.
 
 
-```python
+```{code-cell} ipython3
 plt.figure(figsize=(8, 6))
 plt.plot(gammas, noiseless_expectations, color="g", linewidth=3, label="Noiseless")
 plt.scatter(gammas, expectations, color="r", label="Unmitigated")
@@ -175,7 +175,7 @@ We now repeat the same task but use Mitiq to mitigate errors.
 We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
 
 
-```python
+```{code-cell} ipython3
 extrapolate = RichardsonFactory.extrapolate
 scale_factors = [1, 3, 5]
 @qml.transforms.mitigate_with_zne(scale_factors, folding, extrapolate)
@@ -196,14 +196,14 @@ def circuit(gamma: float):
 We then run the same code above to compute the energy landscape, but this time use the ``mitigated_executor`` instead of just the executor.
 
 
-```python
+```{code-cell} ipython3
 mitigated_expectations = [circuit(g) for g in gammas]
 ```
 
 Let us visualize the mitigated landscape alongside the unmitigated and noiseless landscapes.
 
 
-```python
+```{code-cell} ipython3
 plt.figure(figsize=(8, 6))
 plt.plot(gammas, noiseless_expectations, color="g", linewidth=3, label="Noiseless")
 plt.scatter(gammas, expectations, color="r", label="Unmitigated")
@@ -228,7 +228,7 @@ which is required in most variational algorithms such as VQE or QAOA.
 We also observe that the minimum of mitigated energy approximates well the theoretical ground state which is equal to $-1$. Indeed:
 
 
-```python
+```{code-cell} ipython3
 print(f"Minimum of the noisy landscape: {round(min(expectations), 3)}")
 print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
 print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
@@ -240,6 +240,6 @@ print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
     
 
 
-```python
+```{code-cell} ipython3
 
 ```
