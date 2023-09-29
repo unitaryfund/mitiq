@@ -92,7 +92,7 @@ also available in the `svg` format at .. |mitiq_template.svg| image:: ../img/gen
 ```{figure} ../img/mitiq_workflow_template.png
 ---
 width: 700px
-name: figzne-overview
+name: fig-overview-template
 ---
 The diagram shows the workflow template of a new technique in Mitiq.
 ```
