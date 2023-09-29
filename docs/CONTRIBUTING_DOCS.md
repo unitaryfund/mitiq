@@ -87,7 +87,7 @@ Remember to add new files to the guide's TOC file `docs/source/guide/guide.md`.
 ### Adding workflow image to the user guide
 
 To insert a workflow to the user's guide of some new technique, the following template is available. The following image is
-also available in the `svg` format at [mitiq_template.svg](../img/general_template.svg)
+also available in the `svg` format at .. |mitiq_template.svg| image:: ../img/general_template.svg
 
 ```{figure} ../img/mitiq_workflow_template.png
 ---
