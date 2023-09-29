@@ -13,6 +13,11 @@ kernelspec:
 
 # How do I use PT?
 
+```{admonition} Warning:
+Pauli Twirling in Mitiq is still under construction. This users guide will change in the future
+after some utility functions are introduced. 
+```
+
 As with all techniques, PT is compatible with any frontend supported by Mitiq:
 
 ```{code-cell} ipython3
@@ -73,26 +78,25 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
 
 ## Apply PT
 Pauli Twirling can be easily implemented with the function
-{func}`.execute_with_pt()`.
+{func}`.pauli_twirl_circuit()`.
 
 ```{code-cell} ipython3
 from mitiq import pt
-mitigated_result = pt.execute_with_pt(
+mitigated_result = pt.pauli_twirl_circuit(
     circuit=circuit,
-    executor=execute,
 )
 ```
 
 ```{code-cell} ipython3
-print(f"Error with mitigation (PT): {abs(ideal_value - mitigated_result) :.3}")
+# print(f"Error with mitigation (PT): {abs(ideal_value - mitigated_result) :.3}")
 ```
 
-Here we observe that the application of PT reduces the estimation error when compared
-to the unmitigated result.
+Here we observe that the application of PT does not reduce the estimation error when compared
+to the unmitigated result. The intended effect was to only tailor the noise. 
 
 ```{admonition} Note:
 PT is designed to transform the noise simulated in this example,
-but it should nnot be expected to always be a positive effect.
+but it should not be expected to always be a positive effect.
 In this sense, it is more of a noise tailoring technique, designed
 to be composed with other techniques rather than an error mitigation
 technique in and of itself.

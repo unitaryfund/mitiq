@@ -13,6 +13,11 @@ kernelspec:
 
 # What is the theory behind Pauli Twirling?
 
+```{admonition} Warning:
+Pauli Twirling in Mitiq is still under construction. This users guide will change in the future
+after some utility functions are introduced. 
+```
+
 Pauli Twirling (PT) {cite}`Wallman_2016_PRA, Hashim_2021_PRX, Urbanek_2021_PRL, Saki_2023_arxiv`
 is a quantum noise tailoring technique designed to transform the noise channel
 towards a more manageable stochastic Pauli channel. This tailoring is achieved

@@ -13,6 +13,11 @@ kernelspec:
 
 # What happens when I use PT?
 
+```{admonition} Warning:
+Pauli Twirling in Mitiq is still under construction. This users guide will change in the future
+after some utility functions are introduced. 
+```
+
 The workflow of Pauli Twirling (PT) in Mitiq is represented in the figure below.
 
 ```{figure} ../img/pt_workflow.svg
@@ -39,12 +44,12 @@ the associated results are averaged to obtain the final expectation value. This 
 it can be considered as an average of independent single-circuit workflows.
 ```
 
-As shown in [How do I use PT?](pt-1-intro.md), the function {func}`.execute_with_pt()` applies PT behind the scenes 
-and directly returns the error-mitigated expectation value.
+As shown in [How do I use PT?](pt-1-intro.md), the function {func}`.pauli_twirl_circuit()` applies PT behind the scenes 
+and returns the different versions of Pauli Twirled circuits.
 In the next sections instead, we show how one can apply PT at a lower level, i.e., by:
 
 - Twirling CZ and CNOT gates in the circuit;
-- Executing the modified circuit.
+- Executing the modified circuit (still under construction).
 - Estimate expectation value by averaging over randomized twirling circuits
 
 ## Twirling CZ and CNOT gates in the circuit
@@ -72,12 +77,18 @@ CNOT_twirled_circuits = pt.twirl_CNOT_gates(circuit_to_twirl, num_circuits=10)
 twirled_circuits = [
     pt.twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
 ]
-print(CNOT_twirled_circuits[0:1])
-print(twirled_circuits[0:1])
+print("Twirling just the CNOT gates: \n", CNOT_twirled_circuits[0], "\n")
+print("Twirling both CNOT and CZ gates: \n" ,twirled_circuits[0])
 ```
 We see that we return lists of the randomly twirled circuits, and so we must take a simple average over their expectation values.
 
 ## Executing the modified circuits
+
+```{admonition} Warning:
+Pauli Twirling in Mitiq is still under construction. Some lines in the code blocks below are commented out as intended behavior
+is currently a WIP. 
+```
+
 Now that we have our twirled circuits, let's simulate some noise and execute those circuits, using the {class}`mitiq.Executor` to collect the results.
 ```{code-cell} ipython3
 from cirq import DensityMatrixSimulator, amplitude_damp
@@ -93,7 +104,7 @@ def execute(circuit, noise_level=0.003):
     return rho[0, 0].real
 
 executor = Executor(execute)
-expvals = executor.evaluate(twirled_circuits, None)
+# expvals = executor.evaluate(twirled_circuits, None)
 ```
 
 
@@ -101,11 +112,11 @@ expvals = executor.evaluate(twirled_circuits, None)
 Pauli Twirling doesn't require running the circuit at different noise levels or with different noise models. It applies a randomized sequence of Pauli operations within the same quantum circuit and averages the results to reduce the effect of the noise.
 
 ```{code-cell} ipython3
-import numpy as np
-from typing import cast
+# import numpy as np
+# from typing import cast
 
-average = cast(float, np.average(expvals))
-print(average)
+# average = cast(float, np.average(expvals))
+# print(average)
 ```
 
 Keep in mind, ths code is for illustration and that the noise level, type of noise (here amplitude damping), and the observable need to be adapted to the specific experiment.
@@ -115,12 +126,12 @@ On a real backend, they have a different sensitivity to noise. The core idea of 
 `circuits_with_pt` (hopefully) tailors the noise into stochastic Pauli channels, such that a simple average over results
 will return a mitigated result.
 
-As a final remark, we stress that the low-level procedure that we have shown is exactly what {func}`.execute_with_pt()` does behind the scenes.
+As a final remark, we stress that the low-level procedure that we have shown is exactly what {func}`.pauli_twirl_circuit()` does behind the scenes.
 Let's verify this fact: 
 
 ```{code-cell} ipython3
-np.isclose(
-  pt.execute_with_pt(circuit, executor),
-  average,
-)
+# np.isclose(
+#  pt.pauli_twirl_circuit(circuit, executor),
+#  average,
+# )
 ```

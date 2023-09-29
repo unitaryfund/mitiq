@@ -13,6 +13,11 @@ kernelspec:
 
 # When should I use PT?
 
+```{admonition} Warning:
+Pauli Twirling in Mitiq is still under construction. This users guide will change in the future
+after some utility functions are introduced. 
+```
+
 ## Advantages
 
 Pauli Twirling is a technique devised to tailor noise towards Pauli channels.

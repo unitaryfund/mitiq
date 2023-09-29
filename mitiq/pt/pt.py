@@ -58,7 +58,7 @@ def pauli_twirl_circuit(
 
     Only the $\mathrm{CZ}$ and $\mathrm{CNOT}$ gates in an
     input circuit are Pauli twirled as specified in
-    :cite:`saki2023hypothesis`.
+    :cite:`Saki_2023_arxiv`.
 
     Args:
         circuit: The input circuit to execute with twirling.

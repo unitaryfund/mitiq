@@ -13,4 +13,9 @@ kernelspec:
 
 # What additional options are available when using PT?
 
+```{admonition} Warning:
+Pauli Twirling in Mitiq is still under construction. This users guide will change in the future
+after some utility functions are introduced. 
+```
+
 Currently Pauli Twirling is designed to have relatively few options, in part to make it readily composable with every other Mitiq technique. In the future, we expect a possibility of supporting additional operations as targets (beyond CZ and CNOT gates), with more customization on picking those targets. Stay tuned!
