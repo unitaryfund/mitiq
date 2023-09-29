@@ -125,8 +125,6 @@ plt.show()
 
 
     
-![png](output_16_0.png)
-    
 
 
 ## Computing the unmitigated landscape
@@ -156,9 +154,6 @@ plt.show()
 ```
 
 
-    
-![png](output_20_0.png)
-    
 
 
 ## Computing the mitigated landscape
@@ -209,8 +204,6 @@ plt.show()
 ```
 
 
-    
-![png](output_26_0.png)
     
 
 
