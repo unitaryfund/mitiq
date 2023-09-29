@@ -84,6 +84,20 @@ where `file.md` is the one to be added. For more information on including files 
 To add information in the guide, please add markdown (`.md`) files to the `docs/guide` directory.
 Remember to add new files to the guide's TOC file `docs/source/guide/guide.md`.
 
+### Adding workflow image to the user guide
+
+To insert a workflow to the user's guide of some new technique, the following template is available. The following image is
+also available in the `svg` format at [mitiq_template.svg](../img/general_template.svg)
+
+```{figure} ../img/mitiq_workflow_template.png
+---
+width: 700px
+name: figzne-overview
+---
+The diagram shows the workflow template of a new technique in Mitiq.
+```
+
+
 ### Adding code examples
 
 All code examples, besides explanations on the use of core software package features, live in the `examples` directory under `docs/source`. You can add
