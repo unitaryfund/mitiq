@@ -11,23 +11,14 @@ kernelspec:
   name: python3
 ---
 
-```{code-cell}
-:id: AepFa1vba3Bv
-
-
-```
-
-+++ {"id": "585e0a85"}
 
 # Use CDR, ZNE, and VNCDR to mitigate the errors in the simulation of 1-D Transverse-Longitudinal Ising model
 
 
 
 
-+++ {"id": "81aa4c72"}
 
-In this tutorial, we employ ZNE, CDR, and VNCDR mitigation techniques to address errors in the simulation of the 1-D Transverse-Longitudinal Ising model using Mitiq. It is important to note that the results presented here are not original, but rather an attempt to reproduce some of the findings outlined in the paper available at https://arxiv.org/pdf/2103.12680.pdf.
-
+In this tutorial, we employ ZNE, CDR, and VNCDR mitigation techniques to address errors in the simulation of the 1-D Transverse-Longitudinal Ising model using Mitiq. It is important to note that the results presented here are not original, but rather an attempt to reproduce some of the findings outlined in the paper available at {cite}`Sopena_2023_Quantum`
 One of the primary applications of quantum computers is simulating dynamics in many-body systems. This is particularly significant because as the system size increases, the number of parameters grows exponentially. As a result, classical computers struggle to efficiently simulate such dynamics. However, we are currently in the Noisy Intermediate-Scale Quantum (NISQ) era, which means we lack the necessary resources for fault-tolerant quantum computing. Nevertheless, Quantum Error Mitigation techniques have been developed to address noise using minimal qubit resources. These techniques harness the power of classical computers to handle and mitigate quantum noise. In quantum simulation, our main interest is usually finding the average value of an observable. However, NISQ hardware can only provide us with noisy results. In mitigation techniques, we combine these noisy results with the computational power of classical computers to combat the noise. In this tutorial, we specifically utilize Zero Noise Extrapolation (ZNE), Corrected Dynamical Reduction (CDR), and Variational Noise-Corrected Dynamical Reduction (VNCDR) techniques to mitigate errors in the simulation of a 1-D Ising Hamiltonian.
 
 The Hamiltonian for the quantum one-dimensional Ising model, with both transverse and longitudinal fields, can be expressed as follows:
@@ -53,12 +44,10 @@ U(\Delta t) \approx e^{-iH_{ZZ}\Delta t}e^{-iH_{Z}\Delta t}e^{-iH_{X}\Delta t},
 \end{equation}
 which is a product of different unitary operators. Finally, one can express each of these unitary operators as a gate sequence of single-qubit gates or two-qubit gates that are subsequently applied.
 
-+++ {"id": "Z4U83K3WjCMv"}
 
 For the first step we import some packages.
 
 ```{code-cell}
-:id: 1ad9eeac
 
 from mitiq.observable import Observable, PauliString
 
@@ -87,12 +76,10 @@ import warnings
 warnings.filterwarnings('ignore')
 ```
 
-+++ {"id": "478f5fc8"}
 
 To start with coding, we define function "trotter_evolution_H" which is  $U(\Delta t)$
 
 ```{code-cell}
-:id: a6d68546
 
 
 
@@ -142,7 +129,6 @@ def trotter_evolution_H(L: int, h_z: float, h_x: float, Jdt: float) -> cirq.Circ
 
 ```
 
-+++ {"id": "PpB5FBVl6_YM"}
 
 Instead of real hardware, we use a (Mitiq-wrapped) Cirq simulator to obtain the simulation results, and add depolarizing noise.
 
@@ -152,7 +138,6 @@ https://mitiq.readthedocs.io/en/stable/examples/cirq-ibmq-backends.html
 In addition, we define an exact simulator as we need to compare the exact and mitigated results.
 
 ```{code-cell}
-:id: OAwRXMmx66_J
 
 # Define an exact simulator
 def exact_simulator(circuit: cirq.Circuit) -> np.ndarray:
@@ -162,13 +147,11 @@ def noisy_simulator(circuit: cirq.Circuit) -> np.ndarray:
     return compute_density_matrix(circuit, DepolarizingChannel ,noise_level=(0.007,))
 ```
 
-+++ {"id": "pcTOIz1NHdWK"}
 
 
 We set the Hamiltonian parameters and simulate the Hamiltonian using the trotterization technique explained earlier. Then, we plot the average value of different observables. We begin by calculating the average value of $Z_2$ when the initial state consists of all spins up.
 
 ```{code-cell}
-:id: TPkKegw0jNV-
 
 L = 5
 h_z = 0.9
@@ -178,12 +161,7 @@ n_dt = 6 #number of time steps
 ```
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-id: 0_30T42Xli1M
-outputId: f67ed77c-3c2e-4653-d7fa-57d47ffa7304
----
+
 # Create qubits
 qubits = cirq.LineQubit.range(L)
 
@@ -232,24 +210,17 @@ for ii in range(n_dt):
 
 ```
 
-+++ {"id": "xXoS2SuzDCqX"}
 
-We plot all the exact, unmitigated, and different mitigated measurements to compare the results. As suggested in the original paper https://arxiv.org/pdf/2103.12680.pdf , the evolution of the $<Z_2(t)>$ is as follows
+We plot all the exact, unmitigated, and different mitigated measurements to compare the results. As suggested in the original paper {cite}`Sopena_2023_Quantum` , the evolution of the $⟨Z_i(t)⟩$ is as follows
 
 $
-<σ^z_i(t)>=a_1 e^{-a_2 t}cos(a_3t)+a_4t+a_5
+⟨Z_i(t)⟩=a_1 e^{-a_2 t}cos(a_3t)+a_4t+a_5
 $
 
 we used the trotterized simulation results to estimate parametrs $a_1$,...,$a_5$.
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-  height: 450
-id: Y9xQMpwMOhI1
-outputId: 62ac6547-c275-4007-d62e-e410de58a817
----
+
 import numpy
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
@@ -273,7 +244,7 @@ y_fit = sigma_z_t(x_fit, *popt)
 
 # Plot the  data sets and the fitted curve
 plt.scatter(x_data, unmitigated_measurement, label='Unmitigated')
-plt.scatter(x_data, exact_measurement, label='trotterized')
+plt.scatter(x_data, exact_measurement, label='Exact_trattorization')
 plt.scatter(x_data, mitigated_measurement_cdr, label='Mitigated_cdr')
 plt.scatter(x_data, mitigated_measurement_vncdr, label='Mitigated_vncdr')
 plt.scatter(x_data, mitigated_measurement_zne, label='Mitigated_zne')
@@ -284,17 +255,11 @@ plt.legend()
 plt.show()
 ```
 
-+++ {"id": "80fNVhwLMvfh"}
 
-We repeat the same thing using a different initial state. this time the initial state is |00011>
+We repeat the same thing using a different initial state. this time the initial state is $\vert 00011⟩$
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-id: GCE-U8l57-li
-outputId: 28416ac0-e992-4639-ad7f-a32742aa7951
----
+
 # Create qubits
 qubits = cirq.LineQubit.range(L)
 
@@ -347,20 +312,9 @@ for ii in range(n_dt):
 
 ```
 
-```{code-cell}
-:id: YEpsDGMeZH5g
-
-
-```
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-  height: 449
-id: 53qNWJPgInhk
-outputId: 2501df62-0080-4672-a152-2c40ea59cb6b
----
+
 import numpy
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
@@ -384,7 +338,7 @@ y_fit = func(x_fit, *popt)
 
 # Plot the original data and the fitted curve
 plt.scatter(x_data, unmitigated_measurement, label='Unmitigated')
-plt.scatter(x_data, exact_measurement, label='Exact')
+plt.scatter(x_data, exact_measurement, label='Exact_trattorization')
 plt.scatter(x_data, mitigated_measurement_cdr, label='Mitigated_cdr')
 plt.scatter(x_data, mitigated_measurement_vncdr, label='Mitigated_vncdr')
 plt.scatter(x_data, mitigated_measurement_zne, label='Mitigated_zne')
@@ -395,21 +349,14 @@ plt.legend()
 plt.show()
 ```
 
-+++ {"id": "4Mczl8AkNu_r"}
 
 One can see that for both different initial states the mitigated results perform much better than the unmitigated results.
 
-+++ {"id": "paFcWHgk4yMf"}
 
 Now, let's define observables as $\Delta_i=Z_i Z_{i+1}$, and assess the effectiveness of various mitigation techniques.
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-id: 3qRgJgxeWOVW
-outputId: 75d515b8-5669-4d18-c746-780128a842e4
----
+
 
 delta=[1]*4
 
@@ -470,13 +417,7 @@ for ii in range(n_dt):
 ```
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-  height: 1000
-id: 4hH_JwVgWgIn
-outputId: 07cc603b-66b0-4abb-fcc4-d231fd6df9d6
----
+
 # Plot exact_measurement using colors
 plt.imshow(np.transpose(exact_measurement), cmap='viridis')
 
@@ -484,7 +425,7 @@ plt.imshow(np.transpose(exact_measurement), cmap='viridis')
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Exact Measurement')
+plt.title('Exact Trattorization')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
@@ -575,18 +516,11 @@ plt.colorbar()
 plt.show()
 ```
 
-+++ {"id": "mu0ImbtkvK1i"}
 
 To enhance the visualization of the performance of various mitigation techniques, the absolute value of the difference between the exact measurement and different mitigation techniques is presented.
 
 ```{code-cell}
----
-colab:
-  base_uri: https://localhost:8080/
-  height: 1000
-id: 62cfPpu0vp_V
-outputId: 9d43bd70-93cc-4821-c013-134ff896d9e6
----
+
 # Plot the difference between exact and unmitigated_measurement using colors
 plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(unmitigated_measurement)), cmap='viridis')
 
@@ -594,7 +528,7 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(unmitigated_measu
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact and unmitigated')
+plt.title('Differnce between exact trattorization and unmitigated')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
@@ -614,7 +548,7 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact and mitigated ZNE')
+plt.title('Differnce between exact trattorization and mitigated ZNE')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
@@ -634,7 +568,7 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact and mitigated CDR')
+plt.title('Differnce between exact trattorization and mitigated CDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
@@ -653,7 +587,7 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact and mitigated VNCDR')
+plt.title('Differnce between exact trattorization and mitigated VNCDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
@@ -666,12 +600,10 @@ plt.colorbar()
 plt.show()
 ```
 
-+++ {"id": "CgZ2FIhfxkkK"}
 
 As one can see, the VNCDR method out performs the other methods and is much better than the unmitigated result.
 
 ```{code-cell}
-:id: 9R1B3n0Dw3Yc
 
 
 ```
