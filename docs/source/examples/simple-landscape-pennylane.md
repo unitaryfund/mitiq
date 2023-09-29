@@ -1,3 +1,17 @@
+---
+jupytext:
+  formats: md:myst,ipynb
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.23.4
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
 # Mitigating the energy landscape of a variational circuit with Mitiq
 
 ### This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
