@@ -324,6 +324,6 @@ Fund](https://unitary.fund/grants.html)\'s list of supported projects.
 
 From the [2023 IBM Qiskit Global Summer School (QGSS23)](https://qiskit.org/events/summer-school-2023):
 - [YouTube lecture (Part 1)](https://www.youtube.com/watch?v=3Ka11boCm1M)
-- [Lecture Notes (Part 1)](https://github.com/qiskit-community/qgss-2023/blob/main/Lecture%20Notes/Lecture%207%20-%20Introduction%20to%20Noise.pdf.zip)
-- [Additional Notes Part 1](https://github.com/qiskit-community/qgss-2023/blob/main/Lecture%20Notes/Lecture%207%20-%20Bonus%20Content.zip)
+- Lecture Notes (Part 1): [download from GitHub](https://github.com/qiskit-community/qgss-2023/blob/main/Lecture%20Notes/Lecture%207%20-%20Introduction%20to%20Noise.pdf.zip)
+- Additional Notes Part 1: [download from GitHub](https://github.com/qiskit-community/qgss-2023/blob/main/Lecture%20Notes/Lecture%207%20-%20Bonus%20Content.zip)
 - Lecture notes, lab content, and solutions at the [QGSS23 Hub](https://github.com/qiskit-community/qgss-2023) 
