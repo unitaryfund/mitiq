@@ -11,6 +11,7 @@ cdr.md
 shadows.md
 ddd.md
 rem.md
+pt.md
 error-mitigation.md
 glossary.md
 ```
