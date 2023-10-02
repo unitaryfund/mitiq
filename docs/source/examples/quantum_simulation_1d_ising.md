@@ -12,7 +12,9 @@ kernelspec:
 ---
 
 
-# Use CDR, ZNE, and VNCDR to mitigate the errors in the simulation of 1-D Transverse-Longitudinal Ising model
+
+ # CDR, ZNE, and VNCDR: 1-D Transverse-Longitudinal Ising model
+
 
 
 
@@ -45,29 +47,28 @@ U(\Delta t) \approx e^{-iH_{ZZ}\Delta t}e^{-iH_{Z}\Delta t}e^{-iH_{X}\Delta t},
 which is a product of different unitary operators. Finally, one can express each of these unitary operators as a gate sequence of single-qubit gates or two-qubit gates that are subsequently applied.
 
 
+
 For the first step we import some packages.
 
 ```{code-cell}
 
+
 from mitiq.observable import Observable, PauliString
 
-
 from mitiq import zne
-
-
-
 
 from cirq.ops.common_channels import DepolarizingChannel
 
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
-
 import cirq
+
 from mitiq import zne
 
 from mitiq import zne, cdr, Observable, PauliString
 
 import time
+
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -77,9 +78,11 @@ warnings.filterwarnings('ignore')
 ```
 
 
+
 To start with coding, we define function "trotter_evolution_H" which is  $U(\Delta t)$
 
 ```{code-cell}
+
 
 
 
@@ -139,6 +142,7 @@ In addition, we define an exact simulator as we need to compare the exact and mi
 
 ```{code-cell}
 
+
 # Define an exact simulator
 def exact_simulator(circuit: cirq.Circuit) -> np.ndarray:
     return compute_density_matrix(circuit, noise_level=(0.0,))
@@ -149,9 +153,11 @@ def noisy_simulator(circuit: cirq.Circuit) -> np.ndarray:
 
 
 
+
 We set the Hamiltonian parameters and simulate the Hamiltonian using the trotterization technique explained earlier. Then, we plot the average value of different observables. We begin by calculating the average value of $Z_2$ when the initial state consists of all spins up.
 
 ```{code-cell}
+
 
 L = 5
 h_z = 0.9
@@ -211,6 +217,7 @@ for ii in range(n_dt):
 ```
 
 
+
 We plot all the exact, unmitigated, and different mitigated measurements to compare the results. As suggested in the original paper {cite}`Sopena_2023_Quantum` , the evolution of the $⟨Z_i(t)⟩$ is as follows
 
 $
@@ -244,16 +251,17 @@ y_fit = sigma_z_t(x_fit, *popt)
 
 # Plot the  data sets and the fitted curve
 plt.scatter(x_data, unmitigated_measurement, label='Unmitigated')
-plt.scatter(x_data, exact_measurement, label='Exact_trattorization')
+plt.scatter(x_data, exact_measurement, label='Exact_Trotterization')
 plt.scatter(x_data, mitigated_measurement_cdr, label='Mitigated_cdr')
 plt.scatter(x_data, mitigated_measurement_vncdr, label='Mitigated_vncdr')
 plt.scatter(x_data, mitigated_measurement_zne, label='Mitigated_zne')
 plt.plot(x_fit, y_fit, 'r-', label='Fitted Curve')
-plt.xlabel('n_dt')
-plt.ylabel('Z_2')
+plt.xlabel('n_dt*Jdt')
+plt.ylabel('$<Z_2>$')
 plt.legend()
 plt.show()
 ```
+
 
 
 We repeat the same thing using a different initial state. this time the initial state is $\vert 00011⟩$
@@ -312,7 +320,6 @@ for ii in range(n_dt):
 
 ```
 
-
 ```{code-cell}
 
 import numpy
@@ -338,22 +345,27 @@ y_fit = func(x_fit, *popt)
 
 # Plot the original data and the fitted curve
 plt.scatter(x_data, unmitigated_measurement, label='Unmitigated')
-plt.scatter(x_data, exact_measurement, label='Exact_trattorization')
+plt.scatter(x_data, exact_measurement, label='Exact_Trotterization')
 plt.scatter(x_data, mitigated_measurement_cdr, label='Mitigated_cdr')
 plt.scatter(x_data, mitigated_measurement_vncdr, label='Mitigated_vncdr')
 plt.scatter(x_data, mitigated_measurement_zne, label='Mitigated_zne')
 plt.plot(x_fit, y_fit, 'r-', label='Fitted Curve')
-plt.xlabel('x')
-plt.ylabel('y')
+plt.xlabel('n_dt * Jdt')
+plt.ylabel('$<Z_2>$')
 plt.legend()
 plt.show()
 ```
 
 
+
 One can see that for both different initial states the mitigated results perform much better than the unmitigated results.
 
 
-Now, let's define observables as $\Delta_i=Z_i Z_{i+1}$, and assess the effectiveness of various mitigation techniques.
+In order to show the temporal evolution of the position of fermions and mesons in this 1-D model, one should measure the probability distribution of kinks {cite}`Sopena_2023_Quantum`
+\begin{equation}
+\Delta_i=\frac{1}{2} (I-Z_i Z_{i+1}).
+\end{equation}
+We assess the effectiveness of various mitigation techniques in the simulation of operatore $Δ_i$
 
 ```{code-cell}
 
@@ -416,6 +428,10 @@ for ii in range(n_dt):
 
 ```
 
+
+
+Then, we plot different simulations using color plots
+
 ```{code-cell}
 
 # Plot exact_measurement using colors
@@ -425,11 +441,11 @@ plt.imshow(np.transpose(exact_measurement), cmap='viridis')
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Exact Trattorization')
+plt.title('Exact Trotterization')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -448,7 +464,7 @@ plt.title('Unmitigated')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -468,7 +484,7 @@ plt.title('Mitigated ZNE')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -488,7 +504,7 @@ plt.title('Mitigated CDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -507,7 +523,7 @@ plt.title('Mitigated VNCDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -516,6 +532,9 @@ plt.colorbar()
 plt.show()
 ```
 
+
+
+The plots are consist of different cells, and the color of each cell represents the value of $\Delta_i$ at that particular time.
 
 To enhance the visualization of the performance of various mitigation techniques, the absolute value of the difference between the exact measurement and different mitigation techniques is presented.
 
@@ -528,11 +547,11 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(unmitigated_measu
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact trattorization and unmitigated')
+plt.title('Differnce between exact Trotterization and unmitigated')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -548,11 +567,11 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact trattorization and mitigated ZNE')
+plt.title('Differnce between exact Trotterization and mitigated ZNE')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -568,11 +587,11 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact trattorization and mitigated CDR')
+plt.title('Differnce between exact Trotterization and mitigated CDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -587,11 +606,11 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact trattorization and mitigated VNCDR')
+plt.title('Differnce between exact Trotterization and mitigated VNCDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
-plt.ylabel('t')
+plt.ylabel('n_dt')
 
 # Add a colorbar for reference
 plt.colorbar()
@@ -602,8 +621,3 @@ plt.show()
 
 
 As one can see, the VNCDR method out performs the other methods and is much better than the unmitigated result.
-
-```{code-cell}
-
-
-```
