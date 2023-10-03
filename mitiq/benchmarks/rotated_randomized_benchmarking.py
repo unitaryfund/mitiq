@@ -73,18 +73,6 @@ def generate_rotated_rb_circuits(
     for circ in circuits:
         qubits = list(circ.all_qubits())
         circ.insert(len(circ) // 2, cirq.Rz(rads=theta).on(qubits[0]))
-        if (
-            theta != 0
-            and cirq.DensityMatrixSimulator()
-            .simulate(circ)
-            .final_density_matrix[0, 0]
-            .real
-            == 1
-        ):
-            circ = cast(
-                cirq.Circuit,
-                generate_rotated_rb_circuits(n_qubits, num_cliffords)[0],
-            )
 
     return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
