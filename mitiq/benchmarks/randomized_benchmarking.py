@@ -1,4 +1,9 @@
 # Copyright (C) Unitary Fund
+# Portions of this code have been adapted from Cirq's qubit characterizations
+# module.
+# Original authors: Cirq developers: 
+# Code URL = ('https://github.com/quantumlib/Cirq/blob/master/cirq-core/cirq/
+# experiments/qubit_characterizations.py')
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -7,12 +12,12 @@
 from typing import List, Optional
 
 import numpy as np
-from cirq import LineQubit
+import cirq
 from cirq.experiments.qubit_characterizations import (
     _gate_seq_to_mats,
-    _random_single_q_clifford,
-    _random_two_q_clifford,
+    _find_inv_matrix,
     _single_qubit_cliffords,
+    _two_qubit_clifford,
     _two_qubit_clifford_matrices,
 )
 
@@ -25,6 +30,7 @@ def generate_rb_circuits(
     num_cliffords: int,
     trials: int = 1,
     return_type: Optional[str] = None,
+    random_state: Optional[int] = None,
 ) -> List[QPROGRAM]:
     """Returns a list of randomized benchmarking circuits, i.e. circuits that
     are equivalent to the identity.
@@ -38,6 +44,7 @@ def generate_rb_circuits(
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
             returned circuits have type ``cirq.Circuit``.
+        random_state: A seed for generating radomzed benchmarking circuits.
 
     Returns:
         A list of randomized benchmarking circuits.
@@ -47,35 +54,41 @@ def generate_rb_circuits(
             "Only generates RB circuits on one or two "
             f"qubits not {n_qubits}."
         )
-    qubits = LineQubit.range(n_qubits)
+    qubits = cirq.LineQubit.range(n_qubits)
     cliffords = _single_qubit_cliffords()
-
+    np.random.seed(random_state)
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
         cfd_mat_1q = np.array(
             [_gate_seq_to_mats(gates) for gates in c1], dtype=np.complex64
         )
+        circuits = []
+        clifford_group_size = 24
+        for _ in range(trials):
+            gate_ids = list(np.random.choice(clifford_group_size, num_cliffords))
+            gate_sequence = [gate for gate_id in gate_ids for gate in c1[gate_id]]
+            idx = _find_inv_matrix(_gate_seq_to_mats(gate_sequence), cfd_mat_1q)
+            gate_sequence.extend(c1[idx])
+            circuits.append(cirq.Circuit(gate(qubits[0]) for gate in gate_sequence))
 
-        circuits = [
-            _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)
-            for _ in range(trials)
-        ]
+                        
     else:
+        clifford_group_size = 11520
         cfd_matrices = _two_qubit_clifford_matrices(
             qubits[0],
             qubits[1],
             cliffords,
         )
-        circuits = [
-            _random_two_q_clifford(
-                qubits[0],
-                qubits[1],
-                num_cliffords,
-                cfd_matrices,
-                cliffords,
-            )
-            for _ in range(trials)
-        ]
+        circuits = []
+        for _ in range(trials):
+            idx_list = list(np.random.choice(clifford_group_size, num_cliffords))
+            circuit = cirq.Circuit()
+            for idx in idx_list:
+                circuit.append(_two_qubit_clifford(qubits[0], qubits[1], idx, cliffords))
+            inv_idx = _find_inv_matrix(cirq.protocols.unitary(circuit), cfd_matrices)
+            circuit.append(_two_qubit_clifford(qubits[0], qubits[1], inv_idx, cliffords))
+                
+            circuits.append(circuit)
 
     return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
