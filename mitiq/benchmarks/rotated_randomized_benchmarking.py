@@ -20,6 +20,7 @@ def generate_rotated_rb_circuits(
     theta: Optional[float] = None,
     trials: int = 1,
     return_type: Optional[str] = None,
+    seed: Optional[int] = None,
 ) -> List[QPROGRAM]:
     r"""
     Generates a list of "rotated" randomized benchmarking circuits.
@@ -56,6 +57,7 @@ def generate_rotated_rb_circuits(
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
             returned circuits have type ``cirq.Circuit``.
+        seed: A seed for generating radomzed benchmarking circuits.
 
 
     Returns:
@@ -64,7 +66,7 @@ def generate_rotated_rb_circuits(
 
     circuits = cast(
         List[cirq.Circuit],
-        generate_rb_circuits(n_qubits, num_cliffords, trials),
+        generate_rb_circuits(n_qubits, num_cliffords, trials, seed=seed),
     )
 
     if theta is None:
