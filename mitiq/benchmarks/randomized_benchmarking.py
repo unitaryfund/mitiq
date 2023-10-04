@@ -57,7 +57,7 @@ def generate_rb_circuits(
         )
     qubits = cirq.LineQubit.range(n_qubits)
     cliffords = _single_qubit_cliffords()
-    np.random.seed(seed)
+    rng = np.random.RandomState(seed)
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
         cfd_mat_1q = np.array(
@@ -66,9 +66,7 @@ def generate_rb_circuits(
         circuits = []
         clifford_group_size = 24
         for _ in range(trials):
-            gate_ids = list(
-                np.random.choice(clifford_group_size, num_cliffords)
-            )
+            gate_ids = list(rng.choice(clifford_group_size, num_cliffords))
             gate_sequence = [
                 gate for gate_id in gate_ids for gate in c1[gate_id]
             ]
@@ -89,9 +87,7 @@ def generate_rb_circuits(
         )
         circuits = []
         for _ in range(trials):
-            idx_list = list(
-                np.random.choice(clifford_group_size, num_cliffords)
-            )
+            idx_list = list(rng.choice(clifford_group_size, num_cliffords))
             circuit = cirq.Circuit()
             for idx in idx_list:
                 circuit.append(
