@@ -37,9 +37,9 @@ def generate_rotated_rb_circuits(
 
     where :math:`G_j` are Clifford elements or Clifford gates.
 
-    The circuits generate expectation values which are sinusoidal functions of
-    :math:`\theta`, which in the ideal (noiseless) case vary in a continuous
-    interval of :math:`E_{\rm ideal} \in  [-1, 1]`.
+    For most values of the seed, the probability of the zero state is a
+    sinusoidal function of :math:`\theta`. For some values of the seed
+    the probability of the zero state is 1 for all :math:`\theta`.
 
     Since (up to factors of 2) we have
     :math:`R_z(\theta) =cos(\theta) I +  i \ sin(\theta) Z`, the rotated
