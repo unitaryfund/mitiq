@@ -16,7 +16,7 @@ from mitiq.shadows.classical_postprocessing import (
     get_single_shot_pauli_fidelity,
     shadow_state_reconstruction,
 )
-from mitiq.shadows.shadows_utils import operator_ptm_vector_rep
+from mitiq.utils import operator_ptm_vector_rep
 
 
 def test_get_single_shot_pauli_fidelity():

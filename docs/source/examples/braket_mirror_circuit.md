@@ -15,7 +15,11 @@ kernelspec:
 
 This notebook shows improved performance on a mirror circuit benchmark with zero-noise extrapolation on Rigetti Aspen-9 via Amazon Braket.
 
-> Note: This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to https://console.aws.amazon.com/braket/ and running from there. This requires an AWS account. **Without an AWS account, you can still run the notebook on a noisy simulator**.
+```{note}
+This notebook is intended to be run through the Amazon Web Services (AWS) console --- that is, by uploading the `.ipynb` file to <https://console.aws.amazon.com/braket/> and running from there.
+This requires an AWS account.
+**Without an AWS account, you can still run the notebook on a noisy simulator**.
+```
 
 ## Setup
 
@@ -43,7 +47,9 @@ from mitiq import benchmarks, zne
 
 We first choose a device to run on.
 
-> Note: Verbatim compiling in Braket - a necessary feature to perform zero-noise extrapolation - is currently only available on Rigetti devices.
+```{warning}
+Verbatim compiling in Braket --- a necessary feature to perform zero-noise extrapolation --- is currently only available on Rigetti devices.
+```
 
 ```{code-cell} ipython3
 try:
@@ -59,9 +65,14 @@ on_aws = aws_device.name != "DensityMatrixSimulator"
 (examples/braket_mirror_circuit/define-the-circuit)=
 ## Define the circuit
 
-We use mirror circuits to benchmark the performance of the device. Mirror circuits, introduced in https://arxiv.org/abs/2008.11294, are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise. The frequency of the correct bitstring is our target metric.
+We use mirror circuits to benchmark the performance of the device. Mirror circuits, introduced in {cite}`Proctor_2021_NatPhys`, are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise. The frequency of the correct bitstring is our target metric.
 
-> Note: Mirror circuits build on Loschmidt echo circuits - i.e., circuits of the form $U U^\dagger$ for some unitary $U$. Loschmidt echo circuits are good benchmarks but have shortcomings - e.g., they are unable to detect coherent errors. Mirror circuits add new features to account for these shortcomings. For more background, see https://arxiv.org/abs/2008.11294.
+```{note}
+Mirror circuits build on Loschmidt echo circuits --- i.e., circuits of the form $U U^\dagger$ for some unitary $U$.
+Loschmidt echo circuits are good benchmarks but have shortcomings --- e.g., they are unable to detect coherent errors.
+Mirror circuits add new features to account for these shortcomings.
+For more background, see <https://arxiv.org/abs/2008.11294>.
+```
 
 To define a mirror circuit, we need the device graph. We will use a subgraph of the device, and our first step is picking a subgraph with good qubits.
 
@@ -80,7 +91,7 @@ To pick good qubits, we pull the latest calibration report in the next two cells
 ```{code-cell} ipython3
 if on_aws:
     twoq_data = pd.DataFrame.from_dict(aws_device.properties.provider.specs["2Q"]).T
-    
+
 twoq_data.sort_values(by=["fCZ"], ascending=False).head() if on_aws else print()
 ```
 
@@ -89,7 +100,7 @@ And the next cell shows single-qubit calibration data sorted by best readout (RO
 ```{code-cell} ipython3
 if on_aws:
     oneq_data = pd.DataFrame.from_dict(aws_device.properties.provider.specs["1Q"]).T
-    
+
 oneq_data.sort_values(by=["fRO"], ascending=False).head() if on_aws else print()
 ```
 
@@ -106,7 +117,7 @@ Now that we have the device (sub)graph, we can generate a mirror circuit and the
 
 ```{code-cell} ipython3
 circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
-    nlayers=1, 
+    nlayers=1,
     two_qubit_gate_prob=1.0,
     two_qubit_gate_name="CZ",
     connectivity_graph=connectivity_graph,
@@ -148,30 +159,42 @@ def compile_to_rigetti_gateset(circuit: Circuit) -> Circuit:
             compiled.add_instruction(gates.Instruction(gates.Rz(-np.pi / 2), instr.target))
         else:
             compiled.add_instruction(instr)
-    
+
     return compiled
 ```
 
 ## Define the executor
 
-Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the frequency of sampling the correct bitstring.
+Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value.
+In this example we return the frequency of sampling the correct bitstring.
 
 ```{code-cell} ipython3
 def execute(
     circuit: Circuit,
-    shots: int = 1_000, 
+    shots: int = 1_000,
     s3_folder: Tuple[str, str] = ("bucket", "folder/"),
 ) -> float:
-    # Add verbatim compiling so that zero-noise extrapolation can be used.
     if on_aws:
-        circuit = Circuit().add_verbatim_box(compile_to_rigetti_gateset(circuit))
-    
-    # Run the circuit and return the frequency of sampling the correct bitstring.
-    if on_aws:
-        aws_task = aws_device.run(circuit, s3_folder, disable_qubit_rewiring=True, shots=shots)
+        # Add verbatim compiling so that ZNE can be used.
+        circuit = Circuit().add_verbatim_box(
+            compile_to_rigetti_gateset(circuit)
+        )
+
+        aws_task = aws_device.run(
+            circuit, s3_folder, disable_qubit_rewiring=True, shots=shots
+        )
+
     else:
-        aws_task = aws_device.run(circuit.copy().apply_gate_noise(Noise.Depolarizing(probability=0.002)), shots=shots)
-    return aws_task.result().measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0)
+        aws_task = aws_device.run(
+            circuit.copy().apply_gate_noise(
+                Noise.Depolarizing(probability=0.002)
+            ),
+            shots=shots,
+        )
+
+    return aws_task.result().measurement_probabilities.get(
+        "".join(map(str, correct_bitstring)), 0.0
+    )
 ```
 
 ## Noisy value
@@ -189,9 +212,9 @@ The result of running the example mirror circuit with zero-noise extrapolation i
 
 ```{code-cell} ipython3
 zne_value = zne.execute_with_zne(
-    circuit, 
-    execute, 
-    scale_noise=zne.scaling.fold_global, 
+    circuit,
+    execute,
+    scale_noise=zne.scaling.fold_global,
     factory=zne.inference.PolyFactory(scale_factors=[1, 3, 5], order=2)
 )
 print("ZNE value:", zne_value)
@@ -216,20 +239,20 @@ zne_values = []
 for nlayers in nlayers_values:
     for i in range(ntrials):
         circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
-            nlayers=nlayers, 
+            nlayers=nlayers,
             two_qubit_gate_prob=1.0,
             two_qubit_gate_name="CZ",
             connectivity_graph=connectivity_graph,
             seed=i,
             return_type="braket",
         )
-    
+
         noisy_values.append(execute(circuit))
         zne_values.append(
             zne.execute_with_zne(
-                circuit, 
-                execute, 
-                scale_noise=zne.scaling.fold_global, 
+                circuit,
+                execute,
+                scale_noise=zne.scaling.fold_global,
                 factory=zne.inference.PolyFactory(scale_factors=[1, 3, 5], order=2)),
         )
 ```
@@ -244,7 +267,7 @@ plt.rcParams.update({"font.family": "serif", "font.size": 16})
 plt.figure(figsize=(9, 5))
 
 plt.plot(nlayers_values, average_zne_values, "--o", label="ZNE")
-plt.plot(nlayers_values, average_noisy_values, "--o", label="Raw")
+plt.plot(nlayers_values, average_noisy_values, "-.o", label="Raw")
 
 plt.xlabel("Circuit depth")
 plt.ylabel("Survival probability")

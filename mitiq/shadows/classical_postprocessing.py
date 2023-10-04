@@ -16,12 +16,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 import mitiq
-from mitiq.shadows.shadows_utils import (
-    bitstring_to_eigenvalues,
-    create_string,
-    kronecker_product,
-    operator_ptm_vector_rep,
-)
+from mitiq.shadows.shadows_utils import bitstring_to_eigenvalues, create_string
+from mitiq.utils import matrix_kronecker_product, operator_ptm_vector_rep
 
 # Local unitaries to measure Pauli operators in the Z basis
 PAULI_MAP = {
@@ -237,7 +233,9 @@ def classical_snapshot(
                     pi * operator_ptm_vector_rep(U2.conj().T @ state @ U2)
                 )
                 # solve for the snapshot state
-            elements.append(1 / f * kronecker_product(pi_snapshot_vecter))
+            elements.append(
+                1 / f * matrix_kronecker_product(pi_snapshot_vecter)
+            )
         rho_snapshot_vector = np.sum(elements, axis=0)
         # normalize the snapshot state
         rho_snapshot = rho_snapshot_vector  # * normalize_factor
@@ -252,7 +250,7 @@ def classical_snapshot(
             local_rho = 3.0 * (U.conj().T @ state @ U) - cirq.I._unitary_()
             local_rhos.append(local_rho)
 
-        rho_snapshot = kronecker_product(local_rhos)
+        rho_snapshot = matrix_kronecker_product(local_rhos)
     return rho_snapshot
 
 
