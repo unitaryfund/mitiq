@@ -1,9 +1,10 @@
 # Copyright (C) Unitary Fund
 # Portions of this code have been adapted from Cirq's qubit characterizations
 # module.
-# Original authors: Cirq developers: 
+# Original authors: Cirq developers: Xiao Mi, Dave Bacon, Craig Gidney,
+# Ping Yeh, Matthew Neely.
 # Code URL = ('https://github.com/quantumlib/Cirq/blob/master/cirq-core/cirq/
-# experiments/qubit_characterizations.py')
+# experiments/qubit_characterizations.py').
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -11,11 +12,11 @@
 """Functions for generating randomized benchmarking circuits."""
 from typing import List, Optional
 
-import numpy as np
 import cirq
+import numpy as np
 from cirq.experiments.qubit_characterizations import (
-    _gate_seq_to_mats,
     _find_inv_matrix,
+    _gate_seq_to_mats,
     _single_qubit_cliffords,
     _two_qubit_clifford,
     _two_qubit_clifford_matrices,
@@ -30,7 +31,7 @@ def generate_rb_circuits(
     num_cliffords: int,
     trials: int = 1,
     return_type: Optional[str] = None,
-    random_state: Optional[int] = None,
+    seed: Optional[int] = None,
 ) -> List[QPROGRAM]:
     """Returns a list of randomized benchmarking circuits, i.e. circuits that
     are equivalent to the identity.
@@ -44,7 +45,7 @@ def generate_rb_circuits(
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
             returned circuits have type ``cirq.Circuit``.
-        random_state: A seed for generating radomzed benchmarking circuits.
+        seed: A seed for generating radomzed benchmarking circuits.
 
     Returns:
         A list of randomized benchmarking circuits.
@@ -56,7 +57,7 @@ def generate_rb_circuits(
         )
     qubits = cirq.LineQubit.range(n_qubits)
     cliffords = _single_qubit_cliffords()
-    np.random.seed(random_state)
+    np.random.seed(seed)
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
         cfd_mat_1q = np.array(
@@ -65,13 +66,20 @@ def generate_rb_circuits(
         circuits = []
         clifford_group_size = 24
         for _ in range(trials):
-            gate_ids = list(np.random.choice(clifford_group_size, num_cliffords))
-            gate_sequence = [gate for gate_id in gate_ids for gate in c1[gate_id]]
-            idx = _find_inv_matrix(_gate_seq_to_mats(gate_sequence), cfd_mat_1q)
+            gate_ids = list(
+                np.random.choice(clifford_group_size, num_cliffords)
+            )
+            gate_sequence = [
+                gate for gate_id in gate_ids for gate in c1[gate_id]
+            ]
+            idx = _find_inv_matrix(
+                _gate_seq_to_mats(gate_sequence), cfd_mat_1q
+            )
             gate_sequence.extend(c1[idx])
-            circuits.append(cirq.Circuit(gate(qubits[0]) for gate in gate_sequence))
+            circuits.append(
+                cirq.Circuit(gate(qubits[0]) for gate in gate_sequence)
+            )
 
-                        
     else:
         clifford_group_size = 11520
         cfd_matrices = _two_qubit_clifford_matrices(
@@ -81,13 +89,21 @@ def generate_rb_circuits(
         )
         circuits = []
         for _ in range(trials):
-            idx_list = list(np.random.choice(clifford_group_size, num_cliffords))
+            idx_list = list(
+                np.random.choice(clifford_group_size, num_cliffords)
+            )
             circuit = cirq.Circuit()
             for idx in idx_list:
-                circuit.append(_two_qubit_clifford(qubits[0], qubits[1], idx, cliffords))
-            inv_idx = _find_inv_matrix(cirq.protocols.unitary(circuit), cfd_matrices)
-            circuit.append(_two_qubit_clifford(qubits[0], qubits[1], inv_idx, cliffords))
-                
+                circuit.append(
+                    _two_qubit_clifford(qubits[0], qubits[1], idx, cliffords)
+                )
+            inv_idx = _find_inv_matrix(
+                cirq.protocols.unitary(circuit), cfd_matrices
+            )
+            circuit.append(
+                _two_qubit_clifford(qubits[0], qubits[1], inv_idx, cliffords)
+            )
+
             circuits.append(circuit)
 
     return_type = "cirq" if not return_type else return_type
