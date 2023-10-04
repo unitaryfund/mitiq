@@ -45,7 +45,7 @@ def generate_rb_circuits(
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
             returned circuits have type ``cirq.Circuit``.
-        seed: A seed for generating radomzed benchmarking circuits.
+        seed: A seed for generating randomized benchmarking circuits.
 
     Returns:
         A list of randomized benchmarking circuits.
