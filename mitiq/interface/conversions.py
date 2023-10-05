@@ -100,6 +100,11 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[cirq.Circuit, str]:
 
         input_circuit_type = "pennylane"
         conversion_function = from_pennylane
+    elif "qibo" in package: 
+        from mitiq.interface.mitiq_qibo.conversions import from_qibo
+
+        input_circuit_type = "qibo"
+        conversion_function = from_qibo
 
     elif package in TO_MITIQ_DICT:
         input_circuit_type = package
@@ -161,6 +166,10 @@ def convert_from_mitiq(
         from mitiq.interface.mitiq_pennylane.conversions import to_pennylane
 
         conversion_function = to_pennylane
+    elif conversion_type == "qibo":
+        from mitiq.interface.mitiq_qibo.conversions import to_qibo
+
+        conversion_function = to_qibo
     elif conversion_type in FROM_MITIQ_DICT:
         conversion_function = FROM_MITIQ_DICT[conversion_type]
 
