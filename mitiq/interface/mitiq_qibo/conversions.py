@@ -8,7 +8,7 @@ Qibo's circuit representation.
 """
 
 from cirq import Circuit
-from qibo import Circuit as QiboCircuit
+from qibo.models import Circuit as QiboCircuit
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm 
