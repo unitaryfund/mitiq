@@ -12,10 +12,7 @@ kernelspec:
 ---
 
 
-
  # CDR, ZNE, and VNCDR: 1-D Transverse-Longitudinal Ising model
-
-
 
 
 
