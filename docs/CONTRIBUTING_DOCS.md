@@ -124,6 +124,15 @@ If you are adding new features to Mitiq, make sure to add API docs in the
 source code, and to the API page `apidoc.md`.
 ```
 
+### Adding references 
+
+To add references to the [Mitiq bibliography](https://mitiq.readthedocs.io/en/stable/bibliography.html), the first step is to add the reference to docs/source/refs.bib which is organized alphabetically. For formatting, please see BibTeX documentation for [articles](https://www.bibtex.com/e/article-entry/), [books](https://www.bibtex.com/e/book-entry/), and [others](https://www.bibtex.com/e/entry-types/).
+
+Once the reference has been added to the docs/source/refs.bib file, cite the reference in the file by using:
+```{python}
+{cite}`title of entry`
+```
+
 ## Build the documentation locally
 The easiest way to build the docs is to run `make docs` from the project 
 root directory, which builds the html docs output.
