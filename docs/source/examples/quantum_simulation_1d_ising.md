@@ -544,7 +544,7 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(unmitigated_measu
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact Trotterization and unmitigated')
+plt.title('Difference between exact Trotterization and unmitigated')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
