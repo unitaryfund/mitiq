@@ -20,7 +20,7 @@ ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.md>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.md>
 ZNE with Cirq: Noise scaling methods <scaling.md>
-ZNE with Cirq: 1D Ising Simulation <quantum_simulation_1d_ising.md>
+ZNE and CDR with Cirq: 1D Ising Simulation <quantum_simulation_1d_ising.md>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.md>
 ZNE with BQSKit compiled circuits <bqskit.md>
 ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits <zne_logical_rb_cirq_stim.md>
