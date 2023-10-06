@@ -584,7 +584,7 @@ plt.imshow(np.abs(np.transpose(exact_measurement)-np.transpose(mitigated_measure
 plt.gca().invert_yaxis()
 
 # Add a title
-plt.title('Differnce between exact Trotterization and mitigated CDR')
+plt.title('Difference between exact Trotterization and mitigated CDR')
 
 # Add x and y labels
 plt.xlabel(r'$\Delta_i$')
