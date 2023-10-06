@@ -15,7 +15,6 @@ kernelspec:
 
  # CDR, ZNE, and VNCDR: 1-D Transverse-Longitudinal Ising model
 
-<img src="../_thumbnails/quantum_simulation_1d_ising.png" width="400">
 
 
 
