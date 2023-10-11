@@ -59,7 +59,7 @@ def variational_circuit(gamma: float):
     qml.RX(gamma, wires=0)
 ```
 
-#### We can visualize the circuit for a particular $\gamma$ as follows.
+We can visualize the circuit for a particular $\gamma$ as follows.
 
 
 ```{code-cell} ipython3
