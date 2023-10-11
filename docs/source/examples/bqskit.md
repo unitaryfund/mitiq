@@ -12,7 +12,7 @@ kernelspec:
 
 # Improving the accuracy of BQSKit compiled circuits with error mitigation
 
-In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/), a compiler for quantum circuits. BQSKit stands for Berkeley Quantum Synthesis Toolkit and it allows one "to compile quantum programs to efficient physical circuits for any QPU".
+In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/) {cite}`Patel_2022_ACM`, a compiler for quantum circuits. BQSKit stands for Berkeley Quantum Synthesis Toolkit and it allows one "to compile quantum programs to efficient physical circuits for any QPU".
 
 To get started, ensure you have the requisite python packages by running the following install commands.
 
@@ -87,10 +87,10 @@ Now we mitigate them!
 
 ## Error Mitigation
 
-Using `mitiq`'s simplest, and easiest to use method of [Zero Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne-1-intro.html) (ZNE) we can obtain more accurate results than we would otherwise.
+Using `mitiq`'s simplest, and easiest to use method of [](../guide/zne.md) (ZNE) we can obtain more accurate results than we would otherwise.
 
 ```{note}
-There are multiple other techniques described in our [user guide](https://mitiq.readthedocs.io/en/stable/guide/guide.html) which could be used as well.
+There are multiple other techniques described in our [](../guide/guide.md) which could be used as well.
 ```
 
 In this tutorial we assume a simple error model of depolarizing noise on two-qubit gates.
@@ -193,23 +193,23 @@ Because compiling many large circuits is computationally expensive, we leave the
 
 Once the errors are computed for each circuit we can collect the results in a histogram to get an idea of how compilation and mitigation affects accuracy more generally.
 
-+++
-
-<img src="../img/bqskit.png" alt="Histograms of circuit accuracy with and without compilation, and error mitigation." width="600"/>
-
-+++
+```{image} ../img/bqskit.png
+:alt: Histograms of circuit accuracy with and without compilation, and error mitigation.
+:width: 90%
+:align: center
+```
 
 These results show that using error mitigation improves the accuracy of both uncompiled, and compiled circuits.
 The [tutorial](https://github.com/unitaryfund/research/blob/main/ieee-quantum-week/compilation-with-error-mitigation-tutorial/bqskit.ipynb) in the research repository shows further that error mitigation both reduces the mean, and standard deviation of these distributions.
 
 In this tutorial we've seen how one can use error mitigation in conjunction with circuit compilation.
-For more information check out the [`bqskit`](https://bqskit.readthedocs.io/en/latest/) and [`mitiq`](https://mitiq.readthedocs.io/en/stable/) documentation.
+For more information check out the [BQSKit](https://bqskit.readthedocs.io/en/latest/) and [Mitiq](../index.md) documentation.
 
 +++
 
 ### References
 
 - BQSKit documentation: <https://bqskit.readthedocs.io/>
-- BQSKit whitepaper: https://doi.org/10.1145/3503222.3507739
+- BQSKit whitepaper: <https://doi.org/10.1145/3503222.3507739> {cite}`Patel_2022_ACM`
 - Mitiq documentation: <https://mitiq.readthedocs.io/>
 - Mitiq whitepaper: <https://quantum-journal.org/papers/q-2022-08-11-774/>

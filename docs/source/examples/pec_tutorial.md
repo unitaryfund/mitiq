@@ -103,7 +103,12 @@ ideal_backend = LocalSimulator("default")
 
 We use mirror circuits to benchmark the performance of the device. Mirror circuits, introduced in *Proctor et al. arXiv (2021)* {cite}`Proctor_2021_NatPhys` ([arXiv:2008.11294](https://arxiv.org/abs/2008.11294)), are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise. The frequency of the correct bitstring is our target metric.
 
-> Note: Mirror circuits build on Loschmidt echo circuits - i.e., circuits of the form $U U^\dagger$ for some unitary $U$. Loschmidt echo circuits are good benchmarks but have shortcomings - e.g., they are unable to detect coherent errors. Mirror circuits add new features to account for these shortcomings. For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
+```{note}
+Mirror circuits build on Loschmidt echo circuits --- i.e., circuits of the form $U U^\dagger$ for some unitary $U$.
+Loschmidt echo circuits are good benchmarks but have shortcomings --- e.g., they are unable to detect coherent errors.
+Mirror circuits add new features to account for these shortcomings.
+For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
+```
 
 To define a mirror circuit, we need the device graph. We will use a subgraph of the device, and our first step is picking a subgraph with good qubits.
 
@@ -129,7 +134,7 @@ def get_circuit(depth: int, seed: int) -> Union[Tuple[cirq.Circuit, str], Tuple[
 
 PEC makes use of quasi-probability representations. We define these here in
 terms of CNOT operations. For more information about these representations in
-the context of PEC and usage within `mitiq`, refer to the ["What is the theory behind PEC"](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#quasi-probability-representations) page.
+the context of PEC and usage within `mitiq`, refer to the [](../guide/pec-5-theory.md) page.
 
 ```{code-cell} ipython3
 def get_cnot_representation(edge: Tuple[int, int]) -> pec.OperationRepresentation:

@@ -67,9 +67,6 @@ docker run --rm -idt -p 5000:5000 rigetti/qvm -S
 docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
 
-If you've modified any docstrings/added new functions, run `make doctest` to ensure they are formatted correctly.
-You may need to run `make docs` before you are able to run `make doctest`.
-
 ### Updating the documentation
 Follow these [instructions for contributing to the documentation](https://mitiq.readthedocs.io/en/latest/contributing_docs.html) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 

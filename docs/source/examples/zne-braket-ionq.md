@@ -36,9 +36,7 @@ We import the zero-noise extrapolation module of Mitiq.
 
 ```{code-cell} ipython3
 from mitiq import zne
-```
 
-```{code-cell} ipython3
 USE_REAL_HARDWARE = False
 ```
 
@@ -47,7 +45,7 @@ When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backen
 ```
 +++
 
-We also set the number of times each quantum circuit is executed and measured (`number_of_shots`).
+We also set the number of times each quantum circuit is executed and measured using `number_of_shots`.
 Setting a large number of shots improves the accuracy of the results, but also increases the computational cost and the execution time.
 
 ```{code-cell} ipython3
@@ -58,7 +56,7 @@ number_of_shots = 1024
 
 +++
 
-For simplicity, we define a single-qubit circuit with 10 $X$ gates that is equivalent to the identity operation.
+For simplicity, we define a single-qubit circuit with 10 $X$ gates that, in total, is equivalent to the identity operation.
 
 ```{code-cell} ipython3
 import braket
@@ -70,7 +68,7 @@ print(braket_circuit)
 ```
 
 We will use the probability of measuring the system in the _zero_ state ($p = \langle 0 | \rho |0\rangle$) as our expectation value to error-mitigate.
-The expectation value evaluates to one in the noiseless setting, but is usually smaller when estimated on a noisy backend.
+The expectation value evaluates to $1$ in the noiseless setting, but is usually smaller when estimated on a noisy backend due to errors.
 
 ## High-level usage
 
@@ -87,10 +85,9 @@ For information on how to define more advanced executors, see the [Executors](..
 +++
 
 ```{warning} 
-Using a real IonQ device requires running this notebook within an Amazon Braket
-cloud session created with a valid AWS account.
-A monetary budget (or credits) is necessary. When `USE_REAL_HARDWARE` is set to `False`,
-this notebook can run on your local machine without costs.
+Using a real IonQ device requires running this notebook within an Amazon Braket cloud session created with a valid AWS account.
+A monetary budget (or credits) is necessary.
+When `USE_REAL_HARDWARE` is set to `False`, this notebook will run on your local machine without costs.
 ```
 
 ```{code-cell} ipython3
@@ -128,8 +125,7 @@ def braket_ionq_execute(
     return result.measurement_probabilities.get("0", 0.0)
 ```
 
-At this point, the circuit can be executed to return a mitigated expectation value by running {func}`.zne.execute_with_zne`,
-as follows.
+At this point, the circuit can be executed to return a mitigated expectation value by running {func}`.zne.execute_with_zne`, as follows.
 
 ```{code-cell} ipython3
 unmitigated = braket_ionq_execute(braket_circuit)
@@ -142,9 +138,9 @@ As long as a circuit and a function for executing the circuit are defined, the {
 be called as above to return zero-noise extrapolated expectation value(s).
 
 ```{warning} 
-When using a real device, the previous method may fail because the internal compiler of the device can undo the _unitary folding_ transformation that Mitiq applies
-to the input circuit. If possible, one should switch off any circuit optimization performed by the hardware device. If not possible, using _global unitary folding_
-as shown in the next section can also be a practical way of solving this problem.  
+When using a real device, the previous method may fail because the internal compiler of the device can undo the _unitary folding_ transformation that Mitiq applies to the input circuit.
+If possible, one should switch off any circuit optimization performed by the hardware device.
+If not possible, using _global unitary folding_ as shown in the next section can also be a practical way of solving this problem.  
 ```
 
 
@@ -152,7 +148,7 @@ as shown in the next section can also be a practical way of solving this problem
 
 
 Different options for noise scaling and extrapolation can be passed into the {func}`.execute_with_zne` function.
-By default, noise is scaled by locally folding gates at random, and the default extrapolation is Richardson.
+By default, noise is scaled by locally folding gates at random, and the default extrapolation method is Richardson extrapolation.
 
 To specify a different extrapolation technique, we can pass a different {class}`.Factory` object to {func}`.execute_with_zne`. 
 The following code block shows an example of using linear extrapolation with five different (noise) scale factors.
@@ -178,8 +174,7 @@ Let's visualize the zero-noise extrapolation fit.
 _ = factory.plot_fit()
 ```
 
-Any different combination of noise scaling and extrapolation technique can be passed as arguments to
-{func}`.execute_with_zne`.
+Any different combination of noise scaling and extrapolation technique can be passed as arguments to {func}`.execute_with_zne`.
 
 
 ## Lower-level usage
@@ -188,7 +183,7 @@ Here, we show a more detailed usage of the Mitiq library which mimics what happe
 {func}`.execute_with_zne` used in the previous sections. This low-level approach allows us to have
 a better control of the error mitigation workflow.
 
-First, we define factors to scale the circuit length by and then we fold the circuit using the {func}`.fold_global` method.
+First, we define factors to scale the circuit length by, folding the circuit using the {func}`.fold_global` method.
 
 ```{code-cell} ipython3
 scale_factors = [1., 1.5, 2., 2.5, 3.]
@@ -201,10 +196,10 @@ folded_circuits = [
 length_in = len(braket_circuit.instructions)
 for j, c in enumerate(folded_circuits):
     length_out = len(c.instructions)
-    print(f"Number of gates of folded circuit {j} scaled by: {length_out / length_in:.3f}")
+    print(f"Number of gates in folded circuit {j} scaled by: {length_out / length_in:.3f}")
 ```
 
-The number of gates has been scaled to approximate the input ``scale_factors``.
+The number of gates has been scaled to approximate the input `scale_factors`.
 
 +++
 
@@ -221,18 +216,19 @@ print(f"Expectation values:\n{expectation_values}")
 ```
 
 ```{note}
-Using a _batched_ executor could speedup this step, as explained in the [Executors](../guide/executors.md) section.
+Using a _batched_ executor which can take as input many circuits at once and potentially run them in parallel could speedup this step.
+More details can be found in the [Executors](../guide/executors.md) section.
 ```
 +++
 
-We can now see the unmitigated expectation value by printing the first element of ``expectation_values``.
+We can now see the unmitigated expectation value by printing the first element of `expectation_values`.
 (This value corresponds to a circuit with scale factor one, i.e., the original circuit.)
 
 ```{code-cell} ipython3
 print("Unmitigated expectation value:", round(expectation_values[0], 3))
 ```
 
-Now we can use the static ``extrapolate()`` method of {class}`.Factory` objects to extrapolate to the zero-noise limit.
+Now we can use the static `extrapolate()` method of {class}`.Factory` objects to extrapolate to the zero-noise limit.
 Below we use an exponential fit and print out the extrapolated zero-noise value.
 
 ```{code-cell} ipython3

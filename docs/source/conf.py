@@ -53,7 +53,6 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",  # after napoleon and autodoc
     "sphinx.ext.todo",
-    "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
@@ -162,6 +161,9 @@ linkcheck_ignore = [
     r"https://dl.acm.org/doi/10.1145/3466752.3480059",
     r"https://doi.org/10.1145/3466752.3480059",
     r"https://doi.org/10.7566/jpsj.90.032001",
+    r"https://arxiv.org/abs/1612.02058",
+    r"https://arxiv.org/abs/1805.04492",
+    r"https://arxiv.org/abs/1807.05572",
 ]
 
 
@@ -353,12 +355,16 @@ nbsphinx_thumbnails = {
     "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     "examples/pec_tutorial": "_static/pec-tutorial.png",
     "examples/scaling": "_static/scaling.png",
+    "examples/shadows_tutorial": "_static/shadow-tutorial.png",
+    "examples/rshadows_tutorial": "_static/rshadow_protocol.png",
     "examples/ddd_tutorial": "_static/ddd-tutorial.png",
     "examples/ddd_on_ibmq_ghz": "_static/ddd_qiskit_ghz_plot.png",
     "examples/calibration-tutorial": "_static/calibration.png",
     "examples/combine_rem_zne": "_static/combine_rem_zne.png",
     "examples/quantum_simulation_scars_ibmq": "_static/qmbs_ibmq.png",
     "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
+    "examples/quantum_simulation_1d_ising": "_static/quantum_simulation.png",
+
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

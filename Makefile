@@ -39,10 +39,6 @@ docs-clean:
 	make -C docs clean
 	make -C docs html
 
-.PHONY: doctest
-doctest:
-	make -C docs doctest
-
 .PHONY: linkcheck
 linkcheck:
 	make -C docs linkcheck
