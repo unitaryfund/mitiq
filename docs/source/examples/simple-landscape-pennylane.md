@@ -14,7 +14,7 @@ kernelspec:
 
 # Mitigating the energy landscape of a variational circuit with Mitiq
 
-### This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
+## This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
 
 
 ```{code-cell} ipython3
@@ -65,11 +65,7 @@ def variational_circuit(gamma: float):
 ```{code-cell} ipython3
 drawer = qml.draw(variational_circuit)
 print(drawer(np.pi))
-```
-
-    0: ──RX(3.14)─╭●───────────╭●──RX(3.14)─┤  
-    1: ───────────╰X──RX(3.14)─╰X───────────┤  
-    
+```    
 
 ## Defining the executor functions with and without noise
 
@@ -239,7 +235,3 @@ print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
     Theoretical ground state energy: -1.0
     
 
-
-```{code-cell} ipython3
-
-```
