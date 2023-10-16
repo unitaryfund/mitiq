@@ -164,7 +164,7 @@ highlighting), use the `code-block` directive:
 ```
 ````
 
-### View the documentation from a PR build
+## View the documentation from a PR build
 
 To preview the documentation (mitiq.readthedocs.io) from a specific build in a PR, click `Details` on the `docs/readthedocs.org:mitiq` line of the pull request's merge box in the PR's Conversation timeline. It may be necessary to scroll down to find the `docs/readthedocs.org:mitiq` line.
 
