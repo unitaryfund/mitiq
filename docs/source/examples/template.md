@@ -162,5 +162,6 @@ To add a thumbnail for an example notebook, first add the thumbnail image file t
 ```{code-cell} ipython3
 nbsphinx_thumbnails = {
     "examples/{EXAMPLE_FILENAME_WITHOUT_.md}": "_static/{THUMBNAIL_FILENAME_WITH_EXTENSION}",
-    "examples/hamiltonians": "_static/vqe-cirq-pauli-sum-mitigation-plot.png",
+    "examples/hamiltonians": "_static/vqe-cirq-pauli-sum-mitigation-plot.png"
+    }
 ```
