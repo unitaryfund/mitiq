@@ -164,6 +164,16 @@ highlighting), use the `code-block` directive:
 ```
 ````
 
+### View the documentation from a PR build
+
+To preview the documentation (mitiq.readthedocs.io) from a specific build in a PR, click `Details` on the `docs/readthedocs.org:mitiq` line of the pull request's merge box in the PR's Conversation timeline. It may be necessary to scroll down to find the `docs/readthedocs.org:mitiq` line.
+
+![RTD of PR](./source/img/read_the_docs_pr.png)
+
+If the Read the Docs build failed, it is still possible to see the documentation from the build by clicking `Details` and then clicking on the `View docs` link on the right side of screen under the time it took for the build to complete.
+
+![RTD failed](./source/img/read_the_docs_failed.png)
+
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
