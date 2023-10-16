@@ -276,7 +276,7 @@ def test_to_dict():
     assert pec_strategy.to_dict() == {
         "technique": "PEC",
         "representation_function": (
-            represent_operation_with_local_depolarizing_noise
+            "represent_operation_with_local_depolarizing_noise"
         ),
         "is_qubit_dependent": False,
         "noise_level": 0.001,

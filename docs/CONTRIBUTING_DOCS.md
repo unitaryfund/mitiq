@@ -32,10 +32,10 @@ in the `conf.py` file.
 
 To add specific feature to the documentation, Sphinx extensions can be added to the build.
 As and example, to add classes and functions to the API doc, make sure that autodoc
-extension is enabled in the `conf.py` file, and for tests the `doctest` one,
+extension is enabled in the `conf.py` file.
 
 ```python
-extensions = ['sphinx.ext.autodoc','sphinx.ext.doctest']
+extensions = ['sphinx.ext.autodoc']
 ```
 
 ## Updating the Documentation
@@ -163,83 +163,6 @@ highlighting), use the `code-block` directive:
    1+1        # simple example
 ```
 ````
-### Run the code with doctest
-In order to make sure that the block is parsed with `make doctest`, use the
-`testcode` directive. This can be used in pair with `testoutput`, if something
-is printed, and, eventually `testsetup`, to import modules or set up variables
-in an invisible block. An example is:
-
-````
-```{testcode} python
-   1+1        # simple example
-```
-````
-with no output and
-
-````
-```{testcode} python
-   print(1+1)        # explicitly print
-```
-
-```{testoutput} python
-   2        # match the print message
-```
-````
-
-If you have code blocks you want to run, but not be displayed, use the 
-`testsetup` directive:
-
-````
-```{testsetup} python
-   import numpy as np  # this block is not rendered in the html
-```
-
-```{testcode} python
-   np.array(2)
-```
-
-```{testoutput} python
-   array(2)
-```
-````
-### IPython code blocks
-There is also the `doctest` directive, which allows you to include interactive
-Python blocks. These need to be given this way:
-
-````
-```{doctest} python
-   >>> import numpy as np
-   >>> print(np.array(2))
-   array(2)
-```
-````
-
-```{note}
-Notice that no space is left between the last input and the output when writing code blocks with interactive inputs and outputs.
-```
-
-### Skipping or ignoring a test
-
-In order to skip a test, if this is problematic, one can use the `SKIP` and
-`IGNORE` keywords, adding them as comments next to the relevant line or block:
-
-```
->>> something_that_raises()  #: doctest: +IGNORE
-```
-
-### Running the tests
-
-Mitiq uses the `doctest` [extension](https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html) to run and test code in the docs, which is configured in the `conf.py` file. To execute the tests in bash, run:
-
-```sh
-make doctest
-```
-from the root directory. 
-
-This command tests the code examples in the documentation files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
-
-One can also use various `doctest` [features](https://doc.pytest.org/en/latest/how-to/doctest.html#using-doctest-options) by configuring them in the
-`docs/pytest.ini` file.
 
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)

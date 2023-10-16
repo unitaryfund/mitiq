@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="438.94376mm"
+   height="222.25mm"
+   viewBox="0 0 438.94376 222.25"
+   version="1.1"
+   id="svg993"
+   inkscape:version="1.3 (1:1.3+202307231459+0e150ed6c4)"
+   sodipodi:docname="pt_workflow.svg"
+   inkscape:export-filename="G:\My Drive\collaborations\zne_workflow2_steps.png"
+   inkscape:export-xdpi="600"
+   inkscape:export-ydpi="600"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs987">
+    <rect
+       x="1922.5439"
+       y="402.53473"
+       width="423.14844"
+       height="80.783936"
+       id="rect5" />
+    <rect
+       x="-315.11597"
+       y="701.38342"
+       width="82.739746"
+       height="639.80685"
+       id="rect3" />
+    <clipPath
+       id="clip0">
+      <rect
+         x="20"
+         y="125"
+         width="1659"
+         height="852"
+         id="rect1556" />
+    </clipPath>
+    <clipPath
+       id="clip0-2">
+      <rect
+         x="20"
+         y="125"
+         width="1659"
+         height="852"
+         id="rect1716" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.5"
+     inkscape:cx="892"
+     inkscape:cy="356"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1600"
+     inkscape:window-height="829"
+     inkscape:window-x="1680"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <metadata
+     id="metadata990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(215.69211,-315.9881)">
+    <rect
+       x="-215.69211"
+       y="315.9881"
+       width="119.85625"
+       height="222.25"
+       fill="#ffff93"
+       id="rect1721"
+       style="stroke-width:0.264583" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1723"
+       x="-176.0914"
+       y="334.24435"
+       style="stroke-width:0.264583">User</text>
+    <rect
+       x="-95.252312"
+       y="315.8436"
+       width="173.94055"
+       height="222.25"
+       fill="#afffff"
+       id="rect1725"
+       style="fill:#a2d0aa;fill-opacity:1;stroke-width:0.251429" />
+    <rect
+       x="78.567703"
+       y="317.33536"
+       width="143.40443"
+       height="222.25"
+       fill="#d9d9d9"
+       id="rect1757"
+       style="fill:#ccffaa;stroke-width:0.289409" />
+    <g
+       id="g980-3"
+       transform="matrix(0.75184764,0,0,0.85019373,145.15014,229.60072)">
+      <rect
+         x="-85.085197"
+         y="295.50186"
+         width="181.09409"
+         height="30.375736"
+         id="rect1522-6"
+         style="fill:#f2f2f2;stroke-width:0.402073" />
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="10.5833px"
+         id="text1524-7"
+         x="-93.00531"
+         y="307.89111"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:10.5833px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;white-space:pre;inline-size:158.949;stroke-width:0.264583"
+         transform="matrix(1.0939119,0,0,1,35.462521,-1.0432105)"
+         xml:space="preserve"><tspan
+           x="-93.00531"
+           y="307.89111"
+           id="tspan5">2. Execute each twirled&#10;</tspan><tspan
+           x="-93.00531"
+           y="321.12024"
+           id="tspan7">circuit on backend</tspan></text>
+    </g>
+    <text
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1727"
+       x="-40.748028"
+       y="334.24435"
+       style="font-weight:400;font-stretch:semi-condensed;font-size:16.9333px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583">mitiq.pt</text>
+    <path
+       d="M -136.69965,388.31068 H -106.03 l 0.52268,-0.76109 -0.58458,0.79375 h 24.823838 v -1.5875 h -25.408428 l -0.52267,0.76109 0.58458,-0.79375 h -30.08507 z m 54.847007,3.20766 5.84581,-3.96875 -5.84581,-3.96875 z"
+       id="path1733"
+       style="stroke-width:0.227061"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccccc" />
+    <path
+       d="m 58.471004,409.86461 h 19.292744 l 0.328792,-0.7611 -0.367729,0.79375 h 15.615438 v -1.5875 H 77.357073 l -0.328785,0.7611 0.36773,-0.79375 H 58.471004 Z m 34.501516,3.20765 3.677302,-3.96875 -3.677302,-3.96875 z"
+       id="path1733-7"
+       style="stroke-width:0.180088"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccccc" />
+    <rect
+       x="-206.29941"
+       y="355.01413"
+       width="101.33542"
+       height="67.46875"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ffffe1"
+       id="rect1737" />
+    <rect
+       x="-205.71223"
+       y="444.3273"
+       width="101.33542"
+       height="67.73333"
+       stroke-miterlimit="8"
+       id="rect1743"
+       style="fill:#ffffe1;stroke:#000000;stroke-width:1.19062;stroke-miterlimit:8" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1759"
+       x="105.44978"
+       y="337.41998"
+       style="stroke-width:0.264583"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         x="105.44978"
+         y="337.41998">Hardware</tspan></text>
+    <rect
+       x="84.049393"
+       y="347.09222"
+       width="82.309341"
+       height="41.155422"
+       stroke="#000000"
+       stroke-width="1.01748"
+       stroke-miterlimit="8"
+       fill="#a6a6a6"
+       id="rect1761-1"
+       style="fill:#ffffff;fill-opacity:1" />
+    <rect
+       x="95.590294"
+       y="356.22943"
+       width="82.309341"
+       height="41.155422"
+       stroke="#000000"
+       stroke-width="1.01748"
+       stroke-miterlimit="8"
+       fill="#a6a6a6"
+       id="rect1761-1-5"
+       style="fill:#ffffff;fill-opacity:1" />
+    <rect
+       x="107.59666"
+       y="368.33395"
+       width="82.309341"
+       height="41.155422"
+       stroke="#000000"
+       stroke-width="1.01748"
+       stroke-miterlimit="8"
+       fill="#a6a6a6"
+       id="rect1761-1-54"
+       style="fill:#ffffff;fill-opacity:1" />
+    <rect
+       x="124.08173"
+       y="385.36111"
+       width="82.309341"
+       height="41.155422"
+       stroke="#000000"
+       stroke-width="1.01748"
+       stroke-miterlimit="8"
+       fill="#a6a6a6"
+       id="rect1761-1-7"
+       style="fill:#ffffff;fill-opacity:1" />
+    <rect
+       x="-76.831085"
+       y="344.724"
+       width="101.33542"
+       height="67.204163"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ddffff"
+       id="rect1769" />
+    <path
+       d="m 171.96026,426.24209 v 47.42678 H -97.406858 v -2.2337 H 171.13648 l -0.82377,1.11685 v -46.30993 z m -268.543336,51.89419 -8.237774,-5.58426 8.237774,-5.58427 z"
+       id="path1797"
+       style="stroke-width:0.311941;stroke-dasharray:none"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccccc" />
+    <g
+       id="g980"
+       transform="matrix(0.82993196,0,0,0.82993196,-12.877404,241.97582)">
+      <rect
+         x="-90.207886"
+         y="293.40179"
+         width="181.09409"
+         height="30.375736"
+         id="rect1522"
+         style="fill:#f2f2f2;stroke-width:0.402073" />
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="10.5833px"
+         id="text1524"
+         x="-93.00531"
+         y="307.89111"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:10.5833px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;white-space:pre;inline-size:158.949;stroke-width:0.264583"
+         transform="matrix(1.0939119,0,0,1,24.104172,-2.1153661)"
+         xml:space="preserve"><tspan
+           x="-93.00531"
+           y="307.89111"
+           id="tspan8">3. Inference : Average over </tspan><tspan
+           x="-93.00531"
+           y="321.12024"
+           id="tspan9">executed results</tspan></text>
+    </g>
+    <g
+       id="g996"
+       transform="matrix(1.0640995,0,0,1,2.000506,269.7649)">
+      <rect
+         x="-81.07872"
+         y="170.73393"
+         width="144.74507"
+         height="20.028122"
+         fill="#f2f2f2"
+         id="rect1512"
+         style="stroke-width:0.281367" />
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="9.525px"
+         id="text1516"
+         x="-78.58831"
+         y="183.82584"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:9.525px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;white-space:pre;inline-size:153.678;stroke-width:0.264583"
+         xml:space="preserve"><tspan
+           x="-78.58831"
+           y="183.82584"
+           id="tspan11">1. Generate <tspan
+   style="stroke-width:0.0700043"
+   id="tspan10">twirled circuit(s)</tspan></tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="-157.41185"
+       y="464.6759"
+       id="text916-7-2"><tspan
+         sodipodi:role="line"
+         x="-157.41185"
+         y="464.6759"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan918-3-2">Error-</tspan><tspan
+         sodipodi:role="line"
+         x="-157.41185"
+         y="479.22803"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan990">mitigated</tspan><tspan
+         sodipodi:role="line"
+         x="-157.41185"
+         y="493.78015"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan964-5">expectation</tspan><tspan
+         sodipodi:role="line"
+         x="-157.41185"
+         y="508.33231"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan994">value</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.87778px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.358811"
+       x="186.78662"
+       y="358.97006"
+       id="text916-7-0"
+       transform="scale(0.87490326,1.1429835)"><tspan
+         sodipodi:role="line"
+         x="186.78662"
+         y="358.97006"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87778px;line-height:1.25;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.358811"
+         id="tspan1013">Execute</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="-157.64777"
+       y="384.89777"
+       id="text1017"><tspan
+         sodipodi:role="line"
+         id="tspan1015"
+         x="-157.64777"
+         y="384.89777"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583">Quantum</tspan><tspan
+         sodipodi:role="line"
+         x="-157.64777"
+         y="399.44989"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan1021">program</tspan></text>
+    <rect
+       x="-64.382614"
+       y="353.54269"
+       width="101.33542"
+       height="67.204163"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ddffff"
+       id="rect2" />
+    <rect
+       x="-53.47023"
+       y="362.13672"
+       width="101.33542"
+       height="67.204163"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ddffff"
+       id="rect1769-3" />
+    <rect
+       x="-43.105877"
+       y="370.56152"
+       width="101.33542"
+       height="67.204163"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ddffff"
+       id="rect1769-6" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2306px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="9.3645878"
+       y="393.40869"
+       id="text916"><tspan
+         sodipodi:role="line"
+         x="9.3645878"
+         y="393.40869"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2306px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan918">Circuit with</tspan><tspan
+         sodipodi:role="line"
+         x="9.3645878"
+         y="406.19693"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2306px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan922">twirling gates</tspan><tspan
+         sodipodi:role="line"
+         x="9.3645878"
+         y="418.9852"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2306px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan924">on CNOT/CZ</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-215.69211,315.9881)"
+       id="text3"
+       style="fill:#000000;font-size:53.33333333px;-inkscape-font-specification:'sans-serif Bold';font-family:sans-serif;font-weight:bold;white-space:pre;shape-inside:url(#rect3)" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-215.69211,315.9881)"
+       id="text5"
+       style="fill:#eeffaa;font-size:32px;-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;opacity:1;stroke:#000000;stroke-opacity:1;fill-opacity:1;line-height:1.25;font-style:normal;font-stretch:normal;font-variant:normal;white-space:pre;shape-inside:url(#rect5)" />
+  </g>
+</svg>
