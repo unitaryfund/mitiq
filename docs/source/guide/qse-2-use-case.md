@@ -16,7 +16,9 @@ kernelspec:
 
 ## Advantages 
 
-The advantage of QSE is that it allows determining the value of excited electronic states without the need for a formal error-correcting procedure. Furthermore, the method is error-agnostic. Computationally, the advantage is eliminating the need for ancilla measurements.  
+The main advantage of QSE is that it enables the approximation of excited states and reduction of errors without the need for a formal error-correcting procedure, in a way that is effective against many types of errors.
+QSE eliminates the need for ancilla measurements, also reducing overhead as compared to full quantum error correction and other symmetry-based techniques.
+QSE can also be used in conjunction with other quantum error mitigation techniques, such as zero noise extrapolation.
 
 ## Disadvantages
 

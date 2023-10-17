@@ -22,7 +22,8 @@ The cache object is modified in place.
 
 Specifically, in order to save runtime, the QSE implementation supports the use of a cache that maps pauli strings to their expectation values. This is taken as an additional parameter in the [`execute_with_qse`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.qse.qse.execute_with_qse) function.
 
-The inclusion of the cache significantly speeds up the runtime and avoids the need for recomputation of already computed values. Furthermore, it is important to note that the cache gets modified in place. Specifically, the cache be reused between different executions of the program. 
+The inclusion of the cache significantly speeds up the runtime and avoids the need for re-computation of already computed values. 
+Furthermore, it is important to note that the cache gets modified in place, so the user can pass the same cache object to `execute_with_qse` and avoid regenerating the cache unnecessarily , e.g. if the noise model is the same from one execution to another.
 
 ## Requirements for Check Operators
 
