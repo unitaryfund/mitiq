@@ -22,7 +22,7 @@ conda activate myenv
 ```
 5. Install the dependencies. First, to get an updated version of [`pip`](https://pypi.org/project/pip/) inside the virtual environment run `conda install pip` followed by
 ```
-pip install -e .[development]
+pip install -e ".[development]"
 ```
 6. You should now have a development environment set up to work on Mitiq! 🎉 To go forward with making the desired changes, please consult the ["Making changes" section](https://www.asmeurer.com/git-workflow/#making-changes) of the `git` workflow article. If you've encountered any problems thus far, please let us know by opening an issue! More information about workflow can be found below in the [lifecycle](#lifecycle) section.
 
@@ -66,9 +66,6 @@ running in the background. The easiest way to do this is with [Docker](https://w
 docker run --rm -idt -p 5000:5000 rigetti/qvm -S
 docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
-
-If you've modified any docstrings/added new functions, run `make doctest` to ensure they are formatted correctly.
-You may need to run `make docs` before you are able to run `make doctest`.
 
 ### Updating the documentation
 Follow these [instructions for contributing to the documentation](https://mitiq.readthedocs.io/en/latest/contributing_docs.html) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.

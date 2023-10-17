@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from mitiq.pt.pt import (
-    execute_with_pauli_twirling,
+    pauli_twirl_circuit,
     twirl_CNOT_gates,
     twirl_CZ_gates,
 )

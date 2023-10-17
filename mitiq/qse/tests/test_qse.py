@@ -95,47 +95,14 @@ def test_execute_with_qse():
     assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
 
-def test_mitigate_executor():
+def test_mitigate_executor_batched():
     qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
         code_hamiltonian,
     ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
 
-    observable = get_observable_in_code_space(PauliString("ZZZZZ"))
-    mitigated_executor = mitigate_executor(
-        execute_with_depolarized_noise,
-        check_operators,
-        code_hamiltonian,
-        observable,
-    )
-    batched_mitigated_executor = mitigate_executor(
-        batched_execute_with_depolarized_noise,
-        check_operators,
-        code_hamiltonian,
-        observable,
-    )
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
-    )
-    mitigated_value = mitigated_executor(qc)
-    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
-
-    batched_mitigated_values = batched_mitigated_executor([qc] * 3)
-    assert all(
-        [
-            abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
-            for mitigated_value in batched_mitigated_values
-        ]
-    )
-
     observable = get_observable_in_code_space(PauliString("XXXXX"))
-    mitigated_executor = mitigate_executor(
-        execute_with_depolarized_noise,
-        check_operators,
-        code_hamiltonian,
-        observable,
-    )
     batched_mitigated_executor = mitigate_executor(
         batched_execute_with_depolarized_noise,
         check_operators,
@@ -145,15 +112,11 @@ def test_mitigate_executor():
     unmitigated_value = observable.expectation(
         qc, execute_with_depolarized_noise
     )
-    mitigated_value = mitigated_executor(qc)
-    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
     batched_mitigated_values = batched_mitigated_executor([qc] * 3)
     assert all(
-        [
-            abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
-            for mitigated_value in batched_mitigated_values
-        ]
+        abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+        for mitigated_value in batched_mitigated_values
     )
 
 

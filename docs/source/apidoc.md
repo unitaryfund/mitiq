@@ -23,6 +23,13 @@
    :members:
 ```
 
+### Rotated Randomized Benchmarking Circuits
+
+```{eval-rst}
+.. automodule:: mitiq.benchmarks.rotated_randomized_benchmarking
+   :members:
+```
+
 ### GHZ Circuits
 ```{eval-rst}
 .. automodule:: mitiq.benchmarks.ghz_circuits
@@ -93,7 +100,7 @@
    :members:
 ```
 
-See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
+See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 
 
 ## Mitiq - Braket
