@@ -16,8 +16,11 @@ kernelspec:
 In addition to the necessary ingredients already discussed in [How do I use QSE?](qse-1-intro.md), there are a few additional options included in the implementation. 
 
 ## Caching Pauli Strings to Expectation Values
+```{warning}
+The cache object is modified in place.
+```
 
-Specifically, in order to save runtime, the QSE implementation supports the use of a cache that maps pauli strings to their expectation values. This is taken as an additional parameter in the [`execute_with_qse`](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.qse.qse) function.
+Specifically, in order to save runtime, the QSE implementation supports the use of a cache that maps pauli strings to their expectation values. This is taken as an additional parameter in the [`execute_with_qse`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.qse.qse.execute_with_qse) function.
 
 The inclusion of the cache significantly speeds up the runtime and avoids the need for recomputation of already computed values. Furthermore, it is important to note that the cache gets modified in place. Specifically, the cache be reused between different executions of the program. 
 
