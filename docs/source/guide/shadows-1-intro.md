@@ -178,16 +178,29 @@ At present, the implementation supports random Pauli measurement. This is equiva
 One can obtain the list of measurement results of local Pauli measurements in terms of bitstrings, and the related Pauli-basis measured in terms of strings as follows.
 
 
+Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used.
+
 ```{code-cell} ipython3
-shadow_measurement_output = shadow_quantum_processing(
-    circuit,
-    noisy_executor,
-    num_total_measurements_shadow=5000,
-)
+import zipfile, pickle, io, requests
+
+run_quantum_processing = False
+repo = "https://github.com/bdg221/mitiq-shadows-storage/raw/main/"
+if not run_quantum_processing:
+    saved_data_name = "shadow_measurement_output1"
+    shadow_measurement_output = pickle.loads(
+        requests.get(f"{repo}/{saved_data_name}.pkl").content
+    )
+
+else:
+    shadow_measurement_output = shadow_quantum_processing(
+        circuit,
+        noisy_executor,
+        num_total_measurements_shadow=5000,
+    )
 ```
                                                                      
 
-AS an example, we print out one of those measurement outcomes and the associated measured operator:
+As an example, we print out one of those measurement outcomes and the associated measured operator:
 
 
 ```{code-cell} ipython3
@@ -284,11 +297,18 @@ Similarly to the previous case (estimation of expectation values), for estimatin
 
 
 ```{code-cell} ipython3
-shadow_measurement_output = shadow_quantum_processing(
-    circuit,
-    noisy_executor,
-    num_total_measurements_shadow=50000,
-)
+if not run_quantum_processing:
+    saved_data_name = "shadow_measurement_output2"
+    shadow_measurement_output = pickle.loads(
+        requests.get(f"{repo}/{saved_data_name}.pkl").content
+    )
+
+else:
+    shadow_measurement_output = shadow_quantum_processing(
+        circuit,
+        noisy_executor,
+        num_total_measurements_shadow=50000,
+    )
 ```
 
 ```{code-cell} ipython3
