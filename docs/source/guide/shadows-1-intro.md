@@ -287,7 +287,7 @@ f_est = pauli_twirling_calibrate(
     k_calibration=1,
     qubits=qubits,
     executor=noisy_executor,
-    num_total_measurements_calibration=50000,
+    num_total_measurements_calibration=5000
 )
 f_est
 ```
