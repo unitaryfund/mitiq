@@ -5,7 +5,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, Dict, Iterable, Tuple, cast
+from typing import Any, Callable, Dict, Iterable, Optional, Tuple, cast
 
 import cirq
 
@@ -259,17 +259,20 @@ def atomic_one_to_many_converter(
 
 
 def accept_qprogram_and_validate(
-    cirq_circuit_modifier: Callable[..., Any]
+    cirq_circuit_modifier: Callable[..., Any],
+    one_to_many: Optional[bool] = False,
 ) -> Callable[..., Any]:
     """This decorator performs two functions:
 
-        1. Transforms a function of signature (cirq.Circuit -> Any) to
-        (QPROGRAM -> Any)
+        1. Transforms a function of signature (cirq.Circuit -> cirq.Circuit)
+        to (QPROGRAM -> QPROGRAM).
         2. Validates the incoming QPROGRAM instance to ensure Mitiq's error
         mitigation techniques can be applied to it.
 
     Args:
-        cirq_circuit_modifier: The function to scale.
+        cirq_circuit_modifier: The function modifying a Cirq circuit.
+        one_to_many: If True, cirq_circuit_modifier is expected to return
+            a sequence of Cirq circuits instead of a single Cirq circuit.
 
     Returns:
         The transformed function which can take any QPROGRAM, and performs
@@ -277,9 +280,7 @@ def accept_qprogram_and_validate(
     """
 
     @wraps(cirq_circuit_modifier)
-    def new_scaling_function(
-        circuit: QPROGRAM, *args: Any, **kwargs: Any
-    ) -> QPROGRAM:
+    def new_function(circuit: QPROGRAM, *args: Any, **kwargs: Any) -> QPROGRAM:
         # Pre atomic conversion
         if "qiskit" in circuit.__module__:
             from qiskit.transpiler.passes import RemoveBarriers
@@ -296,68 +297,83 @@ def accept_qprogram_and_validate(
             # when converting to Cirq. Eventually, identities will be removed.
             idle_qubits = _add_identity_to_idle(circuit)
 
-        scaled_circuit = atomic_converter(cirq_circuit_modifier)(
-            circuit, *args, **kwargs
-        )
-
-        # Post atomic conversion
-        # PyQuil: Restore declarations, measurements, and metadata.
-        if "pyquil" in scaled_circuit.__module__:
-            from pyquil import Program
-            from pyquil.quilbase import Declare, Measurement
-
-            circuit = cast(Program, circuit)
-
-            # Grab all measurements from the input circuit.
-            measurements = [
-                instr
-                for instr in circuit.instructions
-                if isinstance(instr, Measurement)
-            ]
-
-            # Remove memory declarations added from Cirq -> pyQuil conversion.
-            new_declarations = {
-                k: v
-                for k, v in scaled_circuit.declarations.items()
-                if k == "ro" or v.memory_type != "BIT"
-            }
-            new_declarations.update(circuit.declarations)
-
-            # Delete all declarations and measurements from the scaled circuit.
-            instructions = [
-                instr
-                for instr in scaled_circuit.instructions
-                if not (isinstance(instr, (Declare, Measurement)))
-            ]
-
-            # Add back original declarations and measurements.
-            scaled_circuit = Program(
-                list(new_declarations.values()) + instructions + measurements
+        if one_to_many:
+            out_circuits = atomic_one_to_many_converter(cirq_circuit_modifier)(
+                circuit, *args, **kwargs
             )
-
-            # Set the number of shots to the input circuit.
-            scaled_circuit.num_shots = circuit.num_shots
-
-        # Qiskit: Keep the same register structure and measurement order.
-        if "qiskit" in scaled_circuit.__module__:
-            from mitiq.interface.mitiq_qiskit.conversions import (
-                _measurement_order,
-                _remove_identity_from_idle,
-                _transform_registers,
+        else:
+            out_circuit = atomic_converter(cirq_circuit_modifier)(
+                circuit, *args, **kwargs
             )
+            out_circuits = [out_circuit]
 
-            scaled_circuit.remove_final_measurements()
-            _transform_registers(scaled_circuit, new_qregs=circuit.qregs)
-            _remove_identity_from_idle(scaled_circuit, idle_qubits)
-            if circuit.cregs and not scaled_circuit.cregs:
-                scaled_circuit.add_register(*circuit.cregs)
+        circuits_to_return = []
+        for out_circuit in out_circuits:
+            # Post atomic conversion
+            # PyQuil: Restore declarations, measurements, and metadata.
+            if "pyquil" in out_circuit.__module__:
+                from pyquil import Program
+                from pyquil.quilbase import Declare, Measurement
 
-            for q, c in _measurement_order(circuit):
-                scaled_circuit.measure(q, c)
+                circuit = cast(Program, circuit)
 
-        return scaled_circuit
+                # Grab all measurements from the input circuit.
+                measurements = [
+                    instr
+                    for instr in circuit.instructions
+                    if isinstance(instr, Measurement)
+                ]
 
-    return new_scaling_function
+                # Remove memory declarations added from Cirq-pyQuil conversion.
+                new_declarations = {
+                    k: v
+                    for k, v in out_circuit.declarations.items()
+                    if k == "ro" or v.memory_type != "BIT"
+                }
+                new_declarations.update(circuit.declarations)
+
+                # Delete all declarations and measurements.
+                instructions = [
+                    instr
+                    for instr in out_circuit.instructions
+                    if not (isinstance(instr, (Declare, Measurement)))
+                ]
+
+                # Add back original declarations and measurements.
+                out_circuit = Program(
+                    list(new_declarations.values())
+                    + instructions
+                    + measurements
+                )
+
+                # Set the number of shots to the input circuit.
+                out_circuit.num_shots = circuit.num_shots
+
+            # Qiskit: Keep the same register structure and measurement order.
+            if "qiskit" in out_circuit.__module__:
+                from mitiq.interface.mitiq_qiskit.conversions import (
+                    _measurement_order,
+                    _remove_identity_from_idle,
+                    _transform_registers,
+                )
+
+                out_circuit.remove_final_measurements()
+                _transform_registers(out_circuit, new_qregs=circuit.qregs)
+                _remove_identity_from_idle(out_circuit, idle_qubits)
+                if circuit.cregs and not out_circuit.cregs:
+                    out_circuit.add_register(*circuit.cregs)
+
+                for q, c in _measurement_order(circuit):
+                    out_circuit.measure(q, c)
+            circuits_to_return.append(out_circuit)
+
+        if not one_to_many:
+            assert len(circuits_to_return) == 1
+            return circuits_to_return[0]
+
+        return circuits_to_return
+
+    return new_function
 
 
 @accept_qprogram_and_validate
