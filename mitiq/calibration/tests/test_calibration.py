@@ -381,6 +381,8 @@ def test_logging(capfd):
     assert "ZNE results:" in captured.out
     assert "PEC results:" in captured.out
     assert settings.get_strategy(0).technique.name in captured.out
+    assert "noisy error" in captured.out
+    assert "mitigated error" in captured.out
 
 
 def test_ExperimentResults_reset_data():
