@@ -6,6 +6,7 @@
 import warnings
 from itertools import product
 from typing import (
+    Any,
     Callable,
     Dict,
     Iterator,
@@ -72,17 +73,28 @@ class ExperimentResults:
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
-    def _get_performance_symbol(
+    def _get_performance(
         self, strategy_id: int, problem_id: int
-    ) -> str:
-        """Returns ✔ the strategy performed better than no mitigation on this
-        problem,  and ✘ otherwise."""
+    ) -> Tuple[str, float, float]:
+        """Get performance symbol and errors.
+
+        Returns:
+            A performance tuple comprising:
+            - performance symbol either ✔ or ✘ depending
+              on whether mitigation technique works well or not.
+              It considered to work well if the mitigated error is less
+              than the noisy error.
+            - the absolute value of the noisy error
+            - the absolute value of the mitigated error
+        """
         mitigated = self.mitigated[strategy_id, problem_id]
         noisy = self.noisy[strategy_id, problem_id]
         ideal = self.ideal[strategy_id, problem_id]
-        mitigation_worked = abs(ideal - mitigated) < abs(ideal - noisy)
-        performance = "✔" if mitigation_worked else "✘"
-        return performance
+        mitigated_error = abs(ideal - mitigated)
+        noisy_error = abs(ideal - noisy)
+        mitigation_worked = mitigated_error < noisy_error
+        performance_symbol = "✔" if mitigation_worked else "✘"
+        return performance_symbol, noisy_error, mitigated_error
 
     def unique_techniques(self) -> Set[MitigationTechnique]:
         """Returns the unique mitigation techniques used across this
@@ -91,24 +103,32 @@ class ExperimentResults:
 
     def _technique_results(
         self, technique: MitigationTechnique
-    ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str]]:
+    ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str, float, float]]:
         """Yields the results from this collection of experiment results,
         limited to a specific technique."""
         for strategy, problem in product(self.strategies, self.problems):
             if strategy.technique is technique:
-                performance = self._get_performance_symbol(
+                performance_symbol, nerr, merr = self._get_performance(
                     strategy.id, problem.id
                 )
-                yield problem, strategy, performance
+                yield problem, strategy, performance_symbol, nerr, merr
 
     def log_technique(self, technique: MitigationTechnique) -> str:
         """Creates a table displaying all results of a given mitigation
         technique."""
-        table = []
-        for problem, strategy, performance in self._technique_results(
-            technique
-        ):
-            row = [performance, problem.type, technique.name]
+        table: List[List[Union[str, float]]] = []
+        for (
+            problem,
+            strategy,
+            performance_symbol,
+            noisy_error,
+            mitigated_error,
+        ) in self._technique_results(technique):
+            row: List[Union[str, float]] = [
+                performance_symbol,
+                problem.type,
+                technique.name,
+            ]
             summary_dict = strategy.to_pretty_dict()
             if strategy.technique is MitigationTechnique.ZNE:
                 row.extend(
@@ -125,8 +145,13 @@ class ExperimentResults:
                         summary_dict["representation_function"],
                     ]
                 )
-
+            row.extend([noisy_error, mitigated_error])
             table.append(row)
+
+        def _sort_best_perf(row: List[Any]) -> float:
+            return row[-1] - row[-2]
+
+        table.sort(key=_sort_best_perf)
 
         if technique is MitigationTechnique.ZNE:
             headers = [
@@ -145,6 +170,8 @@ class ExperimentResults:
                 "noise bias",
                 "noise representation",
             ]
+
+        headers.extend(["noisy error", "mitigated error"])
 
         return tabulate(table, headers, tablefmt="simple_grid")
 
