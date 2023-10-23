@@ -243,7 +243,7 @@ def test_is_measurement():
     circ = Circuit(
         [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit), ops.measure(qbit)]
     )
-    for (i, op) in enumerate(circ.all_operations()):
+    for i, op in enumerate(circ.all_operations()):
         if i == 3:
             assert _is_measurement(op)
         else:

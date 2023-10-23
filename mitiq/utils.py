@@ -57,7 +57,6 @@ def _simplify_circuit_exponents(circuit: Circuit) -> None:
         simplified_operations = []
         # Iterate over operations in moment
         for op in moment:
-
             if not isinstance(op, GateOperation):
                 simplified_operations.append(op)
                 continue

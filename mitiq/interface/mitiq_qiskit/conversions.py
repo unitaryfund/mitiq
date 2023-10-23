@@ -180,7 +180,7 @@ def _measurement_order(
         circuit: Qiskit circuit to get the measurement order of.
     """
     order = []
-    for (gate, qubits, cbits) in circuit.data:
+    for gate, qubits, cbits in circuit.data:
         if isinstance(gate, qiskit.circuit.Measure):
             if len(qubits) != 1 or len(cbits) != 1:
                 raise ValueError(
