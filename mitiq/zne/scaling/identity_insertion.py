@@ -11,6 +11,7 @@ from typing import Tuple
 import numpy as np
 from cirq import Circuit, Moment, ops
 
+from mitiq.interface import accept_qprogram_and_validate
 from mitiq.utils import _append_measurements, _pop_measurements
 
 
@@ -67,7 +68,7 @@ def _calculate_id_layers(
         )
         return (num_uniform_layers, num_partial_layers)
 
-
+@accept_qprogram_and_validate
 def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     """Returns a scaled version of the input circuit by inserting layers of
     identities.
