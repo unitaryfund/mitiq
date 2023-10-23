@@ -7,7 +7,6 @@ on:
       - reopened
       - synchronize
       - ready_for_review
-      - draft
     branches:
       - master
   push:
