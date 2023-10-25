@@ -29,7 +29,7 @@ sphinx-gallery==0.10.1
 nbsphinx==0.9.1
 matplotlib==3.8.0
 pandas==2.1.1
-pyscf==2.3.0; sys_platform != 'win32'
+pyscf==2.4.0; sys_platform != 'win32'
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
 bqskit[ext]==1.0.4
