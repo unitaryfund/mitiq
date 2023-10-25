@@ -184,12 +184,14 @@ Whether to run the quantum measurement or directly use the results from the prev
 import zipfile, pickle, io, requests
 
 run_quantum_processing = False
-repo = "https://github.com/bdg221/mitiq-shadows-storage/raw/main/"
+run_pauli_twirling_calibration = False
+
+file_directory = "../examples/resources"
+
 if not run_quantum_processing:
-    saved_data_name = "shadow_measurement_output1"
-    shadow_measurement_output = pickle.loads(
-        requests.get(f"{repo}/{saved_data_name}.pkl").content
-    )
+    saved_data_name = "shadows-1-intro-output1"
+    with open(f"{file_directory}/{saved_data_name}.pkl", "rb") as file:
+        shadow_measurement_output = pickle.load(file)
 
 else:
     shadow_measurement_output = shadow_quantum_processing(
@@ -283,12 +285,19 @@ noisy_executor = partial(
     noise_model_function=cirq.bit_flip,
 )
 
-f_est = pauli_twirling_calibrate(
-    k_calibration=1,
-    qubits=qubits,
-    executor=noisy_executor,
-    num_total_measurements_calibration=5000
-)
+if not run_pauli_twirling_calibration:
+    saved_data_name = "shadows-1-intro-PTC-50000"
+    with open(f"{file_directory}/{saved_data_name}.pkl", "rb") as file:
+        f_est = pickle.load(file)
+
+else:
+    f_est = pauli_twirling_calibrate(
+        k_calibration=1,
+        qubits=qubits,
+        executor=noisy_executor,
+        num_total_measurements_calibration=50000
+    )
+
 f_est
 ```
 
@@ -298,10 +307,9 @@ Similarly to the previous case (estimation of expectation values), for estimatin
 
 ```{code-cell} ipython3
 if not run_quantum_processing:
-    saved_data_name = "shadow_measurement_output2"
-    shadow_measurement_output = pickle.loads(
-        requests.get(f"{repo}/{saved_data_name}.pkl").content
-    )
+    saved_data_name = "shadows-1-intro-output2"
+    with open(f"{file_directory}/{saved_data_name}.pkl", "rb") as file:
+        shadow_measurement_output = pickle.load(file)
 
 else:
     shadow_measurement_output = shadow_quantum_processing(
