@@ -34,11 +34,15 @@ We define a function which returns a simple two-qubit variational circuit depend
 
 ```{code-cell} ipython3
 # Describe noise
-noise_gate = qml.PhaseDamping
 noise_strength = 0.4
 
-dev = qml.device('default.mixed', wires=2)#Ideal device
-dev_noisy = qml.transforms.insert(noise_gate, noise_strength)(dev)#with noise
+#Ideal device
+dev = qml.device('default.mixed', wires=2)
+#noisy device
+dev_noise = qml.transforms.insert(
+    qml.DepolarizingChannel,
+    noise_strength
+)(dev)
 ```
 
 
