@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for the Clifford data regression top-level API."""
+import re
 from functools import partial
 
 import cirq
@@ -379,11 +380,42 @@ def test_logging(capfd):
     )
     cal.run(log=True)
     captured = capfd.readouterr()
-    assert "ZNE results:" in captured.out
-    assert "PEC results:" in captured.out
-    assert settings.get_strategy(0).technique.name in captured.out
-    assert "noisy error" in captured.out
-    assert "mitigated error" in captured.out
+    for s in cal.strategies:
+        for line in str(s).split():
+            assert line in captured.out
+    for p in cal.problems:
+        for line in str(p).split():
+            assert line in captured.out
+    mcount = 0
+    ncount = 0
+    for line in captured.out.split("\n"):
+        if "Mitigated error: " in line:
+            mcount += 1
+        if "Noisy error: " in line:
+            ncount += 1
+    assert mcount == (len(cal.strategies) * len(cal.problems))
+    assert ncount == (len(cal.strategies) * len(cal.problems))
+
+
+def test_logging_cartesian(capfd):
+    cal = Calibrator(
+        damping_execute, frontend="cirq", settings=light_combined_settings
+    )
+    cal.run(log_cartesian=True)
+    captured = capfd.readouterr()
+    for s in cal.strategies:
+        for line in str(s).split():
+            assert line in captured.out
+    for p in cal.problems:
+        for line in str(p).split():
+            assert line in captured.out
+    for line in captured.out.split("\n"):
+        if "Mitigated error: " in line:
+            assert len(re.findall("Mitigated error: ", line)) == len(
+                cal.problems
+            )
+        if "Noisy error: " in line:
+            assert len(re.findall("Noisy error: ", line)) == len(cal.problems)
 
 
 def test_ExperimentResults_reset_data():

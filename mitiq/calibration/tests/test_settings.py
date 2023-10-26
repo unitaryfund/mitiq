@@ -122,12 +122,72 @@ def test_basic_settings():
     assert ghz_problem.two_qubit_gate_count == 1
     assert ghz_problem.ideal_distribution == {"00": 0.5, "11": 0.5}
 
+    lines = str(ghz_problem).split("\n")
+    ghz_problem_dict = ghz_problem.to_dict()
+    for line in lines:
+        [title, value] = line.split(":", 1)
+        key = title.lower().replace(" ", "_")
+        value = value.strip()
+        assert key in ghz_problem_dict
+        assert value == str(ghz_problem_dict[key])
+
     strategies = settings.make_strategies()
     num_strategies = 4
     assert len(strategies) == num_strategies
 
-    strategy_summary = str(strategies[0]).replace("'", '"')
+    strategy_summary = repr(strategies[0]).replace("'", '"')
     assert isinstance(json.loads(strategy_summary), dict)
+
+    lines = str(strategies[0]).split("\n")
+    strategy_dict = strategies[0].to_pretty_dict()
+    for line in lines:
+        [title, value] = line.split(":")
+        key = title.lower().replace(" ", "_")
+        value = value.strip()
+        assert key in strategy_dict
+        assert value == str(strategy_dict[key])
+
+
+def test_settings_pretty_dict():
+    settings = Settings(
+        benchmarks=[
+            {
+                "circuit_type": "ghz",
+                "num_qubits": 2,
+                "circuit_depth": 999,
+            }
+        ],
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "pec",
+                "representation_function": (
+                    represent_operation_with_local_depolarizing_noise
+                ),
+                "is_qubit_dependent": False,
+                "noise_level": 0.001,
+                "num_samples": 200,
+            },
+        ],
+    )
+    strategies = settings.make_strategies()
+    _dict = strategies[0].to_dict()
+    pretty_dict = strategies[0].to_pretty_dict()
+    if pretty_dict["technique"] == "ZNE":
+        assert pretty_dict["factory"] == _dict["factory"][:-7]
+        assert (
+            pretty_dict["scale_factors"] == str(_dict["scale_factors"])[1:-1]
+        )
+    elif pretty_dict["technique"] == "PEC":
+        assert pretty_dict["noise_bias"] == _dict.get("noise_bias", "N/A")
+        assert (
+            pretty_dict["representation_function"]
+            == _dict["representation_function"][25:]
+        )
 
 
 def test_make_circuits_qv_circuits():

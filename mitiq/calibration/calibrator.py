@@ -4,20 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
-from itertools import product
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
-    cast,
-)
+from operator import itemgetter
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import cirq
 import numpy as np
@@ -33,7 +21,6 @@ from mitiq import (
 )
 from mitiq.calibration.settings import (
     BenchmarkProblem,
-    MitigationTechnique,
     Settings,
     Strategy,
     ZNESettings,
@@ -96,95 +83,96 @@ class ExperimentResults:
         performance_symbol = "✔" if mitigation_worked else "✘"
         return performance_symbol, noisy_error, mitigated_error
 
-    def unique_techniques(self) -> Set[MitigationTechnique]:
-        """Returns the unique mitigation techniques used across this
-        collection of experiment results."""
-        return set(strategy.technique for strategy in self.strategies)
-
-    def _technique_results(
-        self, technique: MitigationTechnique
-    ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str, float, float]]:
-        """Yields the results from this collection of experiment results,
-        limited to a specific technique."""
-        for strategy, problem in product(self.strategies, self.problems):
-            if strategy.technique is technique:
-                performance_symbol, nerr, merr = self._get_performance(
+    def log_results(self) -> None:
+        """Prints calibration results in the following form
+        ┌────────────────────────────────────────────┬────────────────────────────────┬─────────────────────────┐
+        │ benchmark                                  │ strategy                       │ performance             │
+        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
+        │ Type: rb                                   │ Technique: ZNE                 │ ✔                       │
+        │ Ideal distribution: {'00': 1.0}            │ Factory: RichardsonFactory     │ Noisy error: 0.1053     │
+        │ Num qubits: 2                              │ Scale factors: [1.0, 2.0, 3.0] │ Mitigated error: 0.0146 │
+        │ Circuit depth: 326                         │ Scale method: fold_global      │                         │
+        │ Two qubit gate count: 79                   │                                │                         │
+        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
+        │ Type: rb                                   │ Technique: ZNE                 │ ✔                       │
+        │ Ideal distribution: {'00': 1.0}            │ Factory: RichardsonFactory     │ Noisy error: 0.1053     │
+        │ Num qubits: 2                              │ Scale factors: [1.0, 3.0, 5.0] │ Mitigated error: 0.0422 │
+        │ Circuit depth: 326                         │ Scale method: fold_global      │                         │
+        │ Two qubit gate count: 79                   │                                │                         │
+        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
+        │ Type: ghz                                  │ Technique: ZNE                 │ ✔                       │
+        │ Ideal distribution: {'00': 0.5, '11': 0.5} │ Factory: RichardsonFactory     │ Noisy error: 0.0157     │
+        │ Num qubits: 2                              │ Scale factors: [1.0, 2.0, 3.0] │ Mitigated error: 0.0018 │
+        │ Circuit depth: 2                           │ Scale method: fold_global      │                         │
+        │ Two qubit gate count: 1                    │                                │                         │
+        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
+        │ Type: ghz                                  │ Technique: ZNE                 │ ✔                       │
+        │ Ideal distribution: {'00': 0.5, '11': 0.5} │ Factory: RichardsonFactory     │ Noisy error: 0.0157     │
+        │ Num qubits: 2                              │ Scale factors: [1.0, 3.0, 5.0] │ Mitigated error: 0.0091 │
+        │ Circuit depth: 2                           │ Scale method: fold_global      │                         │
+        │ Two qubit gate count: 1                    │                                │                         │
+        └────────────────────────────────────────────┴────────────────────────────────┴─────────────────────────┘
+        """  # noqa: E501
+        table: List[List[str | float]] = []
+        headers: List[str] = ["benchmark", "strategy", "performance"]
+        for problem in self.problems:
+            row_group: List[List[str | float]] = []
+            for strategy in self.strategies:
+                perf, nerr, merr = self._get_performance(
                     strategy.id, problem.id
                 )
-                yield problem, strategy, performance_symbol, nerr, merr
+                row_group.append(
+                    [
+                        str(problem),
+                        str(strategy),
+                        f"{perf}\nNoisy error: {round(nerr, 4)}\n"
+                        f"Mitigated error: {round(merr, 4)}",
+                        # this is only for sorting
+                        # removed after sorting
+                        merr - nerr,
+                    ]
+                )
+            row_group.sort(key=itemgetter(-1))
+            table.extend([r[:-1] for r in row_group])
+        return print(tabulate(table, headers, tablefmt="simple_grid"))
 
-    def log_technique(self, technique: MitigationTechnique) -> str:
-        """Creates a table displaying all results of a given mitigation
-        technique."""
-        table: List[List[Union[str, float]]] = []
-        for (
-            problem,
-            strategy,
-            performance_symbol,
-            noisy_error,
-            mitigated_error,
-        ) in self._technique_results(technique):
-            row: List[Union[str, float]] = [
-                performance_symbol,
-                problem.type,
-                technique.name,
-            ]
-            summary_dict = strategy.to_pretty_dict()
-            if strategy.technique is MitigationTechnique.ZNE:
-                row.extend(
-                    [
-                        summary_dict["factory"],
-                        summary_dict["scale_factors"],
-                        summary_dict["scale_method"],
-                    ]
+    def log_results_cartesian(self) -> None:
+        """Prints calibration results in the following form
+        ┌────────────────────────────────┬───────────────────────────────────┬──────────────────────────────────────────────┐
+        │ strategy\benchmark             │ Type: rb                          │ Type: ghz                                    │
+        │                                │ Ideal distribution: {'00': 1.0}   │ Ideal distribution: {'00': 0.5, '11': 0.5}   │
+        │                                │ Num qubits: 2                     │ Num qubits: 2                                │
+        │                                │ Circuit depth: 326                │ Circuit depth: 2                             │
+        │                                │ Two qubit gate count: 79          │ Two qubit gate count: 1                      │
+        │                                │                                   │                                              │
+        ├────────────────────────────────┼───────────────────────────────────┼──────────────────────────────────────────────┤
+        │ Technique: ZNE                 │ ✔                                 │ ✔                                            │
+        │ Factory: RichardsonFactory     │ Noisy error: 0.1053               │ Noisy error: 0.0157                          │
+        │ Scale factors: [1.0, 2.0, 3.0] │ Mitigated error: 0.0146           │ Mitigated error: 0.0018                      │
+        │ Scale method: fold_global      │                                   │                                              │
+        ├────────────────────────────────┼───────────────────────────────────┼──────────────────────────────────────────────┤
+        │ Technique: ZNE                 │ ✔                                 │ ✔                                            │
+        │ Factory: RichardsonFactory     │ Noisy error: 0.1053               │ Noisy error: 0.0157                          │
+        │ Scale factors: [1.0, 3.0, 5.0] │ Mitigated error: 0.0422           │ Mitigated error: 0.0091                      │
+        │ Scale method: fold_global      │                                   │                                              │
+        └────────────────────────────────┴───────────────────────────────────┴──────────────────────────────────────────────┘
+        """  # noqa: E501
+        table: List[List[str]] = []
+        headers: List[str] = ["strategy\\benchmark"]
+        for problem in self.problems:
+            headers.append(str(problem))
+        for strategy in self.strategies:
+            row: List[str] = [str(strategy)]
+            for problem in self.problems:
+                perf, nerr, merr = self._get_performance(
+                    strategy.id, problem.id
                 )
-            elif strategy.technique is MitigationTechnique.PEC:
-                row.extend(
-                    [
-                        summary_dict["noise_level"],
-                        summary_dict["noise_bias"],
-                        summary_dict["representation_function"],
-                    ]
+                row.append(
+                    f"{perf}\nNoisy error: {round(nerr, 4)}\n"
+                    f"Mitigated error: {round(merr, 4)}",
                 )
-            row.extend([noisy_error, mitigated_error])
             table.append(row)
-
-        def _sort_best_perf(row: List[Any]) -> float:
-            return row[-1] - row[-2]
-
-        table.sort(key=_sort_best_perf)
-
-        if technique is MitigationTechnique.ZNE:
-            headers = [
-                "performance",
-                "circuit type",
-                "method",
-                "extrapolation",
-                "scale_factors",
-                "scale method",
-            ]
-        elif technique is MitigationTechnique.PEC:
-            headers = [
-                "performance",
-                "circuit type",
-                "method",
-                "noise level",
-                "noise bias",
-                "noise representation",
-            ]
-
-        headers.extend(["noisy error", "mitigated error"])
-
-        return tabulate(table, headers, tablefmt="simple_grid")
-
-    def log_results(self) -> None:
-        """Log results from entire calibration run. Logging is performed on
-        each mitigation technique individually to avoid confusion when many
-        techniques are used."""
-        for mitigation_technique in self.unique_techniques():
-            print(f"{mitigation_technique.name} results:")
-            print(self.log_technique(mitigation_technique))
-            print()
+        return print(tabulate(table, headers, tablefmt="simple_grid"))
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -308,7 +296,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run(self, log: bool = False) -> None:
+    def run(self, log: bool = False, log_cartesian: bool = False) -> None:
         """Runs all the circuits required for calibration."""
         if not self.results.is_missing_data():
             self.results.reset_data()
@@ -341,6 +329,9 @@ class Calibrator:
 
         if log:
             self.results.log_results()
+
+        if log_cartesian:
+            self.results.log_results_cartesian()
 
     def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the

@@ -126,6 +126,13 @@ class BenchmarkProblem:
     def __repr__(self) -> str:
         return str(self.to_dict())
 
+    def __str__(self) -> str:
+        result: str = ""
+        for key, value in self.to_dict().items():
+            title: str = key.replace("_", " ").capitalize()
+            result += f"{title}: {value}\n"
+        return result.rstrip()
+
 
 @dataclass
 class Strategy:
@@ -238,6 +245,13 @@ class Strategy:
 
     def __repr__(self) -> str:
         return str(self.to_dict())
+
+    def __str__(self) -> str:
+        result: str = ""
+        for key, value in self.to_pretty_dict().items():
+            title: str = key.replace("_", " ").capitalize()
+            result += f"{title}: {value}\n"
+        return result.rstrip()
 
     def num_circuits_required(self) -> int:
         summary = self.to_dict()
