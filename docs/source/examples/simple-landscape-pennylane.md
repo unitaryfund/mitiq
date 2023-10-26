@@ -234,8 +234,3 @@ print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 
 print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
 ```
 
-    Minimum of the noisy landscape: -0.993
-    Minimum of the mitigated landscape: -0.994
-    Theoretical ground state energy: -1.0
-    
-
