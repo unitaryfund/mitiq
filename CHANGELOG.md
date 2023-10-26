@@ -1,5 +1,30 @@
 # Changelog
 
+## Version 0.30.0
+
+Released October 13, 2023
+
+### Summary
+This release contains several documentation improvements and some new additions.
+The classical shadows documentation has been improved (including a tutorial!) by @Min-Li. The Pauli Twirling method is added to the user guide (thanks @Aaron-Robertson and @purva-thakre). There is a new tutorial applying both zero-noise extrapolation (ZNE) and Clifford Data Regression (CDR) to quantum simulation, for the 1D Ising chain, in Cirq, by @farzadkianvash, a new contributor! The documentation has been further improved and unified by @Misty-W and @natestemen.
+
+In terms of additions, a new type of benchmark quantum circuits, "rotated" randomized benchmarking (RB) quantum circuits have been added by @Misty-W, for more general benchmarks.
+
+
+### All changes
+- Add a tutorial for simulating Ising 1-D chain with Cirq with ZNE and CDR [@farzadkianvash]
+- Add section on quantum noise to user guide (#2036) [@Misty-W]
+- New QEM benchmarking method: "rotated" RB circuits (#2028) [@Misty-W]
+- Add Pauli Twirling (PT) User Guide (#1848) [@Aaron-Robertson @purva-thakre]
+- Documentation cleanup (#2008) [@natestemen]
+- Remove draft workflow from Github Actions (#2019) [@purva-thakre]
+- Improve documentation of Classical Shadows (#2026) [@Min-Li]
+- Classical Shadows: Add tutorial (#1945) [@Min-Li]
+
+#### Dependency updates
+- Update amazon-braket-sdk requirement from ~=1.54.1 to ~=1.55.1 (#2016) [@dependabot]
+- Bump matplotlib from 3.7.2 to 3.7.3 (#2011) [@dependabot]
+
 ## Version 0.29.0
 
 ### Summary
@@ -34,7 +59,7 @@ This tutorial also introduces the use of Mitiq’s ZNE functions with a new back
 
 #### Calibration, Testing, and Documentation
 
-Streamlined formatting of calibration logs, removed redundant test cases, and fixed documentation issues. 
+Streamlined formatting of calibration logs, removed redundant test cases, and fixed documentation issues.
 Thanks @natestemen for these improvements and for reviewing many of the PRs in this release!
 
 Also, congrats to our new contributor @bdg221 for closing their first Mitiq PR! :tada:
