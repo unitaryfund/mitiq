@@ -34,7 +34,7 @@ We define a function which returns a simple two-qubit variational circuit depend
 
 ```{code-cell} ipython3
 # Describe noise
-noise_strength = 0.4
+noise_strength = 0.04
 
 #Ideal device
 dev = qml.device('default.mixed', wires=2)
