@@ -141,6 +141,7 @@ class ExperimentResults:
             elif strategy.technique is MitigationTechnique.PEC:
                 row.extend(
                     [
+                        summary_dict["noise_level"],
                         summary_dict["noise_bias"],
                         summary_dict["representation_function"],
                     ]
@@ -167,6 +168,7 @@ class ExperimentResults:
                 "performance",
                 "circuit type",
                 "method",
+                "noise level",
                 "noise bias",
                 "noise representation",
             ]
