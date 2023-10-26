@@ -352,7 +352,8 @@ nbsphinx_thumbnails = {
     "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
     "examples/bqskit": "_static/bqskit.png",
     "examples/simple-landscape-qiskit": "_static/simple-landscape-qiskit.png",
-    "examples/simple-landscape-pennylane": "_static/simple-landscape-pennylane.png",
+    "examples/simple-landscape-pennylane": 
+    "_static/simple-landscape-pennylane.png",
     "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     "examples/pec_tutorial": "_static/pec-tutorial.png",
     "examples/scaling": "_static/scaling.png",
