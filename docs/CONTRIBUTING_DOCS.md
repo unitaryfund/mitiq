@@ -126,9 +126,9 @@ source code, and to the API page `apidoc.md`.
 
 ### Adding references 
 
-To add references to the [Mitiq bibliography](https://mitiq.readthedocs.io/en/stable/bibliography.html), the first step is to add the reference to docs/source/refs.bib which is organized alphabetically. For formatting, please see BibTeX documentation for [articles](https://www.bibtex.com/e/article-entry/), [books](https://www.bibtex.com/e/book-entry/), and [others](https://www.bibtex.com/e/entry-types/).
+To add references to the [Mitiq bibliography](https://mitiq.readthedocs.io/en/stable/bibliography.html), the first step is to add the reference to `docs/source/refs.bib` which is organized alphabetically. For formatting, please see BibTeX documentation for [articles](https://www.bibtex.com/e/article-entry/), [books](https://www.bibtex.com/e/book-entry/), and [others](https://www.bibtex.com/e/entry-types/).
 
-Once the reference has been added to the docs/source/refs.bib file, cite the reference in the file by using:
+Once the reference has been added to the `docs/source/refs.bib` file, cite the reference in the file by using:
 ```md
 {cite}`title of entry`
 ```
