@@ -64,7 +64,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.8", None),
+    "python": ("https://docs.python.org/3.9", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
     # Cirq is no longer using sphinx docs so interlinking is not possible.
@@ -364,7 +364,6 @@ nbsphinx_thumbnails = {
     "examples/quantum_simulation_scars_ibmq": "_static/qmbs_ibmq.png",
     "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
     "examples/quantum_simulation_1d_ising": "_static/quantum_simulation.png",
-
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

@@ -37,15 +37,18 @@ Whether to run the quantum measurement or directly use the results from the prev
 
 
 ```{code-cell} ipython3
-import zipfile, pickle, io, requests
+import zipfile, pickle, io, requests, os
 
 run_quantum_processing = False
-repo = "https://github.com/Min-Li/mitiq-shadows-storage/raw/main/"
+run_pauli_twirling_calibration = False
+
+file_directory = "./resources"
+
 if not run_quantum_processing:
     saved_data_name = "saved_data-rshadows"
-    zip_data = requests.get(f"{repo}/{saved_data_name}.zip").content
-    with zipfile.ZipFile(io.BytesIO(zip_data), "r") as zf:
-        saved_data = pickle.loads(zf.read(f"{saved_data_name}.pkl"))
+
+    with zipfile.ZipFile(f"{file_directory}/rshadows-tutorial-{saved_data_name}.zip") as zf:
+        saved_data = pickle.load(zf.open(f"{saved_data_name}.pkl"))    
 ```
 
 The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
@@ -67,9 +70,8 @@ num_qubits = 8
 qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
 
 if download_ising_circuits:
-    circuit = pickle.loads(
-        requests.get(f"{repo}/1D_Ising_g=1_{num_qubits}qubits.pkl").content
-    )
+    with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
+        circuit = pickle.load(file)
     g = 1
 
 # or user can import from tensorflow_quantum
@@ -106,6 +108,7 @@ def cirq_executor(
     Returns:
         A one shot MeasurementResult object containing the measurement outcomes.
     """
+    
     circuit = circuit.copy()
     qubits = sorted(list(circuit.all_qubits()))
     if noise_level[0] > 0:
@@ -129,6 +132,7 @@ def cirq_executor(
         shots=1,
         sampler=sampler,
     )
+    
     return executor
 ```
 
@@ -293,7 +297,6 @@ def compare_shadow_methods(
             executor=noisy_executor,
             qubits=qubits,
         )
-
         shadow_measurement_result = shadow_quantum_processing(
             circuit,
             num_total_measurements_shadow=n_measurement_shadow,
@@ -302,12 +305,23 @@ def compare_shadow_methods(
     else:
         assert shadow_measurement_result is not None
         assert zero_state_shadow_output is not None
-
-    f_est = pauli_twirling_calibrate(
-        zero_state_shadow_outcomes=zero_state_shadow_output,
-        k_calibration=k_calibration,
-        locality=locality,
-    )
+        
+    file_zsso = zero_state_shadow_output[1][0]
+    file_k_cal = k_calibration
+    file_locality = locality
+    file_name = f"rshadows-tutorial-{file_zsso}-{file_k_cal}-{file_locality}"
+    
+    if not run_pauli_twirling_calibration and os.path.exists(f"{file_directory}/{file_name}.pkl"):
+         # use the file
+         with open(f"{file_directory}/{file_name}.pkl", "rb") as file:
+             f_est = pickle.load(file)
+    else:
+        f_est = pauli_twirling_calibrate(
+            zero_state_shadow_outcomes=zero_state_shadow_output,
+            k_calibration=k_calibration,
+            locality=locality,
+        )
+        
     output_shadow = classical_post_processing(
         shadow_outcomes=shadow_measurement_result,
         use_calibration=False,
@@ -322,6 +336,7 @@ def compare_shadow_methods(
         observables=observables,
         k_shadows=k_shadows,
     )
+
     return {"standard": output_shadow, "robust": output_shadow_cal}
 ```
 
@@ -493,9 +508,8 @@ Import groud state of 1-D Ising model with periodic boundary condition
 num_qubits = 16
 qubits = cirq.LineQubit.range(num_qubits)
 if download_ising_circuits:
-    circuit = pickle.loads(
-        requests.get(f"{repo}/1D_Ising_g=1_{num_qubits}qubits.pkl").content
-    )
+    with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
+        circuit = pickle.load(file)
     g = 1
 else:
     qbs = cirq.GridQubit.rect(num_qubits, 1)
