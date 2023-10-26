@@ -14,7 +14,7 @@ kernelspec:
 
 # Mitigating the energy landscape of a variational circuit with Mitiq
 
-## This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
+This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
 
 
 ```{code-cell} ipython3
