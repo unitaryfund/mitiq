@@ -178,16 +178,31 @@ At present, the implementation supports random Pauli measurement. This is equiva
 One can obtain the list of measurement results of local Pauli measurements in terms of bitstrings, and the related Pauli-basis measured in terms of strings as follows.
 
 
+Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used.
+
 ```{code-cell} ipython3
-shadow_measurement_output = shadow_quantum_processing(
-    circuit,
-    noisy_executor,
-    num_total_measurements_shadow=5000,
-)
+import zipfile, pickle, io, requests
+
+run_quantum_processing = False
+run_pauli_twirling_calibration = False
+
+file_directory = "../examples/resources"
+
+if not run_quantum_processing:
+    saved_data_name = "shadows-1-intro-output1"
+    with open(f"{file_directory}/{saved_data_name}.pkl", "rb") as file:
+        shadow_measurement_output = pickle.load(file)
+
+else:
+    shadow_measurement_output = shadow_quantum_processing(
+        circuit,
+        noisy_executor,
+        num_total_measurements_shadow=5000,
+    )
 ```
                                                                      
 
-AS an example, we print out one of those measurement outcomes and the associated measured operator:
+As an example, we print out one of those measurement outcomes and the associated measured operator:
 
 
 ```{code-cell} ipython3
@@ -270,12 +285,19 @@ noisy_executor = partial(
     noise_model_function=cirq.bit_flip,
 )
 
-f_est = pauli_twirling_calibrate(
-    k_calibration=1,
-    qubits=qubits,
-    executor=noisy_executor,
-    num_total_measurements_calibration=50000,
-)
+if not run_pauli_twirling_calibration:
+    saved_data_name = "shadows-1-intro-PTC-50000"
+    with open(f"{file_directory}/{saved_data_name}.pkl", "rb") as file:
+        f_est = pickle.load(file)
+
+else:
+    f_est = pauli_twirling_calibrate(
+        k_calibration=1,
+        qubits=qubits,
+        executor=noisy_executor,
+        num_total_measurements_calibration=50000
+    )
+
 f_est
 ```
 
@@ -284,11 +306,17 @@ Similarly to the previous case (estimation of expectation values), for estimatin
 
 
 ```{code-cell} ipython3
-shadow_measurement_output = shadow_quantum_processing(
-    circuit,
-    noisy_executor,
-    num_total_measurements_shadow=50000,
-)
+if not run_quantum_processing:
+    saved_data_name = "shadows-1-intro-output2"
+    with open(f"{file_directory}/{saved_data_name}.pkl", "rb") as file:
+        shadow_measurement_output = pickle.load(file)
+
+else:
+    shadow_measurement_output = shadow_quantum_processing(
+        circuit,
+        noisy_executor,
+        num_total_measurements_shadow=50000,
+    )
 ```
 
 ```{code-cell} ipython3
