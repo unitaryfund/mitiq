@@ -39,7 +39,7 @@ noise_strength = 0.4
 #Ideal device
 dev = qml.device('default.mixed', wires=2)
 #noisy device
-dev_noise = qml.transforms.insert(
+dev_noisy = qml.transforms.insert(
     qml.DepolarizingChannel,
     noise_strength
 )(dev)
