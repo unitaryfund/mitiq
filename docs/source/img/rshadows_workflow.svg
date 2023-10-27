@@ -7,7 +7,7 @@
    id="svg993"
    inkscape:version="1.3 (1:1.3+202307231459+0e150ed6c4)"
    sodipodi:docname="rshadows_workflow.svg"
-   inkscape:export-filename="../../../../Pictures/robust_shadow.png"
+   inkscape:export-filename="robust_shadow.png"
    inkscape:export-xdpi="600"
    inkscape:export-ydpi="600"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -46,8 +46,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.53706755"
-     inkscape:cx="588.38037"
-     inkscape:cy="348.18712"
+     inkscape:cx="588.38036"
+     inkscape:cy="348.18711"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -96,7 +96,9 @@
        id="text1723"
        x="-176.0914"
        y="334.24435"
-       style="stroke-width:0.264583">User</text>
+       style="font-size:14.1111px;stroke-width:0.264583"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.1111px;font-family:Monospace;-inkscape-font-specification:Monospace"
+         id="tspan3">User</tspan></text>
     <rect
        x="-86.263092"
        y="315.9881"
@@ -113,7 +115,9 @@
        x="-49.383244"
        y="314.78397"
        style="font-weight:400;font-stretch:semi-condensed;font-size:13.3432px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.250184"
-       transform="scale(0.94558015,1.0575518)">mitiq.shadows</text>
+       transform="scale(0.94558015,1.0575518)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+         id="tspan5">mitiq.shadows</tspan></text>
     <path
        d="m -104.51469,385.30741 h 19.826907 l 0.337891,-0.76109 -0.377912,0.79375 h 16.047788 v -1.5875 h -16.425701 l -0.33789,0.76109 0.377912,-0.79375 h -19.448995 z m 35.456762,3.20766 3.779122,-3.96875 -3.779122,-3.96875 z"
        id="path1733"
@@ -158,9 +162,11 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1759"
-       x="105.18319"
-       y="336.43057"
-       style="stroke-width:0.264583">Hardware</text>
+       x="115.93195"
+       y="336.01251"
+       style="font-size:14.1111px;stroke-width:0.264583"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.1111px;font-family:Monospace;-inkscape-font-specification:Monospace"
+         id="tspan6">Hardware</tspan></text>
     <path
        d="m 144.03077,483.25294 h -39.18516 l -0.66778,0.68664 0.7469,-0.7161 H 73.208481 v 1.4322 h 32.463129 l 0.66778,-0.68664 -0.74689,0.7161 h 38.43827 z m -70.075404,-2.89386 -7.4689,3.5805 7.4689,3.5805 z"
        id="path1733-5-9"
@@ -169,7 +175,7 @@
        sodipodi:nodetypes="ccccccccccccccc" />
     <g
        id="g980"
-       transform="matrix(0.95815506,0,0,1.0397067,-8.7118536,207.68752)">
+       transform="matrix(0.95815506,0,0,1.0397067,-16.642995,210.32241)">
       <rect
          x="-97.253273"
          y="296.23883"
@@ -228,22 +234,22 @@
          sodipodi:role="line"
          x="-154.82864"
          y="489.55225"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.241112"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.241112"
          id="tspan918-3-2">Error-</tspan><tspan
          sodipodi:role="line"
          x="-154.82864"
          y="502.81351"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.241112"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.241112"
          id="tspan990">mitigated</tspan><tspan
          sodipodi:role="line"
          x="-154.82864"
          y="516.07477"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.241112"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.241112"
          id="tspan964-5">expectation</tspan><tspan
          sodipodi:role="line"
          x="-154.82864"
          y="529.336"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.241112"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.609px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.241112"
          id="tspan994">value</tspan></text>
     <text
        xml:space="preserve"
@@ -255,11 +261,11 @@
          id="tspan1015"
          x="-157.64777"
          y="384.89777"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583">Quantum</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.264583">Quantum</tspan><tspan
          sodipodi:role="line"
          x="-157.64777"
          y="399.44989"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1021">program</tspan></text>
     <text
        xml:space="preserve"
@@ -361,17 +367,17 @@
          sodipodi:role="line"
          x="172.19193"
          y="358.96652"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.12195px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.217552"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.12195px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.217552"
          id="tspan23">Z-basis</tspan><tspan
          sodipodi:role="line"
          x="172.19193"
          y="369.11896"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.12195px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.217552"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.12195px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.217552"
          id="tspan24">Measurements</tspan><tspan
          sodipodi:role="line"
          x="172.19193"
          y="379.27139"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.12195px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.217552"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.12195px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.217552"
          id="tspan1">of noisy channel</tspan></text>
     <rect
        x="-53.749443"
@@ -397,25 +403,25 @@
        style="fill:#71c837" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:8.39453px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.185997"
-       x="9.1757021"
-       y="355.99463"
+       style="font-style:normal;font-weight:normal;font-size:9.47583px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.209955"
+       x="7.692399"
+       y="380.43326"
        id="text26"
-       transform="scale(0.90718937,1.1023057)"><tspan
+       transform="scale(0.96846409,1.0325628)"><tspan
          sodipodi:role="line"
-         x="9.1757021"
-         y="355.99463"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.39453px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.185997"
+         x="7.6923981"
+         y="380.43326"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.47583px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.209955"
          id="tspan26">Randomly sampled</tspan><tspan
          sodipodi:role="line"
-         x="9.1757011"
-         y="366.48779"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.39453px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.185997"
+         x="7.6924"
+         y="392.27805"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.47583px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.209955"
          id="tspan28">unitaries from</tspan><tspan
          sodipodi:role="line"
-         x="9.1757011"
-         y="376.98096"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.39453px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.185997"
+         x="7.692399"
+         y="404.12283"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.47583px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.209955"
          id="tspan27">ensemble</tspan></text>
     <path
        d="m 57.067405,394.80991 h 19.215183 l 0.327466,-0.76109 -0.366252,0.79375 h 15.552663 v -1.5875 H 75.877549 l -0.327465,0.76109 0.366252,-0.79375 H 57.067405 Z m 34.362807,3.20766 3.662524,-3.96875 -3.662524,-3.96875 z"
@@ -424,8 +430,8 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccccccccc" />
     <rect
-       x="-77.405258"
-       y="453.52649"
+       x="-72.619202"
+       y="457.3616"
        width="139.63368"
        height="58.460796"
        stroke="#000000"
@@ -437,29 +443,34 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.30332"
-       x="-6.3554554"
-       y="464.93332"
+       x="-6.2009711"
+       y="462.84955"
        id="text30"
        transform="scale(0.98603887,1.0141588)"><tspan
          sodipodi:role="line"
-         x="-6.3554549"
-         y="464.93332"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.30332"
+         x="-6.2009702"
+         y="462.84955"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.30332"
          id="tspan30">Classical shadows</tspan><tspan
          sodipodi:role="line"
-         x="-6.355454"
-         y="475.51666"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.30332"
-         id="tspan31">reconstruction via Pauli Twirling</tspan><tspan
+         x="-6.2009692"
+         y="473.43289"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.30332"
+         id="tspan31">reconstruction via </tspan><tspan
          sodipodi:role="line"
-         x="-6.3554554"
-         y="486.10001"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.30332"
+         x="-6.2009716"
+         y="484.01624"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.30332"
+         id="tspan7">Pauli Twirling</tspan><tspan
+         sodipodi:role="line"
+         x="-6.2009702"
+         y="494.59955"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.30332"
          id="tspan32">using measurement</tspan><tspan
          sodipodi:role="line"
-         x="-6.3554554"
-         y="496.68332"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.30332"
+         x="-6.2009706"
+         y="505.18289"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46667px;font-family:Monospace;-inkscape-font-specification:Monospace;text-align:center;text-anchor:middle;stroke-width:0.30332"
          id="tspan33">outcomes</tspan></text>
   </g>
 </svg>
