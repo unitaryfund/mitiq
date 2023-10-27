@@ -137,10 +137,6 @@ plt.show()
 
 ```
 
-
-    
-
-
 ## Computing the unmitigated landscape
 We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$
 in the following code block.
