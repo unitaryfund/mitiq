@@ -166,10 +166,6 @@ plt.legend(fontsize=14)
 plt.ylim(-1, 1);
 plt.show()
 ```
-
-
-
-
 ## Computing the mitigated landscape
 We now repeat the same task but use Mitiq to mitigate errors.
 We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
