@@ -12,9 +12,10 @@ kernelspec:
   name: python3
 ---
 
-# Mitigating the energy landscape of a variational circuit with Mitiq
+# Mitigating the energy landscape of a variational circuit with Mitiq and PennyLane
 
-This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation.
+This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored 
+using the [PennyLane](https://pennylane.ai/) frontend, with and without error mitigation in Mitiq.
 
 
 ```{code-cell} ipython3
@@ -27,7 +28,7 @@ from mitiq.zne.scaling import fold_global as folding
 import pennylane_qiskit
 ```
 
-## Defining the ideal variational circuit in Qiskit
+## Defining the ideal variational circuit in PennyLane
 
 We define a function which returns a simple two-qubit variational circuit depending on a single parameter $\gamma$ (“gamma”).
 
@@ -110,7 +111,8 @@ def executor_with_noise(gamma) -> float:
     return qml.density_matrix([1,0])
 ```
 
-The above code block uses depolarizing noise, but any PennyLane `Channel` (noise model) can be substituted in.
+The above code block uses depolarizing noise, but any PennyLane 
+[`Channel`](https://docs.pennylane.ai/en/stable/code/api/pennylane.operation.Channel.html) (noise model) can be substituted in.
 
 
 ## Computing the landscape without noise
