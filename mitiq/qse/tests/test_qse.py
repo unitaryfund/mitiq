@@ -317,38 +317,21 @@ def prepare_logical_0_state_for_5_1_3_code():
         return np.reshape(orthonormalVecs, (32, 32)).T
 
     logical_0_state = np.zeros(32)
-    for z in ["00000", "10010", "01001", "10100", "01010", "00101"]:
-        logical_0_state[int(z, 2)] = 1 / 4
-    for z in [
-        "11011",
-        "00110",
-        "11000",
-        "11101",
-        "00011",
-        "11110",
-        "01111",
-        "10001",
-        "01100",
-        "10111",
-    ]:
-        logical_0_state[int(z, 2)] = -1 / 4
+    # bitstrings ["00000", "10010", "01001", "10100", "01010", "00101"]
+    np.put(logical_0_state, [0, 5, 9, 10, 18, 20], 1 / 4)
+    # bitstrings: [
+    #  "11011", "00110", "11000", "11101", "00011",
+    #  "11110", "01111", "10001", "01100", "10111"
+    # ]
+    np.put(logical_0_state, [3, 6, 12, 15, 17, 23, 24, 27, 29, 30], -1 / 4)
 
     logical_1_state = np.zeros(32)
-    for z in ["11111", "01101", "10110", "01011", "10101", "11010"]:
-        logical_1_state[int(z, 2)] = 1 / 4
-    for z in [
-        "00100",
-        "11001",
-        "00111",
-        "00010",
-        "11100",
-        "00001",
-        "10000",
-        "01110",
-        "10011",
-        "01000",
-    ]:
-        logical_1_state[int(z, 2)] = -1 / 4
+    # bitstrings ["11111", "01101", "10110", "01011", "10101", "11010"]
+    np.put(logical_1_state, [11, 13, 21, 22, 26, 31], 1 / 4)
+    # bitstrings: [
+    #  "00100", "11001", "00111", "00010", "11100",
+    #  "00001", "10000", "01110", "10011", "01000"]
+    np.put(logical_1_state, [1, 2, 4, 7, 8, 14, 16, 19, 25, 28], 1 / 4)
 
     # Fill up the rest of the matrix with orthonormal vectors
     matrix = gram_schmidt([logical_0_state, logical_1_state])
