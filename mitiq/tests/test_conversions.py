@@ -80,7 +80,7 @@ def one_to_many_circuit_modifier(
 # Apply one-to-many decorator
 one_to_many_circuit_modifier = accept_qprogram_and_validate(
     one_to_many_circuit_modifier,
-    one_to_many="True",
+    one_to_many=True,
 )
 
 

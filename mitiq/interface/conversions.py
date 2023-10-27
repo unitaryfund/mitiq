@@ -271,7 +271,7 @@ def accept_qprogram_and_validate(
 
     Args:
         cirq_circuit_modifier: The function modifying a Cirq circuit.
-        one_to_many: If True, cirq_circuit_modifier is expected to return
+        one_to_many: If True, ``cirq_circuit_modifier`` is expected to return
             a sequence of Cirq circuits instead of a single Cirq circuit.
 
     Returns:
