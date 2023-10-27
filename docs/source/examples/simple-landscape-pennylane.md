@@ -216,11 +216,6 @@ plt.ylim(-1.5, 1.5);
 plt.show()
 
 ```
-
-
-    
-
-
 Noise usually tends to flatten expectation values towards a constant. Therefore error mitigation 
 can be used to increase the visibility the landscape and this fact can simplify the energy minimization 
 which is required in most variational algorithms such as VQE or QAOA.
