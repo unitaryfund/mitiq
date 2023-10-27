@@ -110,7 +110,7 @@ def executor_with_noise(gamma) -> float:
     return qml.density_matrix([1,0])
 ```
 
-The above code block uses depolarizing noise, but any Qiskit `NoiseModel` can be substituted in.
+The above code block uses depolarizing noise, but any PennyLane `Channel` (noise model) can be substituted in.
 
 
 ## Computing the landscape without noise
