@@ -10,6 +10,18 @@ The classical shadows documentation has been improved (including a tutorial!) by
 
 In terms of additions, a new type of benchmark quantum circuits, "rotated" randomized benchmarking (RB) quantum circuits have been added by @Misty-W, for more general benchmarks.
 
+```py
+import numpy as np
+from mitiq.benchmarks import generate_rotated_rb_circuits
+
+circuits = generate_rotated_rb_circuits(
+    n_qubits=2,
+    num_cliffords=10,
+    theta=2 * np.pi * np.random.Generator.random(),
+    trials=100,
+)
+```
+
 
 ### All changes
 - Add a tutorial for simulating Ising 1-D chain with Cirq with ZNE and CDR [@farzadkianvash]
