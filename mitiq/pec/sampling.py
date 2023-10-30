@@ -7,13 +7,17 @@
 
 import warnings
 from copy import deepcopy
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import cirq
 import numpy as np
 
 from mitiq import QPROGRAM
-from mitiq.interface import convert_from_mitiq, convert_to_mitiq
+from mitiq.interface import (
+    accept_qprogram_and_validate,
+    convert_from_mitiq,
+    convert_to_mitiq,
+)
 from mitiq.pec.types import OperationRepresentation
 from mitiq.utils import _equal
 
@@ -103,6 +107,63 @@ def sample_sequence(
     return sequences, signs, norm
 
 
+def _cirq_sample_circuit(
+    ideal_circuit: cirq.Circuit,
+    representations: Sequence[OperationRepresentation],
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    num_samples: int = 1,
+    extra_data: Dict[str, Any] = {},
+) -> List[cirq.Circuit]:
+    """Cirq version of the more general "sample_circuit" function.
+
+    Args:
+        ideal_circuit: The ideal circuit from which an implementable circuit
+            is sampled.
+        representations: List of representations of every operation in the
+            input circuit. If a representation cannot be found for an operation
+            in the circuit, a ValueError is raised.
+        random_state: Seed for sampling.
+        num_samples: The number of samples,
+        extra_data: Mutable dictionary to save extra data beyond output
+            circuits. After the function call it will contain ``signs`` (the
+            signs associated to sampled_circuits) and ``norm`` (the one-norm
+            of the full circuit representation).
+
+    Returns:
+        The sampled implementable circuits.
+
+    Raises:
+        ValueError:
+            If a representation is not found for an operation in the circuit.
+    """
+    if isinstance(random_state, int):
+        random_state = np.random.RandomState(random_state)
+
+    # copy and remove all moments
+    sampled_circuits = [
+        deepcopy(ideal_circuit)[0:0] for _ in range(num_samples)
+    ]
+    sampled_signs = [1 for _ in range(num_samples)]
+    norm = 1.0
+
+    for op in ideal_circuit.all_operations():
+        sequences, loc_signs, loc_norm = sample_sequence(
+            cirq.Circuit(op),
+            representations,
+            num_samples=num_samples,
+            random_state=random_state,
+        )
+        norm *= loc_norm
+        for j in range(num_samples):
+            sampled_signs[j] *= loc_signs[j]
+            cirq_seq, _ = convert_to_mitiq(sequences[j])
+            sampled_circuits[j].append(cirq_seq.all_operations())
+
+    extra_data.update({"signs": sampled_signs, "norm": norm})
+
+    return sampled_circuits
+
+
 def sample_circuit(
     ideal_circuit: QPROGRAM,
     representations: Sequence[OperationRepresentation],
@@ -133,31 +194,15 @@ def sample_circuit(
         ValueError:
             If a representation is not found for an operation in the circuit.
     """
-    if isinstance(random_state, int):
-        random_state = np.random.RandomState(random_state)
+    qprogram_sample_circuit = accept_qprogram_and_validate(
+        _cirq_sample_circuit,
+        one_to_many=True,
+    )
+    extra_data: Dict[str, Any] = {}
+    sampled_qprograms = qprogram_sample_circuit(
+        ideal_circuit, representations, random_state, num_samples, extra_data
+    )
+    signs: List[int] = extra_data["signs"]
+    norm: float = extra_data["norm"]
 
-    # TODO: Likely to cause issues - conversions may introduce gates which are
-    #  not included in `decompositions`.
-    ideal, rtype = convert_to_mitiq(ideal_circuit)
-
-    # copy and remove all moments
-    sampled_circuits = [deepcopy(ideal)[0:0] for _ in range(num_samples)]
-    sampled_signs = [1 for _ in range(num_samples)]
-    norm = 1.0
-
-    for op in ideal.all_operations():
-        sequences, loc_signs, loc_norm = sample_sequence(
-            cirq.Circuit(op),
-            representations,
-            num_samples=num_samples,
-            random_state=random_state,
-        )
-        norm *= loc_norm
-        for j in range(num_samples):
-            sampled_signs[j] *= loc_signs[j]
-            cirq_seq, _ = convert_to_mitiq(sequences[j])
-            sampled_circuits[j].append(cirq_seq.all_operations())
-
-    native_circuits = [convert_from_mitiq(c, rtype) for c in sampled_circuits]
-
-    return native_circuits, sampled_signs, norm
+    return sampled_qprograms, signs, norm
