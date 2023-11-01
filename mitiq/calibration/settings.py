@@ -127,8 +127,10 @@ class BenchmarkProblem:
         return str(self.to_dict())
 
     def __str__(self) -> str:
-        result: str = ""
+        result = ""
         for key, value in self.to_dict().items():
+            if key == "ideal_distribution":
+                continue
             title: str = key.replace("_", " ").capitalize()
             result += f"{title}: {value}\n"
         return result.rstrip()
@@ -247,7 +249,7 @@ class Strategy:
         return str(self.to_dict())
 
     def __str__(self) -> str:
-        result: str = ""
+        result = ""
         for key, value in self.to_pretty_dict().items():
             title: str = key.replace("_", " ").capitalize()
             result += f"{title}: {value}\n"

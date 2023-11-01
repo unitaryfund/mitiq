@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
+from enum import StrEnum, auto
 from operator import itemgetter
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
@@ -30,6 +31,11 @@ from mitiq.interface import convert_from_mitiq
 
 class MissingResultsError(Exception):
     pass
+
+
+class OutputForm(StrEnum):
+    flat = auto()
+    cartesian = auto()
 
 
 class ExperimentResults:
@@ -60,73 +66,70 @@ class ExperimentResults:
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
-    def _get_performance(
+    @staticmethod
+    def _performance_str(noisy_error: float, mitigated_error: float):
+        """Get human readable performance representaion."""
+        return (
+            f"{'✔' if mitigated_error < noisy_error else '✘'}\n"
+            f"Noisy error: {round(noisy_error, 4)}\n"
+            f"Mitigated error: {round(mitigated_error, 4)}\n"
+            f"Improvement factor: {round(noisy_error / mitigated_error, 4)}"
+        )
+
+    def _get_errors(
         self, strategy_id: int, problem_id: int
     ) -> Tuple[str, float, float]:
-        """Get performance symbol and errors.
+        """Get errors for a given strategy/problem combination.
 
         Returns:
-            A performance tuple comprising:
-            - performance symbol either ✔ or ✘ depending
-              on whether mitigation technique works well or not.
-              It considered to work well if the mitigated error is less
-              than the noisy error.
-            - the absolute value of the noisy error
-            - the absolute value of the mitigated error
+            A tuple comprising:
+            - absolute value of the noisy error
+            - absolute value of the mitigated error
         """
         mitigated = self.mitigated[strategy_id, problem_id]
         noisy = self.noisy[strategy_id, problem_id]
         ideal = self.ideal[strategy_id, problem_id]
         mitigated_error = abs(ideal - mitigated)
         noisy_error = abs(ideal - noisy)
-        mitigation_worked = mitigated_error < noisy_error
-        performance_symbol = "✔" if mitigation_worked else "✘"
-        return performance_symbol, noisy_error, mitigated_error
+        return noisy_error, mitigated_error
 
-    def log_results(self) -> None:
+    def log_results_flat(self) -> None:
         """Prints calibration results in the following form
-        ┌────────────────────────────────────────────┬────────────────────────────────┬─────────────────────────┐
-        │ benchmark                                  │ strategy                       │ performance             │
-        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
-        │ Type: rb                                   │ Technique: ZNE                 │ ✔                       │
-        │ Ideal distribution: {'00': 1.0}            │ Factory: RichardsonFactory     │ Noisy error: 0.1053     │
-        │ Num qubits: 2                              │ Scale factors: [1.0, 2.0, 3.0] │ Mitigated error: 0.0146 │
-        │ Circuit depth: 326                         │ Scale method: fold_global      │                         │
-        │ Two qubit gate count: 79                   │                                │                         │
-        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
-        │ Type: rb                                   │ Technique: ZNE                 │ ✔                       │
-        │ Ideal distribution: {'00': 1.0}            │ Factory: RichardsonFactory     │ Noisy error: 0.1053     │
-        │ Num qubits: 2                              │ Scale factors: [1.0, 3.0, 5.0] │ Mitigated error: 0.0422 │
-        │ Circuit depth: 326                         │ Scale method: fold_global      │                         │
-        │ Two qubit gate count: 79                   │                                │                         │
-        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
-        │ Type: ghz                                  │ Technique: ZNE                 │ ✔                       │
-        │ Ideal distribution: {'00': 0.5, '11': 0.5} │ Factory: RichardsonFactory     │ Noisy error: 0.0157     │
-        │ Num qubits: 2                              │ Scale factors: [1.0, 2.0, 3.0] │ Mitigated error: 0.0018 │
-        │ Circuit depth: 2                           │ Scale method: fold_global      │                         │
-        │ Two qubit gate count: 1                    │                                │                         │
-        ├────────────────────────────────────────────┼────────────────────────────────┼─────────────────────────┤
-        │ Type: ghz                                  │ Technique: ZNE                 │ ✔                       │
-        │ Ideal distribution: {'00': 0.5, '11': 0.5} │ Factory: RichardsonFactory     │ Noisy error: 0.0157     │
-        │ Num qubits: 2                              │ Scale factors: [1.0, 3.0, 5.0] │ Mitigated error: 0.0091 │
-        │ Circuit depth: 2                           │ Scale method: fold_global      │                         │
-        │ Two qubit gate count: 1                    │                                │                         │
-        └────────────────────────────────────────────┴────────────────────────────────┴─────────────────────────┘
+        ┌──────────────────────────┬──────────────────────────────┬────────────────────────────┐
+        │ benchmark                │ strategy                     │ performance                │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: rb                 │ Technique: ZNE               │ ✔                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
+        │ Circuit depth: 323       │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0294    │
+        │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 3.4398 │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: rb                 │ Technique: ZNE               │ ✔                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
+        │ Circuit depth: 323       │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │
+        │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 2.016  │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: ghz                │ Technique: ZNE               │ ✔                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
+        │ Circuit depth: 2         │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0082    │
+        │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 1.561  │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: ghz                │ Technique: ZNE               │ ✘                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
+        │ Circuit depth: 2         │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0137    │
+        │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 0.9369 │
+        └──────────────────────────┴──────────────────────────────┴────────────────────────────┘
         """  # noqa: E501
         table: List[List[str | float]] = []
         headers: List[str] = ["benchmark", "strategy", "performance"]
         for problem in self.problems:
             row_group: List[List[str | float]] = []
             for strategy in self.strategies:
-                perf, nerr, merr = self._get_performance(
-                    strategy.id, problem.id
-                )
+                nerr, merr = self._get_errors(strategy.id, problem.id)
                 row_group.append(
                     [
                         str(problem),
                         str(strategy),
-                        f"{perf}\nNoisy error: {round(nerr, 4)}\n"
-                        f"Mitigated error: {round(merr, 4)}",
+                        self._performance_str(nerr, merr),
                         # this is only for sorting
                         # removed after sorting
                         merr - nerr,
@@ -138,24 +141,22 @@ class ExperimentResults:
 
     def log_results_cartesian(self) -> None:
         """Prints calibration results in the following form
-        ┌────────────────────────────────┬───────────────────────────────────┬──────────────────────────────────────────────┐
-        │ strategy\benchmark             │ Type: rb                          │ Type: ghz                                    │
-        │                                │ Ideal distribution: {'00': 1.0}   │ Ideal distribution: {'00': 0.5, '11': 0.5}   │
-        │                                │ Num qubits: 2                     │ Num qubits: 2                                │
-        │                                │ Circuit depth: 326                │ Circuit depth: 2                             │
-        │                                │ Two qubit gate count: 79          │ Two qubit gate count: 1                      │
-        │                                │                                   │                                              │
-        ├────────────────────────────────┼───────────────────────────────────┼──────────────────────────────────────────────┤
-        │ Technique: ZNE                 │ ✔                                 │ ✔                                            │
-        │ Factory: RichardsonFactory     │ Noisy error: 0.1053               │ Noisy error: 0.0157                          │
-        │ Scale factors: [1.0, 2.0, 3.0] │ Mitigated error: 0.0146           │ Mitigated error: 0.0018                      │
-        │ Scale method: fold_global      │                                   │                                              │
-        ├────────────────────────────────┼───────────────────────────────────┼──────────────────────────────────────────────┤
-        │ Technique: ZNE                 │ ✔                                 │ ✔                                            │
-        │ Factory: RichardsonFactory     │ Noisy error: 0.1053               │ Noisy error: 0.0157                          │
-        │ Scale factors: [1.0, 3.0, 5.0] │ Mitigated error: 0.0422           │ Mitigated error: 0.0091                      │
-        │ Scale method: fold_global      │                                   │                                              │
-        └────────────────────────────────┴───────────────────────────────────┴──────────────────────────────────────────────┘
+        ┌──────────────────────────────┬────────────────────────────┬────────────────────────────┐
+        │ strategy\benchmark           │ Type: rb                   │ Type: ghz                  │
+        │                              │ Num qubits: 2              │ Num qubits: 2              │
+        │                              │ Circuit depth: 337         │ Circuit depth: 2           │
+        │                              │ Two qubit gate count: 80   │ Two qubit gate count: 1    │
+        ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
+        │ Technique: ZNE               │ ✔                          │ ✘                          │
+        │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
+        │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │ Mitigated error: 0.0439    │
+        │ Scale method: fold_global    │ Improvement factor: 2.2515 │ Improvement factor: 0.2665 │
+        ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
+        │ Technique: ZNE               │ ✔                          │ ✘                          │
+        │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
+        │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0408    │ Mitigated error: 0.0171    │
+        │ Scale method: fold_global    │ Improvement factor: 2.7672 │ Improvement factor: 0.6852 │
+        └──────────────────────────────┴────────────────────────────┴────────────────────────────┘
         """  # noqa: E501
         table: List[List[str]] = []
         headers: List[str] = ["strategy\\benchmark"]
@@ -164,13 +165,8 @@ class ExperimentResults:
         for strategy in self.strategies:
             row: List[str] = [str(strategy)]
             for problem in self.problems:
-                perf, nerr, merr = self._get_performance(
-                    strategy.id, problem.id
-                )
-                row.append(
-                    f"{perf}\nNoisy error: {round(nerr, 4)}\n"
-                    f"Mitigated error: {round(merr, 4)}",
-                )
+                nerr, merr = self._get_errors(strategy.id, problem.id)
+                row.append(self._performance_str(nerr, merr))
             table.append(row)
         return print(tabulate(table, headers, tablefmt="simple_grid"))
 
@@ -296,7 +292,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run(self, log: bool = False, log_cartesian: bool = False) -> None:
+    def run(self, log: OutputForm = None) -> None:
         """Runs all the circuits required for calibration."""
         if not self.results.is_missing_data():
             self.results.reset_data()
@@ -327,11 +323,15 @@ class Calibrator:
 
         self.results.ensure_full()
 
-        if log:
-            self.results.log_results()
-
-        if log_cartesian:
-            self.results.log_results_cartesian()
+        if log is not None:
+            if log == OutputForm.flat:
+                self.results.log_results_flat()
+            elif log == OutputForm.cartesian:
+                self.results.log_results_cartesian()
+            else:
+                raise ValueError(
+                    f"log parameter must be one of: {', '.join(OutputForm._member_names_)}"
+                )
 
     def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the

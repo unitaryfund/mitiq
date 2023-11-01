@@ -73,6 +73,33 @@ light_zne_settings = Settings(
 )
 
 
+basic_settings = Settings(
+    benchmarks=[
+        {
+            "circuit_type": "ghz",
+            "num_qubits": 2,
+            "circuit_depth": 999,
+        }
+    ],
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+    ],
+)
+
+
 def test_MitigationTechnique():
     pec_enum = MitigationTechnique.PEC
     assert pec_enum.mitigation_function == execute_with_pec
@@ -83,110 +110,78 @@ def test_MitigationTechnique():
     assert raw_enum.name == "RAW"
 
 
-def test_basic_settings():
-    settings = Settings(
-        benchmarks=[
-            {
-                "circuit_type": "ghz",
-                "num_qubits": 2,
-                "circuit_depth": 999,
-            }
-        ],
-        strategies=[
-            {
-                "technique": "zne",
-                "scale_noise": fold_global,
-                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
-            },
-            {
-                "technique": "zne",
-                "scale_noise": fold_global,
-                "factory": RichardsonFactory([1.0, 3.0, 5.0]),
-            },
-            {
-                "technique": "zne",
-                "scale_noise": fold_global,
-                "factory": LinearFactory([1.0, 2.0, 3.0]),
-            },
-            {
-                "technique": "zne",
-                "scale_noise": fold_global,
-                "factory": LinearFactory([1.0, 3.0, 5.0]),
-            },
-        ],
-    )
-    circuits = settings.make_problems()
-    assert len(circuits) == 1
-    ghz_problem = circuits[0]
+def test_BenchmarkProblem_make_problems():
+    settings = basic_settings
+    problems = settings.make_problems()
+    assert len(problems) == 1
+    ghz_problem = problems[0]
     assert len(ghz_problem.circuit) == 2
     assert ghz_problem.two_qubit_gate_count == 1
     assert ghz_problem.ideal_distribution == {"00": 0.5, "11": 0.5}
 
-    lines = str(ghz_problem).split("\n")
-    ghz_problem_dict = ghz_problem.to_dict()
+
+def test_BenchmarkProblem_repr():
+    settings = basic_settings
+    problems = settings.make_problems()
+    problem_repr = repr(problems[0]).replace("'", '"')
+    assert isinstance(json.loads(problem_repr), dict)
+
+
+def test_BenchmarkProblem_str():
+    settings = basic_settings
+    circuits = settings.make_problems()
+    problem = circuits[0]
+    lines = str(problem).split("\n")
+    problem_dict = problem.to_dict()
     for line in lines:
         [title, value] = line.split(":", 1)
         key = title.lower().replace(" ", "_")
         value = value.strip()
-        assert key in ghz_problem_dict
-        assert value == str(ghz_problem_dict[key])
+        assert key in problem_dict
+        assert value == str(problem_dict[key])
+    assert "Ideal distribution: " not in str(problem)
 
+
+def test_Strategy_repr():
+    settings = basic_settings
     strategies = settings.make_strategies()
-    num_strategies = 4
-    assert len(strategies) == num_strategies
+    strategy_repr = repr(strategies[0]).replace("'", '"')
+    assert isinstance(json.loads(strategy_repr), dict)
 
-    strategy_summary = repr(strategies[0]).replace("'", '"')
-    assert isinstance(json.loads(strategy_summary), dict)
 
-    lines = str(strategies[0]).split("\n")
-    strategy_dict = strategies[0].to_pretty_dict()
-    for line in lines:
+def test_Strategy_str():
+    settings = basic_settings
+    strategies = settings.make_strategies()
+
+    strategy_str = str(strategies[0])
+    strategy_pretty_dict = strategies[0].to_pretty_dict()
+    for line in strategy_str.split("\n"):
         [title, value] = line.split(":")
         key = title.lower().replace(" ", "_")
         value = value.strip()
-        assert key in strategy_dict
-        assert value == str(strategy_dict[key])
+        assert key in strategy_pretty_dict
+        assert value == str(strategy_pretty_dict[key])
 
 
-def test_settings_pretty_dict():
-    settings = Settings(
-        benchmarks=[
-            {
-                "circuit_type": "ghz",
-                "num_qubits": 2,
-                "circuit_depth": 999,
-            }
-        ],
-        strategies=[
-            {
-                "technique": "zne",
-                "scale_noise": fold_global,
-                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
-            },
-            {
-                "technique": "pec",
-                "representation_function": (
-                    represent_operation_with_local_depolarizing_noise
-                ),
-                "is_qubit_dependent": False,
-                "noise_level": 0.001,
-                "num_samples": 200,
-            },
-        ],
-    )
+def test_Strategy_pretty_dict():
+    settings = basic_settings
     strategies = settings.make_strategies()
-    _dict = strategies[0].to_dict()
-    pretty_dict = strategies[0].to_pretty_dict()
-    if pretty_dict["technique"] == "ZNE":
-        assert pretty_dict["factory"] == _dict["factory"][:-7]
+
+    strategy_dict = strategies[0].to_dict()
+    strategy_pretty_dict = strategies[0].to_pretty_dict()
+    if strategy_pretty_dict["technique"] == "ZNE":
+        assert strategy_pretty_dict["factory"] == strategy_dict["factory"][:-7]
         assert (
-            pretty_dict["scale_factors"] == str(_dict["scale_factors"])[1:-1]
+            strategy_pretty_dict["scale_factors"]
+            == str(strategy_dict["scale_factors"])[1:-1]
         )
-    elif pretty_dict["technique"] == "PEC":
-        assert pretty_dict["noise_bias"] == _dict.get("noise_bias", "N/A")
+    elif strategy_pretty_dict["technique"] == "PEC":
+        assert strategy_pretty_dict["noise_bias"] == strategy_dict.get(
+            "noise_bias", "N/A"
+        )
         assert (
-            pretty_dict["representation_function"]
-            == _dict["representation_function"][25:]
+            strategy_pretty_dict["representation_function"]
+            == strategy_dict["representation_function"][25:]
         )
 
 
