@@ -68,7 +68,7 @@ class ExperimentResults:
         self.ideal[strategy.id, problem.id] = ideal_val
 
     @staticmethod
-    def _performance_str(noisy_error: float, mitigated_error: float):
+    def _performance_str(noisy_error: float, mitigated_error: float) -> str:
         """Get human readable performance representaion."""
         return (
             f"{'✔' if mitigated_error < noisy_error else '✘'}\n"
@@ -79,7 +79,7 @@ class ExperimentResults:
 
     def _get_errors(
         self, strategy_id: int, problem_id: int
-    ) -> Tuple[str, float, float]:
+    ) -> Tuple[float, float]:
         """Get errors for a given strategy/problem combination.
 
         Returns:
@@ -293,7 +293,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run(self, log: OutputForm = None) -> None:
+    def run(self, log: Optional[OutputForm] = None) -> None:
         """Runs all the circuits required for calibration."""
         if not self.results.is_missing_data():
             self.results.reset_data()
@@ -331,7 +331,8 @@ class Calibrator:
                 self.results.log_results_cartesian()
             else:
                 raise ValueError(
-                    f"log parameter must be one of: {', '.join(OutputForm._member_names_)}"
+                    "log parameter must be one of: "
+                    f"{', '.join(OutputForm._member_names_)}"
                 )
 
     def best_strategy(self) -> Strategy:
