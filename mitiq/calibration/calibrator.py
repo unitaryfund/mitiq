@@ -4,13 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
-from enum import StrEnum, auto
+from enum import auto
 from operator import itemgetter
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import cirq
 import numpy as np
 import numpy.typing as npt
+from strenum import StrEnum
 from tabulate import tabulate
 
 from mitiq import (
