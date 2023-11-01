@@ -27,7 +27,7 @@ pydata-sphinx-theme==0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
 nbsphinx==0.9.1
-matplotlib==3.8.0
+matplotlib==3.8.1
 pandas==2.1.2
 pyscf==2.4.0; sys_platform != 'win32'
 openfermion==1.6.0; sys_platform != 'win32'
