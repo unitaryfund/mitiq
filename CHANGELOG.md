@@ -1,5 +1,45 @@
 # Changelog
 
+## Version 0.31.0
+
+Released November 2, 2023
+
+### Summary
+
+This release contains several documentation improvements and some new additions. Quantum subspace expansion (QSE) is added to the user guide (thanks @bubakazouba). Thanks to our first time contributors @dubeyPraY for a new tutorial on using PennyLane and Mitiq in calculating the energy landscape of a simple variational circuit and @kozhukalov for adding the PEC noise level and calculated error to the calibration logs. **We also removed support for python 3.8**. 
+
+### All changes
+
+- Second incremental speed up of Mitiq tests [@Misty-W]
+- More general conversion decorator and fix conversion bug in PEC (#2064) [@andreamari]
+- Added Example for Mitiq in simple landscape for Pennylane  (#2048) [@dubeyPraY]
+- Indicate under active development on master (#2054) [@Misty-W]
+- 2029 update contributing docs.md for references thumbnails viewing rtd build (#2053) [@bdg221]
+- Add noise level to the PEC calibration log (#2045) [@kozhukalov]
+- 2024 reduce documentation build time after classical shadows added (#2058) [@bdg221]
+- Clean up GitHub CI (#2069) [@natestemen]
+- remove binder directory (#2071) [@natestemen]
+- drop support for python 3.8 (#2068) [nate stemen]
+- Include calculated error in calibrator logs (#2038) [@kozhukalov]
+- Adds QSE user guide (#1976) [@bubakazouba]
+
+#### Dependency updates
+
+- Bump openfermion from 1.5.1 to 1.6.0 (#2078) [@dependabot]
+- Update qiskit-aer requirement from ~=0.12.2 to ~=0.13.0 (#2076) [@dependabot]
+- Bump pandas from 2.1.1 to 2.1.2 (#2077) [@dependabot]
+- Update qiskit requirement from ~=0.44.2 to ~=0.44.3 (#2073) [@dependabot]
+- Update scipy requirement from <=1.11.2,>=1.5.0 to >=1.5.0,<=1.11.3 (#2031) [@dependabot]
+- Update qiskit-ibm-provider requirement from ~=0.7.1 to ~=0.7.2 (#2072) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.55.1 to ~=1.59.2 (#2070) [@dependabot]
+- Bump pyscf from 2.3.0 to 2.4.0 (#2055) [@dependabot]
+- Update qiskit requirement from ~=0.44.1 to ~=0.44.2 (#2041) [@dependabot]
+- Update qiskit-ibm-provider requirement from ~=0.7.0 to ~=0.7.1 (#2059) [@dependabot]
+- Bump matplotlib from 3.7.3 to 3.8.0 (#2020) [@dependabot]
+- Bump pandas from 2.0.3 to 2.1.1 (#2023) [@dependabot]
+- Update pennylane-qiskit requirement from ~=0.31.0 to ~=0.32.0 (#1980) [@dependabot]
+- Update seaborn requirement from ~=0.12.2 to ~=0.13.0 (#2037) [@dependabot]
+
 ## Version 0.30.0
 
 Released October 13, 2023
@@ -27,7 +67,7 @@ circuits = generate_rotated_rb_circuits(
 - Add a tutorial for simulating Ising 1-D chain with Cirq with ZNE and CDR [@farzadkianvash]
 - Add section on quantum noise to user guide (#2036) [@Misty-W]
 - New QEM benchmarking method: "rotated" RB circuits (#2028) [@Misty-W]
-- Add Pauli Twirling (PT) User Guide (#1848) [@Aaron-Robertson @purva-thakre]
+- Add Pauli Twirling (PT) User Guide (#1848) [@Aaron-Robertson,@purva-thakre]
 - Documentation cleanup (#2008) [@natestemen]
 - Remove draft workflow from Github Actions (#2019) [@purva-thakre]
 - Improve documentation of Classical Shadows (#2026) [@Min-Li]
