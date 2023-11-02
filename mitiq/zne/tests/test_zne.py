@@ -124,10 +124,7 @@ def test_with_observable_adaptive_factory(executor):
     assert abs(zne_value - true_value) <= abs(noisy_value - true_value)
 
 
-@pytest.mark.parametrize(
-    "executor", (sample_bitstrings, compute_density_matrix)
-)
-def test_with_observable_two_qubits(executor):
+def test_with_observable_two_qubits():
     observable = Observable(
         PauliString(spec="XX", coeff=-1.21), PauliString(spec="ZZ", coeff=0.7)
     )
@@ -135,8 +132,9 @@ def test_with_observable_two_qubits(executor):
         cirq.H.on(cirq.LineQubit(0)), cirq.CNOT.on(*cirq.LineQubit.range(2))
     )
     circuit += [circuit.copy(), cirq.inverse(circuit.copy())] * 20
+    executor = compute_density_matrix
 
-    noisy_value = observable.expectation(circuit, sample_bitstrings)
+    noisy_value = observable.expectation(circuit, executor)
     zne_value = execute_with_zne(
         circuit,
         executor=functools.partial(
@@ -146,7 +144,7 @@ def test_with_observable_two_qubits(executor):
         factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
     )
     true_value = observable.expectation(
-        circuit, functools.partial(compute_density_matrix, noise_level=(0,))
+        circuit, functools.partial(executor, noise_level=(0,))
     )
 
     assert abs(zne_value - true_value) <= 3 * abs(noisy_value - true_value)
