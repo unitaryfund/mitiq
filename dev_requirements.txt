@@ -33,6 +33,6 @@ pyscf==2.4.0; sys_platform != 'win32'
 openfermion==1.6.0; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
 bqskit[ext]==1.0.4
-seaborn~=0.13.0
+seaborn==0.13.0
 stim==1.12.0
 stimcirq==1.12.0
