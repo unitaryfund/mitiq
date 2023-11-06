@@ -27,12 +27,12 @@ pydata-sphinx-theme==0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
 nbsphinx==0.9.1
-matplotlib==3.8.0
+matplotlib==3.8.1
 pandas==2.1.2
 pyscf==2.4.0; sys_platform != 'win32'
 openfermion==1.6.0; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
 bqskit[ext]==1.0.4
-seaborn~=0.13.0
+seaborn==0.13.0
 stim==1.12.0
 stimcirq==1.12.0
