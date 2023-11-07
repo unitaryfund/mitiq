@@ -11,18 +11,18 @@ and modified to support a larger gateset (e.g. CPHASE).
 """
 
 from math import pi
-from typing import Any, Union, cast
+from typing import cast
 
 import numpy as np
 from pyquil.gates import CZ, RX, RZ, XY, I
-from pyquil.quil import FormalArgument, Program, Qubit, QubitPlaceholder
-from pyquil.quilbase import Expression, Gate
-
-QubitLike = Union[Qubit, QubitPlaceholder, FormalArgument]
-AngleLike = Union[Expression, Any, complex]
+from pyquil.quil import Program
+from pyquil.quilatom import ParameterDesignator, QubitDesignator
+from pyquil.quilbase import Gate
 
 
-def _CCNOT(q0: QubitLike, q1: QubitLike, q2: QubitLike) -> Program:
+def _CCNOT(
+    q0: QubitDesignator, q1: QubitDesignator, q2: QubitDesignator
+) -> Program:
     """
     A CCNOT in terms of RX(+-pi/2), RZ(theta), and CZ
 
@@ -50,7 +50,7 @@ def _CCNOT(q0: QubitLike, q1: QubitLike, q2: QubitLike) -> Program:
     return p
 
 
-def _CNOT(q0: QubitLike, q1: QubitLike) -> Program:
+def _CNOT(q0: QubitDesignator, q1: QubitDesignator) -> Program:
     """
     A CNOT in terms of RX(+-pi/2), RZ(theta), and CZ
 
@@ -65,7 +65,9 @@ def _CNOT(q0: QubitLike, q1: QubitLike) -> Program:
     return p
 
 
-def _CPHASE(angle: AngleLike, q0: QubitLike, q1: QubitLike) -> Program:
+def _CPHASE(
+    angle: ParameterDesignator, q0: QubitDesignator, q1: QubitDesignator
+) -> Program:
     """
     from quilc:
 
@@ -85,7 +87,7 @@ def _CPHASE(angle: AngleLike, q0: QubitLike, q1: QubitLike) -> Program:
     return p
 
 
-def _H(q: QubitLike) -> Program:
+def _H(q: QubitDesignator) -> Program:
     """
     A Hadamard in terms of RX(+-pi/2) and RZ(theta)
 
@@ -98,7 +100,7 @@ def _H(q: QubitLike) -> Program:
     return p
 
 
-def _ISWAP(q0: QubitLike, q1: QubitLike) -> Program:
+def _ISWAP(q0: QubitDesignator, q1: QubitDesignator) -> Program:
     """
     An ISWAP as an XY(pi). Of course, assumes XY is available.
     """
@@ -107,7 +109,7 @@ def _ISWAP(q0: QubitLike, q1: QubitLike) -> Program:
     return p
 
 
-def _PHASE(angle: AngleLike, q: QubitLike) -> Program:
+def _PHASE(angle: ParameterDesignator, q: QubitDesignator) -> Program:
     """
     from quilc:
 
@@ -119,7 +121,7 @@ def _PHASE(angle: AngleLike, q: QubitLike) -> Program:
     return p
 
 
-def _RX(angle: AngleLike, q: QubitLike) -> Program:
+def _RX(angle: ParameterDesignator, q: QubitDesignator) -> Program:
     """
     A RX in terms of native RX(+-pi/2) and RZ gates.
     """
@@ -132,7 +134,7 @@ def _RX(angle: AngleLike, q: QubitLike) -> Program:
     return p
 
 
-def _RY(angle: AngleLike, q: QubitLike) -> Program:
+def _RY(angle: ParameterDesignator, q: QubitDesignator) -> Program:
     """
     A RY in terms of RX(+-pi/2) and RZ(theta)
     """
@@ -143,14 +145,14 @@ def _RY(angle: AngleLike, q: QubitLike) -> Program:
     return p
 
 
-def _S(q: QubitLike) -> Program:
+def _S(q: QubitDesignator) -> Program:
     """
     An S in terms of RZ(theta)
     """
     return Program(RZ(np.pi / 2, q))
 
 
-def _SWAP(q0: QubitLike, q1: QubitLike) -> Program:
+def _SWAP(q0: QubitDesignator, q1: QubitDesignator) -> Program:
     """
     A SWAP in terms of _CNOT
 
@@ -165,7 +167,7 @@ def _SWAP(q0: QubitLike, q1: QubitLike) -> Program:
     return p
 
 
-def _T(q: QubitLike, dagger: bool = False) -> Program:
+def _T(q: QubitDesignator, dagger: bool = False) -> Program:
     """
     A T in terms of RZ(theta)
     """
@@ -175,7 +177,7 @@ def _T(q: QubitLike, dagger: bool = False) -> Program:
         return Program(RZ(np.pi / 4, q))
 
 
-def _X(q: QubitLike) -> Program:
+def _X(q: QubitDesignator) -> Program:
     """
     An X in terms of RX(pi)
 
@@ -187,7 +189,7 @@ def _X(q: QubitLike) -> Program:
     return p
 
 
-def _Y(q: QubitLike) -> Program:
+def _Y(q: QubitDesignator) -> Program:
     """
     A Y in terms of _RY
     """
@@ -196,7 +198,7 @@ def _Y(q: QubitLike) -> Program:
     return p
 
 
-def _Z(q: QubitLike) -> Program:
+def _Z(q: QubitDesignator) -> Program:
     """
     A Z in terms of RZ
     """
