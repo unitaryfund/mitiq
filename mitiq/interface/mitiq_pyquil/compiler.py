@@ -10,7 +10,6 @@ NB: Copied in large part from rigetti/forest-benchmarking (Apache-2.0)
 and modified to support a larger gateset (e.g. CPHASE).
 """
 
-from math import pi
 from typing import cast
 
 import numpy as np
@@ -126,11 +125,11 @@ def _RX(angle: ParameterDesignator, q: QubitDesignator) -> Program:
     A RX in terms of native RX(+-pi/2) and RZ gates.
     """
     p = Program()
-    p += RZ(pi / 2, q)
-    p += RX(pi / 2, q)
+    p += RZ(np.pi / 2, q)
+    p += RX(np.pi / 2, q)
     p += RZ(angle, q)
-    p += RX(-pi / 2, q)
-    p += RZ(-pi / 2, q)
+    p += RX(-np.pi / 2, q)
+    p += RZ(-np.pi / 2, q)
     return p
 
 
@@ -139,9 +138,9 @@ def _RY(angle: ParameterDesignator, q: QubitDesignator) -> Program:
     A RY in terms of RX(+-pi/2) and RZ(theta)
     """
     p = Program()
-    p += RX(pi / 2, q)
+    p += RX(np.pi / 2, q)
     p += RZ(angle, q)
-    p += RX(-pi / 2, q)
+    p += RX(-np.pi / 2, q)
     return p
 
 
@@ -212,8 +211,8 @@ def is_magic_angle(angle: complex) -> bool:
     Checks to see if an angle is 0, +/-pi/2, or +/-pi.
     """
     return bool(
-        np.isclose(np.abs(angle), pi / 2)
-        or np.isclose(np.abs(angle), pi)
+        np.isclose(np.abs(angle), np.pi / 2)
+        or np.isclose(np.abs(angle), np.pi)
         or np.isclose(angle, 0.0)
     )
 
