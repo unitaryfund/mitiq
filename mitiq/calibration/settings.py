@@ -473,6 +473,7 @@ PECSettings = Settings(
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
+            "force_run_all": False,
         },
         {
             "technique": "pec",
@@ -482,6 +483,7 @@ PECSettings = Settings(
             "is_qubit_dependent": False,
             "noise_level": 0.01,
             "num_samples": 200,
+            "force_run_all": False,
         },
     ],
 )
