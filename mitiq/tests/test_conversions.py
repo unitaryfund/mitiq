@@ -5,6 +5,8 @@
 
 """Tests for circuit conversions."""
 
+from typing import List
+
 import cirq
 import numpy as np
 import pennylane as qml
@@ -69,6 +71,19 @@ circuit_types = {
 @accept_qprogram_and_validate
 def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
     return circ
+
+
+def one_to_many_circuit_modifier(
+    circ: cirq.Circuit, *args, **kwargs
+) -> List[cirq.Circuit]:
+    return [circ, circ[0:1] + circ]
+
+
+# Apply one-to-many decorator
+one_to_many_circuit_modifier = accept_qprogram_and_validate(
+    one_to_many_circuit_modifier,
+    one_to_many=True,
+)
 
 
 @accept_any_qprogram_as_input
@@ -189,6 +204,27 @@ def test_converter_keeps_register_structure_qiskit(nbits, measure):
     assert scaled.qregs == circ.qregs
     assert scaled.cregs == circ.cregs
     assert scaled == circ
+
+
+@pytest.mark.parametrize("nbits", [1, 10])
+@pytest.mark.parametrize("measure", [True, False])
+def test_converter_keeps_register_structure_qiskit_one_to_many(nbits, measure):
+    qreg = qiskit.QuantumRegister(nbits)
+    creg = qiskit.ClassicalRegister(nbits)
+    circ = qiskit.QuantumCircuit(qreg, creg)
+    circ.h(qreg)
+
+    if measure:
+        circ.measure(qreg, creg)
+
+    out_circuits = one_to_many_circuit_modifier(circ)
+
+    for out_circ in out_circuits:
+        assert out_circ.qregs == circ.qregs
+        assert out_circ.cregs == circ.cregs
+        print(out_circ)
+    assert out_circuits[0] == circ
+    assert out_circuits[1] != circ
 
 
 @pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())

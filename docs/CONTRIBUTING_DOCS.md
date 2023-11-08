@@ -124,6 +124,15 @@ If you are adding new features to Mitiq, make sure to add API docs in the
 source code, and to the API page `apidoc.md`.
 ```
 
+### Adding references 
+
+To add references to the [Mitiq bibliography](https://mitiq.readthedocs.io/en/stable/bibliography.html), the first step is to add the reference to `docs/source/refs.bib` which is organized alphabetically. For formatting, please see BibTeX documentation for [articles](https://www.bibtex.com/e/article-entry/), [books](https://www.bibtex.com/e/book-entry/), and [others](https://www.bibtex.com/e/entry-types/).
+
+Once the reference has been added to the `docs/source/refs.bib` file, cite the reference in the file by using:
+```md
+{cite}`title of entry`
+```
+
 ## Build the documentation locally
 The easiest way to build the docs is to run `make docs` from the project 
 root directory, which builds the html docs output.
@@ -154,6 +163,16 @@ highlighting), use the `code-block` directive:
    1+1        # simple example
 ```
 ````
+
+## View the documentation from a PR build
+
+To preview the documentation (mitiq.readthedocs.io) from a specific build in a PR, click `Details` on the `docs/readthedocs.org:mitiq` line of the pull request's merge box in the PR's Conversation timeline. It may be necessary to scroll down to find the `docs/readthedocs.org:mitiq` line.
+
+![RTD of PR](./source/img/read_the_docs_pr.png)
+
+If the Read the Docs build failed, it is still possible to see the documentation from the build by clicking `Details` and then clicking on the `View docs` link on the right side of screen under the time it took for the build to complete.
+
+![RTD failed](./source/img/read_the_docs_failed.png)
 
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)

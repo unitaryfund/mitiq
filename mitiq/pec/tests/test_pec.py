@@ -193,6 +193,7 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
         representations=representations,
         num_samples=500,
         random_state=1,
+        force_run_all=False,
     )
     assert np.isclose(pec_value, exact, atol=0.1)
 
@@ -233,6 +234,7 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
         representations=representations,
         num_samples=500,
         random_state=1,
+        force_run_all=False,
     )
     assert np.isclose(pec_value, exact, atol=0.1)
 
@@ -386,6 +388,7 @@ def test_precision_option_in_execute_with_pec(precision: float):
         representations=pauli_representations,
         precision=precision,
         num_samples=num_samples,
+        force_run_all=False,
         full_output=True,
     )
     assert pec_data["num_samples"] == num_samples
@@ -417,6 +420,7 @@ def test_large_sample_size_warning():
             partial(fake_executor, random_state=np.random.RandomState(0)),
             representations=pauli_representations,
             num_samples=100001,
+            force_run_all=False,
         )
 
 
@@ -466,7 +470,7 @@ def decorated_serial_executor(circuit: QPROGRAM) -> float:
         [1.0],
     )
 
-    @pec_decorator(representations=[rep], precision=0.08)
+    @pec_decorator(representations=[rep], precision=0.08, force_run_all=False)
     def decorated_executor(qp):
         return serial_executor(qp)
 

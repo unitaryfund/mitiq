@@ -72,6 +72,7 @@ light_pec_settings = Settings(
             "noise_level": 0.01,
             "noise_bias": 0.1,
             "num_samples": 200,
+            "force_run_all": False,
         },
     ],
 )

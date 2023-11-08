@@ -19,11 +19,12 @@ from cirq import (
     ops,
 )
 from pyquil import Program, gates
-from qiskit import QuantumCircuit, QuantumRegister
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.pec import (
     NoisyOperation,
     OperationRepresentation,
+    represent_operation_with_global_depolarizing_noise,
     sample_circuit,
     sample_sequence,
 )
@@ -448,3 +449,25 @@ def test_sample_circuit_choi():
 
     assert pec_error < noise_error
     assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
+
+
+def test_conversions_in_sample_circuit():
+    """Tests sample_circuit preserves idle qubits and quantum registers."""
+    qreg = QuantumRegister(3, name="Q")
+    creg = ClassicalRegister(2, name="C")
+    circuit = QuantumCircuit(qreg, creg)
+    circuit.h(qreg[0])
+    circuit.cnot(qreg[0], qreg[1])
+    circuit.measure(0, 0)
+    cnot_circuit = QuantumCircuit(qreg)
+    cnot_circuit.cnot(qreg[0], qreg[1])
+    rep = represent_operation_with_global_depolarizing_noise(
+        cnot_circuit,
+        noise_level=0.0,
+    )
+    out_circuits, signs, norm = sample_circuit(circuit, [rep], num_samples=3)
+    for out_circ in out_circuits:
+        out_circ == circuit
+    assert len(signs) == 3
+    assert set(signs).issubset({1.0, -1.0})
+    assert np.isclose(norm, 1.0)
