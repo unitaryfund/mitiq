@@ -9,25 +9,60 @@ Qibo's circuit representation.
 
 from cirq import Circuit
 from qibo import Circuit as QiboCircuit
-from pennylane_qiskit.qiskit_device import QISKIT_OPERATION_MAP
+from qibo import gates
+from numpy import pi 
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
-from pennylane import from_qasm as pennylane_from_qasm
-from pennylane.tape import QuantumTape
-from pennylane.wires import Wires
+
 
 UNSUPPORTED_QIBO = {"crx", "cry", "crz"}
-SUPPORTED_PL = set(QISKIT_OPERATION_MAP.keys())
-UNSUPPORTED = {"CRX", "CRY", "CRZ", "S", "T"}
-SUPPORTED = SUPPORTED_PL - UNSUPPORTED
-
 
 class UnsupportedCirqCircuitError(Exception):
     pass
 
 class UnsupportedQiboCircuitError(Exception): 
     pass 
+
+def decompose_qibo_circuit(qibo_circuit: QiboCircuit) -> QiboCircuit:
+    """Returns a QiboCircuit circuit equivalent to the input QiboCircuit
+    with all unsupported gates decomposed.
+
+    Args:
+        qibo_circuit: QiboCircuit to decompose.
+
+    Returns:
+        Decomposed QiboCircuit
+    """
+    decomp_circuit = qibo_circuit.__class__(qibo_circuit.nqubits)
+    for gate in qibo_circuit.queue:
+        if gate.name == "crx": 
+            q0,q1 = gate.init_args
+            theta = gate.parameters[0]
+            decomp_circuit.add(gates.RZ(q1,pi/2))
+            decomp_circuit.add(gates.RY(q1,theta/2))
+            decomp_circuit.add(gates.CNOT(q0,q1)) 
+            decomp_circuit.add(gates.RY(q1,-theta/2))
+            decomp_circuit.add(gates.CNOT(q0,q1))
+            decomp_circuit.add(gates.RZ(q1,-pi/2,0))
+        elif gate.name == "cry": 
+            q0,q1 = gate.init_args
+            theta = gate.parameters[0]
+            decomp_circuit.add(gates.RY(q1,theta/2))
+            decomp_circuit.add(gates.CNOT(q0,q1)) 
+            decomp_circuit.add(gates.RY(q1,-theta/2))
+            decomp_circuit.add(gates.CNOT(q0,q1))
+        elif gate.name == "crz": 
+            q0,q1 = gate.init_args
+            theta = gate.parameters[0]
+            decomp_circuit.add(gates.RZ(q1,theta/2))
+            decomp_circuit.add(gates.CNOT(q0,q1)) 
+            decomp_circuit.add(gates.RZ(q1,-theta/2))
+            decomp_circuit.add(gates.CNOT(q0,q1))
+        else: 
+            decomp_circuit.add(gate)
+
+    return decomp_circuit
 
 
 def from_qibo(qibo_circuit: QiboCircuit) -> Circuit:
@@ -53,31 +88,15 @@ def from_qibo(qibo_circuit: QiboCircuit) -> Circuit:
                 "OpenQASM does not support multi-controlled gates."
                 )
 
-    
-    qasm = qibo_circuit.to_qasm()
-
-    
+    #Decompose the circuit if it contains an unsupported gate
     unsupported_gate = False
     for gate in qibo_circuit.queue: 
         if gate.name in UNSUPPORTED_QIBO:
             unsupported_gate = True 
-            
-    #Convert through PennyLane if the circuit contains an unsupported gate
     if unsupported_gate: 
-
-        #Pennylane does not support measurments in the input tape 
-        for gate in qibo_circuit.queue:
-            if gate.name == 'measure': 
-                    raise UnsupportedQiboCircuitError(
-                        "One or more unsupported gates CRX, CRY or CRZ were included in a circuit with measurements. "
-                        "In this case, measurments should be subsequently added by the executor."
-                        )
-
-        qfunc = pennylane_from_qasm(qasm)
-        with QuantumTape() as tape:
-            qfunc(wires=Wires(range(qibo_circuit.nqubits)))
-        tape = tape.expand(stop_at=lambda obj: obj.name in SUPPORTED)
-        qasm = tape.to_openqasm(rotations=False, wires=sorted(tape.wires), measure_all=False)
+        qibo_circuit = decompose_qibo_circuit(qibo_circuit)
+        
+    qasm = qibo_circuit.to_qasm()
 
     return cirq_from_qasm(qasm)
 

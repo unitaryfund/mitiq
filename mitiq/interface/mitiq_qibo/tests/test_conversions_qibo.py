@@ -47,14 +47,22 @@ def test_from_qibo_unsupported_gates():
     with pytest.raises(UnsupportedQiboCircuitError, match="OpenQASM does not support multi-controlled gates."):
         from_qibo(qibo_circuit) 
 
-def test_from_qibo_CRX_plus_measurment():
+def test_from_qibo_CRY():
     qibo_circuit = qibo.Circuit(2) 
-    qibo_circuit.add(qibo.gates.CRX(0,1,0.4)) 
-    qibo_circuit.add(qibo.gates.M(0))
-    with pytest.raises(UnsupportedQiboCircuitError, match="One or more unsupported gates CRX, CRY or CRZ "
-                        "were included in a circuit with measurements. "
-                        "In this case, measurments should be subsequently added by the executor."):
-        from_qibo(qibo_circuit) 
+    qibo_circuit.add(qibo.gates.CRY(0,1,0.4)) 
+    qibo_circuit.add(qibo.gates.M(1))
+    circuit = from_qibo(qibo_circuit) 
+
+    q0,q1 = cirq.LineQubit.range(2)
+    correct = cirq.Circuit()
+    correct.append(cirq.Ry(rads=0.2).on(q1))
+    correct.append(cirq.CNOT(q0,q1))
+    correct.append(cirq.Ry(rads=-0.2).on(q1))
+    correct.append(cirq.CNOT(q0,q1))
+    correct.append(cirq.measure(q1))
+
+    assert _equal(circuit, correct, require_qubit_equality=False)
+
 
 def test_to_qibo_unsupported_cirq():
     q = cirq.LineQubit(0)
