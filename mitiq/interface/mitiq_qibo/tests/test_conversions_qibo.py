@@ -41,13 +41,19 @@ def test_from_qibo_register_name_error():
         +f" register names but K was used."):
         from_qibo(qibo_circuit)
 
-def test_from_qibo_unsupported_gates():
+def test_from_qibo_unsupported_multi_controlled_gate():
     qibo_circuit = qibo.Circuit(4)
     qibo_circuit.add(qibo.gates.X(0).controlled_by(1,2,3))
     with pytest.raises(UnsupportedQiboCircuitError, match="OpenQASM does not support multi-controlled gates."):
         from_qibo(qibo_circuit) 
 
-def test_from_qibo_CRY():
+def test_from_qibo_unsupported_gate(): 
+    qibo_circuit = qibo.Circuit(3) 
+    qibo_circuit.add(qibo.gates.DEUTSCH(0, 1, 2, 0.4)) 
+    with pytest.raises(UnsupportedQiboCircuitError, match="deutsch is not supported by OpenQASM."):
+        from_qibo(qibo_circuit)
+
+def test_from_qibo_unknown_cirq_gate():
     qibo_circuit = qibo.Circuit(2) 
     qibo_circuit.add(qibo.gates.CRY(0,1,0.4)) 
     qibo_circuit.add(qibo.gates.M(1))
@@ -62,7 +68,6 @@ def test_from_qibo_CRY():
     correct.append(cirq.measure(q1))
 
     assert _equal(circuit, correct, require_qubit_equality=False)
-
 
 def test_to_qibo_unsupported_cirq():
     q = cirq.LineQubit(0)
@@ -105,19 +110,35 @@ def test_qibo_integration(i):
         qibo.gates.Y(0),
         qibo.gates.Z(0),
         qibo.gates.S(0),
+        qibo.gates.SDG(0),
         qibo.gates.T(0),
+        qibo.gates.I(0),
+        qibo.gates.TDG(0),
         qibo.gates.RX(0, 0.4),
         qibo.gates.RY(0, 0.4),
         qibo.gates.RZ(0, 0.4),
         qibo.gates.H(0),
+        qibo.gates.SX(0),
+        qibo.gates.SXDG(0),
+        qibo.gates.CSX(0,1),
+        qibo.gates.CSXDG(0,1),
         qibo.gates.TOFFOLI(0, 1, 2),
         qibo.gates.SWAP(0, 1),
+        qibo.gates.iSWAP(0, 1),
+        qibo.gates.FSWAP(0, 1),
+        qibo.gates.CNOT(0, 1),
+        qibo.gates.CZ(0, 1),
         qibo.gates.U1(0, 0.4),
         qibo.gates.U2(0, 0.4, 0.5),
         qibo.gates.U3(0, 0.4, 0.5, 0.6),
+        qibo.gates.CU1(0, 1, 0.4),
+        qibo.gates.CU3(0, 1, 0.4, 0.5, 0.6),
         qibo.gates.CRX(0, 1, 0.4),
         qibo.gates.CRY(0, 1, 0.4),
         qibo.gates.CRZ(0, 1, 0.4),
+        qibo.gates.RXX(0, 1, 0.4),
+        qibo.gates.RYY(0, 1, 0.4),
+        qibo.gates.RZZ(0, 1, 0.4)
     ]
 
     layers = 3
