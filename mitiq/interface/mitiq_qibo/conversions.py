@@ -36,6 +36,7 @@ def crx_decomp(gate: gates.CRX) -> list:
     ]
     return decomp_gate
 
+
 def cry_decomp(gate: gates.CRY) -> list: 
     """Decomposes CRY gate to Cirq known gates. 
     
@@ -54,6 +55,7 @@ def cry_decomp(gate: gates.CRY) -> list:
         gates.CNOT(q0,q1),         
     ]
     return decomp_gate
+
 
 def crz_decomp(gate: gates.CRZ) -> list:
     """Decomposes CRZ gate to Cirq known gates.
@@ -74,6 +76,7 @@ def crz_decomp(gate: gates.CRZ) -> list:
     ]
     return decomp_gate
 
+
 def cu1_decomp(gate: gates.CU1) -> list:
     """Decomposes CU1 gate to Cirq known gates.
     
@@ -93,6 +96,7 @@ def cu1_decomp(gate: gates.CU1) -> list:
         gates.U1(q1,theta/2),
     ]
     return decomp_gate
+
 
 def cu3_decomp(gate: gates.CU3) -> list:
     """Decomposes CU3 gate to Cirq known gates.
@@ -117,6 +121,7 @@ def cu3_decomp(gate: gates.CU3) -> list:
     ]
     return decomp_gate
 
+
 def csx_decomp(gate: gates.CSX) -> list:
     """Decomposes CSX gate to Cirq known gates.
     
@@ -138,6 +143,7 @@ def csx_decomp(gate: gates.CSX) -> list:
         gates.H(q1),
     ]
     return decomp_gate
+
 
 def csxdg_decomp(gate: gates.CSXDG) -> list:
     """Decomposes CSXDG gate to Cirq known gates.
@@ -161,6 +167,7 @@ def csxdg_decomp(gate: gates.CSXDG) -> list:
     ]
     return decomp_gate
 
+
 def iswap_decomp(gate: gates.iSWAP) -> list:
     """Decomposes ISWAP gate to Cirq known gates.
     
@@ -180,6 +187,7 @@ def iswap_decomp(gate: gates.iSWAP) -> list:
         gates.H(q1),
     ]
     return decomp_gate
+
 
 def fswap_decomp(gate: gates.FSWAP) -> list:
     """Decomposes FSWAP gate to Cirq known gates.
@@ -211,6 +219,7 @@ def fswap_decomp(gate: gates.FSWAP) -> list:
     ]
     return decomp_gate
 
+
 def rxx_decomp(gate: gates.RXX) -> list:
     """Decomposes RXX gate to Cirq known gates.
     
@@ -232,6 +241,7 @@ def rxx_decomp(gate: gates.RXX) -> list:
         gates.H(q1),
     ]
     return decomp_gate
+
 
 def ryy_decomp(gate: gates.RYY) -> list:
     """Decomposes RYY gate to Cirq known gates.
@@ -255,6 +265,7 @@ def ryy_decomp(gate: gates.RYY) -> list:
     ]
     return decomp_gate
 
+
 def rzz_decomp(gate: gates.RZZ) -> list:
     """Decomposes RZZ gate to Cirq known gates.
     
@@ -273,6 +284,7 @@ def rzz_decomp(gate: gates.RZZ) -> list:
     ]
     return decomp_gate
 
+
 UNKNOWN_CIRQ = {
     "crx": crx_decomp,
     "cry": cry_decomp,
@@ -288,11 +300,13 @@ UNKNOWN_CIRQ = {
     "rzz": rzz_decomp,
 }
 
+
 class UnsupportedCirqCircuitError(Exception):
     pass
 
 class UnsupportedQiboCircuitError(Exception): 
     pass 
+
 
 def decompose_qibo_circuit(qibo_circuit: QiboCircuit) -> QiboCircuit:
     """Returns a QiboCircuit circuit equivalent to the input QiboCircuit
@@ -349,6 +363,7 @@ def from_qibo(qibo_circuit: QiboCircuit) -> Circuit:
     qasm = decompose_qibo_circuit(qibo_circuit).to_qasm()
 
     return cirq_from_qasm(qasm)
+
 
 def to_qibo(circuit: Circuit) -> QiboCircuit:
     """Returns a QiboCircuit equivalent to the input Cirq circuit.

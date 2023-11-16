@@ -32,6 +32,7 @@ def test_from_qibo():
 
     assert _equal(circuit, correct, require_qubit_equality=False)
 
+
 def test_from_qibo_register_name_error(): 
     qibo_circuit = qibo.Circuit(2) 
     qibo_circuit.add(qibo.gates.CNOT(0, 1)) 
@@ -41,17 +42,20 @@ def test_from_qibo_register_name_error():
         +f" register names but K was used."):
         from_qibo(qibo_circuit)
 
+
 def test_from_qibo_unsupported_multi_controlled_gate():
     qibo_circuit = qibo.Circuit(4)
     qibo_circuit.add(qibo.gates.X(0).controlled_by(1,2,3))
     with pytest.raises(UnsupportedQiboCircuitError, match="OpenQASM does not support multi-controlled gates."):
         from_qibo(qibo_circuit) 
 
+
 def test_from_qibo_unsupported_gate(): 
     qibo_circuit = qibo.Circuit(3) 
     qibo_circuit.add(qibo.gates.DEUTSCH(0, 1, 2, 0.4)) 
     with pytest.raises(UnsupportedQiboCircuitError, match="deutsch is not supported by OpenQASM."):
         from_qibo(qibo_circuit)
+
 
 def test_from_qibo_unknown_cirq_gate():
     qibo_circuit = qibo.Circuit(2) 
@@ -69,6 +73,7 @@ def test_from_qibo_unknown_cirq_gate():
 
     assert _equal(circuit, correct, require_qubit_equality=False)
 
+
 def test_to_qibo_unsupported_cirq():
     q = cirq.LineQubit(0)
     # Empty circuit
@@ -76,6 +81,7 @@ def test_to_qibo_unsupported_cirq():
 
     with pytest.raises(UnsupportedCirqCircuitError, match='The number of qubits must be at least 1 but is 0.'):
         to_qibo(circuit)
+
 
 @pytest.mark.parametrize("random_state", range(10))
 def test_to_from_qibo(random_state):
@@ -90,11 +96,13 @@ def test_to_from_qibo(random_state):
         cirq.unitary(converted), cirq.unitary(circuit), atol=1e-7
     )
 
+
 def test_to_from_qibo_cnot_same_gates():
     qreg = cirq.LineQubit.range(2)
     circuit = cirq.Circuit(cirq.CNOT(*qreg))
     converted = from_qibo(to_qibo(circuit))
     assert _equal(circuit, converted, require_qubit_equality=False)
+
     
 def test_to_from_qibo_identity():
     q = cirq.LineQubit(0)
@@ -102,6 +110,7 @@ def test_to_from_qibo_identity():
     # Identity gate
     converted = from_qibo(to_qibo(circuit))
     assert _equal(circuit, converted, require_qubit_equality=False)
+
 
 @pytest.mark.parametrize('i', range(10))
 def test_qibo_integration(i):
