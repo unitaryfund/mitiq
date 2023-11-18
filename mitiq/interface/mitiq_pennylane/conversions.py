@@ -76,4 +76,3 @@ def to_pennylane(circuit: Circuit) -> QuantumTape:
         qfunc(wires=Wires(range(len(circuit.all_qubits()))))
 
     return tape
-    
