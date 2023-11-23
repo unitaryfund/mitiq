@@ -19,7 +19,7 @@ In this tutorial we will cover how to use Mitiq in conjunction with [Qibo](https
 - [Error mitigation with Qibo using noisy simulation ](#error-mitigation-with-qibo-using-noisy-simulation)
   - [Setup: Defining a circuit](#setup-defining-a-circuit)
   - [Setup: Defining the executor](#setup-defining-the-executor)
-  - [Options](#options)
+  - [Applying ZNE](#applying-zne)
   - [Decorator usage](#decorator-usage)
 
 +++
@@ -47,54 +47,38 @@ In this example, we will use the probability of obtaining the $|00\rangle$ state
 
 ## Setup: Defining the executor 
 
-We define the executor function in the following code block.
-As we are using IBMQ backends, we first load our account.
-    
-**Note:** Using an IBM quantum computer requires a valid IBMQ account.
-See <https://quantum-computing.ibm.com/> for instructions to create an account, save credentials, and get access to online quantum computers.
-
-First, we get our devices set up depending on whether we would like to use real hardware, or a simulator.
+We define the executor function in the following code block. In the executor, we initially make a deep copy of the input circuit and modify it to add the measurement gates. We then create a noise map and apply it to the circuit. Finally we simulate the noisy circuit and obtain the desired observable as output of the executor function. For more detailed information about the noise map features see [Qibo noisy simulation](<https://qibo.science/qibo/stable/code-examples/advancedexamples.html#adding-noise-after-every-gate>).  
 
 ```{code-cell} ipython3
-import qiskit
-from qiskit_ibm_provider import IBMProvider
+import copy
 
-USE_REAL_HARDWARE = False
+def executor(circuit, shots = 1000):
+    """Returns the expectation value to be mitigated. 
+    In this case the expectation value is the probability to get the |00> state. 
 
-if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
-    provider = IBMProvider()
-    dev = qml.device(
-        "qiskit.ibmq",
-        wires=1,
-        backend="ibmq_qasm_simulator",
-        provider=provider
-    )
-else:
-    noise_strength = 0.05
-    dev_noise_free = qml.device("default.mixed", wires=1)
-    dev = qml.transforms.insert(
-        qml.AmplitudeDamping,
-        noise_strength
-    )(dev_noise_free)
+    Args:
+        circuit: Circuit to run.
+        shots: Number of times to execute the circuit to compute the expectation value.
+    """
+    circuit_copy=copy.deepcopy(circuit) 
+    circuit_copy.add(gates.M(0, 1)) 
+
+    # Apply noisy map (simulate noisy backend)
+    noise_map = {0: list(zip(["X", "Z"], [0.02, 0.02])), 1: list(zip(["X", "Z"], [0.02, 0.02]))}
+    noisy_c = circuit_copy.with_pauli_noise(noise_map)
+
+    result = noisy_c(nshots=shots)
+    result_freq=result.frequencies(binary=True)
+    counts_00 = result_freq.get("00")
+     
+    if counts_00 is None:
+        expectation_value = 0.
+    else:
+        expectation_value = counts_00 / shots  
+    return expectation_value
 ```
 
-With `dev` set to the desired device, we can now use PennyLane's [`mitigate_with_zne`](https://pennylane.readthedocs.io/en/stable/code/api/pennylane.transforms.mitigate_with_zne.html) function, in conjuction with a noise scaling method, and inference technique from Mitiq.
-
-```{code-cell} ipython3
-from mitiq.zne.scaling import fold_global
-from mitiq.zne.inference import RichardsonFactory
-
-scale_factors = [1, 2, 3]
-noise_scale_method = fold_global
-
-device_circuit = qml.QNode(circuit, dev)
-error_mitigated_device_circuit = qml.transforms.mitigate_with_zne(
-    device_circuit,
-    scale_factors,
-    noise_scale_method,
-    RichardsonFactory.extrapolate, 
-)
-```
+## Applying ZNE
 
 We can now test the mitigated version of the circuit against the unmitigated to ensure it is working as expected.
 
@@ -106,9 +90,6 @@ print(f"Mitigated result   {mitigated:.3f}")
 ```
 
 As the ideal, desired result is `1.000`, the mitigated result performs much better than unmitigated.
-
-
-## Options
 
 In this section we will discuss the many different options for noise scaling and extrapolation that can be passed into PennyLane's `mitigate_with_zne` function.
 
