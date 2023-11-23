@@ -30,17 +30,16 @@ from qibo import Circuit,gates
 c = Circuit(1) 
 for _ in range(10): 
     c.add(gates.X(0))
+c.add(gates.M(0))
 ```
 
 In this example, we will use the probability of obtaining the $|0\rangle$ state as our observable to mitigate, the expectation value of which should evaluate to one in the noiseless setting.
 
 ## Setup: Defining the executor 
 
-We define the executor function in the following code block. In the executor, we initially make a deep copy of the input circuit and modify it to add the measurement gates. We then create a noise map and apply it to the circuit. Finally we simulate the noisy circuit and obtain the desired observable as output of the executor function. For more detailed information about the noise map features see [Qibo noisy simulation](<https://qibo.science/qibo/stable/code-examples/advancedexamples.html#adding-noise-after-every-gate>).  
+We define the executor function in the following code block. In the executor, we create a noise map and apply it to the circuit. Finally we simulate the noisy circuit and obtain the desired observable as output of the executor function. For more detailed information about the noise map features see [Qibo noisy simulation](<https://qibo.science/qibo/stable/code-examples/advancedexamples.html#adding-noise-after-every-gate>).  
 
 ```{code-cell} ipython3
-import copy 
-
 def executor(circuit, shots = 1000):
     """Returns the expectation value to be mitigated. 
     In this case the expectation value is the probability to get the |0> state. 
@@ -49,12 +48,10 @@ def executor(circuit, shots = 1000):
         circuit: Circuit to run.
         shots: Number of times to execute the circuit to compute the expectation value.
     """
-    circuit_copy = copy.deepcopy(circuit) 
-    circuit_copy.add(gates.M(0)) 
-
     # Apply noisy map (simulate noisy backend)
     noise_map = {0: list(zip(["X", "Z"], [0.03, 0.03]))}
-    noisy_c = circuit_copy.with_pauli_noise(noise_map)
+    noisy_c = circuit.with_pauli_noise(noise_map)
+    
     result = noisy_c(nshots=shots)
     result_freq = result.frequencies(binary=True)
     counts_0 = result_freq.get("0")
