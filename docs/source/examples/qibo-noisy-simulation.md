@@ -11,43 +11,41 @@ kernelspec:
   name: python3
 ---
 
-# Error mitigation with Pennylane on IBMQ backends
+# Error mitigation with Qibo using noisy simulation
 
 
-In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](https://pennylane.ai/), and further how to run error-mitigated circuits on IBMQ backends.
+In this tutorial we will cover how to use Mitiq in conjunction with [Qibo](https://qibo.science/). Besides, we will simulate a noisy channel by adding pauli gates with a certain probability after each gate.
 
-- [Error mitigation with Pennylane on IBMQ backends](#error-mitigation-with-pennylane-on-ibmq-backends)
+- [Error mitigation with Qibo using noisy simulation ](#error-mitigation-with-qibo-using-noisy-simulation)
   - [Setup: Defining a circuit](#setup-defining-a-circuit)
-  - [High-level usage](#high-level-usage)
+  - [Setup: Defining the executor](#setup-defining-the-executor)
   - [Options](#options)
   - [Decorator usage](#decorator-usage)
 
 +++
 
-(examples/ibmq-backends-pennylane/setup-defining-a-circuit)=
+(examples/qibo-noisy-simulation/setup-defining-a-circuit)=
 ## Setup: Defining a circuit
 
 +++
 
-For simplicity, we'll use a single-qubit circuit with ten Pauli $X$ gates that compiles to the identity, defined below.
+We'll use a two-qubit circuit which creates the maximally entangled state $\frac{|00\rangle+|11\rangle}{\sqrt{2}}$ and then adds four  $X$ gates to the first qubit that are equivalent to the identity. The circuit is defined below: 
 
 ```{code-cell} ipython3
-import pennylane as qml
+from qibo import Circuit,gates
 
-def circuit():
-    for _ in range(10):
-        qml.PauliX(wires=0)
-    return qml.expval(qml.PauliZ(0))
+c = Circuit(2) 
+c.add(gates.H(0)) 
+c.add(gates.CNOT(0,1))
+for _ in range(4): 
+    c.add(gates.X(0))
 ```
 
-In this example, we will use the probability of the ground state as our observable to mitigate, the expectation value of which should evaluate to one in the noiseless setting.
+In this example, we will use the probability of obtaining the $|00\rangle$ state as our observable to mitigate, the expectation value of which should evaluate to one half in the noiseless setting.
 
 +++
 
-## High-level usage
-
-As of version `0.19` of PennyLane, and `0.11` of Mitiq, PennyLane comes with out of the box support for error mitigation.
-This makes it very easy to use zero-noise extrapolation when working with PennyLane, regardless of where the circuit is being executed.
+## Setup: Defining the executor 
 
 We define the executor function in the following code block.
 As we are using IBMQ backends, we first load our account.
