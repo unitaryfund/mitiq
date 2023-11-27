@@ -65,13 +65,24 @@ def executor(circuit, shots = 1000):
 
 ## Applying ZNE
 
-We can now test the mitigated version of the circuit against the unmitigated one to ensure it is working as expected.
+We can now test the mitigated version of the circuit against the unmitigated one to ensure it is working as expected. We apply ZNE using 
+as scale factors 1, 2 and 3 and using RichardsonFactory. For each scaling factor we average over three circuits. 
 
 ```{code-cell} ipython3
 from mitiq import zne
+from mitiq.zne.inference import RichardsonFactory
 
 unmitigated = executor(c) 
 print(f"Unmitigated result {unmitigated:.3f}")
-mitigated = zne.execute_with_zne(c, executor)
+scale_factors = [1.0,2.0,3.0]
+factory = RichardsonFactory(scale_factors=scale_factors) #default ZNE configuration
+mitigated = zne.execute_with_zne(c, executor, factory = factory, num_to_average = 3)
 print(f"Mitigated result {mitigated:.3f}")
+```
+The mitigated result is closer to the noiseless result, wich is one. 
+In addition, we can show the interpolation performed: 
+```{code-cell} ipython3
+import matplotlib.pyplot as plt
+factory.plot_fit()
+plt.show()
 ```
