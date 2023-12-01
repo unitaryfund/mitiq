@@ -211,7 +211,7 @@ class Executor:
 
     def run(
         self,
-        circuits: Sequence[QPROGRAM],
+        circuits: Union[QPROGRAM, Sequence[QPROGRAM]],
         force_run_all: bool = True,
         **kwargs: Any,
     ) -> Sequence[QuantumResult]:
@@ -219,11 +219,14 @@ class Executor:
         the executor.
 
         Args:
-            circuits: Sequence of circuits to execute using the executor.
+            circuits: Circuit or sequence thereof to execute with the executor.
             force_run_all: If True, force every circuit in the input sequence
                 to be executed (if some are identical). Else, detects identical
                 circuits and runs a minimal set.
         """
+        if not isinstance(circuits, Sequence):
+            circuits = [circuits]
+
         start_result_index = len(self._quantum_results)
 
         if force_run_all:
