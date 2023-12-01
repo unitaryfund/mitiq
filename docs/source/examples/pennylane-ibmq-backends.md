@@ -160,12 +160,19 @@ For this our circuit will be defined as above, but we will use decorators to ind
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_from_left
 
-@qml.transforms.mitigate_with_zne([1, 2, 3], fold_gates_from_left, RichardsonFactory.extrapolate)
+
 @qml.qnode(dev)
 def circuit():
     for _ in range(10):
         qml.PauliX(wires=0)
     return qml.expval(qml.PauliZ(0))
+
+circuit = qml.transforms.mitigate_with_zne(
+    circuit,
+    [1, 2, 3],
+    fold_gates_from_left,
+    RichardsonFactory.extrapolate,
+)
 
 print(f"Zero-noise extrapolated value: {circuit():.3f}")
 ```
