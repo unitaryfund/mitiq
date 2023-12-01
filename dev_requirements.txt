@@ -3,7 +3,7 @@ qiskit~=0.44.3
 qiskit-aer~=0.12.2
 qiskit-ibm-provider~=0.7.2
 pyquil~=3.5.4
-pennylane-qiskit~=0.33.0
+pennylane-qiskit~=0.33.1
 pennylane~=0.32.0
 amazon-braket-sdk~=1.62.1
 
