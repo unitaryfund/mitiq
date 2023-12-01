@@ -100,6 +100,7 @@ def test_executor_non_hermitian_observable():
     with pytest.warns(UserWarning, match="hermitian"):
         executor.evaluate(circuits, obs)
 
+
 def test_run_executor_single_circuit():
     collector = Executor(executor=executor_serial)
     circuit = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
@@ -107,6 +108,7 @@ def test_run_executor_single_circuit():
     results_sequence = collector.run([circuit])
     assert np.allclose(results_no_sequence, np.zeros(1))
     assert np.allclose(results_no_sequence, results_sequence)
+
 
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
 @pytest.mark.parametrize("executor", (executor_batched, executor_serial))
