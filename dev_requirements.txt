@@ -1,5 +1,5 @@
 # Third-party integration.
-qiskit~=0.44.3
+qiskit~=0.45.1
 qiskit-aer~=0.12.2
 qiskit-ibm-provider~=0.7.2
 pyquil~=3.5.4
