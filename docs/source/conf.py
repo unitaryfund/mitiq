@@ -166,6 +166,7 @@ linkcheck_ignore = [
     r"https://arxiv.org/abs/1807.05572",
 ]
 
+suppress_warnings = ["myst.header"]
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
     """Style that mimicks APS journals."""
