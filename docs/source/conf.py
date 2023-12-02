@@ -169,7 +169,7 @@ linkcheck_ignore = [
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
     """Style that mimicks APS journals."""
-
+    
     def __init__(
         self,
         label_style=None,

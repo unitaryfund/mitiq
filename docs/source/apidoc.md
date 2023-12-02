@@ -320,13 +320,11 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-
 #### PyQuil Conversions
 ```{eval-rst}
 .. automodule:: mitiq.interface.mitiq_pyquil.conversions
    :members:
 ```
-
 
 #### Qiskit Conversions
 ```{eval-rst}
