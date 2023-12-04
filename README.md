@@ -9,6 +9,7 @@
 [![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-Unitary%20Fund-FFFF00.svg)](https://unitary.fund)
 [![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?urlpath=%2Ftree%2Fdocs%2Fsource%2Fexamples)
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -75,6 +76,7 @@ Try out the calibration module demonstrated below to help find the best paramete
 ![](docs/source/img/calibration.gif)
 
 See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
+The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
 
 ## Quick Tour
 
@@ -96,9 +98,9 @@ We refer to any programming language you can write quantum circuits in as a _fro
 
 #### Supported frontends
 
-| [Cirq](https://quantumai.google/cirq)                                                                                                                                         | [Qiskit](https://qiskit.org/)                                                                                         | [pyQuil](https://github.com/rigetti/pyquil)                                                                                                             | [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                                                                                         | [PennyLane](https://pennylane.ai/)                                                                                                  | [Qibo](https://qibo.science/) |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/master/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="130"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="80"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="150"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="150"/></a> | &nbsp;&nbsp; <a href="https://pennylane.ai/"><img src="https://pennylane.ai/img/xanadu_x.png" alt="PennyLane logo" width="60"/></a> | &nbsp;&nbsp; <a href="https://qibo.science/"><img src="https://github.com/qiboteam/qibo/blob/master/doc/source/_static/qibo_logo_dark.svg" alt="Qibo logo" width="90"/></a> |
+| [Cirq](https://quantumai.google/cirq)                                                                                                                                         | [Qiskit](https://qiskit.org/)                                                                                         | [pyQuil](https://github.com/rigetti/pyquil)                                                                                                             | [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                                                                                         | [PennyLane](https://pennylane.ai/)                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/master/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="130"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="80"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="150"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="150"/></a> | &nbsp;&nbsp; <a href="https://pennylane.ai/"><img src="https://pennylane.ai/img/xanadu_x.png" alt="PennyLane logo" width="60"/></a> |
 
 Note: Cirq is a core requirement of Mitiq and is installed when you `pip install mitiq`.
 
@@ -106,11 +108,16 @@ Note: Cirq is a core requirement of Mitiq and is installed when you `pip install
 
 You can use Mitiq with any backend you have access to that can interface with supported frontends.
 
+### Benchmarks
+
+Mitiq uses [`asv`](https://asv.readthedocs.io/en/stable/) to benchmark the core functionalities of the project.
+They are found in the [`benchmarks/`](https://github.com/unitaryfund/mitiq/tree/master/benchmarks) directory and their changes can be seen overtime at https://benchmarks.mitiq.dev/.
+
 ### Citing Mitiq
 
 If you use Mitiq in your research, please reference the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) using the bibtex entry found in [`CITATION.bib`](https://github.com/unitaryfund/mitiq/blob/master/CITATION.bib).
 
-A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?cites=12810395086731011605) / [Semantic Scholar](https://api.semanticscholar.org/CorpusID:221555755?).
+A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?cites=12810395086731011605) / [Semantic Scholar](https://www.semanticscholar.org/paper/Mitiq%3A-A-software-package-for-error-mitigation-on-LaRose-Mari/dc55b366d5b2212c6df8cd5c0bf05bab13104bd7#citing-papers).
 
 ## License
 
