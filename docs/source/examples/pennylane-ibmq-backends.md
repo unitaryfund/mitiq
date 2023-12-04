@@ -13,7 +13,6 @@ kernelspec:
 
 # Error mitigation with Pennylane on IBMQ backends
 
-
 In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](https://pennylane.ai/), and further how to run error-mitigated circuits on IBMQ backends.
 
 - [Error mitigation with Pennylane on IBMQ backends](#error-mitigation-with-pennylane-on-ibmq-backends)
@@ -25,6 +24,7 @@ In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](
 +++
 
 (examples/ibmq-backends-pennylane/setup-defining-a-circuit)=
+
 ## Setup: Defining a circuit
 
 +++
@@ -42,8 +42,6 @@ def circuit():
 
 In this example, we will use the probability of the ground state as our observable to mitigate, the expectation value of which should evaluate to one in the noiseless setting.
 
-+++
-
 ## High-level usage
 
 As of version `0.19` of PennyLane, and `0.11` of Mitiq, PennyLane comes with out of the box support for error mitigation.
@@ -51,9 +49,11 @@ This makes it very easy to use zero-noise extrapolation when working with PennyL
 
 We define the executor function in the following code block.
 As we are using IBMQ backends, we first load our account.
-    
-**Note:** Using an IBM quantum computer requires a valid IBMQ account.
+
+```{note}
+Using an IBM quantum computer requires a valid IBMQ account.
 See <https://quantum-computing.ibm.com/> for instructions to create an account, save credentials, and get access to online quantum computers.
+```
 
 First, we get our devices set up depending on whether we would like to use real hardware, or a simulator.
 
@@ -75,9 +75,10 @@ else:
     noise_strength = 0.05
     dev_noise_free = qml.device("default.mixed", wires=1)
     dev = qml.transforms.insert(
+        dev_noise_free,
         qml.AmplitudeDamping,
         noise_strength
-    )(dev_noise_free)
+    )
 ```
 
 With `dev` set to the desired device, we can now use PennyLane's [`mitigate_with_zne`](https://pennylane.readthedocs.io/en/stable/code/api/pennylane.transforms.mitigate_with_zne.html) function, in conjuction with a noise scaling method, and inference technique from Mitiq.
@@ -94,7 +95,7 @@ error_mitigated_device_circuit = qml.transforms.mitigate_with_zne(
     device_circuit,
     scale_factors,
     noise_scale_method,
-    RichardsonFactory.extrapolate, 
+    RichardsonFactory.extrapolate,
 )
 ```
 
@@ -108,7 +109,6 @@ print(f"Mitigated result   {mitigated:.3f}")
 ```
 
 As the ideal, desired result is `1.000`, the mitigated result performs much better than unmitigated.
-
 
 ## Options
 
@@ -125,13 +125,13 @@ mitigated = qml.transforms.mitigate_with_zne(
     device_circuit,
     scale_factors,
     noise_scale_method,
-    LinearFactory.extrapolate, 
+    LinearFactory.extrapolate,
 )()
 
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
-To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``.
+To specify a different noise scaling method, we can pass a different function for the argument `scale_noise`.
 This function should input a circuit and scale factor and return a circuit.
 The following code block shows an example of scaling noise by local folding instead of global folding.
 
@@ -144,14 +144,13 @@ mitigated = qml.transforms.mitigate_with_zne(
     device_circuit,
     scale_factors,
     noise_scale_method,
-    LinearFactory.extrapolate, 
+    LinearFactory.extrapolate,
 )()
 
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
 Further options are described and elaborated in our article on [additional options](../guide/zne-3-options.md) in ZNE.
-
 
 ## Decorator usage
 
@@ -161,12 +160,19 @@ For this our circuit will be defined as above, but we will use decorators to ind
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_from_left
 
-@qml.transforms.mitigate_with_zne([1, 2, 3], fold_gates_from_left, RichardsonFactory.extrapolate)
+
 @qml.qnode(dev)
 def circuit():
     for _ in range(10):
         qml.PauliX(wires=0)
     return qml.expval(qml.PauliZ(0))
+
+circuit = qml.transforms.mitigate_with_zne(
+    circuit,
+    [1, 2, 3],
+    fold_gates_from_left,
+    RichardsonFactory.extrapolate,
+)
 
 print(f"Zero-noise extrapolated value: {circuit():.3f}")
 ```
