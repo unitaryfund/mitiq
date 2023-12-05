@@ -77,11 +77,6 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-### Executors
-```{eval-rst}
-.. automodule:: mitiq.executor.executor
-   :members:
-```
 
 ### Pauli Twirling
 ```{eval-rst}
@@ -263,6 +258,11 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+### Executors
+```{eval-rst}
+.. automodule:: mitiq.executor.executor
+   :members:
+```
 
 ### Observables
 
@@ -272,7 +272,7 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-#### Pauli
+#### Pauli Observable
 ```{eval-rst}
 .. automodule:: mitiq.observable.pauli
    :members:
