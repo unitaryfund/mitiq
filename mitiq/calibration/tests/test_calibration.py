@@ -6,11 +6,11 @@
 """Tests for the Clifford data regression top-level API."""
 import re
 from functools import partial
+from unittest.mock import MagicMock, call
 
 import cirq
 import numpy as np
 import pytest
-from unittest.mock import MagicMock, call
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
