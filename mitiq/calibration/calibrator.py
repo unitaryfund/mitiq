@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
-from enum import Enum, auto
+from enum import Enum
 from operator import itemgetter
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
