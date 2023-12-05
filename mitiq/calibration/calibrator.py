@@ -34,8 +34,8 @@ class MissingResultsError(Exception):
 
 
 class OutputForm(str, Enum):
-    flat = auto()
-    cartesian = auto()
+    flat = "flat"
+    cartesian = "cartesian"
 
 
 class ExperimentResults:
