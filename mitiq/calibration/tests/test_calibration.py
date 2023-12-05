@@ -10,7 +10,7 @@ from functools import partial
 import cirq
 import numpy as np
 import pytest
-from mock import MagicMock, call
+from unittest.mock import MagicMock, call
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
