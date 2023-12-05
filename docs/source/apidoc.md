@@ -189,7 +189,7 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 ```
 
 
-## Tools For Error Mitigation Techniques
+## Tools For Error Mitigation
 
 ### Benchmarks
 
