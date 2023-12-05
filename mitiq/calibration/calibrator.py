@@ -4,14 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
-from enum import auto
+from enum import auto, Enum
 from operator import itemgetter
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import cirq
 import numpy as np
 import numpy.typing as npt
-from strenum import StrEnum
 from tabulate import tabulate
 
 from mitiq import (
@@ -34,7 +33,7 @@ class MissingResultsError(Exception):
     pass
 
 
-class OutputForm(StrEnum):
+class OutputForm(str, Enum):
     flat = auto()
     cartesian = auto()
 
@@ -120,10 +119,10 @@ class ExperimentResults:
         │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 0.9369 │
         └──────────────────────────┴──────────────────────────────┴────────────────────────────┘
         """  # noqa: E501
-        table: List[List[str | float]] = []
+        table: List[List[Union[str, float]]] = []
         headers: List[str] = ["benchmark", "strategy", "performance"]
         for problem in self.problems:
-            row_group: List[List[str | float]] = []
+            row_group: List[List[Union[str, float]]] = []
             for strategy in self.strategies:
                 nerr, merr = self._get_errors(strategy.id, problem.id)
                 row_group.append(
