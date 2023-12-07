@@ -4,20 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 import warnings
-from itertools import product
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
-    cast,
-)
+from enum import Enum
+from operator import itemgetter
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import cirq
 import numpy as np
@@ -33,7 +22,6 @@ from mitiq import (
 )
 from mitiq.calibration.settings import (
     BenchmarkProblem,
-    MitigationTechnique,
     Settings,
     Strategy,
     ZNESettings,
@@ -43,6 +31,11 @@ from mitiq.interface import convert_from_mitiq
 
 class MissingResultsError(Exception):
     pass
+
+
+class OutputForm(str, Enum):
+    flat = "flat"
+    cartesian = "cartesian"
 
 
 class ExperimentResults:
@@ -73,118 +66,109 @@ class ExperimentResults:
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
-    def _get_performance(
+    @staticmethod
+    def _performance_str(noisy_error: float, mitigated_error: float) -> str:
+        """Get human readable performance representaion."""
+        return (
+            f"{'✔' if mitigated_error < noisy_error else '✘'}\n"
+            f"Noisy error: {round(noisy_error, 4)}\n"
+            f"Mitigated error: {round(mitigated_error, 4)}\n"
+            f"Improvement factor: {round(noisy_error / mitigated_error, 4)}"
+        )
+
+    def _get_errors(
         self, strategy_id: int, problem_id: int
-    ) -> Tuple[str, float, float]:
-        """Get performance symbol and errors.
+    ) -> Tuple[float, float]:
+        """Get errors for a given strategy/problem combination.
 
         Returns:
-            A performance tuple comprising:
-            - performance symbol either ✔ or ✘ depending
-              on whether mitigation technique works well or not.
-              It considered to work well if the mitigated error is less
-              than the noisy error.
-            - the absolute value of the noisy error
-            - the absolute value of the mitigated error
+            A tuple comprising:
+            - absolute value of the noisy error
+            - absolute value of the mitigated error
         """
         mitigated = self.mitigated[strategy_id, problem_id]
         noisy = self.noisy[strategy_id, problem_id]
         ideal = self.ideal[strategy_id, problem_id]
         mitigated_error = abs(ideal - mitigated)
         noisy_error = abs(ideal - noisy)
-        mitigation_worked = mitigated_error < noisy_error
-        performance_symbol = "✔" if mitigation_worked else "✘"
-        return performance_symbol, noisy_error, mitigated_error
+        return noisy_error, mitigated_error
 
-    def unique_techniques(self) -> Set[MitigationTechnique]:
-        """Returns the unique mitigation techniques used across this
-        collection of experiment results."""
-        return set(strategy.technique for strategy in self.strategies)
-
-    def _technique_results(
-        self, technique: MitigationTechnique
-    ) -> Iterator[Tuple[BenchmarkProblem, Strategy, str, float, float]]:
-        """Yields the results from this collection of experiment results,
-        limited to a specific technique."""
-        for strategy, problem in product(self.strategies, self.problems):
-            if strategy.technique is technique:
-                performance_symbol, nerr, merr = self._get_performance(
-                    strategy.id, problem.id
-                )
-                yield problem, strategy, performance_symbol, nerr, merr
-
-    def log_technique(self, technique: MitigationTechnique) -> str:
-        """Creates a table displaying all results of a given mitigation
-        technique."""
+    def log_results_flat(self) -> None:
+        """Prints calibration results in the following form
+        ┌──────────────────────────┬──────────────────────────────┬────────────────────────────┐
+        │ benchmark                │ strategy                     │ performance                │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: rb                 │ Technique: ZNE               │ ✔                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
+        │ Circuit depth: 323       │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0294    │
+        │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 3.4398 │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: rb                 │ Technique: ZNE               │ ✔                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
+        │ Circuit depth: 323       │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │
+        │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 2.016  │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: ghz                │ Technique: ZNE               │ ✔                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
+        │ Circuit depth: 2         │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0082    │
+        │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 1.561  │
+        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+        │ Type: ghz                │ Technique: ZNE               │ ✘                          │
+        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
+        │ Circuit depth: 2         │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0137    │
+        │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 0.9369 │
+        └──────────────────────────┴──────────────────────────────┴────────────────────────────┘
+        """  # noqa: E501
         table: List[List[Union[str, float]]] = []
-        for (
-            problem,
-            strategy,
-            performance_symbol,
-            noisy_error,
-            mitigated_error,
-        ) in self._technique_results(technique):
-            row: List[Union[str, float]] = [
-                performance_symbol,
-                problem.type,
-                technique.name,
-            ]
-            summary_dict = strategy.to_pretty_dict()
-            if strategy.technique is MitigationTechnique.ZNE:
-                row.extend(
+        headers: List[str] = ["benchmark", "strategy", "performance"]
+        for problem in self.problems:
+            row_group: List[List[Union[str, float]]] = []
+            for strategy in self.strategies:
+                nerr, merr = self._get_errors(strategy.id, problem.id)
+                row_group.append(
                     [
-                        summary_dict["factory"],
-                        summary_dict["scale_factors"],
-                        summary_dict["scale_method"],
+                        str(problem),
+                        str(strategy),
+                        self._performance_str(nerr, merr),
+                        # this is only for sorting
+                        # removed after sorting
+                        merr - nerr,
                     ]
                 )
-            elif strategy.technique is MitigationTechnique.PEC:
-                row.extend(
-                    [
-                        summary_dict["noise_level"],
-                        summary_dict["noise_bias"],
-                        summary_dict["representation_function"],
-                    ]
-                )
-            row.extend([noisy_error, mitigated_error])
+            row_group.sort(key=itemgetter(-1))
+            table.extend([r[:-1] for r in row_group])
+        return print(tabulate(table, headers, tablefmt="simple_grid"))
+
+    def log_results_cartesian(self) -> None:
+        """Prints calibration results in the following form
+        ┌──────────────────────────────┬────────────────────────────┬────────────────────────────┐
+        │ strategy\benchmark           │ Type: rb                   │ Type: ghz                  │
+        │                              │ Num qubits: 2              │ Num qubits: 2              │
+        │                              │ Circuit depth: 337         │ Circuit depth: 2           │
+        │                              │ Two qubit gate count: 80   │ Two qubit gate count: 1    │
+        ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
+        │ Technique: ZNE               │ ✔                          │ ✘                          │
+        │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
+        │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │ Mitigated error: 0.0439    │
+        │ Scale method: fold_global    │ Improvement factor: 2.2515 │ Improvement factor: 0.2665 │
+        ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
+        │ Technique: ZNE               │ ✔                          │ ✘                          │
+        │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
+        │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0408    │ Mitigated error: 0.0171    │
+        │ Scale method: fold_global    │ Improvement factor: 2.7672 │ Improvement factor: 0.6852 │
+        └──────────────────────────────┴────────────────────────────┴────────────────────────────┘
+        """  # noqa: E501
+        table: List[List[str]] = []
+        headers: List[str] = ["strategy\\benchmark"]
+        for problem in self.problems:
+            headers.append(str(problem))
+        for strategy in self.strategies:
+            row: List[str] = [str(strategy)]
+            for problem in self.problems:
+                nerr, merr = self._get_errors(strategy.id, problem.id)
+                row.append(self._performance_str(nerr, merr))
             table.append(row)
-
-        def _sort_best_perf(row: List[Any]) -> float:
-            return row[-1] - row[-2]
-
-        table.sort(key=_sort_best_perf)
-
-        if technique is MitigationTechnique.ZNE:
-            headers = [
-                "performance",
-                "circuit type",
-                "method",
-                "extrapolation",
-                "scale_factors",
-                "scale method",
-            ]
-        elif technique is MitigationTechnique.PEC:
-            headers = [
-                "performance",
-                "circuit type",
-                "method",
-                "noise level",
-                "noise bias",
-                "noise representation",
-            ]
-
-        headers.extend(["noisy error", "mitigated error"])
-
-        return tabulate(table, headers, tablefmt="simple_grid")
-
-    def log_results(self) -> None:
-        """Log results from entire calibration run. Logging is performed on
-        each mitigation technique individually to avoid confusion when many
-        techniques are used."""
-        for mitigation_technique in self.unique_techniques():
-            print(f"{mitigation_technique.name} results:")
-            print(self.log_technique(mitigation_technique))
-            print()
+        return print(tabulate(table, headers, tablefmt="simple_grid"))
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -308,7 +292,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run(self, log: bool = False) -> None:
+    def run(self, log: Optional[OutputForm] = None) -> None:
         """Runs all the circuits required for calibration."""
         if not self.results.is_missing_data():
             self.results.reset_data()
@@ -339,8 +323,16 @@ class Calibrator:
 
         self.results.ensure_full()
 
-        if log:
-            self.results.log_results()
+        if log is not None:
+            if log == OutputForm.flat:
+                self.results.log_results_flat()
+            elif log == OutputForm.cartesian:
+                self.results.log_results_cartesian()
+            else:
+                raise ValueError(
+                    "log parameter must be one of: "
+                    f"{', '.join(OutputForm._member_names_)}"
+                )
 
     def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the
