@@ -60,22 +60,18 @@ def generate_training_circuits(
         random_state = np.random.RandomState(random_state)
 
     # Find the non-Clifford operations in the circuit.
-    operations = np.array(list(circuit.all_operations()))
-    non_clifford_indices_and_ops = np.array(
-        [
-            [i, op]
-            for i, op in enumerate(operations)
-            if not cirq.has_stabilizer_effect(op)
-        ]
-    )
+    operations = list(circuit.all_operations())
+    non_clifford_indices_and_ops = [
+        (i, op)
+        for i, op in enumerate(operations)
+        if not cirq.has_stabilizer_effect(op)
+    ]
 
     if len(non_clifford_indices_and_ops) == 0:
         return [circuit] * num_training_circuits
 
-    non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
-    non_clifford_ops = cast(
-        List[cirq.ops.Operation], non_clifford_indices_and_ops[:, 1]
-    )
+    non_clifford_indices = [i for i, _ in non_clifford_indices_and_ops]
+    non_clifford_ops = [op for _, op in non_clifford_indices_and_ops]
 
     # Replace (some of) the non-Clifford operations.
     near_clifford_circuits = []
@@ -88,7 +84,9 @@ def generate_training_circuits(
             random_state,
             **kwargs,
         )
-        operations[non_clifford_indices] = new_ops
+        for non_clifford_index, new_op in zip(non_clifford_indices, new_ops):
+            operations[non_clifford_index] = new_op
+
         near_clifford_circuits.append(Circuit(operations))
 
     return near_clifford_circuits
