@@ -325,12 +325,12 @@ def expectation_estimation_shadow(
         target_locs.append(int(qubit))
 
     # classical values stored in classical computer
-    b_lists_shadow = np.array(
-        [list(u) for u in measurement_outcomes[0]]
-    )[:, target_locs]
-    u_lists_shadow = np.array(
-        [list(u) for u in measurement_outcomes[1]]
-    )[:, target_locs]
+    b_lists_shadow = np.array([list(u) for u in measurement_outcomes[0]])[
+        :, target_locs
+    ]
+    u_lists_shadow = np.array([list(u) for u in measurement_outcomes[1]])[
+        :, target_locs
+    ]
 
     means = []
 
@@ -340,19 +340,19 @@ def expectation_estimation_shadow(
     # loop over the splits of the shadow:
     for idxes in group_idxes:
         if len(
-                np.nonzero(
-                    np.all(
-                        u_lists_shadow[idxes] == target_obs, axis=1
-                    )
-                )[0]):
+            np.nonzero(np.all(u_lists_shadow[idxes] == target_obs, axis=1))[0]
+        ):
             product = (-1) ** np.mod(
                 np.sum(
-                    b_lists_shadow[np.nonzero(
-                        np.all(
-                            u_lists_shadow[idxes] == target_obs, axis=1
+                    b_lists_shadow[
+                        np.nonzero(
+                            np.all(u_lists_shadow[idxes] == target_obs, axis=1)
                         )
-                    )].astype(int), axis=1
-                ), 2)
+                    ].astype(int),
+                    axis=1,
+                ),
+                2,
+            )
 
             if pauli_twirling_calibration:
                 if f_est is None:
