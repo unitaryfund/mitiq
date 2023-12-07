@@ -71,7 +71,8 @@ qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
 
 if download_ising_circuits:
     with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
-        circuit = pickle.load(file)
+        old_cirq_circuit = pickle.load(file)
+        circuit = cirq.Circuit(old_cirq_circuit.all_operations())
     g = 1
 
 # or user can import from tensorflow_quantum
@@ -509,7 +510,8 @@ num_qubits = 16
 qubits = cirq.LineQubit.range(num_qubits)
 if download_ising_circuits:
     with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
-        circuit = pickle.load(file)
+        old_cirq_circuit = pickle.load(file)
+        circuit = cirq.Circuit(old_cirq_circuit.all_operations())
     g = 1
 else:
     qbs = cirq.GridQubit.rect(num_qubits, 1)
