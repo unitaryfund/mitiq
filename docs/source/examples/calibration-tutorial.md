@@ -16,14 +16,14 @@ kernelspec:
 
 <img src="../_thumbnails/calibration.png" width="400">
 
-This tutorial helps answer the question: "What quantum error mitigation technique should I use for my problem?". 
+This tutorial helps answer the question: "What quantum error mitigation technique should I use for my problem?".
 The newly introduced `mitiq.calibration` module helps answer that in an optimized way, through `Benchmarks` and `Strategies`.
 
 More specifically, this tutorial covers:
 
 - Getting started with Mitiq's calibration module with ZNE
 - Use Qiskit noisy simulator with `FakeJakarta` as backend
-- Run calibration with some special settings, `RBSettings`, using the `cal.run(log=True)` option
+- Run calibration with some special settings, `RBSettings`, and logging the results
 
 ## Getting started with Mitiq
 
@@ -110,12 +110,12 @@ We import from the calibration module the key ingredients to use `mitiq.calibrat
 
 Currently `mitiq.calibration` supports ZNE as a technique to calibrate from, tuning different scale factors, extrapolation methods and circuit scaling methods.
 
-Let's run the calibration using an ad-hoc RBSettings and using the `log=True` option in order to print the list of experiments run.
+Let's run the calibration using an ad-hoc RBSettings while logging the results for comparison.
 
 - benchmarks: Circuit type: "rb"
 - strategies: use various "zne" strategies, testing various "scale_noise" methods
-(such as `mitiq.zne.scaling.folding.fold_global`, `mitiq.zne.scaling.folding.fold_gates_at_random`, and `mitiq.zne.scaling.folding.fold_all`), 
-and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
+  (such as `mitiq.zne.scaling.folding.fold_global`, `mitiq.zne.scaling.folding.fold_gates_at_random`, and `mitiq.zne.scaling.folding.fold_all`),
+  and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
 
 ```{code-cell} ipython3
 RBSettings = Settings(
@@ -189,17 +189,17 @@ RBSettings = Settings(
             "scale_noise": fold_all,
             "factory": LinearFactory([1.0, 3.0, 5.0]),
         },
-        
+
     ],
 )
 ```
 
 ```{code-cell} ipython3
 cal = Calibrator(execute_calibration, frontend="qiskit", settings=RBSettings)
-cal.run(log=True)
+cal.run(log="flat")
 ```
 
-As you can see above, several experiments were run, and each one has either a red cross (❌) or a green check (✅) to signal whether the error mitigation experiment obtained an expectation value that is better than the non-mitigated one.
+As you can see above, several experiments were run, and each one has either a cross (✘) or a check (✔) to signal whether the error mitigation experiment obtained an expectation value that is better than the non-mitigated one.
 
 ```{code-cell} ipython3
 calibrated_mitigated=execute_with_mitigation(circuit, execute_circuit, calibrator=cal)
