@@ -344,9 +344,9 @@ def expectation_estimation_shadow(
         ):
             product = (-1) ** np.sum(
                 b_lists_shadow[
-                np.nonzero(
-                    np.all(u_lists_shadow[idxes] == target_obs, axis=1)
-                )
+                    np.nonzero(
+                        np.all(u_lists_shadow[idxes] == target_obs, axis=1)
+                    )
                 ].astype(int),
                 axis=1,
             )
