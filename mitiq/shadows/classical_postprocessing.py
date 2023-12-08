@@ -342,16 +342,13 @@ def expectation_estimation_shadow(
         if len(
             np.nonzero(np.all(u_lists_shadow[idxes] == target_obs, axis=1))[0]
         ):
-            product = (-1) ** np.mod(
-                np.sum(
-                    b_lists_shadow[
-                        np.nonzero(
-                            np.all(u_lists_shadow[idxes] == target_obs, axis=1)
-                        )
-                    ].astype(int),
-                    axis=1,
-                ),
-                2,
+            product = (-1) ** np.sum(
+                b_lists_shadow[
+                np.nonzero(
+                    np.all(u_lists_shadow[idxes] == target_obs, axis=1)
+                )
+                ].astype(int),
+                axis=1,
             )
 
             if pauli_twirling_calibration:
