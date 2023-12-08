@@ -368,6 +368,7 @@ def expectation_estimation_shadow(
                 f_val = f_est.get(b, None)
                 if f_val is None:
                     means.append(0.0)
+                    continue
                 else:
                     # product becomes an array of snapshots expectation values
                     # witch satisfy condition (1) and (2)
