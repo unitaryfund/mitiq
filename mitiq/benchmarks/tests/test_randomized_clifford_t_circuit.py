@@ -76,5 +76,6 @@ def test_conversion(return_type):
                                                       num_oneq_cliffords=2,  
                                                       num_twoq_cliffords=2, 
                                                       num_t_gates=2, 
+                                                      return_type=return_type,
                                                       seed=3)
     assert return_type in circuit.__module__
