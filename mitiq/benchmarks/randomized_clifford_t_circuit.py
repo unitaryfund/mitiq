@@ -53,8 +53,8 @@ def generate_random_clifford_t_circuit(
 
     rnd_state = np.random.RandomState(seed)
 
-    oneq_cliffords = [cirq.S, cirq.H]   # This list could be user-defined or not
-    twoq_cliffords = [cirq.CNOT, cirq.CZ]   # This list could be user-defined or not
+    oneq_cliffords = [cirq.S, cirq.H]
+    twoq_cliffords = [cirq.CNOT, cirq.CZ]
     oneq_list = [rnd_state.choice(oneq_cliffords) for _ in range(num_oneq_cliffords)]
     twoq_list = [rnd_state.choice(twoq_cliffords) for _ in range(num_twoq_cliffords)]
     t_list = [cirq.T for _ in range(num_t_gates)]
