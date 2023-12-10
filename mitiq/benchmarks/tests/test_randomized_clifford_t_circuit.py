@@ -29,7 +29,7 @@ def test_generate_model_circuit_no_seed():
                                                       num_twoq_cliffords=2, 
                                                       num_t_gates=2, 
                                                       seed=1)
-    assert len(circuit) == 3
+    assert len(circuit) == 2 #number of two qubit cliffords
 
 
 def test_generate_model_circuit_with_seed():
@@ -71,7 +71,7 @@ def test_compute_heavy_bitstrings():
     assert computed_heavy_set == true_heavy_set
 
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
-def test_volume_conversion(return_type):
+def test_conversion(return_type):
     circuit, _ = generate_random_clifford_t_circuit(num_qubits=2, 
                                                       num_oneq_cliffords=2,  
                                                       num_twoq_cliffords=2, 

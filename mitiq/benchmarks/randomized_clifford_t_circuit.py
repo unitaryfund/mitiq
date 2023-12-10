@@ -46,6 +46,11 @@ def generate_random_clifford_t_circuit(
         A list of the heavy bitstrings for the returned circuit.
     """
 
+    if num_qubits <= 0:
+        raise ValueError(
+            "Cannot prepare a circuit with {} qubits", num_qubits
+        )
+
     rnd_state = np.random.RandomState(seed)
 
     oneq_cliffords = [cirq.S, cirq.H]   # This list could be user-defined or not
