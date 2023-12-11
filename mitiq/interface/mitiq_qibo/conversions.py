@@ -285,7 +285,7 @@ def rzz_decomp(gate: gates.RZZ) -> list:
     return decomp_gate
 
 
-UNKNOWN_CIRQ = {
+GATES_TO_DECOMPOSE = {
     "crx": crx_decomp,
     "cry": cry_decomp,
     "crz": crz_decomp,
@@ -318,10 +318,10 @@ def decompose_qibo_circuit(qibo_circuit: QiboCircuit) -> QiboCircuit:
     Returns:
         Decomposed QiboCircuit
     """
-    decomp_circuit = qibo_circuit.__class__(qibo_circuit.nqubits)
+    decomp_circuit = QiboCircuit(qibo_circuit.nqubits)
     for gate in qibo_circuit.queue:
-        if gate.name in UNKNOWN_CIRQ: 
-            decomposed_gate =  UNKNOWN_CIRQ.get(gate.name)(gate)
+        if gate.name in GATES_TO_DECOMPOSE: 
+            decomposed_gate =  GATES_TO_DECOMPOSE.get(gate.name)(gate)
             decomp_circuit.add(decomposed_gate)
         else:
             decomp_circuit.add(gate) 
@@ -377,10 +377,6 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
     qasm = cirq_to_qasm(circuit)
     nqubits, gate_list = QiboCircuit._parse_qasm(qasm)
     
-    if not isinstance(nqubits, int):
-        raise UnsupportedCirqCircuitError(
-        f"The number of qubits must be an integer but is {nqubits}."
-        )
     if nqubits < 1:
         raise UnsupportedCirqCircuitError(
         f"The number of qubits must be at least 1 but is {nqubits}."
