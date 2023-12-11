@@ -7,8 +7,8 @@
 
 import cirq
 import numpy as np
-import qibo 
 import pytest
+import qibo
 
 from mitiq.interface.mitiq_qibo import (
     UnsupportedCirqCircuitError,
@@ -16,59 +16,67 @@ from mitiq.interface.mitiq_qibo import (
     from_qibo,
     to_qibo,
 )
-
 from mitiq.utils import _equal
 
 
 def test_from_qibo():
-    qibo_circuit = qibo.Circuit(2) 
-    qibo_circuit.add(qibo.gates.CNOT(0, 1)) 
+    qibo_circuit = qibo.Circuit(2)
+    qibo_circuit.add(qibo.gates.CNOT(0, 1))
     qibo_circuit.add(qibo.gates.M(0))
-    
+
     circuit = from_qibo(qibo_circuit)
-    
+
     correct = cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2)))
     correct.append(cirq.measure(cirq.LineQubit(0)))
 
     assert _equal(circuit, correct, require_qubit_equality=False)
 
 
-def test_from_qibo_register_name_error(): 
-    qibo_circuit = qibo.Circuit(2) 
-    qibo_circuit.add(qibo.gates.CNOT(0, 1)) 
-    qibo_circuit.add(qibo.gates.M(0,register_name='K'))
+def test_from_qibo_register_name_error():
+    qibo_circuit = qibo.Circuit(2)
+    qibo_circuit.add(qibo.gates.CNOT(0, 1))
+    qibo_circuit.add(qibo.gates.M(0, register_name="K"))
 
-    with pytest.raises(UnsupportedQiboCircuitError, match="OpenQASM does not support capital letters in"
-        +f" register names but K was used."):
+    with pytest.raises(
+        UnsupportedQiboCircuitError,
+        match="OpenQASM does not support capital letters in"
+        + f" register names but K was used.",
+    ):
         from_qibo(qibo_circuit)
 
 
 def test_from_qibo_unsupported_multi_controlled_gate():
     qibo_circuit = qibo.Circuit(4)
-    qibo_circuit.add(qibo.gates.X(0).controlled_by(1,2,3))
-    with pytest.raises(UnsupportedQiboCircuitError, match="OpenQASM does not support multi-controlled gates."):
-        from_qibo(qibo_circuit) 
+    qibo_circuit.add(qibo.gates.X(0).controlled_by(1, 2, 3))
+    with pytest.raises(
+        UnsupportedQiboCircuitError,
+        match="OpenQASM does not support multi-controlled gates.",
+    ):
+        from_qibo(qibo_circuit)
 
 
-def test_from_qibo_unsupported_gate(): 
-    qibo_circuit = qibo.Circuit(3) 
-    qibo_circuit.add(qibo.gates.DEUTSCH(0, 1, 2, 0.4)) 
-    with pytest.raises(UnsupportedQiboCircuitError, match="deutsch is not supported by OpenQASM."):
+def test_from_qibo_unsupported_gate():
+    qibo_circuit = qibo.Circuit(3)
+    qibo_circuit.add(qibo.gates.DEUTSCH(0, 1, 2, 0.4))
+    with pytest.raises(
+        UnsupportedQiboCircuitError,
+        match="deutsch is not supported by OpenQASM.",
+    ):
         from_qibo(qibo_circuit)
 
 
 def test_from_qibo_unknown_cirq_gate():
-    qibo_circuit = qibo.Circuit(2) 
-    qibo_circuit.add(qibo.gates.CRY(0,1,0.4)) 
+    qibo_circuit = qibo.Circuit(2)
+    qibo_circuit.add(qibo.gates.CRY(0, 1, 0.4))
     qibo_circuit.add(qibo.gates.M(1))
-    circuit = from_qibo(qibo_circuit) 
+    circuit = from_qibo(qibo_circuit)
 
-    q0,q1 = cirq.LineQubit.range(2)
+    q0, q1 = cirq.LineQubit.range(2)
     correct = cirq.Circuit()
     correct.append(cirq.Ry(rads=0.2).on(q1))
-    correct.append(cirq.CNOT(q0,q1))
+    correct.append(cirq.CNOT(q0, q1))
     correct.append(cirq.Ry(rads=-0.2).on(q1))
-    correct.append(cirq.CNOT(q0,q1))
+    correct.append(cirq.CNOT(q0, q1))
     correct.append(cirq.measure(q1))
 
     assert _equal(circuit, correct, require_qubit_equality=False)
@@ -79,7 +87,10 @@ def test_to_qibo_unsupported_cirq():
     # Empty circuit
     circuit = cirq.Circuit()
 
-    with pytest.raises(UnsupportedCirqCircuitError, match='The number of qubits must be at least 1 but is 0.'):
+    with pytest.raises(
+        UnsupportedCirqCircuitError,
+        match="The number of qubits must be at least 1 but is 0.",
+    ):
         to_qibo(circuit)
 
 
@@ -103,7 +114,7 @@ def test_to_from_qibo_cnot_same_gates():
     converted = from_qibo(to_qibo(circuit))
     assert _equal(circuit, converted, require_qubit_equality=False)
 
-    
+
 def test_to_from_qibo_identity():
     q = cirq.LineQubit(0)
     circuit = cirq.Circuit(cirq.I(q))
@@ -112,7 +123,7 @@ def test_to_from_qibo_identity():
     assert _equal(circuit, converted, require_qubit_equality=False)
 
 
-@pytest.mark.parametrize('i', range(10))
+@pytest.mark.parametrize("i", range(10))
 def test_qibo_integration(i):
     gates = [
         qibo.gates.X(0),
@@ -129,8 +140,8 @@ def test_qibo_integration(i):
         qibo.gates.H(0),
         qibo.gates.SX(0),
         qibo.gates.SXDG(0),
-        qibo.gates.CSX(0,1),
-        qibo.gates.CSXDG(0,1),
+        qibo.gates.CSX(0, 1),
+        qibo.gates.CSXDG(0, 1),
         qibo.gates.TOFFOLI(0, 1, 2),
         qibo.gates.SWAP(0, 1),
         qibo.gates.iSWAP(0, 1),
@@ -147,18 +158,17 @@ def test_qibo_integration(i):
         qibo.gates.CRZ(0, 1, 0.4),
         qibo.gates.RXX(0, 1, 0.4),
         qibo.gates.RYY(0, 1, 0.4),
-        qibo.gates.RZZ(0, 1, 0.4)
+        qibo.gates.RZZ(0, 1, 0.4),
     ]
 
     layers = 3
-    np.random.seed(13*i)
+    np.random.seed(13 * i)
     gates_per_layers = [np.random.permutation(gates) for _ in range(layers)]
 
-    qibo_circuit = qibo.Circuit(3) 
+    qibo_circuit = qibo.Circuit(3)
     for gates in gates_per_layers:
-            for gate in gates:
-                qibo_circuit.add(gate)
-   
+        for gate in gates:
+            qibo_circuit.add(gate)
 
     base_circ = from_qibo(qibo_circuit)
     qibo_recovered = to_qibo(base_circ)
@@ -166,10 +176,3 @@ def test_qibo_integration(i):
     u_1 = cirq.unitary(base_circ)
     u_2 = cirq.unitary(circ_recovered)
     cirq.testing.assert_allclose_up_to_global_phase(u_1, u_2, atol=0)
-
-
-
-
-    
-   
-

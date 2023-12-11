@@ -28,7 +28,7 @@ SUPPORTED_PROGRAM_TYPES = {
     "qiskit": "QuantumCircuit",
     "braket": "Circuit",
     "pennylane": "QuantumTape",
-    "qibo": "Circuit"
+    "qibo": "Circuit",
 }
 
 
@@ -53,13 +53,15 @@ except ImportError:  # pragma: no cover
     _QuantumTape = _Circuit
 
 try:
-    from qibo import Circuit as _QiboCircuit 
+    from qibo import Circuit as _QiboCircuit
 except ImportError:  # pragma: no cover
     _QiboCircuit = _Circuit
 
 
 # Supported + installed quantum programs.
-QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape, _QiboCircuit]
+QPROGRAM = Union[
+    _Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape, _QiboCircuit
+]
 
 
 # Define MeasurementResult, a result obtained by measuring qubits on a quantum

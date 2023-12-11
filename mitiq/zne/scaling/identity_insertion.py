@@ -68,6 +68,7 @@ def _calculate_id_layers(
         )
         return (num_uniform_layers, num_partial_layers)
 
+
 @accept_qprogram_and_validate
 def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     """Returns a scaled version of the input circuit by inserting layers of

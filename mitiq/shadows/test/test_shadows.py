@@ -38,7 +38,6 @@ def executor(
 
 
 def test_pauli_twirling_calibrate():
-
     # Call the function with valid inputs
     result = pauli_twirling_calibrate(
         qubits=qubits, executor=executor, num_total_measurements_calibration=2
@@ -69,7 +68,6 @@ def test_pauli_twirling_calibrate():
 
 
 def test_shadow_quantum_processing():
-
     # Call the function with valid inputs
     result = shadow_quantum_processing(
         circuit, executor, num_total_measurements_shadow=10

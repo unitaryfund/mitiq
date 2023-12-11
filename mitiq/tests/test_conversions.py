@@ -11,8 +11,8 @@ import cirq
 import numpy as np
 import pennylane as qml
 import pytest
-import qiskit
 import qibo
+import qiskit
 from braket.circuits import Circuit as BKCircuit
 from braket.circuits import Instruction
 from braket.circuits import gates as braket_gates
