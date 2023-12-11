@@ -4,7 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for the Clifford data regression top-level API."""
+import re
 from functools import partial
+from unittest.mock import MagicMock, call
 
 import cirq
 import numpy as np
@@ -373,17 +375,105 @@ light_combined_settings = Settings(
 )
 
 
-def test_logging(capfd):
+def test_ExtrapolationResults_performance_str():
+    nerr = 0.9876543
+    merr = 0.1234567
+    perf_str = ExperimentResults._performance_str(nerr, merr)
+    mandatory_lines_count = 0
+    for line in perf_str.split("\n"):
+        if "Noisy error: " in line:
+            assert line.split("Noisy error: ")[1] == str(round(nerr, 4))
+            mandatory_lines_count += 1
+        if "Mitigated error: " in line:
+            assert line.split("Mitigated error: ")[1] == str(round(merr, 4))
+            mandatory_lines_count += 1
+        if "Improvement factor: " in line:
+            assert line.split("Improvement factor: ")[1] == str(
+                round(nerr / merr, 4)
+            )
+            mandatory_lines_count += 1
+    assert mandatory_lines_count == 3
+
+
+def test_Calibrator_log_argument():
     cal = Calibrator(
-        damping_execute, frontend="cirq", settings=light_combined_settings
+        damping_execute, frontend="cirq", settings=Settings([], [])
     )
-    cal.run(log=True)
+    cal.results = MagicMock()
+    cal.run()
+    cal.results.log_results_flat.assert_not_called()
+
+    cal.run(log="flat")
+    cal.results.log_results_flat.assert_called_once()
+
+    cal.run(log="cartesian")
+    cal.results.log_results_cartesian.assert_called_once()
+
+    with pytest.raises(ValueError):
+        cal.run(log="foo")
+
+
+def test_ExtrapolationResults_logging_results_flat(capfd):
+    settings = light_zne_settings
+    problems = settings.make_problems()
+    strategies = settings.make_strategies()
+    results = ExperimentResults(strategies, problems)
+    perf_str = "performance result"
+    results._performance_str = MagicMock(return_value=perf_str)
+    for s in strategies:
+        for p in problems:
+            results.add_result(
+                s, p, ideal_val=1.0, noisy_val=0.5, mitigated_val=0.6
+            )
+    results.log_results_flat()
     captured = capfd.readouterr()
-    assert "ZNE results:" in captured.out
-    assert "PEC results:" in captured.out
-    assert settings.get_strategy(0).technique.name in captured.out
-    assert "noisy error" in captured.out
-    assert "mitigated error" in captured.out
+    results._performance_str.assert_has_calls(
+        [call(0.5, 0.4)] * len(strategies) * len(problems)
+    )
+    for s in strategies:
+        for line in str(s).split():
+            assert line in captured.out
+    for p in problems:
+        for line in str(p).split():
+            assert line in captured.out
+    # Here we make sure that we have len(strategies) * len(problems)
+    # performance results lines in the output. One performance result
+    # per strategy/problem combination.
+    perf_count = 0
+    for line in captured.out.split("\n"):
+        if perf_str in line:
+            perf_count += 1
+    assert perf_count == (len(strategies) * len(problems))
+
+
+def test_ExtrapolationResults_logging_results_cartesian(capfd):
+    settings = light_zne_settings
+    problems = settings.make_problems()
+    strategies = settings.make_strategies()
+    results = ExperimentResults(strategies, problems)
+    perf_str = "performance result"
+    results._performance_str = MagicMock(return_value=perf_str)
+    for s in strategies:
+        for p in problems:
+            results.add_result(
+                s, p, ideal_val=1.0, noisy_val=0.5, mitigated_val=0.6
+            )
+    results.log_results_cartesian()
+    captured = capfd.readouterr()
+    results._performance_str.assert_has_calls(
+        [call(0.5, 0.4)] * len(strategies) * len(problems)
+    )
+    for s in strategies:
+        for line in str(s).split():
+            assert line in captured.out
+    for p in problems:
+        for line in str(p).split():
+            assert line in captured.out
+    # Here we make sure the output contains multiple columns.
+    # One column per problem
+    for line in captured.out.split("\n"):
+        if perf_str in line:
+            assert len(re.findall(perf_str, line)) == len(problems)
 
 
 def test_ExperimentResults_reset_data():
