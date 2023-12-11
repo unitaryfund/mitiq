@@ -48,7 +48,11 @@ def generate_random_clifford_t_circuit(
 
     if num_qubits <= 0:
         raise ValueError(
-            "Cannot prepare a circuit with {} qubits", num_qubits
+            "Cannot prepare a circuit with {} qubits.", num_qubits
+        )
+    elif num_qubits == 1 and num_twoq_cliffords > 0:
+        raise ValueError(
+            "Need more than 2 qubits for two-qubit Clifford gates."
         )
 
     rnd_state = np.random.RandomState(seed)
