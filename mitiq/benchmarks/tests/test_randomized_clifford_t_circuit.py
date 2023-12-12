@@ -21,6 +21,7 @@ from mitiq.benchmarks.randomized_clifford_t_circuit import (
     generate_random_clifford_t_circuit,
 )
 
+
 def test_generate_model_circuit_with_seed():
     """Test that a model circuit is determined by its seed."""
     circuit_1, _ = generate_random_clifford_t_circuit(num_qubits=2, 

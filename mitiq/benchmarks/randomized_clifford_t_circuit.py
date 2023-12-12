@@ -17,7 +17,6 @@ from mitiq import QPROGRAM, Bitstring
 from mitiq.interface import convert_from_mitiq
 
 
-
 #def generate_random_clifford_t_circuit(seed, num_oneq_cliffords, num_twoq_cliffords, num_t):
 def generate_random_clifford_t_circuit(
     num_qubits: int,
