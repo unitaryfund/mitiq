@@ -10,6 +10,7 @@ kernelspec:
   language: python
   name: python3
 ---
+
 # Robust Shadow Estimation with Mitiq
 
 **Corresponding to:** Min Li (minl2@illinois.edu)
@@ -29,6 +30,7 @@ from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
+
 # set random seed
 np.random.seed(666)
 ```
@@ -47,8 +49,10 @@ file_directory = "./resources"
 if not run_quantum_processing:
     saved_data_name = "saved_data-rshadows"
 
-    with zipfile.ZipFile(f"{file_directory}/rshadows-tutorial-{saved_data_name}.zip") as zf:
-        saved_data = pickle.load(zf.open(f"{saved_data_name}.pkl"))    
+    with zipfile.ZipFile(
+        f"{file_directory}/rshadows-tutorial-{saved_data_name}.zip"
+    ) as zf:
+        saved_data = pickle.load(zf.open(f"{saved_data_name}.pkl"))
 ```
 
 The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
@@ -71,7 +75,8 @@ qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
 
 if download_ising_circuits:
     with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
-        circuit = pickle.load(file)
+        old_cirq_circuit = pickle.load(file)
+        circuit = cirq.Circuit(old_cirq_circuit.all_operations())
     g = 1
 
 # or user can import from tensorflow_quantum
@@ -102,18 +107,20 @@ def cirq_executor(
     sampler=cirq.Simulator(),
 ) -> MeasurementResult:
     """
-    This function returns the measurement outcomes of a circuit with noisy channel added right before measurement.
+    This function returns the measurement outcomes of a circuit with noisy
+    channel added right before measurement.
     Args:
         circuit: The circuit to execute.
     Returns:
-        A one shot MeasurementResult object containing the measurement outcomes.
+        A one shot MeasurementResult object containing the measurement
+        outcomes.
     """
-    
-    circuit = circuit.copy()
-    qubits = sorted(list(circuit.all_qubits()))
+
+    tmp_circuit = circuit.copy()
+    qubits = sorted(list(tmp_circuit.all_qubits()))
     if noise_level[0] > 0:
         noisy_circuit = cirq.Circuit()
-        operations = list(circuit)
+        operations = list(tmp_circuit)
         n_ops = len(operations)
         for i, op in enumerate(operations):
             if i == n_ops - 1:
@@ -123,16 +130,16 @@ def cirq_executor(
                     )
                 )
             noisy_circuit.append(op)
-        circuit = noisy_circuit
+        tmp_circuit = noisy_circuit
     # circuit.append(cirq.Moment(*noise_model_function(*noise_level).on_each(*qubits)))
     executor = cirq_sample_bitstrings(
-        circuit,
+        tmp_circuit,
         noise_model_function=None,
         noise_level=(0,),
         shots=1,
         sampler=sampler,
     )
-    
+
     return executor
 ```
 
@@ -146,7 +153,6 @@ from mitiq.utils import operator_ptm_vector_rep
 
 operator_ptm_vector_rep(cirq.I._unitary_() / np.sqrt(2))
 ```
-
 
 ### 2.2 Pauli Twirling of Quantum Channel and Pauli Fidelity:
 The classical shadow estimation involves Pauli twirling of a quantum channel represented by $\mathcal{G} \subset U(d)$, with PTM representation $\mathcal{U}$. This twirling allows direct computation of $\widehat{\mathcal{M}}$ for the noisy channel $\Lambda$:
@@ -242,9 +248,7 @@ plt.xticks(
 plt.ylabel("Pauli fidelity")
 plt.legend()
 ```
-<!--     
-![png](../img/rshadows_compare_channels.png)
-     -->
+
 
 ## 3. Calibration of the operator expectation value estimation
 The expectation value for a series of operators, denoted as $\{O_\iota\}_{\iota\leq M}$, has a snapshot version of expectation value estimation by random Pauli measurement $\widetilde{\mathcal{M}}=\bigotimes_{i}\widetilde{\mathcal{M}}_{P_i}$ and Pauli-twirling calibration $\widehat{\mathcal{M}}^{-1}=\sum_{b\in\{0,1\}^n}f_b^{-1}\bigotimes_{i}\Pi_{b_i\in b}$, which is given by
@@ -263,13 +267,11 @@ Therefore, the final expression of the expectation value estimation can be simpl
 \end{align}
  Additionally, when $P_i =X_i$ (r.e.s.p. $Y_i,\;Z_i$), $U_i^{(2)}$ must correspond to $X$ (r.e.s.p. $Y,\;Z$)-basis measurement to yield a non-zero value, which is easy to check considered that the $P$-basis measurement channel has a PTM rep: $\widetilde{\mathcal{M}}_{P}=\frac{1}{2}(|I\rangle\!\rangle\langle\!\langle I|+|P\rangle\!\rangle\langle\!\langle P|)$, observiously the only measurement that didn't vanished by the operator's $i$-th qubit component in PTM rep: $P\rightarrow \langle\!\langle P|$, is the local $P$-basis measurement.  
 
-
 Next steps are same with classical protocol,with the statistical method of taking an average called "median of means" to achieve an acceptable failure probability of estimation, which need $R_2=N_2K_2$ snapshots, where we use the subscript "2" to denote the index of classical shadow protocol. Acctually,
 \begin{align}
 \hat{o}_\iota(N_2,K_2):=\mathrm{median}\{\hat{o}_\iota^{(1)},\cdots,\hat{o}_\iota^{(K_2)}\}~~\mathrm{where}~~\hat{o}_\iota^{(j)}=N_2^{-1}\sum_{k=N_2(j-1)+1}^{N_2j}\mathrm{Tr}(O_\iota\hat{\rho}_k),\qquad \forall~1\leq j\leq K_2,
 \end{align}
 where we have $K_2$ estimators each of which is the average of $N_2$ single-round estimators $\hat{o}_i^{(j)}$, and take the median of these $K_2$ estimators as our final estimator $\hat{o}_\iota(N_2,K_2)$. We can calculate the median of means of each irreps with projection $\Pi_b=\bigotimes_{i=1}^n\Pi_{b_i}$, 
-
 
 ### 3.1 Ground State Energy Estimation of Ising model with the RSHADOWS algorithm
 
@@ -464,11 +466,6 @@ df_hamiltonian = df_hamiltonian.reset_index()
 noise_model = "bit_flip"
 ```
 
-    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_23400/2684437156.py:1: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
-      df_hamiltonian = df_energy.groupby(["noise_level", "method"]).sum()
-
-
-
 ```{code-cell} ipython3
 # Define a color palette
 palette = {"exact": "black", "robust": "red", "standard": "green"}
@@ -483,23 +480,16 @@ sns.lineplot(
     markers=True,
     style="method",
     dashes=False,
-    ci=95,
+    errorbar=("ci", 95),
 )
 plt.title(f"Hamiltonian Estimation for {noise_model} Noise")
 plt.xlabel("Noise Level")
-plt.ylabel("Energy Value")
+plt.ylabel("Energy Value");
 ```
-<!-- 
-    
-![png](../img/rshadows_energy.png)
-     -->
-
-
 
 
 ### 3.2 Two Point Correlation Function Estimation with RShadows
 Let's estimate two point correlation fuction: $\langle Z_0 Z_i\rangle$ of a 16-spin 1D Ising model with transverse field on critical point ground state.
-
 
 Import groud state of 1-D Ising model with periodic boundary condition
 
@@ -509,7 +499,8 @@ num_qubits = 16
 qubits = cirq.LineQubit.range(num_qubits)
 if download_ising_circuits:
     with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
-        circuit = pickle.load(file)
+        old_cirq_circuit = pickle.load(file)
+        circuit = cirq.Circuit(old_cirq_circuit.all_operations())
     g = 1
 else:
     qbs = cirq.GridQubit.rect(num_qubits, 1)
@@ -622,13 +613,9 @@ sns.lineplot(
     markers=True,
     style="method",
     dashes=False,
-    ci=95,
+    errorbar=("ci", 95),
 )
-plt.title(f"Correlation Function Estimation w/ 0.3 Depolarization Noise")
+plt.title("Correlation Function Estimation w/ 0.3 Depolarization Noise")
 plt.xlabel(r"Correlation Function $\langle Z_0Z_i \rangle$")
-plt.ylabel("Correlation")
+plt.ylabel("Correlation");
 ```
-<!-- 
-    
-![png](../img/rshadows_2pt_func.png)
-     -->
