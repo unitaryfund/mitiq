@@ -9,7 +9,7 @@ from typing import Optional, Sequence, Tuple
 import cirq
 import numpy as np
 
-#from cirq import S, H, CNOT, T, Circuit
+# from cirq import S, H, CNOT, T, Circuit
 from cirq.contrib.quantum_volume import compute_heavy_set
 from cirq.value import big_endian_int_to_bits
 
@@ -17,7 +17,7 @@ from mitiq import QPROGRAM, Bitstring
 from mitiq.interface import convert_from_mitiq
 
 
-#def generate_random_clifford_t_circuit(seed, num_oneq_cliffords, num_twoq_cliffords, num_t):
+# def generate_random_clifford_t_circuit(seed, num_oneq_cliffords, num_twoq_cliffords, num_t):
 def generate_random_clifford_t_circuit(
     num_qubits: int,
     num_oneq_cliffords: int,
@@ -58,8 +58,12 @@ def generate_random_clifford_t_circuit(
 
     oneq_cliffords = [cirq.S, cirq.H]
     twoq_cliffords = [cirq.CNOT, cirq.CZ]
-    oneq_list = [rnd_state.choice(oneq_cliffords) for _ in range(num_oneq_cliffords)]
-    twoq_list = [rnd_state.choice(twoq_cliffords) for _ in range(num_twoq_cliffords)]
+    oneq_list = [
+        rnd_state.choice(oneq_cliffords) for _ in range(num_oneq_cliffords)
+    ]
+    twoq_list = [
+        rnd_state.choice(twoq_cliffords) for _ in range(num_twoq_cliffords)
+    ]
     t_list = [cirq.T for _ in range(num_t_gates)]
 
     all_gates = oneq_list + twoq_list + t_list
@@ -69,7 +73,9 @@ def generate_random_clifford_t_circuit(
     circuit = cirq.Circuit()
 
     for gate in all_gates:
-        qubits_for_gate = rnd_state.choice(qubits, size=gate.num_qubits(), replace=False)
+        qubits_for_gate = rnd_state.choice(
+            qubits, size=gate.num_qubits(), replace=False
+        )
         operation = gate.on(*qubits_for_gate)
         circuit.append(operation)
 
@@ -77,6 +83,7 @@ def generate_random_clifford_t_circuit(
 
     return_type = "cirq" if not return_type else return_type
     return convert_from_mitiq(circuit, return_type), heavy_bitstrings
+
 
 def compute_heavy_bitstrings(
     circuit: cirq.Circuit,

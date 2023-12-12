@@ -24,21 +24,27 @@ from mitiq.benchmarks.randomized_clifford_t_circuit import (
 
 def test_generate_model_circuit_with_seed():
     """Test that a model circuit is determined by its seed."""
-    circuit_1, _ = generate_random_clifford_t_circuit(num_qubits=2, 
-                                                      num_oneq_cliffords=2,  
-                                                      num_twoq_cliffords=2, 
-                                                      num_t_gates=2, 
-                                                      seed=1)
-    circuit_2, _ = generate_random_clifford_t_circuit(num_qubits=2, 
-                                                      num_oneq_cliffords=2,  
-                                                      num_twoq_cliffords=2, 
-                                                      num_t_gates=2, 
-                                                      seed=1)
-    circuit_3, _ = generate_random_clifford_t_circuit(num_qubits=2, 
-                                                      num_oneq_cliffords=2,  
-                                                      num_twoq_cliffords=2, 
-                                                      num_t_gates=2, 
-                                                      seed=3)
+    circuit_1, _ = generate_random_clifford_t_circuit(
+        num_qubits=2,
+        num_oneq_cliffords=2,
+        num_twoq_cliffords=2,
+        num_t_gates=2,
+        seed=1,
+    )
+    circuit_2, _ = generate_random_clifford_t_circuit(
+        num_qubits=2,
+        num_oneq_cliffords=2,
+        num_twoq_cliffords=2,
+        num_t_gates=2,
+        seed=1,
+    )
+    circuit_3, _ = generate_random_clifford_t_circuit(
+        num_qubits=2,
+        num_oneq_cliffords=2,
+        num_twoq_cliffords=2,
+        num_t_gates=2,
+        seed=3,
+    )
 
     assert circuit_1 == circuit_2
     assert circuit_2 != circuit_3
@@ -60,12 +66,15 @@ def test_compute_heavy_bitstrings():
     computed_heavy_set = compute_heavy_bitstrings(model_circuit, 3)
     assert computed_heavy_set == true_heavy_set
 
+
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_conversion(return_type):
-    circuit, _ = generate_random_clifford_t_circuit(num_qubits=2, 
-                                                      num_oneq_cliffords=2,  
-                                                      num_twoq_cliffords=2, 
-                                                      num_t_gates=2, 
-                                                      return_type=return_type,
-                                                      seed=3)
+    circuit, _ = generate_random_clifford_t_circuit(
+        num_qubits=2,
+        num_oneq_cliffords=2,
+        num_twoq_cliffords=2,
+        num_t_gates=2,
+        return_type=return_type,
+        seed=3,
+    )
     assert return_type in circuit.__module__
