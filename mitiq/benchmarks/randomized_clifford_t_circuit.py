@@ -17,7 +17,6 @@ from mitiq import QPROGRAM, Bitstring
 from mitiq.interface import convert_from_mitiq
 
 
-# def generate_random_clifford_t_circuit(seed, num_oneq_cliffords, num_twoq_cliffords, num_t):
 def generate_random_clifford_t_circuit(
     num_qubits: int,
     num_oneq_cliffords: int,
@@ -26,8 +25,9 @@ def generate_random_clifford_t_circuit(
     return_type: Optional[str] = None,
     seed: Optional[int] = None,
 ) -> Tuple[QPROGRAM, Sequence[Bitstring]]:
-    r"""Generate a random quantum circuit with the given number of qubits, number of one-qubit Cliffords,
-     number of two-qubit Cliffords and number of T gates.
+    r"""Generate a random quantum circuit with the given number of qubits,
+    number of one-qubit Cliffords, number of two-qubit Cliffords and number
+    of T gates.
 
     Args:
         num_qubits: The number of qubits in the generated circuit.

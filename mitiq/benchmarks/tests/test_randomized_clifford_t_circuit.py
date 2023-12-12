@@ -13,7 +13,6 @@ fits with Mitiq's interface.
 
 import cirq
 import pytest
-from cirq import protocols
 
 from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.benchmarks.randomized_clifford_t_circuit import (
