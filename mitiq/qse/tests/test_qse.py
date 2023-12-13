@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 import cirq
 import numpy as np
+import pytest
 
 from mitiq import QPROGRAM, Observable, PauliString
 from mitiq.interface import convert_to_mitiq
@@ -44,12 +45,19 @@ def execute_no_noise(circuit: QPROGRAM) -> np.ndarray:
     )
 
 
-def test_execute_with_qse_no_noise():
+@pytest.fixture
+def prepare_setup():
     qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
         code_hamiltonian,
     ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+    return qc, check_operators, code_hamiltonian
+
+
+def test_execute_with_qse_no_noise(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
     mitigated_value = execute_with_qse(
         qc, execute_no_noise, check_operators, code_hamiltonian, observable
@@ -63,12 +71,9 @@ def test_execute_with_qse_no_noise():
     assert np.isclose(mitigated_value.real, 0.5)
 
 
-def test_execute_with_qse():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_execute_with_qse(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
     unmitigated_value = observable.expectation(
         qc, execute_with_depolarized_noise
@@ -97,12 +102,8 @@ def test_execute_with_qse():
 
 
 @patch("mitiq.qse.qse.execute_with_qse")
-def test_mitigate_executor_batched(mock_execute_with_qse):
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_mitigate_executor_batched(mock_execute_with_qse, prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
 
     observable = get_observable_in_code_space(PauliString("XXXXX"))
     batched_mitigated_executor = mitigate_executor(
@@ -128,12 +129,9 @@ def test_mitigate_executor_batched(mock_execute_with_qse):
 
 
 @patch("mitiq.qse.qse.execute_with_qse")
-def test_qse_decorator(mock_execute_with_qse):
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_qse_decorator(mock_execute_with_qse, prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
 
     @qse_decorator(
@@ -152,23 +150,17 @@ def test_qse_decorator(mock_execute_with_qse):
     mock_execute_with_qse.assert_called_once()
 
 
-def test_get_projector():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_get_projector(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     P = get_projector(qc, execute_no_noise, check_operators, code_hamiltonian)
     uniform_projector = Observable(*[-0.25 * c for c in check_operators])
     assert P == uniform_projector
 
 
-def test_compute_overlap_matrix():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        _,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_compute_overlap_matrix(prepare_setup):
+    qc, check_operators, _ = prepare_setup
+
     S = _compute_overlap_matrix(qc, execute_no_noise, check_operators, {})
     assert np.allclose(S, np.ones(16))
 
@@ -190,12 +182,8 @@ def test_compute_overlap_matrix():
     assert off_diag_elements[0] < 1
 
 
-def test_compute_hamiltonian_overlap_matrix():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_compute_hamiltonian_overlap_matrix(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
 
     # If we have a full set of check operators that form a group then all
     # entries of the H matrix should be the same.
