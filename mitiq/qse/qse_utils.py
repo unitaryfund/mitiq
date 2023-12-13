@@ -74,15 +74,14 @@ def get_expectation_value_for_observable(
         )[0]
         return (pauli_expectation_cache[cache_key] * pauli_string.coeff).real
 
-    expectation_value = 0.0
-    if isinstance(observable, PauliString):
-        pauli_string = observable
-        expectation_value += get_expectation_value_for_one_pauli(pauli_string)
-    elif isinstance(observable, Observable):
-        for pauli_string in observable.paulis:
-            expectation_value += get_expectation_value_for_one_pauli(
-                pauli_string
-            )
+    paulis = (
+        [observable]
+        if isinstance(observable, PauliString)
+        else observable.paulis
+    )
+    expectation_value = sum(
+        get_expectation_value_for_one_pauli(pauli) for pauli in paulis
+    )
     return expectation_value
 
 
