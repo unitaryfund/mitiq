@@ -61,6 +61,10 @@ def get_expectation_value_for_observable(
     This function modifies pauli_string_to_expectation_cache in place.
     """
 
+    final_executor = (
+        executor if isinstance(executor, Executor) else Executor(executor)
+    )
+
     def get_expectation_value_for_one_pauli(
         pauli_string: PauliString,
     ) -> float:
@@ -73,10 +77,6 @@ def get_expectation_value_for_observable(
         ).real
 
     total_expectation_value_for_observable = 0.0
-    final_executor = (
-        executor if isinstance(executor, Executor) else Executor(executor)
-    )
-
     if isinstance(observable, PauliString):
         pauli_string = observable
         total_expectation_value_for_observable += (
