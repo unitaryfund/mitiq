@@ -192,7 +192,7 @@ def test_compute_hamiltonian_overlap_matrix(prepare_setup):
     H = _compute_hamiltonian_overlap_matrix(
         qc, execute_no_noise, check_operators, code_hamiltonian, {}
     )
-    assert np.allclose(H, -16 * np.ones(16))
+    assert np.allclose(H, np.full(16, -16))
 
     H = _compute_hamiltonian_overlap_matrix(
         qc,
