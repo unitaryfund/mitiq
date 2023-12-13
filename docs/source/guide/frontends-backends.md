@@ -13,6 +13,9 @@ kernelspec:
 
 # Frontends and Backends
 
+In short, a frontend is the tool used to write a quantum program, and a backend is the tool that executes said program.
+What follows is more detailed information as to how these concepts are handled in Mitiq.
+
 ## Mitiq-specific types
 
 There are a number of types that are specific to Mitiq, the most important being `mitiq.QPROGRAM` and `mitiq.QuantumResult`.
