@@ -73,7 +73,7 @@ def get_expectation_value_for_observable(
         ).real
 
     total_expectation_value_for_observable = 0.0
-    final_executor: Executor = (
+    final_executor = (
         executor if isinstance(executor, Executor) else Executor(executor)
     )
 
