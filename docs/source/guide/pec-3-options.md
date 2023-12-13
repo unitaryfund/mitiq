@@ -460,9 +460,7 @@ The learning-based PEC workflow was inspired by the procedure described in *Stri
 
 +++
 
-The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy
-{ref}`executor <guide/executors/executors>` 
-and on a classical simulator via an ideal {ref}`executor <guide/executors/executors>`. 
+The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy executor and on a classical simulator via an ideal executor (for more information on executors, check out the {doc}`executors` portion of the documentation).
 The training circuits are near-Clifford approximations of the input circuit. 
 During training, the noise strength parameter is used to calculate quasiprobability representations of the ideal gate with
 a depolarizing noise model.
@@ -476,7 +474,7 @@ In addition to specifying the input operation, the circuit of interest, and the 
 of training circuits, the fraction of non-Clifford gates in the training circuits, an initial guess for noise strength, and in the case of
 biased noise, an initial guess for a noise bias. 
 The user can also set options for the intermediate executions of {func}`.pec.execute_with_pec()` during the training process as a dictionary in
-`pec_kwargs`, specify the {ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
+`pec_kwargs`, specify the {doc}`observable <observables>` of which the expecation value is to be computed, and
 enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
 for the chosen optimization method.
 

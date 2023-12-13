@@ -23,8 +23,6 @@ In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](
 
 +++
 
-(examples/ibmq-backends-pennylane/setup-defining-a-circuit)=
-
 ## Setup: Defining a circuit
 
 +++

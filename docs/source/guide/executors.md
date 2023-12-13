@@ -11,7 +11,6 @@ kernelspec:
   name: python3
 ---
 
-(guide/executors/executors)=
 # Executors
 
 +++

@@ -39,7 +39,6 @@ USE_REAL_HARDWARE = False
 
 **Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
 
-(examples/cirq-ibmq-backends/setup-defining-a-circuit)=
 ## Setup: Defining a circuit in Cirq
 
 +++
@@ -70,7 +69,7 @@ the expectation value to mitigate. This function will:
 2. Run the circuit.
 3. Convert from raw measurement statistics (or a different output format) to an expectation value.
 
-For information on how to define more advanced executors, see the {ref}`Executors <guide/executors/executors>` section of the Mitiq user guide.
+For information on how to define more advanced executors, see the {doc}`../guide/executors` section of the Mitiq user guide.
 
 We define the executor function in the following code block. Because we are using IBMQ backends, we first load our account.
 

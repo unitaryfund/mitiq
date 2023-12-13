@@ -43,7 +43,6 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_n
 USE_REAL_HARDWARE = False
 ```
 
-(examples/ibmq-backends/setup-defining-a-circuit)=
 ## Setup: Defining a circuit
 
 +++
