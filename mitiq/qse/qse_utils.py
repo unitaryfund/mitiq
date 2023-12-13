@@ -53,7 +53,7 @@ def get_expectation_value_for_observable(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Union[PauliString, Observable],
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
+    pauli_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
     """Provide pauli_string_to_expectation_cache if you want to take advantage
     of caching.
@@ -69,25 +69,21 @@ def get_expectation_value_for_observable(
         pauli_string: PauliString,
     ) -> float:
         cache_key = pauli_string.with_coeff(1)
-        pauli_string_to_expectation_cache[cache_key] = final_executor.evaluate(
+        pauli_expectation_cache[cache_key] = final_executor.evaluate(
             circuit, Observable(cache_key)
         )[0]
-        return (
-            pauli_string_to_expectation_cache[cache_key] * pauli_string.coeff
-        ).real
+        return (pauli_expectation_cache[cache_key] * pauli_string.coeff).real
 
-    total_expectation_value_for_observable = 0.0
+    expectation_value = 0.0
     if isinstance(observable, PauliString):
         pauli_string = observable
-        total_expectation_value_for_observable += (
-            get_expectation_value_for_one_pauli(pauli_string)
-        )
+        expectation_value += get_expectation_value_for_one_pauli(pauli_string)
     elif isinstance(observable, Observable):
         for pauli_string in observable.paulis:
-            total_expectation_value_for_observable += (
-                get_expectation_value_for_one_pauli(pauli_string)
+            expectation_value += get_expectation_value_for_one_pauli(
+                pauli_string
             )
-    return total_expectation_value_for_observable
+    return expectation_value
 
 
 def _compute_overlap_matrix(
