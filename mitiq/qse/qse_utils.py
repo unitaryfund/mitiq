@@ -113,17 +113,16 @@ def _compute_hamiltonian_overlap_matrix(
     code_hamiltonian: Observable,
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> npt.NDArray[np.float64]:
-    H: List[List[float]] = []
-    # H_ij = <Ψ|Mi† H Mj|Ψ>
-    for i in range(len(check_operators)):
-        H.append([])
-        for j in range(len(check_operators)):
-            H[-1].append(
-                get_expectation_value_for_observable(
-                    circuit,
-                    executor,
-                    check_operators[i] * code_hamiltonian * check_operators[j],
-                    pauli_string_to_expectation_cache,
-                )
+    num_ops = len(check_operators)
+
+    H = np.zeros((num_ops, num_ops))
+    # Hij = ⟨Ψ|Mi† H Mj|Ψ⟩
+    for i in range(num_ops):
+        for j in range(num_ops):
+            H[i, j] = get_expectation_value_for_observable(
+                circuit,
+                executor,
+                check_operators[i] * code_hamiltonian * check_operators[j],
+                pauli_string_to_expectation_cache,
             )
-    return np.array(H)
+    return H
