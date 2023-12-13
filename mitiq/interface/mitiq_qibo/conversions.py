@@ -324,7 +324,8 @@ def decompose_qibo_circuit(qibo_circuit: QiboCircuit) -> QiboCircuit:
     decomp_circuit = QiboCircuit(qibo_circuit.nqubits)
     for gate in qibo_circuit.queue:
         if gate.name in GATES_TO_DECOMPOSE:
-            decomposed_gate = GATES_TO_DECOMPOSE.get(gate.name)(gate)
+            function = GATES_TO_DECOMPOSE.get(gate.name)
+            decomposed_gate = function(gate)
             decomp_circuit.add(decomposed_gate)
         else:
             decomp_circuit.add(gate)
