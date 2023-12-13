@@ -232,7 +232,7 @@ def test_compute_hamiltonian_overlap_matrix():
     assert H[0][0].real > -16
 
 
-def get_observable_in_code_space(observable: List[cirq.PauliString]):
+def get_observable_in_code_space(observable: cirq.PauliString):
     FIVE_I = PauliString("IIIII")
     projector_onto_code_space = [
         PauliString("XZZXI"),
