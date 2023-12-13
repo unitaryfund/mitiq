@@ -6,6 +6,7 @@
 """Tests for the Quantum Subspace Expansion top level API."""
 
 from typing import List
+from unittest.mock import patch
 
 import cirq
 import numpy as np
@@ -95,7 +96,8 @@ def test_execute_with_qse():
     assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
 
-def test_mitigate_executor_batched():
+@patch("mitiq.qse.qse.execute_with_qse")
+def test_mitigate_executor_batched(mock_execute_with_qse):
     qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
@@ -109,18 +111,24 @@ def test_mitigate_executor_batched():
         code_hamiltonian,
         observable,
     )
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
+
+    num_circuits = 3
+    circuits = [qc] * num_circuits
+    batched_mitigated_executor(circuits)
+
+    mock_execute_with_qse.assert_called_with(
+        circuits[0],
+        batched_execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+        {},
     )
-
-    batched_mitigated_values = batched_mitigated_executor([qc] * 3)
-    assert all(
-        abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
-        for mitigated_value in batched_mitigated_values
-    )
+    assert mock_execute_with_qse.call_count == num_circuits
 
 
-def test_qse_decorator():
+@patch("mitiq.qse.qse.execute_with_qse")
+def test_qse_decorator(mock_execute_with_qse):
     qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
@@ -140,31 +148,8 @@ def test_qse_decorator():
             noise_level=(0.01,),
         )
 
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
-    )
-    mitigated_value = decorated_executor(qc)
-    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
-
-    observable = get_observable_in_code_space(PauliString("XXXXX"))
-
-    @qse_decorator(
-        check_operators=check_operators,
-        code_hamiltonian=code_hamiltonian,
-        observable=observable,
-    )
-    def decorated_executor(circuit: QPROGRAM) -> np.ndarray:
-        return compute_density_matrix(
-            convert_to_mitiq(circuit)[0],
-            noise_model_function=cirq.depolarize,
-            noise_level=(0.01,),
-        )
-
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
-    )
-    mitigated_value = decorated_executor(qc)
-    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+    decorated_executor(qc)
+    mock_execute_with_qse.assert_called_once()
 
 
 def test_get_projector():
