@@ -175,7 +175,7 @@ def test_compute_overlap_matrix(prepare_setup):
     # All off diagonal terms are the same because of the symmetry of the
     # total depolarizing noise.
     off_diag_elements = S[np.where(~np.eye(16, dtype=bool))]
-    np.allclose(off_diag_elements, off_diag_elements[0])
+    assert np.allclose(off_diag_elements, off_diag_elements[0])
     assert off_diag_elements[0] < 1
 
 
