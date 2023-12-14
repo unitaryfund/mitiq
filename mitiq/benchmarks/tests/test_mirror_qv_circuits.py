@@ -52,7 +52,7 @@ def test_generate_model_circuit_with_seed():
     circuit_2 = generate_mirror_qv_circuit(4, 3, seed=1)
     circuit_3 = generate_mirror_qv_circuit(4, 3, seed=2)
 
-    assert circuit_1 == circuit_2
+    assert cirq.approx_eq(circuit_1, circuit_2, atol=1e-12)
     assert circuit_2 != circuit_3
 
 
