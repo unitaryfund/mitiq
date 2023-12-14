@@ -4,16 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for generating rotated randomized benchmarking circuits."""
-from typing import Optional, Sequence, Tuple
+from typing import Optional
 
 import cirq
 import numpy as np
 
-# from cirq import S, H, CNOT, T, Circuit
-from cirq.contrib.quantum_volume import compute_heavy_set
-from cirq.value import big_endian_int_to_bits
-
-from mitiq import QPROGRAM, Bitstring
+from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 
 
@@ -24,7 +20,7 @@ def generate_random_clifford_t_circuit(
     num_t_gates: int,
     return_type: Optional[str] = None,
     seed: Optional[int] = None,
-) -> Tuple[QPROGRAM, Sequence[Bitstring]]:
+) -> QPROGRAM:
     r"""Generate a random quantum circuit with the given number of qubits,
     number of one-qubit Cliffords, number of two-qubit Cliffords and number
     of T gates.
@@ -79,30 +75,5 @@ def generate_random_clifford_t_circuit(
         operation = gate.on(*qubits_for_gate)
         circuit.append(operation)
 
-    heavy_bitstrings = compute_heavy_bitstrings(circuit, num_qubits)
-
     return_type = "cirq" if not return_type else return_type
-    return convert_from_mitiq(circuit, return_type), heavy_bitstrings
-
-
-def compute_heavy_bitstrings(
-    circuit: cirq.Circuit,
-    num_qubits: int,
-) -> Sequence[Bitstring]:
-    """Classically compute the heavy bitstrings of the provided circuit.
-
-    The heavy bitstrings are defined as the output bit-strings that have a
-    greater than median probability of being generated.
-
-    Args:
-        circuit: The circuit to classically simulate.
-
-    Returns:
-        A list containing the heavy bitstrings.
-    """
-    heavy_vals = compute_heavy_set(circuit)
-    # Convert base-10 ints to Bitstrings.
-    heavy_bitstrings = [
-        big_endian_int_to_bits(val, bit_count=num_qubits) for val in heavy_vals
-    ]
-    return heavy_bitstrings
+    return convert_from_mitiq(circuit, return_type)
