@@ -43,7 +43,7 @@ from mitiq import Calibrator
 ```
 
 To instantiate a `Calibrator` we need to pass it an executor (as defined above), and a `Settings` object.
-You are free to define your own `Settings`, but as a simple starting point, we provide `ZNESettings` based on different zero-noise extrapolation strategies and `PECSettings` based on different quasiprobability representations of ideal gates.
+You are free to define your own `Settings`, but as a simple starting point, we provide `ZNE_SETTINGS` based on different zero-noise extrapolation strategies and `PEC_SETTINGS` based on different quasiprobability representations of ideal gates.
 Finally, the `execute_with_mitigation` function allows us to pass the calibration results directly to Mitiq and have it pick the strategy that performed best of those supplied in the `Settings` object.
 
 ## Calibration Experiments
@@ -91,6 +91,7 @@ cal.execute_with_mitigation(circuit, execute)
 ```
 
 ## Tutorial
+
 You can find an example on quantum error mitigation calibration in the **[Examples](../examples/calibration-tutorial.md)** section of the documentation.
 This example illustrates functionalities from the calibration module using ZNE
 on a simulated IBM Quantum backend using Qiskit, defining a new settings object.

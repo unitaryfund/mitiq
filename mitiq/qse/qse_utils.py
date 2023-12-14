@@ -5,7 +5,8 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Dict, List, Sequence, Union
+from itertools import product
+from typing import Callable, Dict, Optional, Sequence, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -30,12 +31,12 @@ def get_projector(
     S = _compute_overlap_matrix(
         circuit, executor, check_operators, pauli_string_to_expectation_cache
     )
-    H = _compute_hamiltonian_overlap_matrix(
+    H = _compute_overlap_matrix(
         circuit,
         executor,
         check_operators,
-        code_hamiltonian,
         pauli_string_to_expectation_cache,
+        code_hamiltonian,
     )
     # We only want the smallest eigenvalue and corresponding eigenvector
     _, C = eigh(pinv(S) @ H, subset_by_index=[0, 0])
@@ -53,7 +54,7 @@ def get_expectation_value_for_observable(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Union[PauliString, Observable],
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
+    pauli_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
     """Provide pauli_string_to_expectation_cache if you want to take advantage
     of caching.
@@ -61,74 +62,50 @@ def get_expectation_value_for_observable(
     This function modifies pauli_string_to_expectation_cache in place.
     """
 
+    final_executor = (
+        executor if isinstance(executor, Executor) else Executor(executor)
+    )
+
     def get_expectation_value_for_one_pauli(
         pauli_string: PauliString,
     ) -> float:
         cache_key = pauli_string.with_coeff(1)
-        pauli_string_to_expectation_cache[cache_key] = final_executor.evaluate(
+        pauli_expectation_cache[cache_key] = final_executor.evaluate(
             circuit, Observable(cache_key)
         )[0]
-        return (
-            pauli_string_to_expectation_cache[cache_key] * pauli_string.coeff
-        ).real
+        return (pauli_expectation_cache[cache_key] * pauli_string.coeff).real
 
-    total_expectation_value_for_observable = 0.0
-    final_executor: Executor = (
-        executor if isinstance(executor, Executor) else Executor(executor)
+    paulis = (
+        [observable]
+        if isinstance(observable, PauliString)
+        else observable.paulis
     )
-
-    if isinstance(observable, PauliString):
-        pauli_string = observable
-        total_expectation_value_for_observable += (
-            get_expectation_value_for_one_pauli(pauli_string)
-        )
-    elif isinstance(observable, Observable):
-        for pauli_string in observable.paulis:
-            total_expectation_value_for_observable += (
-                get_expectation_value_for_one_pauli(pauli_string)
-            )
-    return total_expectation_value_for_observable
+    expectation_value = sum(
+        get_expectation_value_for_one_pauli(pauli) for pauli in paulis
+    )
+    return expectation_value
 
 
 def _compute_overlap_matrix(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
+    pauli_expectation_cache: Dict[PauliString, complex] = {},
+    code_hamiltonian: Optional[Observable] = None,
 ) -> npt.NDArray[np.float64]:
-    S: List[List[float]] = []
-    # S_ij = <Ψ|Mi† Mj|Ψ>
-    for i in range(len(check_operators)):
-        S.append([])
-        for j in range(len(check_operators)):
-            sij = get_expectation_value_for_observable(
-                circuit,
-                executor,
-                check_operators[i] * check_operators[j],
-                pauli_string_to_expectation_cache,
-            )
-            S[-1].append(sij)
-    return np.array(S)
+    num_ops = len(check_operators)
 
-
-def _compute_hamiltonian_overlap_matrix(
-    circuit: QPROGRAM,
-    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-    check_operators: Sequence[PauliString],
-    code_hamiltonian: Observable,
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
-) -> npt.NDArray[np.float64]:
-    H: List[List[float]] = []
-    # H_ij = <Ψ|Mi† H Mj|Ψ>
-    for i in range(len(check_operators)):
-        H.append([])
-        for j in range(len(check_operators)):
-            H[-1].append(
-                get_expectation_value_for_observable(
-                    circuit,
-                    executor,
-                    check_operators[i] * code_hamiltonian * check_operators[j],
-                    pauli_string_to_expectation_cache,
-                )
+    H = np.zeros((num_ops, num_ops))
+    # Hij = ⟨Ψ|Mi† H Mj|Ψ⟩
+    for i, j in product(range(num_ops), repeat=2):
+        observable: Union[PauliString, Observable]
+        if code_hamiltonian:
+            observable = (
+                check_operators[i] * code_hamiltonian * check_operators[j]
             )
-    return np.array(H)
+        else:
+            observable = check_operators[i] * check_operators[j]
+        H[i, j] = get_expectation_value_for_observable(
+            circuit, executor, observable, pauli_expectation_cache
+        )
+    return H

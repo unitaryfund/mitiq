@@ -9,7 +9,7 @@ import pytest
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.calibration import PECSettings, Settings, ZNESettings
+from mitiq.calibration import PEC_SETTINGS, ZNE_SETTINGS, Settings
 from mitiq.calibration.settings import (
     BenchmarkProblem,
     MitigationTechnique,
@@ -246,9 +246,9 @@ def test_unsupported_technique_error():
         strategy.mitigation_function()
 
 
-def test_ZNESettings():
-    circuits = ZNESettings.make_problems()
-    strategies = ZNESettings.make_strategies()
+def test_ZNE_SETTINGS():
+    circuits = ZNE_SETTINGS.make_problems()
+    strategies = ZNE_SETTINGS.make_strategies()
     repr_string = repr(circuits[0])
     assert all(
         s in repr_string
@@ -258,9 +258,9 @@ def test_ZNESettings():
     assert len(strategies) == 2 * 2 * 2
 
 
-def test_PECSettings():
-    circuits = PECSettings.make_problems()
-    strategies = PECSettings.make_strategies()
+def test_PEC_SETTINGS():
+    circuits = PEC_SETTINGS.make_problems()
+    strategies = PEC_SETTINGS.make_strategies()
     repr_string = repr(circuits[0])
     assert all(
         s in repr_string

@@ -21,10 +21,10 @@ from mitiq import (
     QuantumResult,
 )
 from mitiq.calibration.settings import (
+    ZNE_SETTINGS,
     BenchmarkProblem,
     Settings,
     Strategy,
-    ZNESettings,
 )
 from mitiq.interface import convert_from_mitiq
 
@@ -228,7 +228,7 @@ class Calibrator:
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         *,
         frontend: str,
-        settings: Settings = ZNESettings,
+        settings: Settings = ZNE_SETTINGS,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
@@ -285,7 +285,7 @@ class Calibrator:
             strategy.num_circuits_required() for strategy in self.strategies
         )
 
-        noisy = num_circuits * num_options
+        noisy = num_circuits * (num_options + 1)
         ideal = 0  # TODO: ideal executor is currently unused
         return {
             "noisy_executions": noisy,
