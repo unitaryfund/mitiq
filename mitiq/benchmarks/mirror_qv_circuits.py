@@ -6,7 +6,7 @@
 """Functions to create a Mirror Quantum Volume Benchmarking circuit
 as defined in https://arxiv.org/abs/2303.02108."""
 
-from typing import Optional
+from typing import Optional, cast
 
 import cirq
 
@@ -63,6 +63,8 @@ def generate_mirror_qv_circuit(
     qv_circuit, _ = generate_quantum_volume_circuit(
         num_qubits, first_half_depth, seed=seed, decompose=decompose
     )
+    qv_circuit = cast(cirq.Circuit, qv_circuit)
+
     mirror_qv_circuit = qv_circuit + cirq.inverse(qv_circuit)
 
     if decompose:
