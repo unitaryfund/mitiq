@@ -9,9 +9,9 @@ Qibo's circuit representation.
 
 from cirq import Circuit
 from numpy import pi
-from qibo import Circuit as QiboCircuit
 from qibo import gates
 from qibo.gates.abstract import Gate
+from qibo.models.circuit import Circuit as QiboCircuit
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm

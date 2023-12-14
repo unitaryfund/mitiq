@@ -53,7 +53,7 @@ except ImportError:  # pragma: no cover
     _QuantumTape = _Circuit
 
 try:
-    from qibo import Circuit as _QiboCircuit
+    from qibo.models.circuit import Circuit as _QiboCircuit
 except ImportError:  # pragma: no cover
     _QiboCircuit = _Circuit
 

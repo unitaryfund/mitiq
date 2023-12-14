@@ -17,10 +17,10 @@ from mitiq.interface.mitiq_qibo import (
     to_qibo,
 )
 from mitiq.utils import _equal
-
+from qibo.models.circuit import Circuit as QiboCircuit
 
 def test_from_qibo():
-    qibo_circuit = qibo.Circuit(2)
+    qibo_circuit = QiboCircuit(2)
     qibo_circuit.add(qibo.gates.CNOT(0, 1))
     qibo_circuit.add(qibo.gates.M(0))
 
@@ -33,7 +33,7 @@ def test_from_qibo():
 
 
 def test_from_qibo_register_name_error():
-    qibo_circuit = qibo.Circuit(2)
+    qibo_circuit = QiboCircuit(2)
     qibo_circuit.add(qibo.gates.CNOT(0, 1))
     qibo_circuit.add(qibo.gates.M(0, register_name="K"))
 
@@ -46,7 +46,7 @@ def test_from_qibo_register_name_error():
 
 
 def test_from_qibo_unsupported_multi_controlled_gate():
-    qibo_circuit = qibo.Circuit(4)
+    qibo_circuit = QiboCircuit(4)
     qibo_circuit.add(qibo.gates.X(0).controlled_by(1, 2, 3))
     with pytest.raises(
         UnsupportedQiboCircuitError,
@@ -56,7 +56,7 @@ def test_from_qibo_unsupported_multi_controlled_gate():
 
 
 def test_from_qibo_unsupported_gate():
-    qibo_circuit = qibo.Circuit(3)
+    qibo_circuit = QiboCircuit(3)
     qibo_circuit.add(qibo.gates.DEUTSCH(0, 1, 2, 0.4))
     with pytest.raises(
         UnsupportedQiboCircuitError,
@@ -66,7 +66,7 @@ def test_from_qibo_unsupported_gate():
 
 
 def test_from_qibo_unknown_cirq_gate():
-    qibo_circuit = qibo.Circuit(2)
+    qibo_circuit = QiboCircuit(2)
     qibo_circuit.add(qibo.gates.CRY(0, 1, 0.4))
     qibo_circuit.add(qibo.gates.M(1))
     circuit = from_qibo(qibo_circuit)
@@ -165,7 +165,7 @@ def test_qibo_integration(i):
     np.random.seed(13 * i)
     gates_per_layers = [np.random.permutation(gates) for _ in range(layers)]
 
-    qibo_circuit = qibo.Circuit(3)
+    qibo_circuit = QiboCircuit(3)
     for gates in gates_per_layers:
         for gate in gates:
             qibo_circuit.add(gate)
