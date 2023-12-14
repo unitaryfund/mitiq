@@ -14,7 +14,7 @@ from mitiq import QPROGRAM
 from mitiq.benchmarks.quantum_volume_circuits import (
     generate_quantum_volume_circuit,
 )
-from mitiq.interface.conversions import convert_from_mitiq, convert_to_mitiq
+from mitiq.interface.conversions import convert_from_mitiq
 
 
 def generate_mirror_qv_circuit(
@@ -60,22 +60,14 @@ def generate_mirror_qv_circuit(
     else:
         first_half_depth = int((depth + 1) / 2)
 
-    qv_generated, _ = generate_quantum_volume_circuit(
+    qv_circuit, _ = generate_quantum_volume_circuit(
         num_qubits, first_half_depth, seed=seed, decompose=decompose
     )
-    qv_half_circ, _ = convert_to_mitiq(qv_generated)
-
-    mirror_half_circ = cirq.Circuit()
-    qv_half_ops = list(qv_half_circ.all_operations())
-    for i in range(len(qv_half_ops))[::-1]:
-        op_inverse = cirq.inverse(qv_half_ops[i])
-        mirror_half_circ.append(op_inverse, strategy=cirq.InsertStrategy.NEW)
-
-    circ = qv_half_circ + mirror_half_circ
+    mirror_qv_circuit = qv_circuit + cirq.inverse(qv_circuit)
 
     if decompose:
         # Decompose random unitary gates into simpler gates.
-        circ = cirq.Circuit(cirq.decompose(circ))
+        mirror_qv_circuit = cirq.Circuit(cirq.decompose(mirror_qv_circuit))
 
     return_type = "cirq" if not return_type else return_type
-    return convert_from_mitiq(circ, return_type)
+    return convert_from_mitiq(mirror_qv_circuit, return_type)
