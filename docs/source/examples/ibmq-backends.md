@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -43,7 +43,6 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_n
 USE_REAL_HARDWARE = False
 ```
 
-(examples/ibmq-backends/setup-defining-a-circuit)=
 ## Setup: Defining a circuit
 
 +++

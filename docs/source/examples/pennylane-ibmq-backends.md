@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -22,8 +22,6 @@ In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](
   - [Decorator usage](#decorator-usage)
 
 +++
-
-(examples/ibmq-backends-pennylane/setup-defining-a-circuit)=
 
 ## Setup: Defining a circuit
 
