@@ -164,14 +164,13 @@ def test_compute_overlap_matrix(prepare_setup):
     S = _compute_overlap_matrix(
         qc, execute_with_depolarized_noise, check_operators, {}
     )
-    # assert that S's diagonal is all ones but the off-diagonal elements
-    #  are less than 1.
-    # Diagonal terms are all 1's because we are computing
-    # <Ψ|C_i C_i|Ψ> = <Ψ|Ψ> = 1
+    # Diagonal terms are all 1 because
+    # ⟨Ψ|C_i C_i|Ψ⟩ = ⟨Ψ|Ψ⟩ = 1
     assert np.allclose(np.diag(np.diag(S)), np.eye(16))
-    # Check that all off diagonal entries of S are the same and less than 1
-    # Off diagonal terms are less than 1 because we are computing <Ψ|C_i C_j|Ψ>
-    # = <Ψ|C_k|Ψ> < 1 (since |Ψ> was rotated a bit from the logical subspace)
+
+    # Off diagonal terms are less than 1 because
+    # ⟨Ψ|C_i C_j|Ψ⟩  = ⟨Ψ|C_k|Ψ⟩ < 1
+    # (since |Ψ⟩ was rotated a bit from the logical subspace)
     # All off diagonal terms are the same because of the symmetry of the
     # total depolarizing noise.
     off_diag_elements = S[np.where(~np.eye(16, dtype=bool))]
@@ -184,7 +183,7 @@ def test_compute_overlap_matrix_with_hamiltonian(prepare_setup):
 
     # If we have a full set of check operators that form a group then all
     # entries of the H matrix should be the same.
-    # H_jk = sum over all i's <Ψ|C_i|Ψ>
+    # H_jk = sum over all i's ⟨Ψ|C_i|Ψ⟩
 
     H = _compute_overlap_matrix(
         qc, execute_no_noise, check_operators, {}, code_hamiltonian
@@ -266,20 +265,19 @@ def prepare_logical_0_state_for_5_1_3_code():
     def gram_schmidt(
         orthogonal_vecs: List[np.ndarray],
     ) -> np.ndarray:
-        # normalize input
         orthonormalVecs = [
             vec / np.sqrt(np.vdot(vec, vec)) for vec in orthogonal_vecs
         ]
-        dim = np.shape(orthogonal_vecs[0])[0]  # get dim of vector space
+        dim = np.shape(orthogonal_vecs[0])[0]
         for i in range(dim - len(orthogonal_vecs)):
             new_vec = np.zeros(dim)
-            new_vec[i] = 1  # construct ith basis vector
+            new_vec[i] = 1
             projs = sum(
                 [
                     np.vdot(new_vec, cached_vec) * cached_vec
                     for cached_vec in orthonormalVecs
                 ]
-            )  # sum of projections of new vec with all existing vecs
+            )
             new_vec -= projs
             orthonormalVecs.append(
                 new_vec / np.sqrt(np.vdot(new_vec, new_vec))
