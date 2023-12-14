@@ -24,7 +24,7 @@ from mitiq.calibration.settings import (
     BenchmarkProblem,
     Settings,
     Strategy,
-    ZNESettings,
+    ZNE_SETTINGS,
 )
 from mitiq.interface import convert_from_mitiq
 
@@ -228,7 +228,7 @@ class Calibrator:
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         *,
         frontend: str,
-        settings: Settings = ZNESettings,
+        settings: Settings = ZNE_SETTINGS,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,

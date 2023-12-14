@@ -32,7 +32,7 @@ from mitiq import cdr, pec, rem, zne, ddd
 from mitiq.calibration import (
     Calibrator,
     execute_with_mitigation,
-    ZNESettings,
+    ZNE_SETTINGS,
     Settings,
 )
 
