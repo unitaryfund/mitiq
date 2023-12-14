@@ -285,7 +285,7 @@ class Calibrator:
             strategy.num_circuits_required() for strategy in self.strategies
         )
 
-        noisy = num_circuits * num_options
+        noisy = num_circuits * (num_options + 1)
         ideal = 0  # TODO: ideal executor is currently unused
         return {
             "noisy_executions": noisy,
