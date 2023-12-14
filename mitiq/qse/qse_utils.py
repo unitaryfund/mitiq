@@ -90,7 +90,7 @@ def _compute_overlap_matrix(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
+    pauli_expectation_cache: Dict[PauliString, complex] = {},
     code_hamiltonian: Optional[Observable] = None,
 ) -> npt.NDArray[np.float64]:
     num_ops = len(check_operators)
@@ -106,9 +106,6 @@ def _compute_overlap_matrix(
         else:
             observable = check_operators[i] * check_operators[j]
         H[i, j] = get_expectation_value_for_observable(
-            circuit,
-            executor,
-            observable,
-            pauli_string_to_expectation_cache,
+            circuit, executor, observable, pauli_expectation_cache
         )
     return H
