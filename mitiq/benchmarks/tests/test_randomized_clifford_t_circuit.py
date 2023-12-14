@@ -11,7 +11,6 @@ Tests below check that generate_quantum_volume_circuit() works as a wrapper and
 fits with Mitiq's interface.
 """
 
-import cirq
 import pytest
 
 from mitiq import SUPPORTED_PROGRAM_TYPES
@@ -46,6 +45,7 @@ def test_generate_model_circuit_with_seed():
 
     assert circuit_1 == circuit_2
     assert circuit_2 != circuit_3
+
 
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_conversion(return_type):

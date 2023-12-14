@@ -54,12 +54,16 @@ def generate_random_clifford_t_circuit(
 
     oneq_cliffords = [cirq.S, cirq.H]
     twoq_cliffords = [cirq.CNOT, cirq.CZ]
-    oneq_list = [
-        rnd_state.choice(oneq_cliffords) for _ in range(num_oneq_cliffords)
+    oneq_idx_list = [
+        rnd_state.choice(list(range(len(oneq_cliffords)))) for _ in range(3)
     ]
-    twoq_list = [
-        rnd_state.choice(twoq_cliffords) for _ in range(num_twoq_cliffords)
+    twoq_idx_list = [
+        rnd_state.choice(list(range(len(twoq_cliffords)))) for _ in range(3)
     ]
+
+    oneq_list = [oneq_cliffords[i] for i in oneq_idx_list]
+    twoq_list = [twoq_cliffords[i] for i in twoq_idx_list]
+
     t_list = [cirq.T for _ in range(num_t_gates)]
 
     all_gates = oneq_list + twoq_list + t_list
@@ -68,10 +72,13 @@ def generate_random_clifford_t_circuit(
     qubits = cirq.LineQubit.range(num_qubits)
     circuit = cirq.Circuit()
 
+    qubits_idx = list(range(num_qubits))
+
     for gate in all_gates:
-        qubits_for_gate = rnd_state.choice(
-            qubits, size=gate.num_qubits(), replace=False
+        qubits_for_gate_idx = rnd_state.choice(
+            qubits_idx, size=gate.num_qubits(), replace=False
         )
+        qubits_for_gate = [qubits[i] for i in qubits_for_gate_idx]
         operation = gate.on(*qubits_for_gate)
         circuit.append(operation)
 
