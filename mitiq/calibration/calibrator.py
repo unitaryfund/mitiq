@@ -21,10 +21,10 @@ from mitiq import (
     QuantumResult,
 )
 from mitiq.calibration.settings import (
+    ZNE_SETTINGS,
     BenchmarkProblem,
     Settings,
     Strategy,
-    ZNE_SETTINGS,
 )
 from mitiq.interface import convert_from_mitiq
 

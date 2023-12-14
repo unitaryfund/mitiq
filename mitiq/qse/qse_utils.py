@@ -5,8 +5,8 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Dict, Sequence, Union, Optional
 from itertools import product
+from typing import Callable, Dict, Optional, Sequence, Union
 
 import numpy as np
 import numpy.typing as npt

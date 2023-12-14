@@ -9,7 +9,7 @@ import pytest
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.calibration import PEC_SETTINGS, Settings, ZNE_SETTINGS
+from mitiq.calibration import PEC_SETTINGS, ZNE_SETTINGS, Settings
 from mitiq.calibration.settings import (
     BenchmarkProblem,
     MitigationTechnique,
