@@ -5,7 +5,8 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Dict, List, Sequence, Union
+from typing import Callable, Dict, Sequence, Union, Optional
+from itertools import product
 
 import numpy as np
 import numpy.typing as npt
@@ -30,12 +31,12 @@ def get_projector(
     S = _compute_overlap_matrix(
         circuit, executor, check_operators, pauli_string_to_expectation_cache
     )
-    H = _compute_hamiltonian_overlap_matrix(
+    H = _compute_overlap_matrix(
         circuit,
         executor,
         check_operators,
-        code_hamiltonian,
         pauli_string_to_expectation_cache,
+        code_hamiltonian,
     )
     # We only want the smallest eigenvalue and corresponding eigenvector
     _, C = eigh(pinv(S) @ H, subset_by_index=[0, 0])
@@ -90,39 +91,24 @@ def _compute_overlap_matrix(
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
-) -> npt.NDArray[np.float64]:
-    S: List[List[float]] = []
-    # S_ij = <Ψ|Mi† Mj|Ψ>
-    for i in range(len(check_operators)):
-        S.append([])
-        for j in range(len(check_operators)):
-            sij = get_expectation_value_for_observable(
-                circuit,
-                executor,
-                check_operators[i] * check_operators[j],
-                pauli_string_to_expectation_cache,
-            )
-            S[-1].append(sij)
-    return np.array(S)
-
-
-def _compute_hamiltonian_overlap_matrix(
-    circuit: QPROGRAM,
-    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-    check_operators: Sequence[PauliString],
-    code_hamiltonian: Observable,
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
+    code_hamiltonian: Optional[Observable] = None,
 ) -> npt.NDArray[np.float64]:
     num_ops = len(check_operators)
 
     H = np.zeros((num_ops, num_ops))
     # Hij = ⟨Ψ|Mi† H Mj|Ψ⟩
-    for i in range(num_ops):
-        for j in range(num_ops):
-            H[i, j] = get_expectation_value_for_observable(
-                circuit,
-                executor,
-                check_operators[i] * code_hamiltonian * check_operators[j],
-                pauli_string_to_expectation_cache,
+    for i, j in product(range(num_ops), repeat=2):
+        observable: Union[PauliString, Observable]
+        if code_hamiltonian:
+            observable = (
+                check_operators[i] * code_hamiltonian * check_operators[j]
             )
+        else:
+            observable = check_operators[i] * check_operators[j]
+        H[i, j] = get_expectation_value_for_observable(
+            circuit,
+            executor,
+            observable,
+            pauli_string_to_expectation_cache,
+        )
     return H

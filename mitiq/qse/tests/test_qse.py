@@ -21,10 +21,7 @@ from mitiq.qse import (
     mitigate_executor,
     qse_decorator,
 )
-from mitiq.qse.qse_utils import (
-    _compute_hamiltonian_overlap_matrix,
-    _compute_overlap_matrix,
-)
+from mitiq.qse.qse_utils import _compute_overlap_matrix
 
 
 def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:
@@ -182,24 +179,24 @@ def test_compute_overlap_matrix(prepare_setup):
     assert off_diag_elements[0] < 1
 
 
-def test_compute_hamiltonian_overlap_matrix(prepare_setup):
+def test_compute_overlap_matrix_with_hamiltonian(prepare_setup):
     qc, check_operators, code_hamiltonian = prepare_setup
 
     # If we have a full set of check operators that form a group then all
     # entries of the H matrix should be the same.
     # H_jk = sum over all i's <Ψ|C_i|Ψ>
 
-    H = _compute_hamiltonian_overlap_matrix(
-        qc, execute_no_noise, check_operators, code_hamiltonian, {}
+    H = _compute_overlap_matrix(
+        qc, execute_no_noise, check_operators, {}, code_hamiltonian
     )
     assert np.allclose(H, np.full(16, -16))
 
-    H = _compute_hamiltonian_overlap_matrix(
+    H = _compute_overlap_matrix(
         qc,
         execute_with_depolarized_noise,
         check_operators,
-        code_hamiltonian,
         {},
+        code_hamiltonian,
     )
     assert np.allclose(H, H[0][0])
     assert H[0][0].real > -16
