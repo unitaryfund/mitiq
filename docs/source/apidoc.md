@@ -267,7 +267,7 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-#### Randomized Clifford+T benchmarking Circuits
+#### Randomized Clifford+T Circuits
 
 ```{eval-rst}
 .. automodule:: mitiq.benchmarks.randomized_clifford_t_circuit
