@@ -6,9 +6,11 @@
 """Tests for the Quantum Subspace Expansion top level API."""
 
 from typing import List
+from unittest.mock import patch
 
 import cirq
 import numpy as np
+import pytest
 
 from mitiq import QPROGRAM, Observable, PauliString
 from mitiq.interface import convert_to_mitiq
@@ -19,10 +21,7 @@ from mitiq.qse import (
     mitigate_executor,
     qse_decorator,
 )
-from mitiq.qse.qse_utils import (
-    _compute_hamiltonian_overlap_matrix,
-    _compute_overlap_matrix,
-)
+from mitiq.qse.qse_utils import _compute_overlap_matrix
 
 
 def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:
@@ -43,12 +42,19 @@ def execute_no_noise(circuit: QPROGRAM) -> np.ndarray:
     )
 
 
-def test_execute_with_qse_no_noise():
+@pytest.fixture
+def prepare_setup():
     qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
         code_hamiltonian,
     ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+    return qc, check_operators, code_hamiltonian
+
+
+def test_execute_with_qse_no_noise(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
     mitigated_value = execute_with_qse(
         qc, execute_no_noise, check_operators, code_hamiltonian, observable
@@ -62,12 +68,9 @@ def test_execute_with_qse_no_noise():
     assert np.isclose(mitigated_value.real, 0.5)
 
 
-def test_execute_with_qse():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_execute_with_qse(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
     unmitigated_value = observable.expectation(
         qc, execute_with_depolarized_noise
@@ -95,12 +98,9 @@ def test_execute_with_qse():
     assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
 
-def test_mitigate_executor_batched():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+@patch("mitiq.qse.qse.execute_with_qse")
+def test_mitigate_executor_batched(mock_execute_with_qse, prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
 
     observable = get_observable_in_code_space(PauliString("XXXXX"))
     batched_mitigated_executor = mitigate_executor(
@@ -109,23 +109,26 @@ def test_mitigate_executor_batched():
         code_hamiltonian,
         observable,
     )
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
-    )
 
-    batched_mitigated_values = batched_mitigated_executor([qc] * 3)
-    assert all(
-        abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
-        for mitigated_value in batched_mitigated_values
-    )
+    num_circuits = 3
+    circuits = [qc] * num_circuits
+    batched_mitigated_executor(circuits)
 
-
-def test_qse_decorator():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
+    mock_execute_with_qse.assert_called_with(
+        circuits[0],
+        batched_execute_with_depolarized_noise,
         check_operators,
         code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+        observable,
+        {},
+    )
+    assert mock_execute_with_qse.call_count == num_circuits
+
+
+@patch("mitiq.qse.qse.execute_with_qse")
+def test_qse_decorator(mock_execute_with_qse, prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
 
     @qse_decorator(
@@ -140,99 +143,65 @@ def test_qse_decorator():
             noise_level=(0.01,),
         )
 
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
-    )
-    mitigated_value = decorated_executor(qc)
-    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
-
-    observable = get_observable_in_code_space(PauliString("XXXXX"))
-
-    @qse_decorator(
-        check_operators=check_operators,
-        code_hamiltonian=code_hamiltonian,
-        observable=observable,
-    )
-    def decorated_executor(circuit: QPROGRAM) -> np.ndarray:
-        return compute_density_matrix(
-            convert_to_mitiq(circuit)[0],
-            noise_model_function=cirq.depolarize,
-            noise_level=(0.01,),
-        )
-
-    unmitigated_value = observable.expectation(
-        qc, execute_with_depolarized_noise
-    )
-    mitigated_value = decorated_executor(qc)
-    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+    decorated_executor(qc)
+    mock_execute_with_qse.assert_called_once()
 
 
-def test_get_projector():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_get_projector(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
+
     P = get_projector(qc, execute_no_noise, check_operators, code_hamiltonian)
     uniform_projector = Observable(*[-0.25 * c for c in check_operators])
     assert P == uniform_projector
 
 
-def test_compute_overlap_matrix():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        _,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_compute_overlap_matrix(prepare_setup):
+    qc, check_operators, _ = prepare_setup
+
     S = _compute_overlap_matrix(qc, execute_no_noise, check_operators, {})
     assert np.allclose(S, np.ones(16))
 
     S = _compute_overlap_matrix(
         qc, execute_with_depolarized_noise, check_operators, {}
     )
-    # assert that S's diagonal is all ones but the off-diagonal elements
-    #  are less than 1.
-    # Diagonal terms are all 1's because we are computing
-    # <Ψ|C_i C_i|Ψ> = <Ψ|Ψ> = 1
+    # Diagonal terms are all 1 because
+    # ⟨Ψ|C_i C_i|Ψ⟩ = ⟨Ψ|Ψ⟩ = 1
     assert np.allclose(np.diag(np.diag(S)), np.eye(16))
-    # Check that all off diagonal entries of S are the same and less than 1
-    # Off diagonal terms are less than 1 because we are computing <Ψ|C_i C_j|Ψ>
-    # = <Ψ|C_k|Ψ> < 1 (since |Ψ> was rotated a bit from the logical subspace)
+
+    # Off diagonal terms are less than 1 because
+    # ⟨Ψ|C_i C_j|Ψ⟩  = ⟨Ψ|C_k|Ψ⟩ < 1
+    # (since |Ψ⟩ was rotated a bit from the logical subspace)
     # All off diagonal terms are the same because of the symmetry of the
     # total depolarizing noise.
     off_diag_elements = S[np.where(~np.eye(16, dtype=bool))]
-    np.allclose(off_diag_elements, off_diag_elements[0])
+    assert np.allclose(off_diag_elements, off_diag_elements[0])
     assert off_diag_elements[0] < 1
 
 
-def test_compute_hamiltonian_overlap_matrix():
-    qc = prepare_logical_0_state_for_5_1_3_code()
-    (
-        check_operators,
-        code_hamiltonian,
-    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+def test_compute_overlap_matrix_with_hamiltonian(prepare_setup):
+    qc, check_operators, code_hamiltonian = prepare_setup
 
     # If we have a full set of check operators that form a group then all
     # entries of the H matrix should be the same.
-    # H_jk = sum over all i's <Ψ|C_i|Ψ>
+    # H_jk = sum over all i's ⟨Ψ|C_i|Ψ⟩
 
-    H = _compute_hamiltonian_overlap_matrix(
-        qc, execute_no_noise, check_operators, code_hamiltonian, {}
+    H = _compute_overlap_matrix(
+        qc, execute_no_noise, check_operators, {}, code_hamiltonian
     )
-    assert np.allclose(H, -16 * np.ones(16))
+    assert np.allclose(H, np.full(16, -16))
 
-    H = _compute_hamiltonian_overlap_matrix(
+    H = _compute_overlap_matrix(
         qc,
         execute_with_depolarized_noise,
         check_operators,
-        code_hamiltonian,
         {},
+        code_hamiltonian,
     )
     assert np.allclose(H, H[0][0])
     assert H[0][0].real > -16
 
 
-def get_observable_in_code_space(observable: List[cirq.PauliString]):
+def get_observable_in_code_space(observable: cirq.PauliString):
     FIVE_I = PauliString("IIIII")
     projector_onto_code_space = [
         PauliString("XZZXI"),
@@ -296,20 +265,19 @@ def prepare_logical_0_state_for_5_1_3_code():
     def gram_schmidt(
         orthogonal_vecs: List[np.ndarray],
     ) -> np.ndarray:
-        # normalize input
         orthonormalVecs = [
             vec / np.sqrt(np.vdot(vec, vec)) for vec in orthogonal_vecs
         ]
-        dim = np.shape(orthogonal_vecs[0])[0]  # get dim of vector space
+        dim = np.shape(orthogonal_vecs[0])[0]
         for i in range(dim - len(orthogonal_vecs)):
             new_vec = np.zeros(dim)
-            new_vec[i] = 1  # construct ith basis vector
+            new_vec[i] = 1
             projs = sum(
                 [
                     np.vdot(new_vec, cached_vec) * cached_vec
                     for cached_vec in orthonormalVecs
                 ]
-            )  # sum of projections of new vec with all existing vecs
+            )
             new_vec -= projs
             orthonormalVecs.append(
                 new_vec / np.sqrt(np.vdot(new_vec, new_vec))
