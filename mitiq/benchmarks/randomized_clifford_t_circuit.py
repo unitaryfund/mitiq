@@ -38,7 +38,6 @@ def generate_random_clifford_t_circuit(
 
     Returns:
         A quantum circuit acting on ``num_qubits`` qubits.
-        A list of the heavy bitstrings for the returned circuit.
     """
 
     if num_qubits <= 0:
@@ -54,12 +53,9 @@ def generate_random_clifford_t_circuit(
 
     oneq_cliffords = [cirq.S, cirq.H]
     twoq_cliffords = [cirq.CNOT, cirq.CZ]
-    oneq_idx_list = [
-        rnd_state.choice(list(range(len(oneq_cliffords)))) for _ in range(3)
-    ]
-    twoq_idx_list = [
-        rnd_state.choice(list(range(len(twoq_cliffords)))) for _ in range(3)
-    ]
+
+    oneq_idx_list = rnd_state.choice(len(oneq_cliffords), num_oneq_cliffords)
+    twoq_idx_list = rnd_state.choice(len(twoq_cliffords), num_twoq_cliffords)
 
     oneq_list = [oneq_cliffords[i] for i in oneq_idx_list]
     twoq_list = [twoq_cliffords[i] for i in twoq_idx_list]

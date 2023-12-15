@@ -3,13 +3,7 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Tests for quantum volume circuits. The Cirq functions that do the main work
-are tested here:
-cirq-core/cirq/contrib/quantum_volume/quantum_volume_test.py
-
-Tests below check that generate_quantum_volume_circuit() works as a wrapper and
-fits with Mitiq's interface.
-"""
+"""Tests for randomized Clifford+T benchmarking circuits."""
 
 import pytest
 
@@ -19,7 +13,7 @@ from mitiq.benchmarks.randomized_clifford_t_circuit import (
 )
 
 
-def test_generate_model_circuit_with_seed():
+def test_seed_circuit_equality():
     """Test that a model circuit is determined by its seed."""
     circuit_1 = generate_random_clifford_t_circuit(
         num_qubits=2,
@@ -55,6 +49,5 @@ def test_conversion(return_type):
         num_twoq_cliffords=2,
         num_t_gates=2,
         return_type=return_type,
-        seed=3,
     )
     assert return_type in circuit.__module__
