@@ -3,7 +3,6 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Functions for generating rotated randomized benchmarking circuits."""
 from typing import Optional
 
 import cirq

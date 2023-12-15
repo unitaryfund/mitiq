@@ -14,3 +14,4 @@ from mitiq.benchmarks.quantum_volume_circuits import (
 )
 from mitiq.benchmarks.w_state_circuits import generate_w_circuit
 from mitiq.benchmarks.qpe_circuits import generate_qpe_circuit
+from mitiq.benchmarks import generate_random_clifford_t_circuit
