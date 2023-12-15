@@ -361,8 +361,7 @@ def expectation_estimation_shadow(
                 b = create_string(num_qubits, target_locs)
                 f_val = f_est.get(b, None)
                 if f_val is None:
-                    means.append(0.0)
-                    continue
+                    product = 0.0
                 else:
                     # product becomes an array of snapshots expectation values
                     # witch satisfy condition (1) and (2)
@@ -370,10 +369,11 @@ def expectation_estimation_shadow(
             else:
                 product = 3 ** (len(target_locs)) * product
 
-            # append the mean of the product in each split
-            means.append(np.sum(product) / len(idxes))
         else:
-            means.append(0.0)
+            product = 0.0
+
+        # append the mean of the product in each split
+        means.append(np.sum(product) / len(idxes))
 
     # return the median of means
     return float(np.real(np.median(means) * coeff))
