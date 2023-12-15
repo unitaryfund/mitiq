@@ -5,6 +5,7 @@
 
 """Functions for finding optimal representations given a noisy basis."""
 
+import functools
 from typing import List, Optional, cast
 
 import numpy as np
@@ -124,9 +125,15 @@ def find_optimal_representation(
     Returns: The optimal OperationRepresentation.
     """
     ideal_cirq_circuit, _ = convert_to_mitiq(ideal_operation)
-    ideal_matrix = kraus_to_super(
-        cast(List[npt.NDArray[np.complex64]], kraus(ideal_cirq_circuit))
-    )
+
+    ops = list(ideal_cirq_circuit.all_operations())
+    super_ops = [
+        kraus_to_super(cast(List[npt.NDArray[np.complex64]], kraus(op)))
+        for op in ops
+    ]
+
+    # Compute super operator of the full ideal_circuit
+    ideal_matrix = functools.reduce(lambda a, b: a @ b, super_ops)
 
     try:
         basis_matrices = [
