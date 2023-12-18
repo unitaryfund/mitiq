@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="562.17828mm"
+   width="562.17834mm"
    height="317.22711mm"
-   viewBox="0 0 562.17944 317.22745"
+   viewBox="0 0 562.1795 317.22745"
    version="1.1"
    id="svg993"
    xmlns="http://www.w3.org/2000/svg"
@@ -106,10 +106,10 @@
   </metadata>
   <g
      id="layer1"
-     transform="translate(213.58761,-323.23799)">
+     transform="translate(-406.44639,-322.86525)">
     <rect
-       x="-211.72528"
-       y="323.62888"
+       x="408.30875"
+       y="323.25613"
        width="143.09996"
        height="314.52731"
        fill="#ffff93"
@@ -121,15 +121,15 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1723"
-       x="-162.27333"
-       y="353.98792"
+       x="443.20731"
+       y="353.6062"
        style="font-size:14.9282px;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan8">User</tspan></text>
     <rect
-       x="-69.18013"
-       y="325.08456"
+       x="550.85388"
+       y="324.71182"
        width="275.11816"
        height="314.51804"
        fill="#afffff"
@@ -140,15 +140,15 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1727"
-       x="-47.742928"
-       y="351.22824"
+       x="628.64636"
+       y="348.67706"
        style="font-weight:400;font-stretch:semi-condensed;font-size:14.9282px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
-         id="tspan6">mitiq.classicalshadows</tspan></text>
+         id="tspan6">mitiq.shadows</tspan></text>
     <g
        id="g980"
-       transform="matrix(0.99327222,0,0,0.98127905,109.89762,304.65674)">
+       transform="matrix(0.99327222,0,0,0.98127905,729.93165,304.28399)">
       <rect
          x="-164.27325"
          y="296.39944"
@@ -169,7 +169,7 @@
     </g>
     <g
        id="g32"
-       transform="matrix(0.93195,0,0,0.93195,-106.87508,25.365218)">
+       transform="matrix(0.93195,0,0,0.93195,513.15895,24.992463)">
       <g
          id="g50"
          transform="translate(-1.4761254,14.570447)">
@@ -238,7 +238,7 @@
     </g>
     <g
        id="g47"
-       transform="translate(-0.14158981,8.559916)"
+       transform="translate(619.89244,8.1871613)"
        style="stroke-width:1.1;stroke-dasharray:none">
       <rect
          x="-33.361992"
@@ -296,7 +296,7 @@
     </g>
     <g
        id="g34"
-       transform="translate(85.180677,9.1807346)">
+       transform="translate(705.21471,8.8079799)">
       <g
          id="g6"
          transform="matrix(1.2356814,0,0,0.77241233,-26.707252,105.48641)"
@@ -354,7 +354,7 @@
     </g>
     <g
        id="g2"
-       transform="translate(4.5591316,87.250088)">
+       transform="translate(624.59316,86.877333)">
       <rect
          x="-200.17229"
          y="411.62842"
@@ -366,50 +366,42 @@
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
-         x="-144.16614"
-         y="437.37802"
+         x="-142.30241"
+         y="445.67419"
          id="text916-7-2"
          transform="scale(1.0228682,0.97764306)"><tspan
-           x="-144.16614"
-           y="437.37802"
+           x="-142.30241"
+           y="445.67419"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan918-3-2">Error-</tspan><tspan
-           x="-144.16614"
-           y="450.35541"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan990">mitigated</tspan><tspan
-           x="-144.16614"
-           y="463.33276"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan964-5">expectation</tspan><tspan
-           x="-144.16614"
-           y="476.31015"
+           id="tspan964-5">Expectation</tspan><tspan
+           x="-142.30241"
+           y="458.65158"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
            id="tspan994">value</tspan><tspan
-           x="-144.16614"
-           y="489.28751"
+           x="-142.30241"
+           y="471.62894"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
            id="tspan69" /><tspan
-           x="-144.16614"
-           y="502.26489"
+           x="-142.30241"
+           y="484.60632"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
            id="tspan71">OR</tspan><tspan
-           x="-144.16614"
-           y="515.24225"
+           x="-142.30241"
+           y="497.58368"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
            id="tspan72" /><tspan
-           x="-144.16614"
-           y="528.21967"
+           x="-142.30241"
+           y="510.56107"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
            id="tspan70">Reconstructed</tspan><tspan
-           x="-144.16614"
-           y="541.19702"
+           x="-142.30241"
+           y="523.53845"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
            id="tspan67">input state</tspan></text>
     </g>
     <g
        id="g4"
-       transform="translate(-4.449263,7.023117)">
+       transform="translate(615.58477,6.6503623)">
       <g
          id="g3">
         <rect
@@ -441,22 +433,22 @@
     </g>
     <path
        style="fill:#000000;stroke:#000000;stroke-width:0.100387;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
-       d="M 277.63905,530.45568 Z"
+       d="M 897.67308,530.08293 Z"
        id="path19" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.49944px;line-height:0.85;font-family:Monospace;-inkscape-font-specification:Monospace;fill:#99ff55;stroke:#000000;stroke-width:1.50581;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
-       x="-59.742207"
-       y="452.52438"
+       x="557.90149"
+       y="452.15018"
        id="text3"
        transform="scale(1.0038701,0.99614482)"><tspan
          id="tspan3"
          style="stroke-width:1.50581"
-         x="-59.742207"
-         y="452.52438"> </tspan></text>
+         x="557.90149"
+         y="452.15018"> </tspan></text>
     <rect
-       x="205.15785"
-       y="324.77469"
+       x="825.19189"
+       y="324.40195"
        width="141.493"
        height="313.71814"
        fill="#d9d9d9"
@@ -468,15 +460,15 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1759"
-       x="218.71768"
-       y="350.99252"
+       x="824.1983"
+       y="350.61081"
        style="font-size:14.9282px;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan7">Hardware</tspan></text>
     <g
        id="g30"
-       transform="translate(29.419153,0.94697826)">
+       transform="translate(649.45319,0.57422356)">
       <rect
          x="185.93433"
          y="416.98273"
@@ -506,7 +498,7 @@
     </g>
     <g
        id="g980-7"
-       transform="matrix(0.99327221,0,0,0.98127905,260.48148,84.927121)">
+       transform="matrix(0.99327221,0,0,0.98127905,880.51551,84.554366)">
       <rect
          x="-95.326027"
          y="295.14841"
@@ -527,7 +519,7 @@
     </g>
     <g
        id="g980-7-4"
-       transform="matrix(0.99327221,0,0,0.98127905,266.58067,288.03826)">
+       transform="matrix(0.99327221,0,0,0.98127905,886.6147,287.66551)">
       <g
          id="g62"
          transform="translate(37.738436,-0.3707144)">
@@ -559,27 +551,27 @@
        id="rect1-0"
        width="391.70831"
        height="190.79935"
-       x="-55.051678"
-       y="352.46756" />
+       x="564.98236"
+       y="352.09482" />
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle)"
-       d="m -49.101018,477.1633 h 13.55929 v -24.01174"
+       d="m 570.93302,476.79055 h 13.55929 v -24.01174"
        id="path53" />
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.48349;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-5)"
-       d="M -78.339698,588.86965 H 111.66072 v -63.85793"
+       d="M 541.69434,588.4969 H 731.69475 V 524.63897"
        id="path53-6" />
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.37008;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8)"
-       d="m 184.4574,499.18605 h 86.51956 v -35.9019"
+       d="m 804.49143,498.8133 h 86.51956 v -35.9019"
        id="path53-2" />
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.16964;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8-8)"
-       d="M 275.92804,413.72755 V 394.51159 H 158.11587"
+       d="M 895.96207,413.3548 V 394.13884 H 778.1499"
        id="path53-2-3" />
     <g
        id="g980-7-9"
-       transform="matrix(0.99327221,0,0,0.98127905,103.30944,182.45505)">
+       transform="matrix(0.99327221,0,0,0.98127905,723.34347,182.0823)">
       <g
          id="g51"
          transform="translate(-59.3989,-31.601702)">
@@ -604,14 +596,14 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.24933;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker64)"
-       d="m -39.176086,394.33557 -57.89792,0.13959"
+       d="m 580.85795,393.96282 -57.89792,0.13959"
        id="path63" />
     <rect
        style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.9927;stroke-dasharray:none;stroke-opacity:1"
        id="rect1"
        width="560.18646"
        height="315.23489"
-       x="-212.59126"
-       y="324.23434" />
+       x="407.44278"
+       y="323.8616" />
   </g>
 </svg>

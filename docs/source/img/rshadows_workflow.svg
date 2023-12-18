@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="560.47906mm"
-   height="316.785mm"
-   viewBox="0 0 560.48022 316.78534"
+   width="562.17822mm"
+   height="317.22711mm"
+   viewBox="0 0 562.17938 317.22745"
    version="1.1"
    id="svg993"
    xmlns="http://www.w3.org/2000/svg"
@@ -122,10 +122,10 @@
   </metadata>
   <g
      id="layer1"
-     transform="translate(211.84111,-323.21915)">
+     transform="translate(-374.13067,-323.10305)">
     <rect
-       x="-211.72528"
-       y="323.62888"
+       x="375.99304"
+       y="323.49393"
        width="143.09996"
        height="314.52731"
        fill="#ffff93"
@@ -137,15 +137,15 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1723"
-       x="-162.27333"
-       y="353.98792"
+       x="411.65012"
+       y="353.84973"
        style="font-size:14.9282px;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan8">User</tspan></text>
     <rect
-       x="-69.18013"
-       y="325.08456"
+       x="518.53821"
+       y="324.94962"
        width="275.11816"
        height="314.51804"
        fill="#afffff"
@@ -156,69 +156,15 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1727"
-       x="28.58448"
-       y="350.45779"
+       x="602.50793"
+       y="350.31961"
        style="font-weight:400;font-stretch:semi-condensed;font-size:14.9282px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan6">mitiq.shadows</tspan></text>
     <g
-       id="g34-3"
-       transform="translate(76.177994,85.229726)">
-      <g
-         id="g6-6"
-         transform="matrix(1.2356814,0,0,0.77241233,-26.707252,105.48641)"
-         style="fill:#5aa02c">
-        <rect
-           x="-4.8783479"
-           y="463.84412"
-           width="102.12129"
-           height="67.204163"
-           stroke="#000000"
-           stroke-width="1.19523"
-           stroke-miterlimit="8"
-           fill="#ddffff"
-           id="rect1769-3-7"
-           style="fill:#5aa02c" />
-        <text
-           xml:space="preserve"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#5aa02c;fill-opacity:1;stroke:none;stroke-width:0.260563"
-           x="45.942749"
-           y="503.28326"
-           id="text916-6-5"
-           transform="scale(1.0228682,0.97764306)"><tspan
-             x="45.942753"
-             y="503.28326"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
-             id="tspan10-5-3">Post processing</tspan><tspan
-             x="45.942749"
-             y="511.0697"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
-             id="tspan16-5" /><tspan
-             x="45.942749"
-             y="518.85614"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
-             id="tspan11-3-6">by m</tspan></text>
-      </g>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.254962"
-         x="28.945852"
-         y="505.233"
-         id="text916-3-2"
-         transform="scale(1.0409342,0.96067551)"><tspan
-           x="28.945848"
-           y="505.233"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
-           id="tspan15-7">Estimated noise</tspan><tspan
-           x="32.003819"
-           y="516.91528"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
-           id="tspan30">channel </tspan></text>
-    </g>
-    <g
        id="g32"
-       transform="matrix(0.99293044,0,0,0.93195,-144.57378,24.899548)">
+       transform="matrix(0.99293044,0,0,0.93195,443.14454,24.76461)">
       <g
          id="g50"
          transform="translate(-1.4761254,14.570447)">
@@ -285,7 +231,7 @@
     </g>
     <g
        id="g47"
-       transform="translate(-0.14158981,8.559916)"
+       transform="translate(587.57673,8.4249779)"
        style="stroke-width:1.1;stroke-dasharray:none">
       <rect
          x="-33.50309"
@@ -355,7 +301,7 @@
     </g>
     <g
        id="g2"
-       transform="translate(4.0672817,85.552309)">
+       transform="translate(591.77453,79.468549)">
       <rect
          x="-204.3428"
          y="466.27551"
@@ -398,7 +344,7 @@
     </g>
     <g
        id="g4"
-       transform="translate(-4.8184701,3.8503181)">
+       transform="translate(582.89984,3.71538)">
       <g
          id="g3">
         <rect
@@ -430,22 +376,22 @@
     </g>
     <path
        style="fill:#000000;stroke:#000000;stroke-width:0.100387;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
-       d="M 277.63905,530.45568 Z"
+       d="M 865.35737,530.32074 Z"
        id="path19" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.49944px;line-height:0.85;font-family:Monospace;-inkscape-font-specification:Monospace;fill:#99ff55;stroke:#000000;stroke-width:1.50581;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
-       x="-59.742207"
-       y="452.52438"
+       x="525.71033"
+       y="452.38892"
        id="text3"
        transform="scale(1.0038701,0.99614482)"><tspan
          id="tspan3"
          style="stroke-width:1.50581"
-         x="-59.742207"
-         y="452.52438"> </tspan></text>
+         x="525.71033"
+         y="452.38892"> </tspan></text>
     <rect
-       x="205.15785"
-       y="324.77469"
+       x="792.87616"
+       y="324.63974"
        width="141.89113"
        height="313.71814"
        fill="#d9d9d9"
@@ -457,15 +403,15 @@
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1759"
-       x="218.71768"
-       y="350.99252"
+       x="792.64111"
+       y="350.85434"
        style="font-size:14.9282px;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan7">Hardware</tspan></text>
     <g
        id="g980-7"
-       transform="matrix(0.99327221,0,0,0.98127905,260.48148,84.927121)">
+       transform="matrix(0.99327221,0,0,0.98127905,848.1998,84.792183)">
       <rect
          x="-95.326027"
          y="295.14841"
@@ -486,7 +432,7 @@
     </g>
     <g
        id="g980-7-4"
-       transform="matrix(0.99327221,0,0,0.98127905,237.66822,267.0301)">
+       transform="matrix(0.99327221,0,0,0.98127905,825.38654,266.89516)">
       <g
          id="g62"
          transform="translate(37.738436,-0.3707144)">
@@ -518,42 +464,42 @@
        id="rect1-0"
        width="391.8905"
        height="163.59698"
-       x="-60.617496"
-       y="351.37939" />
+       x="527.10083"
+       y="351.24445" />
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.5512;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8)"
-       d="M 162.09267,481.81604 H 275.04768 V 446.56495"
+       d="M 749.81099,481.6811 H 862.766 v -35.25109"
        id="path53-2" />
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.48707;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8-8)"
-       d="M 274.27283,413.2852 V 395.15571 H 72.423974"
+       d="M 861.99115,413.15026 V 395.02077 H 660.14229"
        id="path53-2-3" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.24933;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker64)"
-       d="m -39.176086,394.33557 -57.89792,0.13959"
+       d="m 548.54223,394.20063 -57.89792,0.13959"
        id="path63" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.20736;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker64-0)"
-       d="m 106.31234,543.96683 0.26672,-49.17749"
+       d="m 685.64141,545.79092 0.26672,-49.17749"
        id="path63-3" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.42992;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker64-0-6)"
-       d="M -85.386565,582.09175 43.147313,581.94702"
+       d="m 502.33175,581.95681 128.53388,-0.14473"
        id="path63-3-6" />
     <rect
        style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.9927;stroke-dasharray:none;stroke-opacity:1"
        id="rect1"
        width="560.18646"
        height="315.23489"
-       x="-212.59126"
-       y="324.23434" />
+       x="375.12704"
+       y="324.0994" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.365;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle)"
-       d="m 277.30866,521.02246 0.48101,15.36507"
+       d="m 865.02698,520.88752 0.48101,15.36507"
        id="path1" />
     <g
        id="g980-7-9"
-       transform="matrix(0.99327222,0,0,0.98127904,281.4638,270.64399)">
+       transform="matrix(0.99327222,0,0,0.98127904,869.18212,270.50905)">
       <g
          id="g51"
          transform="translate(-59.3989,-31.601702)">
@@ -585,32 +531,32 @@
       </g>
     </g>
     <rect
-       x="-82.655716"
-       y="605.45581"
-       width="292.87283"
+       x="505.51144"
+       y="603.43195"
+       width="295.31851"
        height="31.136967"
        id="rect1522-7-2-1"
-       style="fill:#ffd42a;stroke-width:0.517687" />
+       style="fill:#ffd42a;stroke-width:0.519844" />
     <text
        font-weight="400"
        font-stretch="semi-condensed"
        font-size="10.5833px"
        id="text1524-64-5-8"
-       x="-75.24736"
-       y="622.22589"
+       x="509.04004"
+       y="620.52875"
        style="font-weight:400;font-stretch:semi-condensed;font-size:10.1396px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.261212"
        transform="scale(1.0060924,0.99394449)"><tspan
          id="tspan22-2"
-         x="-75.24736"
-         y="622.22589"
+         x="509.04004"
+         y="620.52875"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1396px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.261212">6.Use estimated noise channel before Step 2 in</tspan><tspan
-         x="-75.24736"
-         y="634.90039"
+         x="509.04004"
+         y="633.20325"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1396px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.261212"
          id="tspan29">Classical Shadows workflow</tspan></text>
     <g
        id="g30"
-       transform="translate(29.419152,0.9469676)">
+       transform="translate(617.13747,0.81202952)">
       <rect
          x="185.93433"
          y="416.98273"
@@ -640,7 +586,7 @@
     </g>
     <g
        id="g34"
-       transform="translate(63.19835,-17.151725)">
+       transform="translate(650.91667,-17.286663)">
       <g
          id="g6"
          transform="matrix(1.2356814,0,0,0.77241233,-26.707252,105.48641)"
@@ -679,30 +625,30 @@
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.254962"
-         x="30.671186"
-         y="494.91788"
+         x="31.107294"
+         y="495.29156"
          id="text916-3"
          transform="scale(1.0409342,0.96067551)"><tspan
-           x="30.671183"
-           y="494.91788"
+           x="31.10729"
+           y="495.29156"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
            id="tspan9">Coefficients of</tspan><tspan
-           x="30.671186"
-           y="506.60016"
+           x="31.107294"
+           y="506.97385"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
            id="tspan10">Pauli twirled</tspan><tspan
-           x="30.671185"
-           y="518.28241"
+           x="31.107292"
+           y="518.65613"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
            id="tspan11">channel over 1</tspan><tspan
-           x="30.671186"
-           y="529.96472"
+           x="31.107294"
+           y="530.33838"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
            id="tspan15">cycle</tspan></text>
     </g>
     <g
        id="g980"
-       transform="matrix(0.99327222,0,0,0.98127904,37.940087,194.61601)">
+       transform="matrix(0.99327222,0,0,0.98127904,622.25706,196.42658)">
       <rect
          x="-98.018318"
          y="315.98993"
@@ -728,6 +674,60 @@
            y="343.65356"><tspan
              style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
              id="tspan19">channel coefficients</tspan></tspan></text>
+    </g>
+    <g
+       id="g34-3"
+       transform="translate(652.92046,86.0053)">
+      <g
+         id="g6-6"
+         transform="matrix(1.2356814,0,0,0.77241233,-26.707252,105.48641)"
+         style="fill:#5aa02c">
+        <rect
+           x="-4.8783479"
+           y="463.84412"
+           width="102.12129"
+           height="67.204163"
+           stroke="#000000"
+           stroke-width="1.19523"
+           stroke-miterlimit="8"
+           fill="#ddffff"
+           id="rect1769-3-7"
+           style="fill:#5aa02c" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#5aa02c;fill-opacity:1;stroke:none;stroke-width:0.260563"
+           x="45.942749"
+           y="503.28326"
+           id="text916-6-5"
+           transform="scale(1.0228682,0.97764306)"><tspan
+             x="45.942753"
+             y="503.28326"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
+             id="tspan10-5-3">Post processing</tspan><tspan
+             x="45.942749"
+             y="511.0697"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
+             id="tspan16-5" /><tspan
+             x="45.942749"
+             y="518.85614"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
+             id="tspan11-3-6">by m</tspan></text>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.254962"
+         x="28.945852"
+         y="505.233"
+         id="text916-3-2"
+         transform="scale(1.0409342,0.96067551)"><tspan
+           x="28.945848"
+           y="505.233"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan15-7">Estimated noise</tspan><tspan
+           x="32.003819"
+           y="516.91528"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan30">channel </tspan></text>
     </g>
   </g>
 </svg>
