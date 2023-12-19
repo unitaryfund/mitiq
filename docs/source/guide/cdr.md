@@ -7,7 +7,7 @@ Clifford data regression (CDR) is a learning-based quantum error mitigation tech
 width: 700px
 name: cdr-workflow-overview
 ---
-The CDR workflow in Mitiq is fully explained in the [What happens when I use CDR?](cdr-4-low-level.md) section.
+The CDR workflow in Mitiq is fully explained in the {doc}`cdr-4-low-level` section.
 ```
 
 Below you can find sections of the documentation that address the following questions:
@@ -23,4 +23,4 @@ cdr-4-low-level.md
 cdr-5-theory.md
 ```
 
-A simple tutorial on CDR can be found in the code blocks in the [Problem setup](cdr-1-intro.md) section of the first section of the user guide.
+A simple tutorial using CDR can be found on the {doc}`cdr-1-intro` page.

@@ -13,9 +13,10 @@ kernelspec:
 
 # What additional options are available in CDR?
 
-In addition to the four necessary ingredients shown in [How do I use CDR?](cdr-1-intro.md), there are additional parameters in CDR.
+In addition to the four necessary ingredients shown in {doc}`cdr-1-intro`, there are additional parameters in CDR.
 
-One option is how many circuits are in the training set (default is 10). This can be changed as follows.
+One option is how many circuits are in the training set (default is 10).
+This can be changed as follows.
 
 ```{code-cell} ipython3
 import warnings
@@ -29,8 +30,8 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 a, b = cirq.LineQubit.range(2)
 circuit = cirq.Circuit(
-    cirq.H.on(a), # Clifford
-    cirq.H.on(b), # Clifford
+    cirq.H.on(a),  # Clifford
+    cirq.H.on(b),  # Clifford
     cirq.rz(1.75).on(a),
     cirq.rz(2.31).on(b),
     cirq.CNOT.on(a, b),  # Clifford
@@ -56,11 +57,10 @@ cdr.execute_with_cdr(
 ).real
 ```
 
-+++
-
 ## Fit function
 
-Another option is which fit function to use for regression (default is {func}`cdr.linear_fit_function`).
+Another option is which fit function to use for regression (default is {func}`.linear_fit_function`).
+
 ```{code-cell} ipython3
 cdr.execute_with_cdr(
     circuit,
@@ -72,18 +72,13 @@ cdr.execute_with_cdr(
 ).real
 ```
 
-Beyond the built-in {func}`cdr.linear_fit_function` and {func}`cdr.linear_fit_function_no_intercept`,
-the user could also define other custom functions.
+Beyond the built-in {func}`.linear_fit_function` and {func}`.linear_fit_function_no_intercept`, the user can define other custom functions.
 
 ## Variable noise CDR
-
-+++
 
 The `circuit` and the associated training circuits can also be run at different noise scale factors to implement [variable noise Clifford data regression](https://arxiv.org/abs/2011.01157) {cite}`Lowe_2021_PRR`.
 
 ```{code-cell} ipython3
-from mitiq.zne import scaling
-
 cdr.execute_with_cdr(
     circuit,
     compute_density_matrix,
