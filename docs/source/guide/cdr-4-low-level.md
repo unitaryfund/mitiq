@@ -26,7 +26,7 @@ The CDR workflow in Mitiq is divided in two steps: Generating circuits, both for
 Similarly to ZNE and PEC, CDR is divided in two main stages: first, one of circuit generation and a second for inference of the mitigated value.
 In CDR, the generation of quantum circuits is different, as it involves the generation of training circuits.
 
-```{warning}
+```{note}
 In {cite}`Czarnik_2021_Quantum`, the authors lay out two different methods for generating the training circuits.
 
 1. Randomly replacing gates in the target circuit with nearby Clifford gates.
