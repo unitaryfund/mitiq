@@ -1,5 +1,130 @@
 # Changelog
 
+## Version 0.32.0
+
+> Happy holidays, and happy (almost) new year!! ❄️☃️🎄🎊
+> This will be our last release of the year, and we'd like to thank everyone who has contributed to Mitiq over the past 12 months.
+> We've accomplished so much in the way of error mitigation this year, and we couldn't have done it without the support and time given by the volunteers.
+> **Thank you!**
+
+The **calibrator logs have been revamped** for to support result discovery and analysis.
+The `Calibrator.run` method now support two options: `flat` and `cartesian` to display the experiment results in either a linear fashion, or grid-like.
+Results here have been truncated for brevity.
+
+```py
+>>> calibrator.run(log="flat")
+┌──────────────────────────┬────────────────────────────────────┬────────────────────────────┐
+│ benchmark                │ strategy                           │ performance                │
+├──────────────────────────┼────────────────────────────────────┼────────────────────────────┤
+│ Type: ghz                │ Technique: ZNE                     │ ✔                          │
+│ Num qubits: 2            │ Factory: Linear                    │ Noisy error: 0.04          │
+│ Circuit depth: 2         │ Scale factors: 1.0, 2.0, 3.0       │ Mitigated error: 0.02      │
+│ Two qubit gate count: 1  │ Scale method: fold_gates_at_random │ Improvement factor: 2.0    │
+├──────────────────────────┼────────────────────────────────────┼────────────────────────────┤
+│ Type: ghz                │ Technique: ZNE                     │ ✘                          │
+│ Num qubits: 2            │ Factory: Linear                    │ Noisy error: 0.04          │
+│ Circuit depth: 2         │ Scale factors: 1.0, 3.0, 5.0       │ Mitigated error: 0.0658    │
+│ Two qubit gate count: 1  │ Scale method: fold_global          │ Improvement factor: 0.6076 │
+├──────────────────────────┼────────────────────────────────────┼────────────────────────────┤
+│ Type: ghz                │ Technique: ZNE                     │ ✘                          │
+│ Num qubits: 2            │ Factory: Richardson                │ Noisy error: 0.98          │
+│ Circuit depth: 33        │ Scale factors: 1.0, 3.0, 5.0       │ Mitigated error: 1.03      │
+│ Two qubit gate count: 14 │ Scale method: fold_global          │ Improvement factor: 0.9515 │
+└──────────────────────────┴────────────────────────────────────┴────────────────────────────┘
+```
+
+```py
+>>> calibrator.run(log="cartesian")
+┌────────────────────────────────────┬────────────────────────────┬────────────────────────────┐
+│ strategy\benchmark                 │ Type: ghz                  │ Type: mirror               │
+│                                    │ Num qubits: 2              │ Num qubits: 2              │
+│                                    │ Circuit depth: 2           │ Circuit depth: 33          │
+│                                    │ Two qubit gate count: 1    │ Two qubit gate count: 14   │
+├────────────────────────────────────┼────────────────────────────┼────────────────────────────┤
+│ Technique: ZNE                     │ ✘                          │ ✘                          │
+│ Factory: Richardson                │ Noisy error: 0.03          │ Noisy error: 1.0           │
+│ Scale factors: 1.0, 2.0, 3.0       │ Mitigated error: 0.09      │ Mitigated error: 1.03      │
+│ Scale method: fold_global          │ Improvement factor: 0.3333 │ Improvement factor: 0.9709 │
+├────────────────────────────────────┼────────────────────────────┼────────────────────────────┤
+│ Technique: ZNE                     │ ✘                          │ ✔                          │
+│ Factory: Richardson                │ Noisy error: 0.03          │ Noisy error: 1.0           │
+│ Scale factors: 1.0, 3.0, 5.0       │ Mitigated error: 0.0563    │ Mitigated error: 0.97      │
+│ Scale method: fold_global          │ Improvement factor: 0.5333 │ Improvement factor: 1.0309 │
+├────────────────────────────────────┼────────────────────────────┼────────────────────────────┤
+│ Technique: ZNE                     │ ✘                          │ ✔                          │
+│ Factory: Linear                    │ Noisy error: 0.03          │ Noisy error: 1.0           │
+│ Scale factors: 1.0, 3.0, 5.0       │ Mitigated error: 0.0417    │ Mitigated error: 0.9975    │
+│ Scale method: fold_global          │ Improvement factor: 0.72   │ Improvement factor: 1.0025 │
+└────────────────────────────────────┴────────────────────────────┴────────────────────────────┘
+```
+
+**New benchmarking circuits:** `mitiq.benchmarks` now contains a function `generate_random_clifford_t_circuit` which does what it says on the tin.
+Special shoutout to new UF team member Farrokh Labib (@farlab) for this contribution.
+
+```py
+from mitiq.benchmarks import generate_random_clifford_t_circuit
+
+clifft = generate_random_clifford_t_circuit(
+    num_qubits=2,
+    num_oneq_cliffords=5,
+    num_twoq_cliffords=5,
+    num_t_gates=5
+)
+print(clifft)
+# 0: ───────────@───S───T───@───H───T───X───T───T───@───@───────
+#               │           │           │           │   │
+# 1: ───S───T───@───────────X───────────@───S───────@───X───S───
+```
+
+The `Executor.run` method now supports a single circuit instance in addition to a list for ease of use when working with a single circuit.
+
+```diff
+- executor.run([circuit])
++ executor.run(circuit)
+```
+
+**Faster Tests!** Working on Mitiq has never been easier to develop with a faster (by 36%) test suite.
+
+### 📓 Documentation
+
+This release contains quite a few documentation improvements, including
+
+1. New workflow images to elucidate the workflow for for using the `mitiq.shadows` module (available [here](https://mitiq.readthedocs.io/en/stable/guide/shadows.html))
+2. A reorganized API-doc which should be easier to navigate
+3. General clean up of the CDR user guide pages
+
+### Commits
+
+- Clarify CDR training docs regarding the use of a markov chain monte carlo (#2130) [@natestemen]
+- Update workflow images in documentation (#2034) [@purva-thakre]
+- 2115 pauli twirling callibration of expectation estimation shadow needs continue (#2116) [@bdg221]
+- Add randomized clifford+T benchmarking circuits. (#2118) [@farlab]
+- Frontend/Backend docs clean up (#2124) [@natestemen]
+- Speed up tests using mocks (#2126) [@natestemen]
+- resolve flaky mirror QV circuit test (#2127) [@natestemen + @misty-w]
+- Simplify expectation_estimation_shadow code (#2113) [@bdg221]
+- Refactor calibration logs (#2074) [@kozhukalov]
+- Organize API-doc (#2104) [@purva-thakre]
+- add support for single circuit on exeuctor run method (#2099) [@emilianog-byte]
+
+#### 📦 Dependency updates
+
+- Update qiskit-ibm-provider requirement from ~=0.7.2 to ~=0.7.3 (#2122) [@dependabot]
+- Update cirq requirement from <1.3.0,>=1.0.0 to >=1.0.0,<1.4.0 (#2107) [@dependabot]
+- Update pennylane requirement from ~=0.32.0 to ~=0.33.1 (#2091) [@dependabot]
+- Update pennylane-qiskit requirement from ~=0.32.0 to ~=0.33.0 (#2081) [@dependabot]
+- Bump stim/stimcirq from 1.12.0 to 1.12.1 (#2106) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.59.2 to ~=1.64.1 (#2089 + #2094 + #2114 + #2123) [@dependabot]
+- Update scipy requirement from <=1.11.3,>=1.5.0 to >=1.5.0,<=1.11.4 (#2095) [@dependabot]
+
+#### 🧑‍💻 Dev Dependency updates
+
+- Bump myst-nb from 0.17.1 to 1.0.0 (#2090) [@dependabot]
+- Bump pandas from 2.1.2 to 2.1.3 (#2093) [@dependabot]
+- Bump matplotlib from 3.8.0 to 3.8.1 (#2084) [@dependabot]
+- Bump isort from 5.12.0 to 5.13.2 (#2120 + #2125) [@dependabot]
+- Bump actions/setup-python from 4 to 5 (#2112) [@dependabot]
+
 ## Version 0.31.0
 
 Released November 2, 2023
