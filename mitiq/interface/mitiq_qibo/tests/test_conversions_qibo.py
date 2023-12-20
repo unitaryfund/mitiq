@@ -56,11 +56,11 @@ def test_from_qibo_unsupported_multi_controlled_gate():
 
 
 def test_from_qibo_unsupported_gate():
-    qibo_circuit = QiboCircuit(3)
-    qibo_circuit.add(qibo.gates.DEUTSCH(0, 1, 2, 0.4))
+    qibo_circuit = QiboCircuit(2)
+    qibo_circuit.add(qibo.gates.fSim(0, 1, 0.4, 0.4))
     with pytest.raises(
         UnsupportedQiboCircuitError,
-        match="deutsch is not supported by OpenQASM.",
+        match="fsim is not supported by OpenQASM.",
     ):
         from_qibo(qibo_circuit)
 
@@ -138,10 +138,6 @@ def test_qibo_integration(i):
         qibo.gates.RY(0, 0.4),
         qibo.gates.RZ(0, 0.4),
         qibo.gates.H(0),
-        qibo.gates.SX(0),
-        qibo.gates.SXDG(0),
-        qibo.gates.CSX(0, 1),
-        qibo.gates.CSXDG(0, 1),
         qibo.gates.TOFFOLI(0, 1, 2),
         qibo.gates.SWAP(0, 1),
         qibo.gates.iSWAP(0, 1),

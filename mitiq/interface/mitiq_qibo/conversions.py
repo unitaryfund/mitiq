@@ -124,52 +124,6 @@ def cu3_decomp(gate: gates.CU3) -> Gate:
     return decomp_gate
 
 
-def csx_decomp(gate: gates.CSX) -> Gate:
-    """Decomposes CSX gate to Cirq known gates.
-
-    Args:
-        gate: CSX gate to decompose.
-
-    Returns:
-        List with gates that has the same effect as applying the original gate.
-    """
-    q0, q1 = gate.init_args
-    theta = pi / 2
-    decomp_gate = [
-        gates.H(q1),
-        gates.U1(q0, theta / 2),
-        gates.CNOT(q0, q1),
-        gates.U1(q1, -theta / 2),
-        gates.CNOT(q0, q1),
-        gates.U1(q1, theta / 2),
-        gates.H(q1),
-    ]
-    return decomp_gate
-
-
-def csxdg_decomp(gate: gates.CSXDG) -> Gate:
-    """Decomposes CSXDG gate to Cirq known gates.
-
-    Args:
-        gate: CSXDG gate to decompose.
-
-    Returns:
-        List with gates that has the same effect as applying the original gate.
-    """
-    q0, q1 = gate.init_args
-    theta = -pi / 2
-    decomp_gate = [
-        gates.H(q1),
-        gates.U1(q0, theta / 2),
-        gates.CNOT(q0, q1),
-        gates.U1(q1, -theta / 2),
-        gates.CNOT(q0, q1),
-        gates.U1(q1, theta / 2),
-        gates.H(q1),
-    ]
-    return decomp_gate
-
-
 def iswap_decomp(gate: gates.iSWAP) -> Gate:
     """Decomposes ISWAP gate to Cirq known gates.
 
@@ -293,8 +247,6 @@ GATES_TO_DECOMPOSE = {
     "crz": crz_decomp,
     "cu1": cu1_decomp,
     "cu3": cu3_decomp,
-    "csx": csx_decomp,
-    "csxdg": csxdg_decomp,
     "iswap": iswap_decomp,
     "fswap": fswap_decomp,
     "rxx": rxx_decomp,
@@ -356,9 +308,7 @@ def from_qibo(qibo_circuit: QiboCircuit) -> Circuit:
             raise UnsupportedQiboCircuitError(
                 "OpenQASM does not support multi-controlled gates."
             )
-        try:
-            gate.qasm_label
-        except NotImplementedError:
+        if gate.name not in gates.QASM_GATES:
             raise UnsupportedQiboCircuitError(
                 f"{gate.name} is not supported by OpenQASM."
             )
