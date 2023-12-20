@@ -343,7 +343,7 @@ def expectation_estimation_shadow(
             np.all(u_lists_shadow[idxes] == target_obs, axis=1)
         )
 
-        if len(matchingIndexes[0]):
+        if len(matching_indexes[0]):
             product = (-1) ** np.sum(
                 b_lists_shadow[idxes][matching_indexes].astype(int),
                 axis=1,
