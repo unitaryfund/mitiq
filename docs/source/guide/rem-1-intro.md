@@ -22,10 +22,8 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
 
 ## Problem setup
-In this example we will simulate a noisy device to demonstrate the capabilities of REM. This method requires an 
-{ref}`observable <guide/observables/observables>` to be defined, and we use
-$Z_0 + Z_1$ as an example. Since the circuit includes an $X$ gate on each qubit, 
-the noiseless expectation value should be $-2$.
+In this example we will simulate a noisy device to demonstrate the capabilities of REM. This method requires an {doc}`observable <observables>` to be defined, and we use $Z_0 + Z_1$ as an example.
+Since the circuit includes an $X$ gate on each qubit,  the noiseless expectation value should be $-2$.
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, X, measure_each

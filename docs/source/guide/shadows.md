@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -21,7 +21,7 @@ sample efficiency and demonstrates noise resilience {cite}`chen2021robust`. For 
 ([Classical Shadow Protocol and its Robust Estimation](shadows-5-theory.md)).
 
  
-```{figure} ../img/shadows_workflow.png
+```{figure} ../img/classicalshadow_workflow.png
 ---
 width: 700px
 name: shadows-workflow-overview

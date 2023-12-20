@@ -392,7 +392,7 @@ class Settings:
         return funcs
 
 
-ZNESettings = Settings(
+ZNE_SETTINGS = Settings(
     benchmarks=[
         {
             "circuit_type": "ghz",
@@ -458,7 +458,7 @@ ZNESettings = Settings(
     ],
 )
 
-PECSettings = Settings(
+PEC_SETTINGS = Settings(
     benchmarks=[
         {
             "circuit_type": "ghz",

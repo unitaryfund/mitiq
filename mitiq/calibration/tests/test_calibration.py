@@ -156,7 +156,7 @@ def non_cirq_depolarizing_execute(circuit):
 def test_ZNE_workflow():
     cal = Calibrator(damping_execute, frontend="cirq")
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 8 * 3 * 4, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 8 * 3 * 4 + 4, "ideal_executions": 0}
 
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
@@ -164,11 +164,10 @@ def test_ZNE_workflow():
 
 
 def test_PEC_workflow():
-    cal = Calibrator(
-        depolarizing_execute, frontend="cirq", settings=light_pec_settings
-    )
+    executor = MagicMock(return_value=MeasurementResult(["111", "110"]))
+    cal = Calibrator(executor, frontend="cirq", settings=light_pec_settings)
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 2 * 200, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 200 + 2, "ideal_executions": 0}
 
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
@@ -188,7 +187,7 @@ def test_ZNE_workflow_multi_platform(circuit_type):
         settings=light_zne_settings,
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 2 * 2, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 2 + 2, "ideal_executions": 0}
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
@@ -201,14 +200,15 @@ def test_PEC_workflow_multi_platform(circuit_type):
     if circuit_type == "cirq":
         return
 
+    executor = MagicMock(return_value=MeasurementResult(["000", "001"]))
     cal = Calibrator(
-        non_cirq_damping_execute,
-        frontend=circuit_type,
-        settings=light_pec_settings,
+        executor, frontend=circuit_type, settings=light_pec_settings
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 2 * 200, "ideal_executions": 0}
+    num_executions = 2 * 200 + 2
+    assert cost == {"noisy_executions": num_executions, "ideal_executions": 0}
     cal.run()
+    assert executor.call_count == num_executions
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -216,7 +216,7 @@ def test_PEC_workflow_multi_platform(circuit_type):
 def test_get_cost():
     cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
     cost = cal.get_cost()
-    expected_cost = 2 * 12  # circuits * num_experiments
+    expected_cost = 2 * (12 + 1)  # circuits * (num_experiments + 1)
     assert cost["noisy_executions"] == expected_cost
     assert cost["ideal_executions"] == 0
 

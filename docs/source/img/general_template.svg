@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="460.62119mm"
+   height="225.7849mm"
+   viewBox="0 0 460.62227 225.78523"
+   version="1.1"
+   id="svg993"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs987" />
+  <metadata
+     id="metadata990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(-406.71046,-335.58264)">
+    <rect
+       x="407.39362"
+       y="336.00531"
+       width="142.94714"
+       height="225.35567"
+       fill="#ffff93"
+       id="rect1721"
+       style="stroke-width:0.29096" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1723"
+       x="442.16443"
+       y="366.66183"
+       style="font-size:14.9282px;stroke-width:0.260376"
+       transform="scale(1.0240361,0.97652808)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
+         id="tspan8">User</tspan></text>
+    <rect
+       x="549.78595"
+       y="335.93253"
+       width="196.03909"
+       height="224.14677"
+       fill="#afffff"
+       id="rect1725"
+       style="fill:#afafe9;fill-opacity:1;stroke-width:0.268058" />
+    <text
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1727"
+       x="543.19513"
+       y="367.1915"
+       style="font-weight:400;font-stretch:semi-condensed;font-size:14.9282px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.260376"
+       transform="scale(1.0240361,0.97652808)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
+         id="tspan6">mitiq.new_technique</tspan></text>
+    <path
+       d="m 522.86001,411.01013 h 41.96652 l 0.71519,-0.76109 -0.79991,0.79375 h 33.96746 v -1.5875 h -34.76736 l -0.7152,0.76109 0.79991,-0.79375 h -41.16661 z m 75.04936,3.20766 7.99906,-3.96875 -7.99906,-3.96875 z"
+       id="path1733"
+       style="stroke-width:0.265607" />
+    <path
+       d="m 631.38192,502.71667 h -52.42154 l -0.89336,0.68664 0.99919,-0.7161 H 536.6365 v 1.4322 h 43.42889 l 0.89336,-0.68664 -0.99918,0.7161 h 51.42237 z m -93.74625,-2.89386 -9.99183,3.5805 9.99183,3.5805 z"
+       id="path1733-5"
+       style="stroke-width:0.281959" />
+    <rect
+       x="742.49451"
+       y="335.87872"
+       width="124.06555"
+       height="224.57286"
+       fill="#d9d9d9"
+       id="rect1757"
+       style="stroke-width:0.270591" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1759"
+       x="746.71973"
+       y="367.92178"
+       style="font-size:14.9282px;stroke-width:0.260376"
+       transform="scale(1.0240361,0.97652808)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
+         id="tspan7">Hardware</tspan></text>
+    <rect
+       x="757.94757"
+       y="430.27438"
+       width="102.12129"
+       height="45.772915"
+       stroke="#000000"
+       stroke-width="1.19523"
+       stroke-miterlimit="8"
+       fill="#a6a6a6"
+       id="rect1761"
+       style="fill:#808080;fill-opacity:1" />
+    <rect
+       x="605.38361"
+       y="376.85428"
+       width="102.12129"
+       height="67.204163"
+       stroke="#000000"
+       stroke-width="1.19523"
+       stroke-miterlimit="8"
+       fill="#ddffff"
+       id="rect1769"
+       style="fill:#8080ff" />
+    <g
+       id="g6"
+       transform="translate(607.86517,3.0857898)">
+      <rect
+         x="-4.8783479"
+         y="463.84412"
+         width="102.12129"
+         height="67.204163"
+         stroke="#000000"
+         stroke-width="1.19523"
+         stroke-miterlimit="8"
+         fill="#ddffff"
+         id="rect1769-3"
+         style="fill:#8080ff" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+         x="45.942749"
+         y="503.28326"
+         id="text916-6"
+         transform="scale(1.0228682,0.97764306)"><tspan
+           x="45.942753"
+           y="503.28326"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan10-5">Post processing</tspan><tspan
+           x="45.942749"
+           y="511.0697"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan16" /><tspan
+           x="45.942749"
+           y="518.85614"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan11-3">by mitiq</tspan></text>
+    </g>
+    <path
+       d="M 810.69511,503.56335 H 757.4416 l -0.90755,0.68664 1.01507,-0.7161 h -43.10309 v 1.4322 h 44.11811 l 0.90754,-0.68664 -1.01504,0.7161 h 52.23848 z m -95.23406,-2.89386 -10.15039,3.5805 10.15039,3.5805 z"
+       id="path1733-5-9"
+       style="stroke-width:0.284189" />
+    <path
+       d="m 706.70208,401.48515 h 104.52424 v 20.59146 H 809.3009 V 402.2789 l 0.9627,0.79375 H 706.70208 Z m 108.37506,19.79771 -4.81354,7.9375 -4.81353,-7.9375 z"
+       id="path1807"
+       style="stroke-width:0.291385" />
+    <g
+       id="g980"
+       transform="matrix(0.99327222,0,0,0.98127905,620.15951,250.05494)">
+      <rect
+         x="-95.326027"
+         y="295.14841"
+         width="85.93396"
+         height="17.372885"
+         id="rect1522"
+         style="fill:#ffd42a;stroke-width:0.209463" />
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="10.5833px"
+         id="text1524"
+         x="-90.440613"
+         y="307.14011"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
+           id="tspan1">2. Inference</tspan></text>
+    </g>
+    <g
+       id="g5"
+       transform="translate(615.67668,9.7003748)">
+      <g
+         id="g996"
+         transform="matrix(1.1825484,0,0,0.63170089,2.5551318,327.50759)"
+         style="fill:#ffd42a">
+        <rect
+           x="-82.494347"
+           y="172.71333"
+           width="70.396614"
+           height="26.987499"
+           fill="#f2f2f2"
+           id="rect1512"
+           style="fill:#ffd42a;stroke-width:0.227777" />
+        <text
+           font-weight="400"
+           font-stretch="semi-condensed"
+           font-size="9.525px"
+           id="text1516"
+           x="-78.58831"
+           y="183.82584"
+           style="font-weight:400;font-stretch:semi-condensed;font-size:9.525px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;fill:#ffd42a;stroke-width:0.264583" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.71336px;line-height:0.85;font-family:Monospace;-inkscape-font-specification:Monospace;fill:#99ff55;stroke:#000000;stroke-width:1.54371;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
+           x="-98.604248"
+           y="149.74246"
+           id="text2"
+           transform="scale(0.77949045,1.2828894)"><tspan
+             id="tspan2"
+             style="stroke-width:1.54371"
+             x="-98.604248"
+             y="149.74246" /></text>
+      </g>
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="10.5833px"
+         id="text1524-6"
+         x="-91.42131"
+         y="460.78809"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:10.2583px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.256458"
+         transform="scale(1.0283009,0.97247799)"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.256458"
+           id="tspan1-1">(<tspan
+   style="font-size:9.95516px;stroke-width:0.256458"
+   id="tspan9">Edit Step 1</tspan>)</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.254962"
+       x="630.35773"
+       y="411.77072"
+       id="text916"
+       transform="scale(1.0409342,0.9606755)"><tspan
+         x="630.35773"
+         y="411.77072"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+         id="tspan5"> Description</tspan><tspan
+         x="630.35773"
+         y="423.453"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+         id="tspan10">of circuit </tspan><tspan
+         x="630.35773"
+         y="435.13528"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+         id="tspan4">generated</tspan><tspan
+         x="630.35773"
+         y="446.81754"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+         id="tspan11">by mitiq</tspan></text>
+    <g
+       id="g2"
+       transform="translate(618.55153,12.363494)">
+      <rect
+         x="-194.58401"
+         y="455.82953"
+         width="102.12129"
+         height="67.73333"
+         stroke-miterlimit="8"
+         id="rect1743"
+         style="fill:#ffffe1;stroke:#000000;stroke-width:1.19523;stroke-miterlimit:8" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+         x="-139.9046"
+         y="483.9335"
+         id="text916-7-2"
+         transform="scale(1.0228682,0.97764306)"><tspan
+           x="-139.9046"
+           y="483.9335"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan918-3-2">Error-</tspan><tspan
+           x="-139.9046"
+           y="496.91089"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan990">mitigated</tspan><tspan
+           x="-139.9046"
+           y="509.88824"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan964-5">expectation</tspan><tspan
+           x="-139.9046"
+           y="522.8656"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan994">value</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+       x="790.02917"
+       y="461.18683"
+       id="text916-7-0"
+       transform="scale(1.0228682,0.97764306)"><tspan
+         x="790.02917"
+         y="461.18683"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+         id="tspan964-4">Execute on</tspan><tspan
+         x="790.02917"
+         y="474.16422"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+         id="tspan1013">backend</tspan></text>
+    <g
+       id="g4"
+       transform="translate(618.55153,12.363494)">
+      <g
+         id="g3">
+        <rect
+           x="-194.21484"
+           y="360.44257"
+           width="102.12129"
+           height="67.46875"
+           stroke="#000000"
+           stroke-width="1.19523"
+           stroke-miterlimit="8"
+           fill="#ffffe1"
+           id="rect1737" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+           x="-142.41753"
+           y="397.13016"
+           id="text1017"
+           transform="scale(1.0228682,0.97764306)"><tspan
+             id="tspan1015"
+             x="-142.41753"
+             y="397.13016"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563">Quantum</tspan><tspan
+             x="-142.41753"
+             y="410.10754"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+             id="tspan1021">program</tspan></text>
+      </g>
+    </g>
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:1.3624;stroke-linecap:square;stroke-miterlimit:0;stroke-dasharray:none;paint-order:stroke fill markers"
+       d="m 811.01493,476.5898 -0.44868,27.42748 v 0"
+       id="path20" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.49944px;line-height:0.85;font-family:Monospace;-inkscape-font-specification:Monospace;fill:#99ff55;stroke:#000000;stroke-width:1.50581;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
+       x="556.83765"
+       y="464.94873"
+       id="text3"
+       transform="scale(1.0038701,0.99614482)"><tspan
+         id="tspan3"
+         style="stroke-width:1.50581"
+         x="556.83765"
+         y="464.94873"> </tspan></text>
+    <rect
+       style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.065;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1"
+       width="459.55707"
+       height="224.72034"
+       x="407.24292"
+       y="336.11514" />
+  </g>
+</svg>

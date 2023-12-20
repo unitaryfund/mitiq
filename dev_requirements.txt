@@ -1,11 +1,11 @@
 # Third-party integration.
 qiskit~=0.45.1
 qiskit-aer~=0.13.1
-qiskit-ibm-provider~=0.7.2
+qiskit-ibm-provider~=0.7.3
 pyquil~=3.5.4
 pennylane-qiskit~=0.33.1
 pennylane~=0.33.1
-amazon-braket-sdk~=1.64.0
+amazon-braket-sdk~=1.64.1
 qibo~=0.1.11
 
 # Unit tests, coverage, and formatting/style.
@@ -15,7 +15,7 @@ pytest-cov==4.0.0
 flake8==6.0.0
 black==22.10
 mypy==1.0.0
-isort==5.12.0
+isort==5.13.2
 types-tabulate
 
 # Documentation and examples.
