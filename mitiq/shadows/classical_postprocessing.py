@@ -339,13 +339,13 @@ def expectation_estimation_shadow(
 
     # loop over the splits of the shadow:
     for idxes in group_idxes:
-        matchingIndexes = np.nonzero(
+        matching_indexes = np.nonzero(
             np.all(u_lists_shadow[idxes] == target_obs, axis=1)
         )
 
         if len(matchingIndexes[0]):
             product = (-1) ** np.sum(
-                b_lists_shadow[idxes][matchingIndexes].astype(int),
+                b_lists_shadow[idxes][matching_indexes].astype(int),
                 axis=1,
             )
 
