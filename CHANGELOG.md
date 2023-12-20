@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.34.0
+
 ## Version 0.33.0
 
 Minor update from 0.32.0 to fix a bug 🐛 in the `mitiq.shadows` module where an incorrect index was being used.
