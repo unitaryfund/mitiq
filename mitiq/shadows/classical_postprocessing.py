@@ -16,7 +16,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 import mitiq
-from mitiq.shadows.shadows_utils import create_string
+from mitiq.shadows.shadows_utils import bitstring_to_eigenvalues, create_string
 from mitiq.utils import matrix_kronecker_product, operator_ptm_vector_rep
 
 # Local unitaries to measure Pauli operators in the Z basis
@@ -323,33 +323,39 @@ def expectation_estimation_shadow(
     for qubit, pauli in obs.items():
         target_obs.append(str(pauli))
         target_locs.append(int(qubit))
+    # if target_locs is [2,3,4], then target_support is "001110"
+    target_support = create_string(num_qubits, target_locs)
 
     # classical values stored in classical computer
-    b_lists_shadow = np.array([list(u) for u in measurement_outcomes[0]])[
-        :, target_locs
-    ]
-    u_lists_shadow = np.array([list(u) for u in measurement_outcomes[1]])[
-        :, target_locs
-    ]
-
+    b_lists_shadow = np.array(measurement_outcomes[0])
+    u_lists_shadow = np.array([list(u) for u in measurement_outcomes[1]])
+    # number of measurements in each split
+    n_total_measurements_shadow = len(b_lists_shadow)
     means = []
-
     # loop over the splits of the shadow:
-    group_idxes = np.array_split(np.arange(len(b_lists_shadow)), k_shadows)
-
+    group_idxes = np.array_split(
+        np.arange(n_total_measurements_shadow), k_shadows
+    )
     # loop over the splits of the shadow:
     for idxes in group_idxes:
-        if len(
-            np.nonzero(np.all(u_lists_shadow[idxes] == target_obs, axis=1))[0]
-        ):
-            product = (-1) ** np.sum(
-                b_lists_shadow[
-                    np.nonzero(
-                        np.all(u_lists_shadow[idxes] == target_obs, axis=1)
-                    )
-                ].astype(int),
-                axis=1,
+        b_lists_shadow_k = b_lists_shadow[idxes]
+        u_lists_shadow_k = u_lists_shadow[idxes]
+        # number of measurements/shadows in each split
+        n_group_measurements = len(b_lists_shadow_k)
+
+        indices = np.all(
+            u_lists_shadow_k[:, target_locs] == target_obs, axis=1
+        )
+        if sum(indices) == 0:
+            means.append(0.0)
+        else:
+            eigenvalues = np.array(
+                [
+                    bitstring_to_eigenvalues(b)
+                    for b in b_lists_shadow_k[indices]
+                ]
             )
+            product = np.prod(eigenvalues[:, target_locs], axis=1)
 
             if pauli_twirling_calibration:
                 if f_est is None:
@@ -367,12 +373,10 @@ def expectation_estimation_shadow(
                     # witch satisfy condition (1) and (2)
                     product = (1.0 / f_val) * product
             else:
-                product = 3 ** (len(target_locs)) * product
+                product = 3 ** (target_support.count("1")) * product
 
             # append the mean of the product in each split
-            means.append(np.sum(product) / len(idxes))
-        else:
-            means.append(0.0)
+            means.append(np.sum(product) / n_group_measurements)
 
     # return the median of means
     return float(np.real(np.median(means) * coeff))
