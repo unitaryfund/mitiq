@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="562.17816mm"
-   height="317.22711mm"
-   viewBox="0 0 562.17932 317.22745"
+   width="562.17822mm"
+   height="372.9848mm"
+   viewBox="0 0 562.17938 372.9852"
    version="1.1"
    id="svg993"
    xmlns="http://www.w3.org/2000/svg"
@@ -92,6 +92,22 @@
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135-0" />
     </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle-5-3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-0-6" />
+    </marker>
   </defs>
   <metadata
      id="metadata990">
@@ -106,70 +122,49 @@
   </metadata>
   <g
      id="layer1"
-     transform="translate(-387.6837,-323.0432)">
+     transform="translate(-392.5164,-244.00354)">
     <rect
-       x="389.54599"
-       y="323.43408"
+       x="394.37869"
+       y="244.39441"
        width="143.09996"
-       height="314.52731"
+       height="370.0282"
        fill="#ffff93"
        id="rect1721"
-       style="stroke-width:0.343923" />
+       style="stroke-width:0.373035" />
     <text
        font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
        font-weight="400"
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1723"
-       x="424.88495"
-       y="353.78845"
+       x="429.60422"
+       y="272.84897"
        style="font-size:14.9282px;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan8">User</tspan></text>
     <rect
-       x="532.09113"
-       y="324.88977"
+       x="536.92383"
+       y="245.8501"
        width="275.11816"
-       height="314.51804"
+       height="368.54947"
        fill="#afffff"
        id="rect1725"
-       style="opacity:1;fill:#b3ff80;fill-opacity:1;stroke-width:0.376161" />
+       style="opacity:1;fill:#b3ff80;fill-opacity:1;stroke-width:0.407192" />
     <text
        font-weight="400"
        font-stretch="semi-condensed"
        font-size="16.9333px"
        id="text1727"
-       x="610.32404"
-       y="348.85931"
+       x="615.04333"
+       y="267.91983"
        style="font-weight:400;font-stretch:semi-condensed;font-size:14.9282px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.260376"
        transform="scale(1.0240361,0.97652808)"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
          id="tspan6">mitiq.shadows</tspan></text>
     <g
-       id="g980"
-       transform="matrix(0.99327222,0,0,0.98127905,711.16891,304.46195)">
-      <rect
-         x="-164.27325"
-         y="296.39944"
-         width="242.77063"
-         height="17.372885"
-         id="rect1522"
-         style="fill:#ffd42a;stroke-width:0.352066" />
-      <text
-         font-weight="400"
-         font-stretch="semi-condensed"
-         font-size="10.5833px"
-         id="text1524"
-         x="-160.85126"
-         y="308.01962"
-         style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
-           id="tspan1">5.Average over all classical snapshots</tspan></text>
-    </g>
-    <g
        id="g32"
-       transform="matrix(0.93195,0,0,0.93195,494.39621,25.170429)">
+       transform="matrix(0.93195,0,0,0.93195,499.22891,-53.869245)">
       <g
          id="g50"
          transform="translate(-1.4761254,14.570447)">
@@ -238,7 +233,7 @@
     </g>
     <g
        id="g47"
-       transform="translate(601.1297,8.365128)"
+       transform="translate(605.3562,-80.640734)"
        style="stroke-width:1.1;stroke-dasharray:none">
       <rect
          x="-33.4995"
@@ -291,8 +286,329 @@
            id="tspan46" /></text>
     </g>
     <g
+       id="g2"
+       transform="translate(628.98817,54.463186)">
+      <rect
+         x="-223.6236"
+         y="390.78049"
+         width="107.96104"
+         height="62.137493"
+         stroke-miterlimit="8"
+         id="rect1743"
+         style="fill:#ffffe1;stroke:#000000;stroke-width:1.17707;stroke-miterlimit:8" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+         x="-167.17671"
+         y="421.55786"
+         id="text916-7-2"
+         transform="scale(1.0228682,0.97764306)"><tspan
+           x="-167.17671"
+           y="421.55786"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan964-5">Mitigated </tspan><tspan
+           x="-167.17671"
+           y="434.53525"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan1">Expectation</tspan><tspan
+           x="-167.17671"
+           y="447.5126"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan994">value</tspan><tspan
+           x="-167.17671"
+           y="460.48999"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan71" /><tspan
+           x="-167.17671"
+           y="473.46735"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan72" /><tspan
+           x="-167.17671"
+           y="486.44473"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan67" /></text>
+    </g>
+    <g
+       id="g2-5"
+       transform="translate(630.72301,152.03956)">
+      <rect
+         x="-223.6236"
+         y="390.78049"
+         width="107.96104"
+         height="62.137493"
+         stroke-miterlimit="8"
+         id="rect1743-3"
+         style="fill:#ffffe1;stroke:#000000;stroke-width:1.17707;stroke-miterlimit:8" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+         x="-167.17671"
+         y="421.55786"
+         id="text916-7-2-5"
+         transform="scale(1.0228682,0.97764306)"><tspan
+           x="-167.17671"
+           y="421.55786"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan67-7">Reconstructed</tspan><tspan
+           x="-167.17671"
+           y="434.53525"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan23">quantum</tspan><tspan
+           x="-167.17671"
+           y="447.5126"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+           id="tspan25">state</tspan></text>
+    </g>
+    <g
+       id="g4"
+       transform="translate(602.26854,-86.779174)">
+      <g
+         id="g3">
+        <rect
+           x="-194.21484"
+           y="360.44257"
+           width="102.12129"
+           height="67.46875"
+           stroke="#000000"
+           stroke-width="1.19523"
+           stroke-miterlimit="8"
+           fill="#ffffe1"
+           id="rect1737" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
+           x="-142.41753"
+           y="397.13016"
+           id="text1017"
+           transform="scale(1.0228682,0.97764306)"><tspan
+             id="tspan1015"
+             x="-142.41753"
+             y="397.13016"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563">Quantum</tspan><tspan
+             x="-142.41753"
+             y="410.10754"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
+             id="tspan1021">program</tspan></text>
+      </g>
+    </g>
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.100387;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
+       d="M 883.74304,451.22122 Z"
+       id="path19" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.49944px;line-height:0.85;font-family:Monospace;-inkscape-font-specification:Monospace;fill:#99ff55;stroke:#000000;stroke-width:1.50581;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
+       x="544.02515"
+       y="372.98331"
+       id="text3"
+       transform="scale(1.0038701,0.99614482)"><tspan
+         id="tspan3"
+         style="stroke-width:1.50581"
+         x="544.02515"
+         y="372.98331"> </tspan></text>
+    <rect
+       x="811.26184"
+       y="245.54022"
+       width="141.493"
+       height="368.90344"
+       fill="#d9d9d9"
+       id="rect1757"
+       style="stroke-width:0.370369" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1759"
+       x="810.59528"
+       y="269.85358"
+       style="font-size:14.9282px;stroke-width:0.260376"
+       transform="scale(1.0240361,0.97652808)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
+         id="tspan7">Hardware</tspan></text>
+    <g
+       id="g980-7"
+       transform="matrix(0.99327221,0,0,0.98127905,847.08004,-12.365212)">
+      <rect
+         x="-95.326027"
+         y="295.14841"
+         width="176.48209"
+         height="17.372885"
+         id="rect1522-7"
+         style="fill:#ffd42a;stroke-width:0.300176" />
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="10.5833px"
+         id="text1524-64"
+         x="-92.344299"
+         y="307.47128"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
+           id="tspan1-3">2.Noisy Z-basis Measurement</tspan></text>
+    </g>
+    <rect
+       style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#163900;stroke-width:2.25906;stroke-dasharray:2.25906, 2.25906;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1-0"
+       width="391.91748"
+       height="159.74704"
+       x="551.27576"
+       y="268.44373" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle)"
+       d="m 557.61679,378.29123 h 13.55929 v -24.01174"
+       id="path53" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.46403;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-5)"
+       d="M 518.50061,472.91759 H 729.77576 V 416.98662"
+       id="path53-6" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.41476;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-5-3)"
+       d="M 520.66784,571.43011 H 730.46252 V 415.19403"
+       id="path53-6-7" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.37008;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8)"
+       d="m 786.65727,399.65139 h 86.51956 v -35.9019"
+       id="path53-2" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.48331;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8-8)"
+       d="M 879.57837,324.14662 V 306.00424 H 678.89164"
+       id="path53-2-3" />
+    <g
+       id="g980-7-9"
+       transform="matrix(0.99327221,0,0,0.98127905,707.64011,88.022616)">
+      <g
+         id="g51"
+         transform="translate(-59.3989,-31.601702)">
+        <rect
+           x="-95.326027"
+           y="295.14841"
+           width="216.02931"
+           height="17.372885"
+           id="rect1522-7-2"
+           style="fill:#ffd42a;stroke-width:0.332109" />
+        <text
+           font-weight="400"
+           font-stretch="semi-condensed"
+           font-size="10.5833px"
+           id="text1524-64-5"
+           x="-91.703407"
+           y="306.89066"
+           style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
+             id="tspan1-3-4">4.Repeat for size chosen in Step 1</tspan></text>
+      </g>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.24933;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker64)"
+       d="m 568.19097,308.36706 -57.89792,0.13959"
+       id="path63" />
+    <rect
+       style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.16095;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1"
+       width="560.01819"
+       height="370.82443"
+       x="393.59686"
+       y="245.08401" />
+    <g
+       id="g34-3"
+       transform="translate(686.90218,-18.24492)">
+      <g
+         id="g6-6"
+         transform="matrix(1.4760802,0,0,0.69309983,43.595532,165.84637)"
+         style="fill:#5aa02c">
+        <rect
+           x="-111.13868"
+           y="435.34201"
+           width="99.907127"
+           height="67.226265"
+           stroke="#000000"
+           stroke-width="1.1824"
+           stroke-miterlimit="8"
+           fill="#ddffff"
+           id="rect1769-3-7"
+           style="fill:#5aa02c" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#5aa02c;fill-opacity:1;stroke:none;stroke-width:0.260563"
+           x="45.942749"
+           y="503.28326"
+           id="text916-6-5"
+           transform="scale(1.0228682,0.97764306)"><tspan
+             x="45.942749"
+             y="503.28326"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
+             id="tspan11-3-6" /></text>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.254962"
+         x="-45.947018"
+         y="502.3082"
+         id="text916-3-2"
+         transform="scale(1.0409342,0.96067551)"><tspan
+           x="-45.947018"
+           y="502.3082"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan17">Prediction using each</tspan><tspan
+           x="-45.947018"
+           y="513.99048"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan4">classical </tspan><tspan
+           x="-45.947018"
+           y="525.67273"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan18">snapshot</tspan></text>
+    </g>
+    <g
+       id="g34-3-0"
+       transform="translate(675.54781,159.31394)">
+      <g
+         id="g6-6-9"
+         transform="matrix(1.4760802,0,0,0.69309983,48.428227,86.806696)"
+         style="fill:#5aa02c">
+        <rect
+           x="-111.13868"
+           y="435.34201"
+           width="99.907127"
+           height="67.226265"
+           stroke="#000000"
+           stroke-width="1.1824"
+           stroke-miterlimit="8"
+           fill="#ddffff"
+           id="rect1769-3-7-3"
+           style="fill:#5aa02c" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#5aa02c;fill-opacity:1;stroke:none;stroke-width:0.260563"
+           x="45.942749"
+           y="503.28326"
+           id="text916-6-5-6"
+           transform="scale(1.0228682,0.97764306)"><tspan
+             x="45.942749"
+             y="503.28326"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:0.75;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#5aa02c;stroke-width:0.260563"
+             id="tspan11-3-6-0" /></text>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.254962"
+         x="-41.304367"
+         y="423.71536"
+         id="text916-3-2-6"
+         transform="scale(1.0409342,0.96067551)"><tspan
+           x="-41.304367"
+           y="423.71536"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan10">Average over all</tspan><tspan
+           x="-41.304371"
+           y="435.39764"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.1585px;line-height:1.15;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.254962"
+           id="tspan11">classical snapshots</tspan></text>
+    </g>
+    <g
        id="g34"
-       transform="translate(686.45197,8.985946)">
+       transform="translate(690.81224,-97.108964)">
       <g
          id="g6"
          transform="matrix(1.2356814,0,0,0.77241233,-26.707252,105.48641)"
@@ -349,122 +665,37 @@
            id="tspan64">state</tspan></text>
     </g>
     <g
-       id="g2"
-       transform="translate(633.15378,83.864142)">
-      <rect
-         x="-227.49567"
-         y="414.81955"
-         width="107.47623"
-         height="124.42329"
-         stroke-miterlimit="8"
-         id="rect1743"
-         style="fill:#ffffe1;stroke:#000000;stroke-width:1.66188;stroke-miterlimit:8" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
-         x="-169.01488"
-         y="448.93832"
-         id="text916-7-2"
-         transform="scale(1.0228682,0.97764306)"><tspan
-           x="-169.01488"
-           y="448.93832"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan964-5">Expectation</tspan><tspan
-           x="-169.01488"
-           y="461.91571"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan994">value</tspan><tspan
-           x="-169.01488"
-           y="474.89307"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan69" /><tspan
-           x="-169.01488"
-           y="487.87045"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan71">OR</tspan><tspan
-           x="-169.01488"
-           y="500.84781"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan72" /><tspan
-           x="-169.01488"
-           y="513.8252"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan70">Reconstructed</tspan><tspan
-           x="-169.01488"
-           y="526.80255"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-           id="tspan67">input state</tspan></text>
-    </g>
-    <g
-       id="g4"
-       transform="translate(596.82203,6.8283287)">
+       id="g980-7-4"
+       transform="matrix(0.99327222,0,0,0.98127904,857.37886,185.84591)">
       <g
-         id="g3">
-        <rect
-           x="-194.21484"
-           y="360.44257"
-           width="102.12129"
-           height="67.46875"
-           stroke="#000000"
-           stroke-width="1.19523"
-           stroke-miterlimit="8"
-           fill="#ffffe1"
-           id="rect1737" />
-        <text
-           xml:space="preserve"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;line-height:1.25;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.260563"
-           x="-142.41753"
-           y="397.13016"
-           id="text1017"
-           transform="scale(1.0228682,0.97764306)"><tspan
-             id="tspan1015"
-             x="-142.41753"
-             y="397.13016"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563">Quantum</tspan><tspan
-             x="-142.41753"
-             y="410.10754"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.3819px;font-family:Monospace;-inkscape-font-specification:'Monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.260563"
-             id="tspan1021">program</tspan></text>
+         id="g62"
+         transform="translate(37.738436,-0.3707144)">
+        <g
+           id="g63"
+           transform="translate(-7.8955654,-70.220643)">
+          <rect
+             x="-95.326027"
+             y="295.14841"
+             width="120.77694"
+             height="17.372885"
+             id="rect1522-7-7"
+             style="fill:#ffd42a;stroke-width:0.248322" />
+          <text
+             font-weight="400"
+             font-stretch="semi-condensed"
+             font-size="10.5833px"
+             id="text1524-64-7"
+             x="-90.043755"
+             y="307.4249"
+             style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan1-3-5">3. Record Outcomes</tspan></text>
+        </g>
       </g>
     </g>
-    <path
-       style="fill:#000000;stroke:#000000;stroke-width:0.100387;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
-       d="M 878.91034,530.26089 Z"
-       id="path19" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.49944px;line-height:0.85;font-family:Monospace;-inkscape-font-specification:Monospace;fill:#99ff55;stroke:#000000;stroke-width:1.50581;stroke-linecap:square;stroke-miterlimit:0;paint-order:stroke fill markers"
-       x="539.21106"
-       y="452.32886"
-       id="text3"
-       transform="scale(1.0038701,0.99614482)"><tspan
-         id="tspan3"
-         style="stroke-width:1.50581"
-         x="539.21106"
-         y="452.32886"> </tspan></text>
-    <rect
-       x="806.42914"
-       y="324.5799"
-       width="141.493"
-       height="313.71814"
-       fill="#d9d9d9"
-       id="rect1757"
-       style="stroke-width:0.341545" />
-    <text
-       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
-       font-weight="400"
-       font-stretch="semi-condensed"
-       font-size="16.9333px"
-       id="text1759"
-       x="805.87598"
-       y="350.79306"
-       style="font-size:14.9282px;stroke-width:0.260376"
-       transform="scale(1.0240361,0.97652808)"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.9282px;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.260376"
-         id="tspan7">Hardware</tspan></text>
     <g
        id="g30"
-       transform="translate(630.69045,0.75219002)">
+       transform="translate(639.90307,-87.838944)">
       <rect
          x="185.93433"
          y="416.98273"
@@ -493,113 +724,27 @@
            id="tspan1013">backend</tspan></text>
     </g>
     <g
-       id="g980-7"
-       transform="matrix(0.99327221,0,0,0.98127905,843.58802,82.127016)">
+       id="g980"
+       transform="matrix(1.0122193,0,0,0.98127904,664.33917,219.26231)">
       <rect
-         x="-95.326027"
-         y="295.14841"
-         width="176.48209"
-         height="17.372885"
-         id="rect1522-7"
-         style="fill:#ffd42a;stroke-width:0.300176" />
+         x="-193.84341"
+         y="300.54453"
+         width="182.3831"
+         height="23.65896"
+         id="rect1522"
+         style="fill:#ffd42a;stroke-width:0.356107" />
       <text
          font-weight="400"
          font-stretch="semi-condensed"
          font-size="10.5833px"
-         id="text1524-64"
-         x="-92.344299"
-         y="307.47128"
+         id="text1524"
+         x="-190.20001"
+         y="315.50775"
          style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
-           id="tspan1-3">2.Noisy Z-basis Measurement</tspan></text>
+           id="tspan5"
+           x="-190.20001"
+           y="315.50775"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace">5.Median of means estimation</tspan></text>
     </g>
-    <g
-       id="g980-7-4"
-       transform="matrix(0.99327221,0,0,0.98127905,867.85196,287.84347)">
-      <g
-         id="g62"
-         transform="translate(37.738436,-0.3707144)">
-        <g
-           id="g63"
-           transform="translate(-7.8955654,-70.220643)">
-          <rect
-             x="-95.326027"
-             y="295.14841"
-             width="120.77694"
-             height="17.372885"
-             id="rect1522-7-7"
-             style="fill:#ffd42a;stroke-width:0.248322" />
-          <text
-             font-weight="400"
-             font-stretch="semi-condensed"
-             font-size="10.5833px"
-             id="text1524-64-7"
-             x="-90.043755"
-             y="307.4249"
-             style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
-               id="tspan1-3-5">3. Record Outcomes</tspan></text>
-        </g>
-      </g>
-    </g>
-    <rect
-       style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#163900;stroke-width:2.46821;stroke-dasharray:2.46821, 2.46821;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect1-0"
-       width="391.70831"
-       height="190.79935"
-       x="546.2196"
-       y="352.27277" />
-    <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle)"
-       d="m 552.17028,476.96851 h 13.55929 v -24.01174"
-       id="path53" />
-    <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.48349;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-5)"
-       d="M 522.9316,588.67486 H 712.93201 V 524.81693"
-       id="path53-6" />
-    <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.37008;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8)"
-       d="m 785.72869,498.99126 h 86.51956 v -35.9019"
-       id="path53-2" />
-    <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.48331;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle-8-8)"
-       d="M 875.5659,413.09566 V 394.95328 H 674.87917"
-       id="path53-2-3" />
-    <g
-       id="g980-7-9"
-       transform="matrix(0.99327221,0,0,0.98127905,704.58073,182.26026)">
-      <g
-         id="g51"
-         transform="translate(-59.3989,-31.601702)">
-        <rect
-           x="-95.326027"
-           y="295.14841"
-           width="216.02931"
-           height="17.372885"
-           id="rect1522-7-2"
-           style="fill:#ffd42a;stroke-width:0.332109" />
-        <text
-           font-weight="400"
-           font-stretch="semi-condensed"
-           font-size="10.5833px"
-           id="text1524-64-5"
-           x="-91.703407"
-           y="306.89066"
-           style="font-weight:400;font-stretch:semi-condensed;font-size:10.2705px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583"><tspan
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2705px;font-family:Monospace;-inkscape-font-specification:Monospace"
-             id="tspan1-3-4">4.Repeat for size chosen in Step 1</tspan></text>
-      </g>
-    </g>
-    <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.24933;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker64)"
-       d="m 562.09521,394.14078 -57.89792,0.13959"
-       id="path63" />
-    <rect
-       style="mix-blend-mode:normal;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.9927;stroke-dasharray:none;stroke-opacity:1"
-       id="rect1"
-       width="560.18646"
-       height="315.23489"
-       x="388.68002"
-       y="324.03955" />
   </g>
 </svg>
