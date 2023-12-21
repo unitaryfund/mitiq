@@ -15,7 +15,8 @@ kernelspec:
 
 **Corresponding to:** Min Li (minl2@illinois.edu)
 
-This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the following notebook `rshadows_tutorial`.
+This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the [following notebook](https://mitiq.readthedocs.io/en/stable/examples/rshadows_tutorial.html).
+
 ```{code-cell} ipython3
 import cirq
 import numpy as np
@@ -75,12 +76,12 @@ MathJax.Hub.Config({
 
 ## 2. Sampling random Pauli measurements 
 
-This process involves applying a random unitary selected from a randomly fixed ensemble $\mathcal{U}\in U(2^n)$ to rotate the state $\rho\rightarrow U^\dagger \rho U$, performing a computational-basis($Z$-basis) measurement, and storing a classical description $U^\dagger |\hat{b}\rangle\langle\hat{b}| U$. After the measurement, the inverse of $U$ is applied to the resulting computational basis state, collapsing $\rho$ to
+This process involves applying a random unitary selected from a randomly fixed ensemble $\mathcal{U}\in U(2^n)$ to rotate the state $\rho\rightarrow U^\dagger \rho U$, followed by a computational-basis($Z$-basis) measurement, and storing a classical description $U^\dagger |\hat{b}\rangle\langle\hat{b}| U$. After the measurement, the inverse of $U$ is applied to the resulting computational basis state, collapsing $\rho$ to
   
 \begin{equation}
 U^\dagger|\hat{b}\rangle\langle\hat{b}| U\qquad \mathrm{where} \qquad \mathrm{Pr}[\hat{b}=b]=\langle b|U\rho U^\dagger|b\rangle.
 \end{equation}
-If the unitary group $\mathcal{U}$ is chosen to be the local Clifford group $\mathrm{CL}(2)^n$, this equavelent to performing a random Pauli measurement on each qubit. This means that for each qubit, we randomly decide to measure one of the Pauli operators. Define the `cirq_executor` take one shot of measurement and return the measurement result.
+If the unitary group $\mathcal{U}$ is chosen to be the local Clifford group $\mathrm{CL}(2)^n$, this equivalent to performing a random Pauli measurement on each qubit. This means that for each qubit, we randomly decide to measure one of the Pauli operators. Below, we define the `cirq_executor` to take one shot of measurement and return the measurement result.
 
 
 ```{code-cell} ipython3
@@ -95,9 +96,9 @@ def cirq_executor(
     )
 ```
 
-In terms of implementation, considering that the only possible measurement to be performed is the $Z$-basis measurement, the random Pauli measurement is equivalent to randomly sampling a unitary from the unitary ensemble: $\mathcal{G}=\{\mathrm{id},\mathrm{H},\mathrm{H}\cdot \mathrm{S}^\dagger\}$. Afterward, the $Z$-basis measurement is conducted. We then record a sequence of Pauli gates $u_i:= U_i^\dagger ZU_i$ that have been measured for each qubit in the circuit. This sequence becomes one of the output lists of the measurement function random_pauli_measurement.
+In terms of implementation, considering that the only possible measurement to be performed is the $Z$-basis measurement, the random Pauli measurement is equivalent to randomly sampling a unitary from the unitary ensemble: $\mathcal{G}=\{\mathrm{id},\mathrm{H},\mathrm{H}\cdot \mathrm{S}^\dagger\}$. Afterward, the $Z$-basis measurement is conducted. We then record a sequence of Pauli gates $u_i:= U_i^\dagger ZU_i$ that have been measured for each qubit in the circuit. This sequence becomes one of the output lists of the measurement function `random_pauli_measurement`.
 
-In the main function, the quantum measurement process is encapsulated within the shadow_quantum_processing function. This function takes the quantum circuit and the number of shots as input. It returns the measurement results as bit strings, for example, '01...0' is equivelent to the measurement basis eigenstate: $|0\rangle|1\rangle...|0\rangle$. Additionally, it provides the measured Pauli gates in string format. For instance, 'XY...Z' signifies a local X-basis measurement on the first qubit, a local Y-basis measurement on the second qubit, and a local Z-basis measurement on the last qubit in the circuit.
+In the main function, the quantum measurement process is encapsulated within the `shadow_quantum_processing function`. This function takes the quantum circuit and the number of shots as input. It returns the measurement results as bit strings, for example, '01...0' is equivalent to the measurement basis eigenstate: $|0\rangle|1\rangle...|0\rangle$. Additionally, it provides the measured Pauli gates in string format. For instance, 'XY...Z' signifies a local X-basis measurement on the first qubit, a local Y-basis measurement on the second qubit, and a local Z-basis measurement on the last qubit in the circuit.
 
 
 ```{code-cell} ipython3
@@ -123,7 +124,7 @@ which has been named a single copy of **classical shadow**. Based on *Schur's Le
 \end{equation}
  which is indeed unitary, however, not CP, so it is not a physical map as expected.
 
-In the case of random Pauli measurement, the unitary could be represented by the tensor product of all qubits, so it is with the state $|\hat{b}\rangle\in\{0,1\}^{\otimes n}$, i.e. $U^\dagger|\hat{b}\rangle=\bigotimes_{i\leq n}U_i|\hat{b}_i\rangle$. Therefore, based on Schur's Lemma, a snapshot would takes the form:
+In the case of random Pauli measurement, the unitary could be represented by the tensor product of all qubits, so it is with the state $|\hat{b}\rangle\in\{0,1\}^{\otimes n}$, i.e. $U^\dagger|\hat{b}\rangle=\bigotimes_{i\leq n}U_i|\hat{b}_i\rangle$. Therefore, based on Schur's Lemma, a snapshot would take the form:
 \begin{equation}
 \hat{\rho}=\bigotimes_{i=1}^{n}\left(3U_i^\dagger|\hat{b}_i\rangle\langle\hat{b}_i|U_i-\mathbb{I}\right),\qquad|\hat{b}_i\rangle\in\{0,1\}.
 \end{equation}
@@ -141,16 +142,16 @@ The classical shadows state reconstruction are then obtained by taking the avera
 this is realized in the function `state_reconstruction`. In the main function `classical_post_processing`, we take the output of `shadow_quantum_processing`, then apply the inverse channel to obtain the snapshots, and finally take the average of the snapshots to obtain the reconstructed state if *state_reconstruction =* **True**. **In the current notebook, we don't preform Pauli twirling calibration, and we set** *rshadow* = **False**.
 
 #### 4.1.1 Error Analysis
-We can take a visualization of the elementwise difference between the reconstructed state and the original state. 
+We can take a visualization of the element wise difference between the reconstructed state and the original state. 
 \begin{equation}
 \Delta\rho_{ij}=|\rho^{\mathrm{shadow}}_{ij}-\rho_{ij}|
 \end{equation}
-The difference is very small, which means that the classical shadow is a good approximation of the original state even in the sence of state tomography. 
+The difference is very small, which means that the classical shadow is a good approximation of the original state even in the sense of state tomography. 
 
 It is anticipated that the fidelity will not necessarily be lower than 1, as the state reconstructed through classical shadow estimation is not guaranteed to be a physical quantum state, given that $\mathcal{M}^{-1}$ is not a quantum channel. 
 
 Fidelity is defined by $F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$, when $\rho=|v\rangle\langle v|$ is a pure state $F(\rho,\sigma)=\langle v|\sigma|v\rangle$.
-Based on the theorem, if the error rate of fedelity is $\epsilon$, i.e.
+Based on the theorem, if the error rate of fidelity is $\epsilon$, i.e.
 \begin{equation}
 |F(\rho,\sigma)-1|\leq\epsilon,
 \end{equation}
@@ -158,7 +159,7 @@ then the minimum number of measurements $N$ (number of snapshots) should be:
 \begin{equation}
 N = \frac{34}{\epsilon^2}\left\|\rho-\mathrm{Tr}(\rho)/{2^n}\mathbb{I}\right\|_{\mathrm{shadow}}^2
 \end{equation}
-with the shadow norm upper bound of the random Pauli measurement $\left\|\cdot\right\|_{\mathrm{shadow}}\leq 2^k\|\cdot\|_\infty$ when the operator acting on $k$ qubits, we have $N\leq 34\epsilon^{-2}2^{2n}+\mathcal{O}(e^{-n})$. Based on Fuchs–van de Graaf inequalities and properties of $L_p$ norm, $\|\rho-\sigma\|_2\leq \|\rho-\sigma\|_1 \leq (1-F(\rho,\sigma))^{1/2}$, the $L_2$ norm distance between the state reconstructed through classical shadow estimation and the state prepared by the circuit is upperbounded by the fidelity error rate $\epsilon$. The dependency of the bound number of measurements $N$ to achieve the error rate $\epsilon$ is depicked in function `n_measurements_tomography_bound`.
+with the shadow norm upper bound of the random Pauli measurement $\left\|\cdot\right\|_{\mathrm{shadow}}\leq 2^k\|\cdot\|_\infty$ when the operator acting on $k$ qubits, we have $N\leq 34\epsilon^{-2}2^{2n}+\mathcal{O}(e^{-n})$. Based on Fuchs–van de Graaf inequalities and properties of $L_p$ norm, $\|\rho-\sigma\|_2\leq \|\rho-\sigma\|_1 \leq (1-F(\rho,\sigma))^{1/2}$, the $L_2$ norm distance between the state reconstructed through classical shadow estimation and the state prepared by the circuit is upperbound by the fidelity error rate $\epsilon$. The dependency of the bound number of measurements $N$ to achieve the error rate $\epsilon$ is depicted in function `n_measurements_tomography_bound`.
 
 
 ```{code-cell} ipython3
@@ -186,13 +187,13 @@ rho_shadow = output["reconstructed_state"]
 
 
 ```{code-cell} ipython3
-# Compute the ideal state vector discribed by the input circuit.
+# Compute the ideal state vector described by the input circuit.
 state_vector = test_circuits.final_state_vector().reshape(-1, 1)
 # Compute the density matrix.
 rho_true = state_vector @ state_vector.conj().T
 ```
 
-We can plot the elementwise difference between the reconstructed state and the original state as a thermal diagram:
+We can plot the element wise difference between the reconstructed state and the original state as a thermal diagram:
 
 
 ```{code-cell} ipython3

@@ -11,6 +11,10 @@ kernelspec:
   name: python3
 ---
 
+```{admonition} Note:
+The documentation for Classical Shadows in Mitiq is still under construction. This users guide will change in the future.
+```
+
 # Classical Shadows
 
 Classical shadows protocol {cite}`huang2020predicting` aims to create an approximate classical representation
@@ -18,7 +22,7 @@ of a quantum state using minimal measurements. The protocol is based on the idea
 which is a technique for reconstructing a quantum state from a small number of measurements.
 This approach not only characterizes and mitigates noise effectively but also retains
 sample efficiency and demonstrates noise resilience {cite}`chen2021robust`. For more details, see the section
-([Classical Shadow Protocol and its Robust Estimation](shadows-5-theory.md)).
+[Classical Shadow Protocol and its Robust Estimation](shadows-5-theory.md).
 
  
 ```{figure} ../img/classicalshadow_workflow.png
@@ -48,6 +52,6 @@ shadows-5-theory.md
 
 Here are some examples on how to use shadows in Mitiq:
 
-- [Classical Shadows Protocal with Cirq](../examples/shadows_tutorial.md)
+- [Classical Shadows Protocol with Cirq](../examples/shadows_tutorial.md)
 - [Robust Shadows Estimation with Cirq](../examples/rshadows_tutorial.md)
 
