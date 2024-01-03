@@ -9,39 +9,13 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
 from scipy.linalg import sqrtm
 
 import mitiq
-
-
-def eigenvalues_to_bitstring(values: Iterable[int]) -> str:
-    """Converts eigenvalues to bitstring. e.g., ``[-1,1,1] -> "100"``
-
-    Args:
-        values: A list of eigenvalues (must be $-1$ and $1$).
-
-    Returns:
-        A string of 1s and 0s corresponding to the states associated to
-        eigenvalues.
-    """
-    return "".join(["1" if v == -1 else "0" for v in values])
-
-
-def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
-    """Converts bitstring to eigenvalues. e.g., ``"100" -> [-1,1,1]``
-
-    Args:
-        bitstring: A string of 1s and 0s.
-
-    Returns:
-        A list of eigenvalues (either $-1$ or $1$) corresponding to the
-        bitstring.
-    """
-    return [1 if b == "0" else -1 for b in bitstring]
 
 
 def create_string(str_len: int, loc_list: List[int]) -> str:

@@ -9,32 +9,11 @@ import numpy as np
 
 import mitiq
 from mitiq.shadows.shadows_utils import (
-    bitstring_to_eigenvalues,
     create_string,
-    eigenvalues_to_bitstring,
     fidelity,
     n_measurements_opts_expectation_bound,
     n_measurements_tomography_bound,
 )
-
-# Tests start here
-
-
-def test_eigenvalues_to_bitstring():
-    values = [-1, 1, 1]
-    assert eigenvalues_to_bitstring(values) == "100"
-    assert bitstring_to_eigenvalues(eigenvalues_to_bitstring(values)) == values
-
-
-def test_bitstring_to_eigenvalues():
-    bitstring = "100"
-    np.testing.assert_array_equal(
-        bitstring_to_eigenvalues(bitstring), np.array([-1, 1, 1])
-    )
-    assert (
-        eigenvalues_to_bitstring(bitstring_to_eigenvalues(bitstring))
-        == bitstring
-    )
 
 
 def test_create_string():
