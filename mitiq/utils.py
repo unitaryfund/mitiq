@@ -297,6 +297,10 @@ def matrix_to_vector(
     r"""Reshapes a :math:`d \times d` density matrix into a
     :math:`d^2`-dimensional state vector, according to the rule:
     :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
+
+    Note: The vectorized form is created by stacking rows of the
+    input matrix rather than the conventional notation of
+    stacking columns.
     """
     return density_matrix.flatten()
 
