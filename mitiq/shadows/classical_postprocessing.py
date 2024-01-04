@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import cirq
 import numpy as np
-from numpy.typing import NDArray
+import numpy.typing as npt
 
 import mitiq
 from mitiq.shadows.shadows_utils import create_string
@@ -184,7 +184,7 @@ def classical_snapshot(
     u_list_shadow: str,
     pauli_twirling_calibration: bool,
     f_est: Optional[Dict[str, float]] = None,
-) -> NDArray[Any]:
+) -> npt.NDArray[Any]:
     r"""
     Implement a single snapshot state reconstruction
     with calibration of the noisy quantum channel.
@@ -258,7 +258,7 @@ def shadow_state_reconstruction(
     shadow_measurement_outcomes: Tuple[List[str], List[str]],
     pauli_twirling_calibration: bool,
     f_est: Optional[Dict[str, float]] = None,
-) -> NDArray[Any]:
+) -> npt.NDArray[Any]:
     """Reconstruct a state approximation as an average over all snapshots.
 
     Args:
