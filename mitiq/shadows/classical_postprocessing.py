@@ -357,15 +357,12 @@ def expectation_estimation_shadow(
                     )
 
                 b = create_string(num_qubits, target_locs)
-                f_val = f_est.get(b, None)
-                if f_val is None:
-                    product = 0.0
-                else:
-                    # product becomes an array of snapshots expectation values
-                    # witch satisfy condition (1) and (2)
-                    product = (1.0 / f_val) * product
+                f_val = f_est.get(b, np.inf)
+                # product becomes an array of snapshot expectation values
+                # witch satisfy condition (1) and (2)
+                product = (1 / f_val) * product
             else:
-                product = 3 ** (len(target_locs)) * product
+                product = 3 ** len(target_locs) * product
 
         else:
             product = 0.0
