@@ -12,8 +12,6 @@
 from typing import List, Tuple
 
 import numpy as np
-from numpy.typing import NDArray
-from scipy.linalg import sqrtm
 
 import mitiq
 
@@ -109,29 +107,3 @@ def n_measurements_opts_expectation_bound(
         / error**2
     )
     return int(np.ceil(N * K)), int(K)
-
-
-def fidelity(
-    sigma: NDArray[np.complex64], rho: NDArray[np.complex64]
-) -> float:
-    """
-    Calculate the fidelity between two states.
-
-    Args:
-        sigma: A state in terms of square matrix or vector.
-        rho: A state in terms square matrix or vector.
-
-    Returns:
-        Scalar corresponding to the fidelity.
-    """
-    if sigma.ndim == 1 and rho.ndim == 1:
-        val = np.abs(np.dot(sigma.conj(), rho)) ** 2.0
-    elif sigma.ndim == 1 and rho.ndim == 2:
-        val = np.abs(sigma.conj().T @ rho @ sigma)
-    elif sigma.ndim == 2 and rho.ndim == 1:
-        val = np.abs(rho.conj().T @ sigma @ rho)
-    elif sigma.ndim == 2 and rho.ndim == 2:
-        val = np.abs(np.trace(sqrtm(sigma) @ rho @ sqrtm(sigma)))
-    else:
-        raise ValueError("Invalid input dimensions")
-    return float(val)
