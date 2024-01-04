@@ -21,9 +21,9 @@ from mitiq.utils import matrix_kronecker_product, operator_ptm_vector_rep
 
 # Local unitaries to measure Pauli operators in the Z basis
 PAULI_MAP = {
-    "X": cirq.H._unitary_(),
-    "Y": cirq.H._unitary_() @ cirq.S._unitary_().conj(),
-    "Z": cirq.I._unitary_(),
+    "X": cirq.unitary(cirq.H),
+    "Y": cirq.unitary(cirq.H) @ cirq.unitary(cirq.S).conj(),
+    "Z": cirq.unitary(cirq.I),
 }
 
 # Density matrices of single-qubit basis states
@@ -247,7 +247,7 @@ def classical_snapshot(
             state = ZERO_STATE if b == "0" else ONE_STATE
             U = PAULI_MAP[u]
             # apply inverse of the quantum channel,get PTM vector rep
-            local_rho = 3.0 * (U.conj().T @ state @ U) - cirq.I._unitary_()
+            local_rho = 3.0 * (U.conj().T @ state @ U) - cirq.unitary(cirq.I)
             local_rhos.append(local_rho)
 
         rho_snapshot = matrix_kronecker_product(local_rhos)
