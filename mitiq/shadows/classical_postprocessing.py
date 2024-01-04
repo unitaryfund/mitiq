@@ -293,7 +293,7 @@ def shadow_state_reconstruction(
 
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[List[str], List[str]],
-    pauli_str: mitiq.PauliString,  # type: ignore
+    pauli_str: mitiq.PauliString,
     k_shadows: int,
     pauli_twirling_calibration: bool,
     f_est: Optional[Dict[str, float]] = None,
