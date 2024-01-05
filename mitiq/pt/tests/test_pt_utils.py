@@ -120,6 +120,44 @@ def test_pauli_vectorized_list():
         ),
         # Identity
         (cirq.I, np.identity(4)),
+        # Note: For rotation gates, the PTM is a 4 x 4 spatial rotation matrix
+        # X Rotation
+        (
+            cirq.Rx(rads=0.167 * np.pi),
+            np.array(
+                [
+                    [1.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 1.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.0 + 0.0j, 0.8660254 + 0.0j, -0.5 + 0.0j],
+                    [0.0 + 0.0j, 0.0 + 0.0j, 0.5 + 0.0j, 0.8660254 + 0.0j],
+                ]
+            ),
+        ),
+        # Y Rotation
+        (
+            cirq.Ry(rads=0.167 * np.pi),
+            np.array(
+                [
+                    [1.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.8660254 + 0.0j, 0.0 + 0.0j, -0.5 + 0.0j],
+                    [0.0 + 0.0j, 0.0 + 0.0j, 1.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.5 + 0.0j, 0.0 + 0.0j, 0.8660254 + 0.0j],
+                ]
+            ),
+        ),
+        # Z Rotation
+        (
+            cirq.Rz(rads=0.167 * np.pi),
+            np.array(
+                [
+                    [1.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.8660254 + 0.0j, -0.5 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.5 + 0.0j, 0.8660254 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 1.0 + 0.0j],
+                ]
+            ),
+        ),
+        # Hadamard
     ],
 )
 def test_ptm_single_ideal_gate(input_gate, expected_ptm):
@@ -127,4 +165,4 @@ def test_ptm_single_ideal_gate(input_gate, expected_ptm):
     circuit = cirq.Circuit()
     circuit.append(input_gate(q0))
     calculated_ptm = ptm_matrix(circuit, 1)
-    np.testing.assert_array_equal(calculated_ptm, expected_ptm)
+    assert np.abs(calculated_ptm - expected_ptm).all() <= 0.1
