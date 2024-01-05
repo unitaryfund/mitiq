@@ -7,7 +7,11 @@ import cirq
 import numpy as np
 import pytest
 
-from mitiq.pt.pt_utils import _n_qubit_paulis, _pauli_vectorized_list, ptm_matrix
+from mitiq.pt.pt_utils import (
+    _n_qubit_paulis,
+    _pauli_vectorized_list,
+    ptm_matrix,
+)
 
 single_qubit_paulis = [
     cirq.unitary((cirq.I)),
