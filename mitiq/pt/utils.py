@@ -6,6 +6,8 @@
 """Utility functions for Pauli Twirling."""
 import cirq
 import numpy as np
+import numpy.typing as npt
+from cirq.circuits import Circuit
 
 from mitiq.utils import matrix_to_vector, vector_to_matrix
 
@@ -17,7 +19,7 @@ pauli_unitary_list = [
 ]
 
 
-def _n_qubit_paulis(num_qubits):
+def _n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Get a list of n-qubit Pauli unitaries."""
     if not num_qubits >= 1:
         raise ValueError("Invalid number of qubits provided.")
@@ -36,7 +38,7 @@ def _n_qubit_paulis(num_qubits):
     return n_qubit_paulis
 
 
-def _pauli_vectorized_list(num_qubits):
+def _pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Define a function to create a list of vectorized matrices.
 
     If the density matrix of interest has more than n>1 qubits, the
@@ -53,7 +55,7 @@ def _pauli_vectorized_list(num_qubits):
     return output_pauli_vec_list
 
 
-def ptm_matrix(circuit, num_qubits):
+def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
     """Find the Pauli Transfer Matrix (PTM) of a circuit."""
     superop = cirq.kraus_to_superoperator(cirq.kraus(circuit))
     vec_pauli = _pauli_vectorized_list(num_qubits)
