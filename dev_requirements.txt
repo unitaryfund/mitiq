@@ -11,7 +11,7 @@ amazon-braket-sdk~=1.65.1
 pytest==7.1.3
 pytest-xdist[psutil]==3.0.2
 pytest-cov==4.0.0
-flake8==6.0.0
+flake8==7.0.0
 black==22.10
 mypy==1.0.0
 isort==5.13.2
