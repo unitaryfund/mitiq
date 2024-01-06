@@ -93,18 +93,11 @@ def test_get_pauli_fidelity():
         ["XX", "YY", "ZZ", "XY"],
     )
     k_calibration = 2
-    expected_result = {
-        "00": (1 + 0j),
-        "10": (-0.25 + 0j),
-        "01": (0.25 + 0j),
-        "11": (-0.25 + 0j),
-    }
+    expected_result = {"00": 1, "10": -0.25, "01": 0.25, "11": -0.25}
     result = get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration
     )
-
-    for key in expected_result.keys():
-        assert np.isclose(result[key], expected_result[key])
+    assert result == expected_result
 
 
 def test_classical_snapshot_cal():
