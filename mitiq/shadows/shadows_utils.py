@@ -9,7 +9,7 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -37,6 +37,36 @@ def create_string(str_len: int, loc_list: List[int]) -> str:
     return "".join(
         map(lambda i: "1" if i in set(loc_list) else "0", range(str_len))
     )
+
+
+def valid_bitstrings(
+    num_qubits: int, max_hamming_weight: Optional[int] = None
+) -> set[str]:
+    """
+    Description.
+
+    Args:
+        num_qubits:
+        max_hamming_weight:
+
+    Returns:
+        The set of all valid bitstrings on ``num_qubits`` bits, with a maximum
+        hamming weight.
+    Raises:
+        Value error when ``max_hamming_weight`` is not greater than 0.
+    """
+    if max_hamming_weight and max_hamming_weight < 1:
+        raise ValueError(
+            "max_hamming_weight must be greater than 0. "
+            f"Got {max_hamming_weight}."
+        )
+
+    bitstrings = {
+        bin(i)[2:].zfill(num_qubits)
+        for i in range(2**num_qubits)
+        if bin(i).count("1") <= max_hamming_weight or num_qubits
+    }
+    return bitstrings
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:

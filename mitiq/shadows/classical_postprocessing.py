@@ -8,7 +8,9 @@
 # LICENSE file in the root directory of this source tree.
 """Classical post-processing process of classical shadows."""
 
-from itertools import combinations
+from functools import reduce
+from itertools import compress
+from operator import mul
 from typing import Any, Dict, List, Optional, Tuple
 
 import cirq
@@ -16,7 +18,7 @@ import numpy as np
 import numpy.typing as npt
 
 import mitiq
-from mitiq.shadows.shadows_utils import create_string
+from mitiq.shadows.shadows_utils import create_string, valid_bitstrings
 from mitiq.utils import matrix_kronecker_product, operator_ptm_vector_rep
 
 # Local unitaries to measure Pauli operators in the Z basis
@@ -30,28 +32,9 @@ PAULI_MAP = {
 ZERO_STATE = np.diag([1.0 + 0.0j, 0.0 + 0.0j])
 ONE_STATE = np.diag([0.0 + 0.0j, 1.0 + 0.0j])
 
-# F_LOCAL_MAP is based on local Pauli fidelity of qubit i
-# f_b_i = <<b_i|U_i|P_z^b_i>>
-# s.t. f_0 = U_11U_11^* + U_12U_12^*, f_1 = U_21U_21^* + U_22U_22^*
-F_LOCAL_MAP = {
-    "0X": 0.0,
-    "0Y": 0.0,
-    "0Z": 1.0,
-    "1X": 0.0,
-    "1Y": 0.0,
-    "1Z": -1.0,
-}
-
-"""
-The following functions are used in the classical post-processing
-of calibration
-"""
-
 
 def get_single_shot_pauli_fidelity(
-    bit_string: str,
-    pauli_string: str,
-    locality: Optional[int] = None,
+    bitstring: str, paulistring: str, locality: Optional[int] = None
 ) -> Dict[str, float]:
     r"""
     Calculate Pauli fidelity :math:`f_b` for a single shot measurement of the
@@ -84,26 +67,18 @@ def get_single_shot_pauli_fidelity(
         than or equal to w. The corresponding Pauli fidelity is the product of
         local Pauli fidelity where the associated locus in the keys are '1'.
     """
-    num_qubits = len(bit_string)
-    if locality is None:
-        locality = num_qubits
-    # local_pauli_fidelity is a list of local Pauli fidelity for each qubit
-    local_pauli_fidelity = np.array(
-        [F_LOCAL_MAP[b + u] for b, u in zip(bit_string, pauli_string)]
-    )
-    # f_est is a dictionary of Pauli fidelity for each b_string
-    f_est = {create_string(num_qubits, []): 1.0}
-    for w in range(1, locality + 1):
-        target_locs = np.array(list(combinations(range(num_qubits), w)))
-        single_round_pauli_fidelity = np.prod(
-            local_pauli_fidelity[target_locs], axis=1
-        )
-        for loc, fidelity in zip(target_locs, single_round_pauli_fidelity):
-            # b_str is a string of length n with maximum number of w 1s.
-            b_str = create_string(num_qubits, loc)
-            f_est[b_str] = fidelity
+    pauli_fidelity = {"Z0": 1.0, "Z1": -1.0}
+    local_fidelities = [
+        pauli_fidelity.get(p + b, 0.0) for b, p in zip(bitstring, paulistring)
+    ]
+    num_qubits = len(bitstring)
+    bitstrings = valid_bitstrings(num_qubits, max_hamming_weight=locality)
+    fidelities = {}
+    for bitstring in bitstrings:
+        subset_fidelities = compress(local_fidelities, map(int, bitstring))
+        fidelities[bitstring] = reduce(mul, subset_fidelities, 1.0)
 
-    return f_est
+    return fidelities
 
 
 def get_pauli_fidelities(
