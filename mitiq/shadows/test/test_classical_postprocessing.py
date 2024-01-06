@@ -24,6 +24,67 @@ def test_get_single_shot_pauli_fidelity():
     u_list = "XY"
     expected_result = {"00": 1.0, "01": 0.0, "10": 0.0, "11": 0.0}
     assert get_single_shot_pauli_fidelity(b_list, u_list) == expected_result
+    b_list = "01101"
+    u_list = "XYZYZ"
+    print(get_single_shot_pauli_fidelity(b_list, u_list))
+    assert get_single_shot_pauli_fidelity(b_list, u_list) == {
+        "00000": 1.0,
+        "10000": 0.0,
+        "01000": 0.0,
+        "00100": -1.0,
+        "00010": 0.0,
+        "00001": -1.0,
+        "11000": 0.0,
+        "10100": 0.0,
+        "10010": 0.0,
+        "10001": 0.0,
+        "01100": 0.0,
+        "01010": 0.0,
+        "01001": 0.0,
+        "00110": 0.0,
+        "00101": 1.0,
+        "00011": 0.0,
+        "11100": 0.0,
+        "11010": 0.0,
+        "11001": 0.0,
+        "10110": 0.0,
+        "10101": 0.0,
+        "10011": 0.0,
+        "01110": 0.0,
+        "01101": 0.0,
+        "01011": 0.0,
+        "00111": 0.0,
+        "11110": 0.0,
+        "11101": 0.0,
+        "11011": 0.0,
+        "10111": 0.0,
+        "01111": 0.0,
+        "11111": 0.0,
+    }
+
+
+def test_get_single_shot_pauli_fidelity_with_locality():
+    b_list = "11101"
+    u_list = "XYZYZ"
+    print(get_single_shot_pauli_fidelity(b_list, u_list, locality=2))
+    assert get_single_shot_pauli_fidelity(b_list, u_list, locality=2) == {
+        "00000": 1.0,
+        "10000": 0.0,
+        "01000": 0.0,
+        "00100": -1.0,
+        "00010": 0.0,
+        "00001": -1.0,
+        "11000": 0.0,
+        "10100": 0.0,
+        "10010": 0.0,
+        "10001": 0.0,
+        "01100": 0.0,
+        "01010": 0.0,
+        "01001": 0.0,
+        "00110": 0.0,
+        "00101": 1.0,
+        "00011": 0.0,
+    }
 
 
 def test_get_pauli_fidelity():
