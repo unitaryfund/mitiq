@@ -9,7 +9,7 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-from typing import List, Optional, Tuple
+from typing import Generator, List, Optional, Tuple
 
 import numpy as np
 
@@ -67,6 +67,23 @@ def valid_bitstrings(
         if bin(i).count("1") <= max_hamming_weight or num_qubits
     }
     return bitstrings
+
+
+def batch_calibration_data(
+    data: Tuple[List[str], List[str]], batch_size: int
+) -> Generator[Tuple[List[str], List[str]], None, None]:
+    """Batch calibration into chunks of size batch_size.
+
+    Args:
+        data: The random Pauli measurement outcomes.
+        batch_size: Size of each batch that will be processed.
+
+    Yields:
+        Tuples of bit strings and pauli strings.
+    """
+    bits, paulis = data
+    for i in range(0, len(bits), batch_size):
+        yield bits[i : i + batch_size], paulis[i : i + batch_size]
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:

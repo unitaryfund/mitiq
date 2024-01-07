@@ -8,9 +8,11 @@
 # LICENSE file in the root directory of this source tree.
 """Classical post-processing process of classical shadows."""
 
+from collections import defaultdict
 from functools import reduce
 from itertools import compress
 from operator import mul
+from statistics import median
 from typing import Any, Dict, List, Optional, Tuple
 
 import cirq
@@ -18,7 +20,11 @@ import numpy as np
 import numpy.typing as npt
 
 import mitiq
-from mitiq.shadows.shadows_utils import create_string, valid_bitstrings
+from mitiq.shadows.shadows_utils import (
+    batch_calibration_data,
+    create_string,
+    valid_bitstrings,
+)
 from mitiq.utils import matrix_kronecker_product, operator_ptm_vector_rep
 
 # Local unitaries to measure Pauli operators in the Z basis
@@ -82,8 +88,8 @@ def get_single_shot_pauli_fidelity(
 
 
 def get_pauli_fidelities(
-    calibration_measurement_outcomes: Tuple[List[str], List[str]],
-    k_calibration: int,
+    calibration_outcomes: Tuple[List[str], List[str]],
+    batch_size: int,
     locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
@@ -105,53 +111,24 @@ def get_pauli_fidelities(
         A :math:`2^n`-dimensional dictionary of Pauli fidelities
         :math:`f_b` for :math:`b = \{0,1\}^{n}`
     """
-
-    # classical values of random Pauli measurement stored in classical computer
-    b_lists, u_lists = calibration_measurement_outcomes
-
-    # number of measurements in each split
-    n_total_measurements = len(b_lists)
-
-    means: Dict[str, List[float]] = {}  # key is bitstring, value is mean
-
-    group_idxes = np.array_split(
-        np.arange(n_total_measurements), k_calibration
-    )
-    # loop over the splits of the shadow:
-    for idxes in group_idxes:
-        b_lists_k = np.array(b_lists)[idxes]
-        u_lists_k = np.array(u_lists)[idxes]
-
-        n_group_measurements = len(b_lists_k)
-        group_results = []
-        for j in range(n_group_measurements):
-            bitstring, u_list = b_lists_k[j], u_lists_k[j]
-            f_est = get_single_shot_pauli_fidelity(
-                bitstring, u_list, locality=locality
+    means = defaultdict(list)
+    for bitstrings, paulistrings in batch_calibration_data(
+        calibration_outcomes, batch_size
+    ):
+        all_fidelities = defaultdict(list)
+        for bitstring, paulistring in zip(bitstrings, paulistrings):
+            fidelities = get_single_shot_pauli_fidelity(
+                bitstring, paulistring, locality=locality
             )
-            group_results.append(f_est)
+            for b, f in fidelities.items():
+                all_fidelities[b].append(f)
 
-        f_est_group = {
-            b: sum([f[b] for f in group_results]) / n_group_measurements
-            for b in group_results[0]
-        }
+        for bitstring, fidelities in all_fidelities.items():
+            means[bitstring].append(sum(fidelities) / batch_size)
 
-        for bitstring, mean in f_est_group.items():
-            if bitstring not in means:
-                means[bitstring] = []
-            means[bitstring].append(mean)
-    # return the median of means
-    medians = {
-        bitstring: complex(np.median(values))
-        for bitstring, values in means.items()
+    return {
+        bitstring: median(averages) for bitstring, averages in means.items()
     }
-    return medians
-
-
-"""
-The following functions are used in the classical post-processing of
-classical shadows.
-"""
 
 
 def classical_snapshot(
