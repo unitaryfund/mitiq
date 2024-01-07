@@ -196,7 +196,7 @@ def classical_post_processing(
     output: Dict[str, Union[float, NDArray[Any]]] = {}
     if state_reconstruction:
         reconstructed_state = shadow_state_reconstruction(
-            shadow_outcomes, use_calibration, f_est=calibration_results
+            shadow_outcomes, use_calibration, fidelities=calibration_results
         )
         output["reconstructed_state"] = reconstructed_state  # type: ignore
     elif observables is not None:

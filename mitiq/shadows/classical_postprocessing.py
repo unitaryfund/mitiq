@@ -208,8 +208,8 @@ def classical_snapshot(
 
 def shadow_state_reconstruction(
     shadow_measurement_outcomes: Tuple[List[str], List[str]],
-    pauli_twirling_calibration: bool,
-    f_est: Optional[Dict[str, float]] = None,
+    calibrate: bool,
+    fidelities: Optional[Dict[str, float]] = None,
 ) -> npt.NDArray[Any]:
     """Reconstruct a state approximation as an average over all snapshots.
 
@@ -225,19 +225,12 @@ def shadow_state_reconstruction(
     Returns:
         The state reconstructed from classical shadow protocol
     """
+    bitstrings, paulistrings = shadow_measurement_outcomes
 
-    # classical values of random Pauli measurement stored in classical computer
-    b_lists_shadow, u_lists_shadow = shadow_measurement_outcomes
-
-    # Averaging over snapshot states.
     return np.mean(
         [
-            classical_snapshot(
-                b_list_shadow, u_list_shadow, pauli_twirling_calibration, f_est
-            )
-            for b_list_shadow, u_list_shadow in zip(
-                b_lists_shadow, u_lists_shadow
-            )
+            classical_snapshot(bitstring, paulistring, calibrate, fidelities)
+            for bitstring, paulistring in zip(bitstrings, paulistrings)
         ],
         axis=0,
     )
