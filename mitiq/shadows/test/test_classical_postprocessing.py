@@ -125,144 +125,55 @@ def test_classical_snapshot():
     u_list = "XY"
     expected_result = np.array(
         [
-            [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
-            [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
-            [0.75 + 0.0j, 0.0 + 2.25j, 0.25 + 0.0j, 0.0 + 0.75j],
-            [0.0 - 2.25j, 0.75 + 0.0j, 0.0 - 0.75j, 0.25 + 0.0j],
+            [0.25, 0.75j, 0.75, 2.25j],
+            [-0.75j, 0.25, -2.25j, 0.75],
+            [0.75, 2.25j, 0.25, 0.75j],
+            [-2.25j, 0.75, -0.75j, 0.25],
         ]
     )
     result = classical_snapshot(b_list, u_list, False)
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (
-        2 ** len(b_list),
-        2 ** len(b_list),
-    )
-    assert np.allclose(result, expected_result)
+    np.testing.assert_allclose(result, expected_result)
 
 
 def test_shadow_state_reconstruction():
-    b_lists = ["010", "001", "000"]
-    u_lists = ["XYZ", "ZYX", "YXZ"]
+    bitstrings = ["010", "001", "000"]
+    paulistrings = ["XYZ", "ZYX", "YXZ"]
+    measurement_outcomes = (bitstrings, paulistrings)
 
-    measurement_outcomes = (b_lists, u_lists)
-
-    expected_result = np.array(
+    expected_state = np.array(
         [
-            [
-                [
-                    0.5 + 0.0j,
-                    -0.5 + 0.0j,
-                    0.5 + 0.0j,
-                    0.0 + 1.5j,
-                    0.5 - 0.5j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                ],
-                [
-                    -0.5 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 1.5j,
-                    -0.25 - 0.75j,
-                    0.0 + 0.0j,
-                    -0.25 + 0.25j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                ],
-                [
-                    0.5 + 0.0j,
-                    0.0 - 1.5j,
-                    0.5 + 0.0j,
-                    -0.5 + 0.0j,
-                    0.0 - 3.0j,
-                    0.0 + 0.0j,
-                    0.5 - 0.5j,
-                    0.0 + 0.0j,
-                ],
-                [
-                    0.0 - 1.5j,
-                    -0.25 + 0.75j,
-                    -0.5 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 1.5j,
-                    0.0 + 0.0j,
-                    -0.25 + 0.25j,
-                ],
-                [
-                    0.5 + 0.5j,
-                    0.0 + 0.0j,
-                    0.0 + 3.0j,
-                    0.0 + 0.0j,
-                    0.25 + 0.0j,
-                    0.25 + 0.0j,
-                    0.5 + 0.75j,
-                    0.0 - 0.75j,
-                ],
-                [
-                    0.0 + 0.0j,
-                    -0.25 - 0.25j,
-                    0.0 + 0.0j,
-                    0.0 - 1.5j,
-                    0.25 + 0.0j,
-                    -0.25 + 0.0j,
-                    0.0 - 0.75j,
-                    -0.25 + 0.0j,
-                ],
-                [
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.5 + 0.5j,
-                    0.0 + 0.0j,
-                    0.5 - 0.75j,
-                    0.0 + 0.75j,
-                    0.25 + 0.0j,
-                    0.25 + 0.0j,
-                ],
-                [
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    -0.25 - 0.25j,
-                    0.0 + 0.75j,
-                    -0.25 + 0.0j,
-                    0.25 + 0.0j,
-                    -0.25 + 0.0j,
-                ],
-            ]
+            [0.5, -0.5, 0.5, 1.5j, 0.5 - 0.5j, 0, 0, 0],
+            [-0.5, 0, 1.5j, -0.25 - 0.75j, 0, -0.25 + 0.25j, 0, 0],
+            [0.5, -1.5j, 0.5, -0.5, -3.0j, 0, 0.5 - 0.5j, 0],
+            [-1.5j, -0.25 + 0.75j, -0.5, 0, 0, 1.5j, 0, -0.25 + 0.25j],
+            [0.5 + 0.5j, 0, 3.0j, 0, 0.25, 0.25, 0.5 + 0.75j, -0.75j],
+            [0, -0.25 - 0.25j, 0, -1.5j, 0.25, -0.25, -0.75j, -0.25],
+            [0, 0, 0.5 + 0.5j, 0, 0.5 - 0.75j, 0.75j, 0.25, 0.25],
+            [0, 0, 0, -0.25 - 0.25j, 0.75j, -0.25, 0.25, -0.25],
         ]
     )
 
-    result = shadow_state_reconstruction(measurement_outcomes, False)
-    num_qubits = len(measurement_outcomes[0])
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (
-        2**num_qubits,
-        2**num_qubits,
-    )
-    assert np.allclose(result, expected_result)
+    state = shadow_state_reconstruction(measurement_outcomes)
+    np.testing.assert_almost_equal(state, expected_state)
 
 
 def test_shadow_state_reconstruction_cal():
-    b_lists = ["01", "01"]
-    u_lists = ["XY", "XY"]
-    measurement_outcomes = (b_lists, u_lists)
-    f_est = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
-    expected_result_vec = operator_ptm_vector_rep(
+    bitstrings, paulistrings = ["01", "01"], ["XY", "XY"]
+    measurement_outcomes = (bitstrings, paulistrings)
+    fidelities = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
+
+    expected_state_vec = operator_ptm_vector_rep(
         np.array(
             [
-                [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
-                [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
-                [0.75 + 0.0j, 0.0 + 2.25j, 0.25 + 0.0j, 0.0 + 0.75j],
-                [0.0 - 2.25j, 0.75 + 0.0j, 0.0 - 0.75j, 0.25 + 0.0j],
+                [0.25, 0.75j, 0.75, 2.25j],
+                [-0.75j, 0.25, -2.25j, 0.75],
+                [0.75, 2.25j, 0.25, 0.75j],
+                [-2.25j, 0.75, -0.75j, 0.25],
             ]
         )
     )
-    result = shadow_state_reconstruction(measurement_outcomes, f_est)
-    num_qubits = len(measurement_outcomes[0])
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (4**num_qubits,)
-    assert np.allclose(result, expected_result_vec)
+    state = shadow_state_reconstruction(measurement_outcomes, fidelities)
+    np.testing.assert_almost_equal(state, expected_state_vec)
 
 
 def test_expectation_estimation_shadow():
