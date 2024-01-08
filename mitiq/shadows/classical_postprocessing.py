@@ -123,8 +123,8 @@ def get_pauli_fidelities(
             for b, f in fidelities.items():
                 all_fidelities[b].append(f)
 
-        for bitstring, fidelities in all_fidelities.items():
-            means[bitstring].append(sum(fidelities) / batch_size)
+        for bitstring, fids in all_fidelities.items():
+            means[bitstring].append(sum(fids) / batch_size)
 
     return {
         bitstring: median(averages) for bitstring, averages in means.items()
