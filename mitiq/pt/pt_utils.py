@@ -26,6 +26,7 @@ def _n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
 
     # get the n-qubit paulis from the Pauli group
     # disregard the n-qubit paulis with complex phase
+
     n_qubit_paulis = pauli_unitary_list
     for i in range(num_qubits - 1):
         n_qubit_paulis = n_qubit_paulis
@@ -71,12 +72,14 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
             superop_on_pauli_matrix_transpose
         )
 
-        ptm_matrix_row = []
-        for j in n_qubit_paulis:
-            pauli_superop_pauli = np.matmul(j, superop_on_pauli_matrix)
-            ptm_matrix_row.append(
-                (0.5**num_qubits) * np.trace(pauli_superop_pauli)
+        # ptm_matrix_row = []
+        for j in range(len(n_qubit_paulis)):
+            pauli_superop_pauli = np.matmul(
+                n_qubit_paulis[j], superop_on_pauli_matrix
             )
-        ptm_matrix[i] = ptm_matrix_row
+            ptm_matrix[i, j] = (0.5**num_qubits) * np.trace(
+                pauli_superop_pauli
+            )
+        # ptm_matrix[i, :] = ptm_matrix_row
 
     return ptm_matrix

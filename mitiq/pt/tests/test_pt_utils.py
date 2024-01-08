@@ -120,7 +120,9 @@ def test_pauli_vectorized_list():
         ),
         # Identity
         (cirq.I, np.identity(4)),
-        # Note: For rotation gates, the PTM is a 4 x 4 spatial rotation matrix
+        # Note: For the rotation gates, the PTM is a 3 x 3 spatial rotation
+        # matrix with the first row and column filled with 0s for the 4 x 4
+        # PTM.
         # X Rotation
         (
             cirq.Rx(rads=0.167 * np.pi),
@@ -134,6 +136,7 @@ def test_pauli_vectorized_list():
             ),
         ),
         # Y Rotation
+        # The PTM for Y rotation has a transposed 3 x 3 rotation matrix
         (
             cirq.Ry(rads=0.167 * np.pi),
             np.array(
@@ -158,6 +161,17 @@ def test_pauli_vectorized_list():
             ),
         ),
         # Hadamard
+        (
+            cirq.H,
+            np.array(
+                [
+                    [1.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 1.0 + 0.0j],
+                    [0.0 + 0.0j, 0.0 + 0.0j, -1.0 + 0.0j, 0.0 + 0.0j],
+                    [0.0 + 0.0j, 1.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                ]
+            ),
+        ),
     ],
 )
 def test_ptm_single_ideal_gate(input_gate, expected_ptm):
@@ -165,4 +179,6 @@ def test_ptm_single_ideal_gate(input_gate, expected_ptm):
     circuit = cirq.Circuit()
     circuit.append(input_gate(q0))
     calculated_ptm = ptm_matrix(circuit, 1)
-    assert np.abs(calculated_ptm - expected_ptm).all() <= 0.1
+    np.testing.assert_array_almost_equal(
+        calculated_ptm, expected_ptm, decimal=2
+    )
