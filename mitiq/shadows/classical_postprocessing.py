@@ -34,9 +34,8 @@ PAULI_MAP = {
     "Z": cirq.unitary(cirq.I),
 }
 
-# Density matrices of single-qubit basis states
-ZERO_STATE = np.diag([1.0 + 0.0j, 0.0 + 0.0j])
-ONE_STATE = np.diag([0.0 + 0.0j, 1.0 + 0.0j])
+ZERO_STATE = np.array([[1, 0], [0, 0]])
+ONE_STATE = np.array([[0, 0], [0, 1]])
 
 
 def get_single_shot_pauli_fidelity(
@@ -132,21 +131,17 @@ def get_pauli_fidelities(
 
 
 def classical_snapshot(
-    b_list_shadow: str,
-    u_list_shadow: str,
-    f_est: Optional[Dict[str, float]] = None,
+    bitstring: str,
+    paulistring: str,
+    fidelities: Optional[Dict[str, float]] = None,
 ) -> npt.NDArray[Any]:
     r"""
     Implement a single snapshot state reconstruction
     with calibration of the noisy quantum channel.
 
     Args:
-        b_list_shadow: The list of length 1, classical outcomes for the
-            snapshot. Here,
-            b = '0' corresponds to :math:`|0\rangle`, and
-            b = '1' corresponds to :math:`|1\rangle`.
-        u_list_shadow: list of len 1, contains str of ("XYZ..") for
-            the applied Pauli measurement on each qubit.
+        bitstring: A bitstring corresponding to the outcome ... TODO
+        paulistring: String of the applied Pauli measurement on each qubit.
         f_est: The estimated Pauli fidelities to use for calibration if
             available.
 
@@ -156,41 +151,34 @@ def classical_snapshot(
     # calibrate the noisy quantum channel, output in PTM rep.
     # ptm rep of identity
     I_ptm = operator_ptm_vector_rep(np.eye(2) / np.sqrt(2))
-    # define projections Pi_0 and Pi_1
     pi_zero = np.outer(I_ptm, I_ptm)
     pi_one = np.eye(4) - pi_zero
     pi_zero = np.diag(pi_zero)
     pi_one = np.diag(pi_one)
 
-    if f_est:
+    if fidelities:
         elements = []
-        # get b_list and f for each calibration measurement
-        for b_list_cal, f in f_est.items():
-            pi_snapshot_vecter = []
-            for b_1, b2, u2 in zip(b_list_cal, b_list_shadow, u_list_shadow):
+        for bits, fidelity in fidelities.items():
+            pi_snapshot_vector = []
+            for b1, b2, pauli in zip(bits, bitstring, paulistring):
                 # get pi for each qubit based on calibration measurement
-                pi = pi_zero if b_1 == "0" else pi_one
+                pi = pi_zero if b1 == "0" else pi_one
                 # get state for each qubit based on shadow measurement
                 state = ZERO_STATE if b2 == "0" else ONE_STATE
-                # get U2 for each qubit based on shadow measurement
-                U2 = PAULI_MAP[u2]
-                pi_snapshot_vecter.append(
-                    pi * operator_ptm_vector_rep(U2.conj().T @ state @ U2)
+                # get U for each qubit based on shadow measurement
+                U = PAULI_MAP[pauli]
+                pi_snapshot_vector.append(
+                    pi * operator_ptm_vector_rep(U.conj().T @ state @ U)
                 )
-                # solve for the snapshot state
             elements.append(
-                1 / f * matrix_kronecker_product(pi_snapshot_vecter)
+                1 / fidelity * matrix_kronecker_product(pi_snapshot_vector)
             )
-        rho_snapshot_vector = np.sum(elements, axis=0)
-        # normalize the snapshot state
-        rho_snapshot = rho_snapshot_vector  # * normalize_factor
-    # w/o calibration, noted here, the output in terms of matrix,
-    # not in PTM rep.
+        rho_snapshot = np.sum(elements, axis=0)
     else:
         local_rhos = []
-        for b, u in zip(b_list_shadow, u_list_shadow):
-            state = ZERO_STATE if b == "0" else ONE_STATE
-            U = PAULI_MAP[u]
+        for bit, pauli in zip(bitstring, paulistring):
+            state = ZERO_STATE if bit == "0" else ONE_STATE
+            U = PAULI_MAP[pauli]
             # apply inverse of the quantum channel,get PTM vector rep
             local_rho = 3.0 * (U.conj().T @ state @ U) - cirq.unitary(cirq.I)
             local_rhos.append(local_rho)
