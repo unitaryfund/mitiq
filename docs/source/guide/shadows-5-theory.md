@@ -11,18 +11,22 @@ kernelspec:
   name: python3
 ---
 
-# What is the theory behand Classical Shadow Estimation
+```{admonition} Note:
+The documentation for Classical Shadows in Mitiq is still under construction. This users guide will change in the future.
+```
+
+# What is the theory behind Classical Shadow Estimation
 
 Investigating an unknown quantum system's properties is essential in quantum computing. Quantum Tomography enables a thorough classical description of a quantum state but demands exponentially large data and an equal number of experiments. Its alternative, Shadow Tomography, requires fewer computations but presupposes the capacity to perform entangling measurements across various state copies, involving exponentially large quantum operations. This section introduces an efficient alternative that constructs an approximate classical depiction of a quantum state with minimal state measurements.
 
 ## 1. Classical Shadow
-The "classical shadow" technique, as proposed by {cite}`huang2020predicting`, offers an innovative approach to quantum state approximation. This method, which requires exponentially fewer measurements, is particularly advantageous for predicting the properties of complex, large-scale quantum systems. In quantum theory, the quantities of interest are often linear functionals of the quantum state $\rho$, such as the expectation values $o_i$ of a set of self-adjoint operators $\{O_i\}_{i}$:
+The "classical shadow" technique, as proposed by {cite}`huang2020predicting`, offers an innovative approach to quantum state approximation. This method is particularly advantageous for predicting the properties of complex, large-scale quantum systems as it requires exponentially fewer measurements. In quantum theory, the quantities of interest are often linear functionals of the quantum state $\rho$, such as the expectation values $o_i$ of a set of self-adjoint operators $\{O_i\}_{i}$:
 \begin{equation}
     o_i=\mathrm{Tr}(O_i \rho),\qquad i\in\mathbb{N}^+,~~ 1\leq i\leq M.
 \end{equation}
 
 
-Rather than striving for a comprehensive classical description of a many-body quantum state {cite}`aaronson2018shadow`—a task that is practically challenging due to the exponentially large quantities of classical data required—this method only demands a size of $N$ "classical shadow" to predict arbitrary $M$ linear functions $\mathrm{Tr}(O_i \rho)$ up to an additive error $\epsilon$, given that 
+Rather than striving for a comprehensive classical description of a many-body quantum state {cite}`aaronson2018shadow`—a task that is practically challenging due to the exponentially large quantities of required classical data—this method only demands a size of $N$ "classical shadow" to predict arbitrary $M$ linear functions $\mathrm{Tr}(O_i \rho)$ up to an additive error $\epsilon$, given that 
 
 \begin{equation}
     N\geq \mathcal{O}(\epsilon^{-2}\log M\max_i \parallel O_i \parallel^2_{\mathrm{shadow}}).
@@ -39,13 +43,13 @@ This random snapshot contains valuable information about $\rho$ in expectation:
 \begin{equation}
     \mathbb{E}[U^\dagger |\hat{b}\rangle\langle\hat{b}|U]=\sum_{b\in\{0,1\}^{\otimes n}}\mathrm{Tr}_{(1)}\left(\rho_{(1)}\mathbb{E}_{U\sim U(2^n)}[(U|b\rangle\langle b|U^\dagger)^{\otimes 2}]\right)=\mathcal{M}(\rho)
 \end{equation}
-where the trace is only taken on one of the copies in the tensor product, and the expectation in the first expression has the form $\mathbb{E}(\cdot)=\int_{U\in\mathcal{U}}d\mu(U)\;\langle b|U^\dagger\rho U|b\rangle(\cdot)$. For any unitary ensemble $\mathcal{U}$, the expected value of the outer product of the classical snapshot corresponds to the operation of the quantum channel $\mathcal{M}$ on the quantum state $\rho$. This is indeed a depolarizing channel, as the middle portion of (4) transfigures into a blend of identity and a swap operator, based on **Schur's Lamma** {cite}`harrow2013church`, when taking the Haar average of $\mathcal{G}=U(d)$ group:
+where the trace is only taken on one of the copies in the tensor product, and the expectation in the first expression has the form $\mathbb{E}(\cdot)=\int_{U\in\mathcal{U}}d\mu(U)\;\langle b|U^\dagger\rho U|b\rangle(\cdot)$. For any unitary ensemble $\mathcal{U}$, the expected value of the outer product of the classical snapshot corresponds to the operation of the quantum channel $\mathcal{M}$ on the quantum state $\rho$. This is indeed a depolarizing channel, as the middle portion of (4) transfigures into a blend of identity and a swap operator, based on **Schur's Lemma** {cite}`harrow2013church`, when taking the Haar average of $\mathcal{G}=U(d)$ group:
 \begin{equation}
     \int_{\mathcal{G}\sim U(d)}~d\mu(\mathcal{G})(U|b\rangle\langle b|U^\dagger)^{\otimes 2}=\frac{\mathbb{I}+X}{d(d+1)}~~
 \Rightarrow~~
     \mathcal{M}(A)=\sum_{b\in\{0,1\}^{\otimes n}}\frac{\mathrm{Tr}(A)\mathbb{I}+(A)}{2^n(1+2^n)} = \mathcal{D}_{(2^n+1)^{-1}}(A).
 \end{equation}
-apparently the quantum channel $\mathcal{M}$ is a depolarizing channel $\mathcal{D}_p$ with $p=\frac{1}{2^n+1}$. It is easy to solve for the inverted map $\mathcal{M}^{-1}(\cdot)=[(2^n +1)-\mathbb{I}\cdot\mathrm{Tr}](\cdot)$, which is indeed unitary, however, not CP, so it is not a physical map as expected. 
+Thus, the quantum channel $\mathcal{M}$ is a depolarizing channel $\mathcal{D}_p$ with $p=\frac{1}{2^n+1}$. It is easy to solve for the inverted map $\mathcal{M}^{-1}(\cdot)=[(2^n +1)-\mathbb{I}\cdot\mathrm{Tr}](\cdot)$, which is indeed unitary, however, not CP, so it is not a physical map as expected. 
 
 If the measurements we sample from are tomographically complete, then the protocol $\mathcal{M}$ defines an invertible linear transformation $\mathcal{M}^{-1}$, which may not be a quantum channel, since it is not CP, which means that it could not be performed in the lab. But it will only be performed on the classical data stored in
 a classical memory. If we apply $\mathcal{M}$ to all the snapshots, the expected value of these inverted snapshots aligns with the density operator as defined by the protocol,
@@ -71,7 +75,7 @@ One can prove that a single classical shadow (6) can correctly predict *any* lin
 \hat{o}_i(N)=\mathbb{E}_{j\in N}(\hat{o}_i^{(j)}\hat{\rho}_j)
 \end{equation}
 
-Actually in practical, with the statistical method of taking an average called "median of means" to achieve an acceptable failure probability of estimation,  
+Actually, in practice, we achieve an acceptable failure probability of estimation with the statistical method of taking an average called "median of means". 
 \begin{equation}
 \hat{o}_i(N,K):=\mathrm{median}\{\hat{o}_i^{(1)},\cdots,\hat{o}_i^{(K)}\}~~\mathrm{where}~~\hat{o}_i^{(j)}=N^{-1}\sum_{k=N(j-1)+1}^{Nj}\mathrm{Tr}(O_i\hat{\rho}_k),\qquad \forall~1\leq j\leq K\nonumber
 \end{equation} 
@@ -85,7 +89,7 @@ Actually in practical, with the statistical method of taking an average called "
  \mathcal{U}=\mathrm{CL}(2)^n:\qquad \parallel O \parallel_{\mathrm{shadow}}\leq 4^{w}\parallel O \parallel^2,\qquad O\mathrm{~acting~on~}w\mathrm{~qubits}
 \end{equation}
 
-The random Clifford measurement (10) involves the uniform random application of an element from the Clifford group to the state. These elements can be classically described. Afterward, the measurement is taken in a computational basis. In the context of random Clifford measurements, the shadow norm is equivalent to the Hilbert norm-- specifically, the $L_2$ norm. As a result, a large collection of (global) observables with a bounded Hilbert-Schmidt norm can be predicted efficiently. In this case based on (5), a snapshot(6) would takes the form
+The random Clifford measurement (11) involves the uniform random application of an element from the Clifford group to the state. These elements can be classically described. Afterward, the measurement is taken in a computational basis. In the context of random Clifford measurements, the shadow norm is equivalent to the Hilbert norm-- specifically, the $L_2$ norm. As a result, a large collection of (global) observables with a bounded Hilbert-Schmidt norm can be predicted efficiently. In this case based on (5), a snapshot(6) would take the form
 \begin{equation}
     \hat{\rho}=(2^n+1)U^\dagger|\hat{b}\rangle\langle\hat{b}|U -\mathbb{I}
 \end{equation}
@@ -98,7 +102,7 @@ On the other hand, a random Pauli measurement (11) means that for each qubit, we
 \end{equation}
 
 
-The Clifford measurement requires the depth of the circuit to grow linearly with system size, which is not currently feasible for large systems, so we are going to implement the local (Pauli) measurement and integrate it into Mitiq in the current stage. However, it is worth noting that there is an intermediate step of scrambling the circuits and combining the local and global measurement {cite}`hu2023classical`. 
+The Clifford measurement requires the depth of the circuit to grow linearly with system size, which is not currently feasible for large systems, which is why only the local (Pauli) measurement is implemented in Mitiq in the current stage. However, it is worth noting that this method involves an intermediate step of scrambling the circuits and combining the local and global measurement {cite}`hu2023classical`. 
 
 
 ## 2. Robust Shadow Estimation
@@ -116,7 +120,7 @@ name: shadows-noisy-channel
 
 The noise in the quantum processing prevents the inversion of the original quantum channel from reversing the process. This necessitates a calibration process. Distinguishing $\Lambda_U$ from the unknown state $\rho$ is generally infeasible, so the noisy quantum channel $\widetilde{\mathcal{M}}$ must be characterized using a known state, such as $\mathbf{|0\rangle}:= |0\rangle^{\otimes n}$, to calibrate the noise. This preparation of $|0\rangle$ is also susceptible to noise, but it provides high fidelity in actual estimation. 
 
-### 2.1 Pauli Twilling of quantum channel and Pauli Fideltiy
+### 2.1 Pauli Twirling of quantum channel and Pauli Fideltiy
 The classical shadow estimation employs a quantum channel, which is subsequently inverted. This operation essentially embodies a Pauli twirling. Within this framework, $\mathcal{G}$ represents a subset, to be further identified within the unitaries in $U(d)$. Moreover, $\mathcal{U}$ personifies the PTM representation of $U$. As $\mathcal{G}$ takes the form of a group, the PTMs ${\mathcal{U}}$ evolve into a representation of $\mathcal{G}$. The implementation of Schur’s Lemma facilitates the direct computation of the precise form of $\widehat{\mathcal{M}}$ when the noisy channel $\Lambda$, representing both the gate noise $\mathcal{U}$ and the measurement noise $\mathcal{M}_Z$, is integrated:
 \begin{equation}
 \widehat{\mathcal{M}} = \mathbb{E}_{\mathcal{G}}[\mathcal{U}^\dagger\mathcal{M}_z\Lambda\mathcal{U}] = \sum_{\lambda}\hat{f}_\lambda\Pi_\lambda,\qquad \hat{f}_\lambda:=\frac{\mathrm{Tr}(\mathcal{M}_z\Lambda\Pi_\lambda)}{\mathrm{Tr}(\Pi_\lambda)}
@@ -140,24 +144,24 @@ The Pauli fidelity estimator for the local Clifford group can be computed utiliz
 \hat{f}^{(r)}_b = \prod_{i=1}^n \langle\!\langle b_i|\mathcal{U}_i|P_z^{b_i}\rangle\!\rangle \equiv \prod_{i=1}^n \langle b_i|\mathcal{U}_i P_Z^{b_i}\mathcal{U}^\dagger_i|b_i\rangle, \qquad \mathcal{U}_i\in\mathrm{CL}(2),~ b_i\in\{0,1\}.
 \end{equation}
 
-Repeat the above step for $R = NK$ rounds. Then the final estimation of fz is given by a median of means estimator $\hat{f}_m$ constructed from the single round estimators $\{\hat{f}_m^{(r)}\}_{1\leq r\leq R}$ with parameter $N, \;K$:
+Repeat the above step for $R = NK$ rounds. Then the final estimation of $f_z$ is given by a median of means estimator $\hat{f}_m$ constructed from the single round estimators $\{\hat{f}_m^{(r)}\}_{1\leq r\leq R}$ with parameter $N, \;K$:
 calculate $K$ estimators each of which is the average of $N$ single-round estimators $\hat{f}$, and take the median of these $K$ estimators as our final estimator $\hat{f}$. In formula,
 \begin{eqnarray}
 &\bar{f}^{(k)}=\frac{1}{N}\sum_{r=(K-1)N+1}^{KN} \hat{f}^{(r)}\\
 & \hat{f} = \mathrm{median}\{\bar{f}^{(1)},\cdots\bar{f}^{(K)}\}_{1\leq k\leq K}
 \end{eqnarray}
-the number of $\{f_m\}$ is related to the number of irreducible representations in the PTM[^1] representation of the twirling group, when the twirling group is the local Clifford group, the number of irreducible representations is $2^n$.
+The number of $\{f_m\}$ is related to the number of irreducible representations in the PTM[^1] representation of the twirling group. When the twirling group is the local Clifford group, the number of irreducible representations is $2^n$.
 ### 2.2 Noiseless Pauli Fidelity --- Ideal Inverse channal vs Estimate Noisy Inverse channel
 One could check that in the absence of noise in the quantum gates ($\Lambda\equiv\mathbb{I}$), the value of the Pauli fidelity $\hat{f}_{b}^{\mathrm{ideal}}\equiv \mathrm{Tr}(\mathcal{M}_z \Pi_b)/\mathrm{Tr}\Pi_b = 3^{-|{b}|}$, where $|b|$ is the count of $|1\rangle$ found in z-eigenstates $|b\rangle:=|b_i\rangle^{\otimes n}$.
 
-When the noisy channel is considered, the inverse channel $\widehat{\mathcal{M}}^{-1}$ can be abtained by inverse the noisy quantum channel $\widehat{\mathcal{M}}$, one has
+When the noisy channel $\widehat{\mathcal{M}}$ is considered, the inverse of the noise channel $\widehat{\mathcal{M}}^{-1}$ can be obtained by:
 \begin{equation}
 \widehat{\mathcal{M}}^{-1}=\sum_{b\in\{0,1\}^{\otimes n}}\hat{f}_b^{-1}\Pi_b
 \end{equation}
-After the above steps, we can preform robust shadow calibration as we did in the standart classical shadow protocal, the only difference is we perform the inverse channel replaced by the calibrated version $\widehat{\mathcal{M}}^{-1}$. One can see that the noisy inverse channel $\mathrm{Tr}(\mathcal{M}_z \Pi_b)$ is differed from the one added on the classical shadow protocal by there difference on the Pauli fidelity $\hat{f}_b^{-1}$.
+After the above steps, we can preform robust shadow calibration as we did in the standard classical shadow protocol. The only difference is we perform the inverse channel replaced by the calibrated version $\widehat{\mathcal{M}}^{-1}$. One can see that the inverse of the noisy channel $\mathrm{Tr}(\mathcal{M}_z \Pi_b)$ is different from the one used in the classical shadow protocol by their difference on the Pauli fidelity $\hat{f}_b^{-1}$.
 The set of noise parameters $\{f_\lambda\}_{\lambda}$ corresponds to the number of irreducible representations of $\mathcal{G}$, called Pauli fidelity. When the unitaries are sampled from local Clifford group, the Pauli fidelities can be computed with the following formula:
 
-Therefore the classical shadow with calibration procedure with be proceeded by, first, estimating the noise channel $\widetilde{\mathcal{M}}$ of Eq. (14) with
+Therefore, the classical shadow combined with the calibration procedure will, first, estimate the noise channel $\widetilde{\mathcal{M}}$ of Eq. (14) via
 the calibration procedure, and then use the $\widetilde{\mathcal{M}}$ estimator 
 as the input parameter, $\mathcal{M}\rightarrow\widetilde{\mathcal{M}}$ of the classical shadow to predict any properties of interest (referred to as the estimation procedure). 
 

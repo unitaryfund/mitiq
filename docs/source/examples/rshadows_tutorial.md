@@ -35,7 +35,10 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
 np.random.seed(666)
 ```
 
-Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used.
+There are two options: Whether to run the quantum measurement or directly use the results from the previous run. 
+
+- If **True**, the measurement will be run again.
+- If **False**, the results from the previous run will be used.
 
 
 ```{code-cell} ipython3
@@ -55,7 +58,7 @@ if not run_quantum_processing:
         saved_data = pickle.load(zf.open(f"{saved_data_name}.pkl"))
 ```
 
-The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
+The *robust shadow estimation*{cite}`chen2021robust` approach based on {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
 
 ## 1. Define Quantum Circuit and Executor
 In this notebook, we'll use the ground state of the Ising model with periodic boundary conditions as an example to study energy and two-point correlation function estimations. We'll compare the performance of robust shadow estimation with the standard shadow protocol, taking into account the bit-flip or depolarization noise on the quantum channels.
@@ -96,7 +99,7 @@ else:
     circuit = circuit.transform_qubits(qubit_map=qubit_map)
 ```
 
-similar with the classical shadow protocal, we define the executor to perform the computational measurement for the circuit. Here we use the simulator that adds single-qubit depolarizing noise after rotation gates and before the $Z$-basis measurement, as the noise is assumped to be gate independent, time invariant and Markovian, the noisy gate satisfies $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$:
+Similar with the classical shadow protocol, we define the executor to perform the computational measurement for the circuit. Here, we use add single-qubit depolarizing noise after rotation gates but before the $Z$-basis measurement. As the noise is assumed to be gate independent, time invariant and Markovian, the noisy gate satisfies $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$:
 
 
 ```{code-cell} ipython3
@@ -213,7 +216,7 @@ counts = {bitstring: bitstring.count("1") for bitstring in bitstrings}
 order = np.argsort(list(counts.values()))
 reordered_bitstrings = bitstrings[order]
 
-# solve for theoretical Pauli fidelitys
+# solve for theoretical Pauli fidelities
 f_theoretical = {}
 bitstrings = list(f_est_results.keys())
 for bitstring in bitstrings:
@@ -228,14 +231,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_style("whitegrid")
-# plot estimated vs theoretical Pauli fidelitys when no errors in quantum circuit
+# plot estimated vs theoretical Pauli fidelities when no errors in quantum circuit
 plt.plot(
     [np.abs(f_est_results[b]) for b in reordered_bitstrings],
     "-*",
     label="Noisy Channel",
 )
 plt.plot(
-    [f_theoretical[b] for b in reordered_bitstrings], label="Noisless Channel"
+    [f_theoretical[b] for b in reordered_bitstrings], label="Noiseless Channel"
 )
 plt.xlabel(r"measurement basis states $b$")
 plt.xticks(
@@ -256,7 +259,7 @@ The expectation value for a series of operators, denoted as $\{O_\iota\}_{\iota\
 \hat{o}_\iota &= \langle\!\langle O_\iota|{\hat{\rho}}\rangle\!\rangle \simeq \langle\!\langle O_\iota|\widehat{\mathcal{M}}^{-1}\widetilde{\mathcal{M}}|\rho\rangle\!\rangle=\sum_{b^{(1)}\in\{0,1\}^{n}}f_{b^{(1)}}^{-1}\left(\bigotimes_{i=1}^n \langle\!\langle P_i|\Pi_{b_i^{(1)}}\widehat{\mathcal{M}}_{P_i}\right)|\rho\rangle\!\rangle\nonumber\\ 
 &=\sum_{b^{(1)}\in\{0,1\}^{n}}f_{b^{(1)}}^{-1}\prod_{i=1}^n \langle\!\langle P_i|\Pi_{b^{(1)}_i}\bigg|U_i^{(2)\dagger}|b_i^{(2)}\rangle\langle b_i^{(2)}|U_i^{(2)}\bigg\rangle\!\bigg\rangle
 \end{align}
-where in the last equality, $\{P_i\}_{i\in n}$ represents Pauli operators, with $P=\{I,X,Y,Z\}$. And as we did previously, we use the lable $(1)$ as the subscript to distinguish the parameters of the calibration process from the parameters of the shadow estimation process, which is labelled by $(2)$. It is assumed that $O_\iota$ are Pauli strings acting on $supp(O_\iota)$ ($|supp(O_\iota)|\leq n$) sites of the system. It can be verified that the cross product over qubit sites within the summation of the final expression in the above equation is zero, except when all sites in $supp(O_\iota)^c$ have $\Pi_0$ acting on. Similarly, it can be verified that the cross product over qubit sites within the summation of the final expression in the above equation is zero, except when all sites in $supp(O_\iota)$ have $\Pi_1$ acting on, i.e.
+where in the last equality, $\{P_i\}_{i\in n}$ represents Pauli operators, with $P=\{I,X,Y,Z\}$. And as we did previously, we use the label $(1)$ as the subscript to distinguish the parameters of the calibration process from the parameters of the shadow estimation process, which is labelled by $(2)$. It is assumed that $O_\iota$ are Pauli strings acting on $supp(O_\iota)$ ($|supp(O_\iota)|\leq n$) sites of the system. It can be verified that the cross product over qubit sites within the summation of the final expression in the above equation is zero, except when all sites in $supp(O_\iota)^c$ have $\Pi_0$ acting on. Similarly, it can be verified that the cross product over qubit sites within the summation of the final expression in the above equation is zero, except when all sites in $supp(O_\iota)$ have $\Pi_1$ acting on, i.e.
 \begin{align}
 \Pi_i|I\rangle\!\rangle\equiv\delta_{i,0}|I\rangle\!\rangle,\qquad \Pi_{i}|P\rangle\!\rangle\equiv\delta_{i,1}|P\rangle\!\rangle,\qquad ~~~ \mathrm{for}~i\in\{0,1\};~P\;=\{X,\;Y,\;Z\}.
 \end{align}
@@ -265,13 +268,13 @@ Therefore, the final expression of the expectation value estimation can be simpl
 \hat{o}_\iota = \left(\sum_{b^{(1)}\in\{0,1\}^{n}}f_{b^{(1)}}^{-1}\prod_{j\in supp(O_\iota)}
 \delta_{b_j^{(1)},1}\prod_{k\in supp(O_\iota)^c}\delta_{b_k^{(1)},0}\right)\prod_{i=1}^n  \langle b_i^{(2)}|U_i^{(2)}P_i U_i^{(2)\dagger}|b_i^{(2)}\rangle
 \end{align}
- Additionally, when $P_i =X_i$ (r.e.s.p. $Y_i,\;Z_i$), $U_i^{(2)}$ must correspond to $X$ (r.e.s.p. $Y,\;Z$)-basis measurement to yield a non-zero value, which is easy to check considered that the $P$-basis measurement channel has a PTM rep: $\widetilde{\mathcal{M}}_{P}=\frac{1}{2}(|I\rangle\!\rangle\langle\!\langle I|+|P\rangle\!\rangle\langle\!\langle P|)$, observiously the only measurement that didn't vanished by the operator's $i$-th qubit component in PTM rep: $P\rightarrow \langle\!\langle P|$, is the local $P$-basis measurement.  
+ Additionally, when $P_i =X_i$ (r.e.s.p. $Y_i,\;Z_i$), $U_i^{(2)}$ must correspond to $X$ (r.e.s.p. $Y,\;Z$)-basis measurement to yield a non-zero value, which is easy to check considered that the $P$-basis measurement channel has a PTM rep: $\widetilde{\mathcal{M}}_{P}=\frac{1}{2}(|I\rangle\!\rangle\langle\!\langle I|+|P\rangle\!\rangle\langle\!\langle P|)$. Obviously, the only measurement that didn't vanish by the operator's $i$-th qubit component in PTM rep: $P\rightarrow \langle\!\langle P|$, is the local $P$-basis measurement.  
 
-Next steps are same with classical protocol,with the statistical method of taking an average called "median of means" to achieve an acceptable failure probability of estimation, which need $R_2=N_2K_2$ snapshots, where we use the subscript "2" to denote the index of classical shadow protocol. Acctually,
+Next steps are identical to the classical protocol, where the statistical method of taking an average called "median of means" is used to achieve an acceptable failure probability of estimation. This needs $R_2=N_2K_2$ snapshots, where we use the subscript "2" to denote the index of classical shadow protocol. Actually,
 \begin{align}
 \hat{o}_\iota(N_2,K_2):=\mathrm{median}\{\hat{o}_\iota^{(1)},\cdots,\hat{o}_\iota^{(K_2)}\}~~\mathrm{where}~~\hat{o}_\iota^{(j)}=N_2^{-1}\sum_{k=N_2(j-1)+1}^{N_2j}\mathrm{Tr}(O_\iota\hat{\rho}_k),\qquad \forall~1\leq j\leq K_2,
 \end{align}
-where we have $K_2$ estimators each of which is the average of $N_2$ single-round estimators $\hat{o}_i^{(j)}$, and take the median of these $K_2$ estimators as our final estimator $\hat{o}_\iota(N_2,K_2)$. We can calculate the median of means of each irreps with projection $\Pi_b=\bigotimes_{i=1}^n\Pi_{b_i}$, 
+where we have $K_2$ estimators each of which is the average of $N_2$ single-round estimators $\hat{o}_i^{(j)}$, and take the median of these $K_2$ estimators as our final estimator $\hat{o}_\iota(N_2,K_2)$. We can calculate the median of means of each irreducible representations with projection $\Pi_b=\bigotimes_{i=1}^n\Pi_{b_i}$, 
 
 ### 3.1 Ground State Energy Estimation of Ising model with the RSHADOWS algorithm
 
