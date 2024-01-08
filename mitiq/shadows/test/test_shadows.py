@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Test classical shadow estimation process."""
+from numbers import Number
 
 import cirq
 
@@ -38,7 +39,6 @@ def executor(
 
 
 def test_pauli_twirling_calibrate():
-
     # Call the function with valid inputs
     result = pauli_twirling_calibrate(
         qubits=qubits, executor=executor, num_total_measurements_calibration=2
@@ -47,9 +47,8 @@ def test_pauli_twirling_calibrate():
     # Check that the dictionary contains the correct number of entries
     assert len(result) <= 2**num_qubits
 
-    # Check that all values in the dictionary are floats
     for value in result.values():
-        assert isinstance(value, complex)
+        assert isinstance(value, Number)
 
     # Call shadow_quantum_processing to get shadow_outcomes
     shadow_outcomes = (["11", "00"], ["ZZ", "XX"])
@@ -63,13 +62,11 @@ def test_pauli_twirling_calibrate():
     # Check that the dictionary contains the correct number of entries
     assert len(result) <= 2**num_qubits
 
-    # Check that all values in the dictionary are floats
     for value in result.values():
-        assert isinstance(value, complex)
+        assert isinstance(value, Number)
 
 
 def test_shadow_quantum_processing():
-
     # Call the function with valid inputs
     result = shadow_quantum_processing(
         circuit, executor, num_total_measurements_shadow=10
@@ -112,7 +109,6 @@ def test_classical_post_processing():
     )
     result_cal = classical_post_processing(
         shadow_outcomes,
-        use_calibration=True,
         calibration_results=calibration_results,
         observables=observables,
         k_shadows=1,

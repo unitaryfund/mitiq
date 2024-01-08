@@ -154,7 +154,6 @@ def shadow_quantum_processing(
 
 def classical_post_processing(
     shadow_outcomes: Tuple[List[str], List[str]],
-    use_calibration: bool = False,
     calibration_results: Optional[Dict[str, float]] = None,
     observables: Optional[List[mitiq.PauliString]] = None,
     k_shadows: Optional[int] = None,
@@ -166,7 +165,6 @@ def classical_post_processing(
 
     Args:
         shadow_outcomes: The output of function `shadow_quantum_processing`.
-        use_calibration: Whether to use the robust shadow estimation.
         calibration_results: The output of function `pauli_twirling_calibrate`.
         observables: The set of observables to measure.
         k_shadows: Number of groups of "median of means" used for shadow
@@ -175,18 +173,13 @@ def classical_post_processing(
             the expectation value of the observables.
 
     Returns:
+        TODO: rewrite this.
         If `state_reconstruction` is True: state tomography matrix in
         :math:`\mathbb{M}_{2^n}(\mathbb{C})` if use_calibration is False,
         otherwise state tomography vector in :math:`\mathbb{C}^{4^d}`.
         If observables is given: estimated expectation values of
         observables.
     """
-
-    if use_calibration:
-        if calibration_results is None:
-            raise ValueError(
-                "Calibration results cannot be None when use_calibration"
-            )
 
     """
     Additional information:
@@ -196,7 +189,7 @@ def classical_post_processing(
     output: Dict[str, Union[float, NDArray[Any]]] = {}
     if state_reconstruction:
         reconstructed_state = shadow_state_reconstruction(
-            shadow_outcomes, use_calibration, fidelities=calibration_results
+            shadow_outcomes, fidelities=calibration_results
         )
         output["reconstructed_state"] = reconstructed_state  # type: ignore
     elif observables is not None:
@@ -208,7 +201,6 @@ def classical_post_processing(
                 shadow_outcomes,
                 obs,
                 k_shadows=k_shadows,
-                pauli_twirling_calibration=use_calibration,
                 f_est=calibration_results,
             )
             output[str(obs)] = expectation_values

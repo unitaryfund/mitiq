@@ -134,7 +134,6 @@ def get_pauli_fidelities(
 def classical_snapshot(
     b_list_shadow: str,
     u_list_shadow: str,
-    pauli_twirling_calibration: bool,
     f_est: Optional[Dict[str, float]] = None,
 ) -> npt.NDArray[Any]:
     r"""
@@ -148,9 +147,8 @@ def classical_snapshot(
             b = '1' corresponds to :math:`|1\rangle`.
         u_list_shadow: list of len 1, contains str of ("XYZ..") for
             the applied Pauli measurement on each qubit.
-        pauli_twirling_calibration: Whether to use Pauli twirling
-            calibration.
-        f_est: The estimated Pauli fidelity for each calibration
+        f_est: The estimated Pauli fidelities to use for calibration if
+            available.
 
     Returns:
         Reconstructed classical snapshot in terms of nparray.
@@ -164,12 +162,7 @@ def classical_snapshot(
     pi_zero = np.diag(pi_zero)
     pi_one = np.diag(pi_one)
 
-    if pauli_twirling_calibration:
-        if f_est is None:
-            raise ValueError(
-                "estimation of Pauli fidelity must be provided for Pauli"
-                "twirling calibration."
-            )
+    if f_est:
         elements = []
         # get b_list and f for each calibration measurement
         for b_list_cal, f in f_est.items():
@@ -208,7 +201,6 @@ def classical_snapshot(
 
 def shadow_state_reconstruction(
     shadow_measurement_outcomes: Tuple[List[str], List[str]],
-    calibrate: bool,
     fidelities: Optional[Dict[str, float]] = None,
 ) -> npt.NDArray[Any]:
     """Reconstruct a state approximation as an average over all snapshots.
@@ -217,11 +209,8 @@ def shadow_state_reconstruction(
         shadow_measurement_outcomes: Measurement result and the basis
             performing the measurement obtained from `random_pauli_measurement`
             for classical shadow protocol.
-        shadow_measurement_outcomes: Measurement results obtained from
-            `random_pauli_measurement` for classical shadow protocol.
-        pauli_twirling_calibration: Whether to use Pauli twirling
-            calibration.
-        f_est: The estimated Pauli fidelity for each calibration
+        f_est: The estimated Pauli fidelities to use for calibration if
+            available.
     Returns:
         The state reconstructed from classical shadow protocol
     """
@@ -229,7 +218,7 @@ def shadow_state_reconstruction(
 
     return np.mean(
         [
-            classical_snapshot(bitstring, paulistring, calibrate, fidelities)
+            classical_snapshot(bitstring, paulistring, fidelities)
             for bitstring, paulistring in zip(bitstrings, paulistrings)
         ],
         axis=0,
@@ -240,7 +229,6 @@ def expectation_estimation_shadow(
     measurement_outcomes: Tuple[List[str], List[str]],
     pauli_str: mitiq.PauliString,
     k_shadows: int,
-    pauli_twirling_calibration: bool,
     f_est: Optional[Dict[str, float]] = None,
 ) -> float:
     """Calculate the expectation value of an observable from classical shadows.
@@ -252,9 +240,8 @@ def expectation_estimation_shadow(
         pauli_str: Single mitiq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
-        pauli_twirling_calibration: Whether to use Pauli twirling
-            calibration.
-        f_est: The estimated Pauli fidelities for each calibration
+        f_est: The estimated Pauli fidelities to use for calibration if
+            available.
 
     Returns:
         Float corresponding to the estimate of the observable
@@ -294,13 +281,7 @@ def expectation_estimation_shadow(
                 axis=1,
             )
 
-            if pauli_twirling_calibration:
-                if f_est is None:
-                    raise ValueError(
-                        "estimation of Pauli fidelity must be provided for"
-                        "Pauli twirling calibration."
-                    )
-
+            if f_est:
                 b = create_string(num_qubits, target_locs)
                 f_val = f_est.get(b, np.inf)
                 # product becomes an array of snapshot expectation values

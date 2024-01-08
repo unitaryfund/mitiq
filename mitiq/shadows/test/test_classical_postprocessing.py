@@ -103,7 +103,6 @@ def test_get_pauli_fidelity():
 def test_classical_snapshot_cal():
     b_list_shadow = "01"
     u_list_shadow = "XY"
-    pauli_twirling_calibration = True
     f_est = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
     expected_result = operator_ptm_vector_rep(
         np.array(
@@ -116,9 +115,7 @@ def test_classical_snapshot_cal():
         )
     )
     np.testing.assert_array_almost_equal(
-        classical_snapshot(
-            b_list_shadow, u_list_shadow, pauli_twirling_calibration, f_est
-        ),
+        classical_snapshot(b_list_shadow, u_list_shadow, f_est),
         expected_result,
     )
 
@@ -261,7 +258,7 @@ def test_shadow_state_reconstruction_cal():
             ]
         )
     )
-    result = shadow_state_reconstruction(measurement_outcomes, True, f_est)
+    result = shadow_state_reconstruction(measurement_outcomes, f_est)
     num_qubits = len(measurement_outcomes[0])
     assert isinstance(result, np.ndarray)
     assert result.shape == (4**num_qubits,)
@@ -313,7 +310,7 @@ def test_expectation_estimation_shadow_cal():
     print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k, True, f_est
+        measurement_outcomes, observable, k, f_est
     )
     assert isinstance(result, float), f"Expected a float, got {type(result)}"
     assert np.isclose(result, expected_result)
