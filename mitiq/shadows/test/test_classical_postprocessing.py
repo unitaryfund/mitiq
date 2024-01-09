@@ -5,7 +5,6 @@
 
 """Tests for classical post-processing functions for classical shadows."""
 
-import cirq
 import numpy as np
 
 import mitiq
@@ -177,25 +176,21 @@ def test_shadow_state_reconstruction_cal():
 
 
 def test_expectation_estimation_shadow():
-    b_lists = ["0101", "0110"]
-    u_lists = ["ZZXX", "ZZXX"]
-
-    measurement_outcomes = (b_lists, u_lists)
-    observable = mitiq.PauliString("ZZ", support=(0, 1))
-    k = 1
+    measurement_outcomes = ["0101", "0110"], ["ZZXX", "ZZXX"]
+    pauli = mitiq.PauliString("ZZ")
+    batch_size = 1
     expected_result = -9
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k, False
+        measurement_outcomes, pauli, batch_size
     )
-    assert isinstance(result, float), f"Expected a float, got {type(result)}"
     assert np.isclose(result, expected_result)
 
 
 def test_expectation_estimation_shadow_cal():
-    b_lists = ["0101", "0110"]
-    u_lists = ["YXZZ", "XXXX"]
-    f_est = {
+    bitstrings = ["0101", "0110"]
+    paulistrings = ["YXZZ", "XXXX"]
+    fidelities = {
         "0000": 1,
         "0001": 1 / 3,
         "0010": 1 / 3,
@@ -214,16 +209,14 @@ def test_expectation_estimation_shadow_cal():
         "1111": 1 / 81,
     }
 
-    measurement_outcomes = b_lists, u_lists
-    observable = mitiq.PauliString("YXZZ", support=(0, 1, 2, 3))
-    k = 1
+    measurement_outcomes = bitstrings, paulistrings
+    pauli = mitiq.PauliString("YXZZ")
+    batch_size = 1
     expected_result = 81 / 2
-    print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k, f_est
+        measurement_outcomes, pauli, batch_size, fidelities
     )
-    assert isinstance(result, float), f"Expected a float, got {type(result)}"
     assert np.isclose(result, expected_result)
 
 
@@ -232,13 +225,12 @@ def test_expectation_estimation_shadow_no_indices():
     Test expectation estimation for a shadow with no matching indices.
     The result should be 0 as there are no matching
     """
-    q0, q1, q2 = cirq.LineQubit.range(3)
-    observable = mitiq.PauliString("XYZ", support=(0, 1, 2))
+    pauli = mitiq.PauliString("XYZ")
     measurement_outcomes = ["101", "010", "101"], ["ZXY", "YZX", "ZZY"]
-    k_shadows = 1
+    batch_size = 1
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k_shadows, False
+        measurement_outcomes, pauli, batch_size
     )
 
-    assert result == 0.0
+    assert result == 0

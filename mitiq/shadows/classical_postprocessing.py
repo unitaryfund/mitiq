@@ -215,9 +215,9 @@ def shadow_state_reconstruction(
 
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[List[str], List[str]],
-    pauli_str: mitiq.PauliString,
-    k_shadows: int,
-    f_est: Optional[Dict[str, float]] = None,
+    pauli: mitiq.PauliString,
+    batch_size: int,
+    fidelities: Optional[Dict[str, float]] = None,
 ) -> float:
     """Calculate the expectation value of an observable from classical shadows.
     Use median of means to ameliorate the effects of outliers.
@@ -227,62 +227,41 @@ def expectation_estimation_shadow(
             `z_basis_measurement`.
         pauli_str: Single mitiq observable consisting of
             Pauli operators.
-        k_shadows: number of splits in the median of means estimator.
+        batch_size: Size of batches to process measurement outcomes in.
         f_est: The estimated Pauli fidelities to use for calibration if
             available.
 
     Returns:
-        Float corresponding to the estimate of the observable
-        expectation value.
+        Float corresponding to the estimate of the observable expectation
+        value.
     """
-    num_qubits = len(measurement_outcomes[0][0])
-    obs = pauli_str._pauli
-    coeff = pauli_str.coeff
+    bitstrings, paulistrings = measurement_outcomes
+    num_qubits = len(bitstrings[0])
 
-    target_obs, target_locs = [], []
-    for qubit, pauli in obs.items():
-        target_obs.append(str(pauli))
-        target_locs.append(int(qubit))
-
-    # classical values stored in classical computer
-    b_lists_shadow = np.array([list(u) for u in measurement_outcomes[0]])[
-        :, target_locs
+    qubits = sorted(pauli.support())
+    filtered_bitstrings = [
+        "".join([bitstring[q] for q in qubits]) for bitstring in bitstrings
     ]
-    u_lists_shadow = np.array([list(u) for u in measurement_outcomes[1]])[
-        :, target_locs
+    filtered_paulis = [
+        "".join([pauli[q] for q in qubits]) for pauli in paulistrings
     ]
+    filtered_data = (filtered_bitstrings, filtered_paulis)
 
     means = []
+    for bits, paulis in batch_calibration_data(filtered_data, batch_size):
+        matching_indices = [i for i, p in enumerate(paulis) if p == pauli.spec]
+        if matching_indices:
+            product = (-1) ** sum(bit.count("1") for bit in bits)
 
-    # loop over the splits of the shadow:
-    group_idxes = np.array_split(np.arange(len(b_lists_shadow)), k_shadows)
-
-    # loop over the splits of the shadow:
-    for idxes in group_idxes:
-        matching_indexes = np.nonzero(
-            np.all(u_lists_shadow[idxes] == target_obs, axis=1)
-        )
-
-        if len(matching_indexes[0]):
-            product = (-1) ** np.sum(
-                b_lists_shadow[idxes][matching_indexes].astype(int),
-                axis=1,
-            )
-
-            if f_est:
-                b = create_string(num_qubits, target_locs)
-                f_val = f_est.get(b, np.inf)
-                # product becomes an array of snapshot expectation values
-                # witch satisfy condition (1) and (2)
-                product = (1 / f_val) * product
+            if fidelities:
+                b = create_string(num_qubits, qubits)
+                product /= fidelities.get(b, np.inf)
             else:
-                product = 3 ** len(target_locs) * product
+                product *= 3 ** len(qubits)
 
         else:
             product = 0.0
 
-        # append the mean of the product in each split
-        means.append(np.sum(product) / len(idxes))
+        means.append(product / len(bits))
 
-    # return the median of means
-    return float(np.real(np.median(means) * coeff))
+    return np.real(np.median(means) * pauli.coeff)
