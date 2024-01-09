@@ -278,7 +278,7 @@ def decompose_qibo_circuit(qibo_circuit: QiboCircuit) -> QiboCircuit:
     decomp_circuit = QiboCircuit(qibo_circuit.nqubits)
     for gate in qibo_circuit.queue:
         if gate.name in GATES_TO_DECOMPOSE:
-            function = GATES_TO_DECOMPOSE.get(gate.name)
+            function = GATES_TO_DECOMPOSE[gate.name]
             decomposed_gate = function(gate)
             decomp_circuit.add(decomposed_gate)
         else:
@@ -376,7 +376,6 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
             measurement gates or ``theta`` for parametrized gates.
     """
     import re
-
     def read_args(args):
         _args = iter(re.split(r"[\[\],]", args))
         for name in _args:
@@ -389,8 +388,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
     lines = "".join(
         line for line in qasm_code.split("\n") if line and line[:2] != "//" and line[1:3] != "//"
     )
-    lines = (line for line in lines.split(";") if line)
-
+    lines = (line for line in lines.split(";") if line and "//" not in line) 
     if next(lines) != "OPENQASM 2.0":
         raise_error(ValueError, "QASM code should start with 'OPENQASM 2.0'.")
 
