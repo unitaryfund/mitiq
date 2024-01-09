@@ -66,7 +66,7 @@ def valid_bitstrings(
     bitstrings = {
         bin(i)[2:].zfill(num_qubits)
         for i in range(2**num_qubits)
-        if bin(i).count("1") <= max_hamming_weight or num_qubits
+        if bin(i).count("1") <= (max_hamming_weight or num_qubits)
     }
     return bitstrings
 
