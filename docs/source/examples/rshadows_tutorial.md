@@ -249,7 +249,7 @@ plt.xticks(
 )
 
 plt.ylabel("Pauli fidelity")
-plt.legend()
+plt.legend();
 ```
 
 
