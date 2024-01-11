@@ -25,7 +25,6 @@ def test_get_single_shot_pauli_fidelity():
     assert get_single_shot_pauli_fidelity(b_list, u_list) == expected_result
     b_list = "01101"
     u_list = "XYZYZ"
-    print(get_single_shot_pauli_fidelity(b_list, u_list))
     assert get_single_shot_pauli_fidelity(b_list, u_list) == {
         "00000": 1.0,
         "10000": 0.0,
@@ -65,7 +64,6 @@ def test_get_single_shot_pauli_fidelity():
 def test_get_single_shot_pauli_fidelity_with_locality():
     b_list = "11101"
     u_list = "XYZYZ"
-    print(get_single_shot_pauli_fidelity(b_list, u_list, locality=2))
     assert get_single_shot_pauli_fidelity(b_list, u_list, locality=2) == {
         "00000": 1.0,
         "10000": 0.0,
