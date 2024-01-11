@@ -200,7 +200,7 @@ def classical_post_processing(
             expectation_values = expectation_estimation_shadow(
                 shadow_outcomes,
                 obs,
-                batch_size=k_shadows,
+                num_batches=k_shadows,
                 fidelities=calibration_results,
             )
             output[str(obs)] = expectation_values

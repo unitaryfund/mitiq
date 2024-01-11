@@ -88,7 +88,7 @@ def get_single_shot_pauli_fidelity(
 
 def get_pauli_fidelities(
     calibration_outcomes: Tuple[List[str], List[str]],
-    batch_size: int,
+    num_batches: int,
     locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
@@ -100,7 +100,7 @@ def get_pauli_fidelities(
     Args:
         calibration_measurement_outcomes: The `random_Pauli_measurement`
             outcomes for the state :math:`|0\rangle^{\otimes n}`}` .
-        k_calibration: number of splits in the median of means estimator.
+        num_batches: The number of batches in the median of means estimator.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. E.g., if the
             operator is the Ising model Hamiltonian with nearest neighbor
@@ -112,7 +112,7 @@ def get_pauli_fidelities(
     """
     means = defaultdict(list)
     for bitstrings, paulistrings in batch_calibration_data(
-        calibration_outcomes, batch_size
+        calibration_outcomes, num_batches
     ):
         all_fidelities = defaultdict(list)
         for bitstring, paulistring in zip(bitstrings, paulistrings):
@@ -123,7 +123,7 @@ def get_pauli_fidelities(
                 all_fidelities[b].append(f)
 
         for bitstring, fids in all_fidelities.items():
-            means[bitstring].append(sum(fids) / batch_size)
+            means[bitstring].append(sum(fids) / num_batches)
 
     return {
         bitstring: median(averages) for bitstring, averages in means.items()
@@ -216,7 +216,7 @@ def shadow_state_reconstruction(
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[List[str], List[str]],
     pauli: mitiq.PauliString,
-    batch_size: int,
+    num_batches: int,
     fidelities: Optional[Dict[str, float]] = None,
 ) -> float:
     """Calculate the expectation value of an observable from classical shadows.
@@ -227,7 +227,7 @@ def expectation_estimation_shadow(
             `z_basis_measurement`.
         pauli_str: Single mitiq observable consisting of
             Pauli operators.
-        batch_size: Size of batches to process measurement outcomes in.
+        num_batches: Number of batches to process measurement outcomes in.
         f_est: The estimated Pauli fidelities to use for calibration if
             available.
 
@@ -248,10 +248,11 @@ def expectation_estimation_shadow(
     filtered_data = (filtered_bitstrings, filtered_paulis)
 
     means = []
-    for bits, paulis in batch_calibration_data(filtered_data, batch_size):
+    for bits, paulis in batch_calibration_data(filtered_data, num_batches):
         matching_indices = [i for i, p in enumerate(paulis) if p == pauli.spec]
         if matching_indices:
-            product = (-1) ** sum(bit.count("1") for bit in bits)
+            matching_bits = (bits[i] for i in matching_indices)
+            product = sum((-1) ** bit.count("1") for bit in matching_bits)
 
             if fidelities:
                 b = create_string(num_qubits, qubits)

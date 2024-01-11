@@ -98,7 +98,7 @@ def fidelity(
 
 
 def batch_calibration_data(
-    data: Tuple[List[str], List[str]], batch_size: int
+    data: Tuple[List[str], List[str]], num_batches: int
 ) -> Generator[Tuple[List[str], List[str]], None, None]:
     """Batch calibration into chunks of size batch_size.
 
@@ -110,6 +110,7 @@ def batch_calibration_data(
         Tuples of bit strings and pauli strings.
     """
     bits, paulis = data
+    batch_size = len(bits) // num_batches
     for i in range(0, len(bits), batch_size):
         yield bits[i : i + batch_size], paulis[i : i + batch_size]
 
