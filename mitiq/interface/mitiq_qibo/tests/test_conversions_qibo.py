@@ -175,10 +175,19 @@ def test_qibo_integration(i):
     cirq.testing.assert_allclose_up_to_global_phase(u_1, u_2, atol=0)
 
 
-def test_invalid_QASM():
+def test_invalid_QASM_start():
     qasm = "OPENQASM 1.0"
     with pytest.raises(
         ValueError, 
         match="QASM code should start with 'OPENQASM 2.0'.",
     ):
         _parse_qasm_modified(qasm)
+
+def test_invalid_QASM_qubit_arg():
+    qasm = "OPENQASM 2.0; \n qreg q[5]; \n ry(pi*-0.5) q[r];" 
+    with pytest.raises(
+        ValueError, 
+        match="Invalid QASM qubit arguments:"
+    ):
+        _parse_qasm_modified(qasm)
+
