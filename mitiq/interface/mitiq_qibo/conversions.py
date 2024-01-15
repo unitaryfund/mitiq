@@ -13,7 +13,7 @@ from qibo import gates
 from qibo.gates.abstract import Gate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
-from typing import Tuple, List, Generator, Union,cast
+from typing import Tuple, List, Generator, Union
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
