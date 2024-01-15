@@ -13,7 +13,7 @@ from qibo import gates
 from qibo.gates.abstract import Gate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
-from typing import Tuple, List, Any
+from typing import Tuple, List, Any, Generator
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
@@ -376,7 +376,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Any]]:
             measurement gates or ``theta`` for parametrized gates.
     """
     import re
-    def read_args(args: str) -> Tuple[str, int]:
+    def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
         _args = iter(re.split(r"[\[\],]", args))
         for name in _args:
             if name:
