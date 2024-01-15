@@ -15,6 +15,7 @@ from mitiq.interface.mitiq_qibo import (
     UnsupportedQiboCircuitError,
     from_qibo,
     to_qibo,
+    _parse_qasm_modified
 )
 from mitiq.utils import _equal
 from qibo.models.circuit import Circuit as QiboCircuit
@@ -172,3 +173,12 @@ def test_qibo_integration(i):
     u_1 = cirq.unitary(base_circ)
     u_2 = cirq.unitary(circ_recovered)
     cirq.testing.assert_allclose_up_to_global_phase(u_1, u_2, atol=0)
+
+
+def test_invalid_QASM():
+    qasm = "OPENQASM 1.0"
+    with pytest.raises(
+        ValueError, 
+        match="QASM code should start with 'OPENQASM 2.0'.",
+    ):
+        _parse_qasm_modified(qasm)
