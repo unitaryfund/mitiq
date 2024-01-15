@@ -13,7 +13,7 @@ from qibo import gates
 from qibo.gates.abstract import Gate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
-from typing import Tuple, List, Generator, Union
+from typing import Tuple, List, Generator, Union,cast
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
@@ -385,10 +385,11 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
             The additional parameter is the ``register_name`` for
             measurement gates or ``theta`` for parametrized gates.
     """
-    lines = "".join(
+     
+    lines = (line for line in "".join(
         line for line in qasm_code.split("\n") if line and line[:2] != "//" and line[1:3] != "//"
-    )
-    lines = (line for line in lines.split(";") if line and "//" not in line) 
+    ).split(";") if line and "//" not in line)
+
     if next(lines) != "OPENQASM 2.0":
         raise_error(ValueError, "QASM code should start with 'OPENQASM 2.0'.")
 
