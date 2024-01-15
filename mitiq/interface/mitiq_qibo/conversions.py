@@ -6,7 +6,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qibo's circuit representation.
 """
-
+import re
 from cirq import Circuit, decompose
 from numpy import pi
 from qibo import gates
@@ -359,6 +359,16 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
     return qibo_circuit
 
 
+def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
+        _args = iter(re.split(r"[\[\],]", args))
+        for name in _args:
+            if name:
+                index = next(_args)
+                if not index.isdigit():
+                    raise_error(ValueError, "Invalid QASM qubit arguments:", args)
+                yield name, int(index)
+
+
 def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Any]]:
     """Extracts circuit information from QASM script.
 
@@ -375,16 +385,6 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Any]]:
             The additional parameter is the ``register_name`` for
             measurement gates or ``theta`` for parametrized gates.
     """
-    import re
-    def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
-        _args = iter(re.split(r"[\[\],]", args))
-        for name in _args:
-            if name:
-                index = next(_args)
-                if not index.isdigit():
-                    raise_error(ValueError, "Invalid QASM qubit arguments:", args)
-                yield name, int(index)
-
     lines = "".join(
         line for line in qasm_code.split("\n") if line and line[:2] != "//" and line[1:3] != "//"
     )
