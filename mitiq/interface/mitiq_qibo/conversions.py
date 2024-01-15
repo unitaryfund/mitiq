@@ -13,7 +13,7 @@ from qibo import gates
 from qibo.gates.abstract import Gate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
-from typing import Tuple, List, Any, Generator
+from typing import Tuple, List, Generator, Union
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
@@ -369,7 +369,7 @@ def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
                 yield name, int(index)
 
 
-def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Any]]:
+def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int], Union[List[float], None]]]]:
     """Extracts circuit information from QASM script.
 
     Helper method for ``from_qasm``.
@@ -525,6 +525,5 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Any]]:
             qubit_list = [qubit_list[k] for k in sorted(qubit_list.keys())]
             gate_list[i] = ("M", qubit_list, register)
 
-    print(type(len(qubits)),type(gate_list))
     return len(qubits), gate_list
 
