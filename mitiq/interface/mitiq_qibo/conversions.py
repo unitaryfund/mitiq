@@ -13,7 +13,7 @@ from qibo import gates
 from qibo.gates.abstract import Gate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
-from typing import Tuple, List, Generator, Union
+from typing import Tuple, List, Generator, Union, Optional
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
@@ -393,11 +393,9 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
     if next(lines) != "OPENQASM 2.0":
         raise_error(ValueError, "QASM code should start with 'OPENQASM 2.0'.")
 
-    qubits = {}  
+    qubits: Dict[Tuple[str, int], int] = {}  
     cregs_size = {}  
-    registers = (
-        {}
-    )  
+    registers: Dict[str, Optional[Dict[int, int]]] = {}
     gate_list = (
         []
     ) 
@@ -525,6 +523,6 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
             qubit_list = registers[register]
             qubit_list = [qubit_list[k] for k in sorted(qubit_list.keys())]
             gate_list[i] = ("M", qubit_list, register)
-
+    print(registers)
     return len(qubits), gate_list
 
