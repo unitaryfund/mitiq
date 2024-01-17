@@ -418,17 +418,17 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                 cregs_size[name] = nqubits
 
         elif command == "measure":
-            args = args.split("->")
-            if len(args) != 2:
+            args_list = args.split("->")
+            if len(args_list) != 2:
                 raise_error(ValueError, "Invalid QASM measurement:", line)
-            qubit = next(read_args(args[0]))
+            qubit = next(read_args(args_list[0]))
             if qubit not in qubits:
                 raise_error(
                     ValueError,
                     "Qubit {} is not defined in QASM code." "".format(qubit),
                 )
 
-            register, idx = next(read_args(args[1]))
+            register, idx = next(read_args(args_list[1]))
             if register not in cregs_size:
                 raise_error(
                     ValueError,
@@ -443,7 +443,8 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                     "".format(idx, register, cregs_size[register]),
                 )
             if register in registers:
-                if idx in registers[register]:
+                registers_not_none = {key: value for key, value in registers.items() if value is not None}
+                if idx in registers_not_none[register]:
                     raise_error(
                         KeyError,
                         "Key {} of register {} has already "
