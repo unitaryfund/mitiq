@@ -38,7 +38,7 @@ from mitiq import MeasurementResult, Observable, PauliString, raw
 ## Task
 
 We will demonstrate using REM + ZNE on RB circuits, which are generated using Mitiq's built-in benchmarking circuit generation function, {func}`.generate_rb_circuits()`. 
-More information on the RB protocol is available [here](https://learn.qiskit.org/course/quantum-hardware/randomized-benchmarking). 
+More information on the RB protocol is available in the [Randomized Benchmarking section](https://qiskit.org/ecosystem/experiments/manuals/verification/randomized_benchmarking.html) of the [Qiskit Experiments Manual](https://qiskit.org/ecosystem/experiments/manuals). 
 In this example we use a two-qubit RB circuit with a Clifford depth (number of Clifford groups) of 10.
 
 ```{code-cell} ipython3
