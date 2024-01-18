@@ -396,9 +396,8 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
     qubits: Dict[Tuple[str, int], int] = {}  
     cregs_size = {}  
     registers: Dict[str, Optional[Dict[int, int]]] = {}
-    gate_list = (
-        []
-    ) 
+    gate_list = []
+    
     for line in lines:
         command, args = line.split(None, 1)
         # remove spaces
@@ -450,7 +449,8 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                         "Key {} of register {} has already "
                         "been used.".format(idx, register),
                     )
-                registers[register][idx] = qubits[qubit]
+                if registers[register] is not None:
+                    registers[register][idx] = qubits[qubit]
             else:
                 registers[register] = {idx: qubits[qubit]}
                 gate_list.append(("M", register, None))
