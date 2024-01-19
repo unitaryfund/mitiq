@@ -9,6 +9,7 @@ import numpy as np
 import numpy.typing as npt
 from cirq.circuits import Circuit
 
+from mitiq.pec.channels import _circuit_to_choi, choi_to_super
 from mitiq.utils import matrix_to_vector, vector_to_matrix
 
 pauli_unitary_list = [
@@ -58,7 +59,9 @@ def _pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
 
 def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
     """Find the Pauli Transfer Matrix (PTM) of a circuit."""
-    superop = cirq.kraus_to_superoperator(cirq.kraus(circuit))
+
+    superop = choi_to_super(_circuit_to_choi(circuit))
+
     vec_pauli = _pauli_vectorized_list(num_qubits)
     n_qubit_paulis = _n_qubit_paulis(num_qubits)
     ptm_matrix = np.zeros([4**num_qubits, 4**num_qubits], dtype=complex)
@@ -77,9 +80,8 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
             pauli_superop_pauli = np.matmul(
                 n_qubit_paulis[j], superop_on_pauli_matrix
             )
-            ptm_matrix[i, j] = (0.5**num_qubits) * np.trace(
+            ptm_matrix[j, i] = (0.5**num_qubits) * np.trace(
                 pauli_superop_pauli
             )
-        # ptm_matrix[i, :] = ptm_matrix_row
 
     return ptm_matrix
