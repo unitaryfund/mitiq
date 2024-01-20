@@ -13,7 +13,7 @@ from qibo import gates
 from qibo.gates.abstract import Gate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
-from typing import Tuple, List, Generator, Union, Optional, Dict
+from typing import cast,Tuple, List, Generator, Union, Optional, Dict
 
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
@@ -372,8 +372,6 @@ def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
 def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int], Union[List[float], None]]]]:
     """Extracts circuit information from QASM script.
 
-    Helper method for ``from_qasm``.
-
     Args:
         qasm_code: String with the QASM code to parse.
 
@@ -449,7 +447,9 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                         "Key {} of register {} has already "
                         "been used.".format(idx, register),
                     )
+                
                 if registers[register] is not None:
+                    cast(Dict[int, int], registers[register])
                     registers[register][idx] = qubits[qubit]
             else:
                 registers[register] = {idx: qubits[qubit]}
@@ -521,9 +521,8 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
     # Create measurement gate qubit lists from registers
     for i, (gatename, register, _) in enumerate(gate_list):
         if gatename == "M":
-            qubit_list = registers[register]
-            qubit_list = [qubit_list[k] for k in sorted(qubit_list.keys())]
+            qubit_dict = cast(Dict[int, int], registers[register])
+            qubit_list = [qubit_dict[k] for k in sorted(qubit_dict.keys())]
             gate_list[i] = ("M", qubit_list, register)
-    print(registers)
     return len(qubits), gate_list
 
