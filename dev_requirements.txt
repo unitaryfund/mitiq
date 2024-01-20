@@ -1,12 +1,13 @@
 # Third-party integration.
 qiskit~=0.45.1
 qiskit-aer~=0.13.1
-qiskit-ibm-provider~=0.7.3
+qiskit-ibm-provider~=0.8.0
 pyquil~=3.5.4
-pennylane-qiskit~=0.33.1
-pennylane~=0.33.1
-amazon-braket-sdk~=1.65.1
+pennylane-qiskit~=0.34.0
+pennylane~=0.34.0
+amazon-braket-sdk~=1.66.0
 qibo==0.1.11
+
 
 
 # Unit tests, coverage, and formatting/style.
