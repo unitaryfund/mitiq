@@ -516,8 +516,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
             elif gatename == "sxdg": 
                 gate_list.append(("RX", list(qubit_list),  [-pi/2]))
             else: 
-                gate_list.append((gates.QASM_GATES[gatename], list(qubit_list), params))
-
+                gate_list.append((str(gates.QASM_GATES[gatename]), list(qubit_list), params))
     # Create measurement gate qubit lists from registers
     for i, (gatename, _, register) in enumerate(gate_list):
         if gatename == "M":
