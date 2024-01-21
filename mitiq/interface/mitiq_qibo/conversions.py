@@ -395,7 +395,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
     qubits: Dict[Tuple[str, int], int] = {}  
     cregs_size = {}  
     registers: Dict[str, Optional[Dict[int, int]]] = {}
-    gate_list = []
+    gate_list: List[Tuple[str, List[int], Union[List[float], str, None]]] = []
     
     for line in lines:
         command, args = line.split(None, 1)
