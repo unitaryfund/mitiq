@@ -369,7 +369,8 @@ def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
                 yield name, int(index)
 
 
-def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int], Union[List[float], None]]]]:
+def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int], Union[List[float], str, None]]]]:
+    
     """Extracts circuit information from QASM script.
 
     Args:
@@ -453,8 +454,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                     registers[register][idx] = qubits[qubit]
             else:
                 registers[register] = {idx: qubits[qubit]}
-                gate_list.append(("M", register, None))
-
+                gate_list.append(("M", [0], register))
         else:
             pieces = [x for x in re.split("[()]", command) if x]
             if len(pieces) == 1:
@@ -519,10 +519,11 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                 gate_list.append((gates.QASM_GATES[gatename], list(qubit_list), params))
 
     # Create measurement gate qubit lists from registers
-    for i, (gatename, register, _) in enumerate(gate_list):
+    for i, (gatename, _, register) in enumerate(gate_list):
         if gatename == "M":
             qubit_dict = cast(Dict[int, int], registers[register])
             qubit_list = [qubit_dict[k] for k in sorted(qubit_dict.keys())]
             gate_list[i] = ("M", qubit_list, register)
+    
     return len(qubits), gate_list
 
