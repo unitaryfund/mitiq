@@ -521,7 +521,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
     # Create measurement gate qubit lists from registers
     for i, (gatename, _, third_arg) in enumerate(gate_list):
         if gatename == "M":
-            register = third_arg
+            register = cast(str, third_arg)
             qubit_dict = cast(Dict[int, int], registers[register])
             qubit_list = [qubit_dict[k] for k in sorted(qubit_dict.keys())]
             gate_list[i] = ("M", qubit_list, register)
