@@ -450,7 +450,7 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
                     )
                 
                 if registers[register] is not None:
-                    cast(Dict[int, int], registers[register])
+                    cast(Dict[str, Dict[int, int]],registers)
                     registers[register][idx] = qubits[qubit]
             else:
                 registers[register] = {idx: qubits[qubit]}
