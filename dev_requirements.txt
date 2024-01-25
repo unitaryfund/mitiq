@@ -8,8 +8,6 @@ pennylane~=0.34.0
 amazon-braket-sdk~=1.66.0
 qibo==0.1.11
 
-
-
 # Unit tests, coverage, and formatting/style.
 pytest==7.1.3
 pytest-xdist[psutil]==3.0.2

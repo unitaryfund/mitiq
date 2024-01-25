@@ -8,5 +8,4 @@ from mitiq.interface.mitiq_qibo.conversions import (
     to_qibo,
     UnsupportedCirqCircuitError,
     UnsupportedQiboCircuitError,
-    _parse_qasm_modified
 )
