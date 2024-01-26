@@ -10,7 +10,7 @@ import re
 from cirq import Circuit, decompose
 from numpy import pi
 from qibo import gates
-from qibo.gates.abstract import Gate
+from qibo.gates.abstract import Gate, ParametrizedGate
 from qibo.models.circuit import Circuit as QiboCircuit
 from qibo.config import raise_error
 from typing import cast,Tuple, List, Generator, Union, Optional, Dict
@@ -19,7 +19,7 @@ from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
 
 
-def crx_decomp(gate: gates.CRX) -> List[Gate]:
+def crx_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes CRX gate to Cirq known gates.
 
     Args:
@@ -41,11 +41,11 @@ def crx_decomp(gate: gates.CRX) -> List[Gate]:
     return decomp_gate
 
 
-def cry_decomp(gate: gates.CRY) -> List[Gate]:
+def cry_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes CRY gate to Cirq known gates.
 
     Args:
-        qibo_gate: CRY gate to decompose.
+        gate: CRY gate to decompose.
 
     Returns:
         List with gates that has the same effect as applying the original gate.
@@ -61,7 +61,7 @@ def cry_decomp(gate: gates.CRY) -> List[Gate]:
     return decomp_gate
 
 
-def crz_decomp(gate: gates.CRZ) -> List[Gate]:
+def crz_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes CRZ gate to Cirq known gates.
 
     Args:
@@ -81,7 +81,7 @@ def crz_decomp(gate: gates.CRZ) -> List[Gate]:
     return decomp_gate
 
 
-def cu1_decomp(gate: gates.CU1) -> List[Gate]:
+def cu1_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes CU1 gate to Cirq known gates.
 
     Args:
@@ -102,7 +102,7 @@ def cu1_decomp(gate: gates.CU1) -> List[Gate]:
     return decomp_gate
 
 
-def cu3_decomp(gate: gates.CU3) -> List[Gate]:
+def cu3_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes CU3 gate to Cirq known gates.
 
     Args:
@@ -126,7 +126,7 @@ def cu3_decomp(gate: gates.CU3) -> List[Gate]:
     return decomp_gate
 
 
-def iswap_decomp(gate: gates.iSWAP) -> List[Gate]:
+def iswap_decomp(gate: Gate) -> List[Gate]:
     """Decomposes ISWAP gate to Cirq known gates.
 
     Args:
@@ -147,7 +147,7 @@ def iswap_decomp(gate: gates.iSWAP) -> List[Gate]:
     return decomp_gate
 
 
-def fswap_decomp(gate: gates.FSWAP) -> List[Gate]:
+def fswap_decomp(gate: Gate) -> List[Gate]:
     """Decomposes FSWAP gate to Cirq known gates.
 
     Args:
@@ -178,7 +178,7 @@ def fswap_decomp(gate: gates.FSWAP) -> List[Gate]:
     return decomp_gate
 
 
-def rxx_decomp(gate: gates.RXX) -> List[Gate]:
+def rxx_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes RXX gate to Cirq known gates.
 
     Args:
@@ -201,7 +201,7 @@ def rxx_decomp(gate: gates.RXX) -> List[Gate]:
     return decomp_gate
 
 
-def ryy_decomp(gate: gates.RYY) -> List[Gate]:
+def ryy_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes RYY gate to Cirq known gates.
 
     Args:
@@ -224,7 +224,7 @@ def ryy_decomp(gate: gates.RYY) -> List[Gate]:
     return decomp_gate
 
 
-def rzz_decomp(gate: gates.RZZ) -> List[Gate]:
+def rzz_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes RZZ gate to Cirq known gates.
 
     Args:
@@ -277,12 +277,8 @@ def decompose_qibo_circuit(qibo_circuit: QiboCircuit) -> QiboCircuit:
     """
     decomp_circuit = QiboCircuit(qibo_circuit.nqubits)
     for gate in qibo_circuit.queue:
-        if gate.name in GATES_TO_DECOMPOSE:
-            function = GATES_TO_DECOMPOSE[gate.name]
-            decomposed_gate = function(gate)
-            decomp_circuit.add(decomposed_gate)
-        else:
-            decomp_circuit.add(gate)
+        decomposition_func = GATES_TO_DECOMPOSE.get(gate.name, lambda x: x)
+        decomp_circuit.add(decomposition_func(gate))
 
     return decomp_circuit
 
@@ -298,7 +294,6 @@ def from_qibo(qibo_circuit: QiboCircuit) -> Circuit:
     """
     for measurement in qibo_circuit.measurements:
         reg_name = measurement.register_name
-        reg_qubits = measurement.target_qubits
         if not reg_name.islower():
             raise UnsupportedQiboCircuitError(
                 f"OpenQASM does not support capital letters in register names but {reg_name} was used."
