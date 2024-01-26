@@ -205,26 +205,9 @@ pec_data = np.loadtxt(
     epsilon0=epsilon0,
     observable=observable,
 )
-
-print(success)
-print(f"Difference of learned value from true value: {abs(epsilon_opt - epsilon) :.5f}")
-print(f"Difference of initial guess from true value: {abs(epsilon0 - epsilon) :.5f}")
 ```
 
 ```{code-cell} ipython3
-[success, epsilon_opt] = learn_depolarizing_noise_parameter(
-    operations_to_learn,
-    circuit,
-    ideal_executor,
-    noisy_executor,
-    pec_kwargs,
-    num_training_circuits=5,
-    fraction_non_clifford=0.2,
-    training_random_state=np.random.RandomState(1),
-    epsilon0=epsilon0,
-    observable=observable,
-)
-
 print(success)
 print(f"Difference of learned value from true value: {abs(epsilon_opt - epsilon) :.5f}")
 print(f"Difference of initial guess from true value: {abs(epsilon0 - epsilon) :.5f}")
