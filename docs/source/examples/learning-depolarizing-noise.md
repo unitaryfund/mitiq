@@ -50,7 +50,7 @@ Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibi
 
 ```{code-cell} ipython3
 circuit = random_x_z_cnot_circuit(
-    LineQubit.range(2), n_moments=10, random_state=np.random.RandomState(1)
+    LineQubit.range(2), n_moments=5, random_state=np.random.RandomState(1)
 )
 print(circuit)
 ```
