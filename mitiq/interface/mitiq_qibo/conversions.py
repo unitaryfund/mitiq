@@ -355,6 +355,20 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
 
 
 def read_args(args: str) ->  Generator[Tuple[str, int], None, None]:
+        
+        """Parses a string of QASM qubit arguments and yields
+        tuples containing qubit names and their corresponding indices.
+
+        Args:
+        - args (str): A string containing QASM qubit arguments in the format 'name[index]'.
+
+        Yelds:
+        Generator[Tuple[str, int], None, None]: A generator that yields tuples of qubit name and index.
+
+        Raises:
+        - ValueError: If the input string is not a valid QASM qubit argument.
+        """
+
         _args = iter(re.split(r"[\[\],]", args))
         for name in _args:
             if name:
@@ -380,9 +394,12 @@ def _parse_qasm_modified(qasm_code: str) -> Tuple[int, List[Tuple[str, List[int]
             measurement gates or ``theta`` for parametrized gates.
     """
      
-    lines = (line for line in "".join(
-        line for line in qasm_code.split("\n") if line and line[:2] != "//" and line[1:3] != "//"
-    ).split(";") if line and "//" not in line)
+    filtered_lines = []
+    for line in "".join(line for line in qasm_code.split("\n") if line and line[:2] != "//" and line[1:3] != "//").split(";"):
+        if line and "//" not in line:
+            filtered_lines.append(line)
+
+    lines = (line for line in filtered_lines)
 
     if next(lines) != "OPENQASM 2.0":
         raise_error(ValueError, "QASM code should start with 'OPENQASM 2.0'.")
