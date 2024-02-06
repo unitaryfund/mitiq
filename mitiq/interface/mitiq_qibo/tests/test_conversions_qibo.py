@@ -9,14 +9,10 @@ import cirq
 import numpy as np
 import pytest
 import qibo
-import re 
-
 from mitiq.interface.mitiq_qibo import (
-    UnsupportedCirqCircuitError,
     UnsupportedQiboCircuitError,
     from_qibo,
     to_qibo,
-    _parse_qasm_modified
 )
 from mitiq.utils import _equal
 from qibo.models.circuit import Circuit as QiboCircuit
@@ -83,19 +79,6 @@ def test_from_qibo_unknown_cirq_gate():
 
     assert _equal(circuit, correct, require_qubit_equality=False)
 
-
-def test_to_qibo_unsupported_cirq():
-    q = cirq.LineQubit(0)
-    # Empty circuit
-    circuit = cirq.Circuit()
-
-    with pytest.raises(
-        UnsupportedCirqCircuitError,
-        match="The number of qubits must be at least 1 but is 0.",
-    ):
-        to_qibo(circuit)
-
-
 @pytest.mark.parametrize("random_state", range(10))
 def test_to_from_qibo(random_state):
     circuit = cirq.testing.random_circuit(
@@ -140,6 +123,10 @@ def test_qibo_integration(i):
         qibo.gates.RY(0, 0.4),
         qibo.gates.RZ(0, 0.4),
         qibo.gates.H(0),
+        qibo.gates.SX(0),
+        qibo.gates.SXDG(0),
+        qibo.gates.CSX(0, 1),
+        qibo.gates.CSXDG(0, 1),
         qibo.gates.TOFFOLI(0, 1, 2),
         qibo.gates.SWAP(0, 1),
         qibo.gates.iSWAP(0, 1),
@@ -176,124 +163,6 @@ def test_qibo_integration(i):
     cirq.testing.assert_allclose_up_to_global_phase(u_1, u_2, atol=0)
 
 
-def test_invalid_QASM_start():
-    qasm = "OPENQASM 1.0"
-    with pytest.raises(
-        ValueError, 
-        match="QASM code should start with 'OPENQASM 2.0'.",
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_qubit_arg():
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n ry(pi*-0.5) q[r];" 
-    with pytest.raises(
-        ValueError, 
-        match="Invalid QASM qubit arguments:"
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_measuremnt():
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n measure q[4] -> c[0] -> c[1];" 
-    with pytest.raises(
-        ValueError, 
-        match="Invalid QASM measurement:"
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_qubit_measurment(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n measure q[6] -> c[0];" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Qubit ('q', 6) is not defined in QASM code.")
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_register_measurment(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n measure q[1] -> c[10];" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Classical register name c is not defined in QASM code.")
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_register_measurment(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n measure q[1] -> c[10];" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Classical register name c is not defined in QASM code.")
-    ):
-        _parse_qasm_modified(qasm)
-
-def test_invalid_QASM_register_index_measurment(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; creg c[3]; \n measure q[1] -> c[10];" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Cannot access index 10 of register c with 3 qubits.")
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_register_already_used_measurment(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; creg c[3]; \n measure q[1] -> c[1]; \n measure q[3] -> c[1]" 
-    with pytest.raises(
-        KeyError, 
-        match=re.escape("Key 1 of register c has already been used.")
-    ):
-        _parse_qasm_modified(qasm)
-
-def test_invalid_QASM_gate(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n hi q[1]" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("QASM command hi is not recognized.")
-    ):
-        _parse_qasm_modified(qasm)
-
-def test_invalid_QASM_missing_parameters_gate(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n rx q[1]" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Missing parameters for QASM gate rx.")
-    ):
-        _parse_qasm_modified(qasm)
-
-def test_invalid_QASM_parametrized_gate(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n parametrised_gate(0.4) q[1]," 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Invalid QASM command parametrised_gate(0.4).")
-    ):
-        _parse_qasm_modified(qasm)
-
-def test_invalid_QASM_value_parametrized_gate(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n rx(0.4j) q[1]," 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Invalid value ['0.4j'] for gate parameters.")
-    ):
-        _parse_qasm_modified(qasm)
-
-def test_invalid_QASM_2_parameters_gate(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n multi(0.4)(0.5) q[1]," 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("QASM command multi(0.4)(0.5) is not recognized.")
-    ):
-        _parse_qasm_modified(qasm)
-
-
-def test_invalid_QASM_qubit_gate(): 
-    qasm = "OPENQASM 2.0; \n qreg q[5]; \n h q[7]" 
-    with pytest.raises(
-        ValueError, 
-        match=re.escape("Qubit ('q', 7) is not defined in QASM code.")
-    ):
-        _parse_qasm_modified(qasm)
 
 
 
