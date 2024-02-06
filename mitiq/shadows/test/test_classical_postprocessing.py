@@ -5,7 +5,6 @@
 
 """Tests for classical post-processing functions for classical shadows."""
 
-import cirq
 import numpy as np
 
 import mitiq
@@ -24,6 +23,65 @@ def test_get_single_shot_pauli_fidelity():
     u_list = "XY"
     expected_result = {"00": 1.0, "01": 0.0, "10": 0.0, "11": 0.0}
     assert get_single_shot_pauli_fidelity(b_list, u_list) == expected_result
+    b_list = "01101"
+    u_list = "XYZYZ"
+    assert get_single_shot_pauli_fidelity(b_list, u_list) == {
+        "00000": 1.0,
+        "10000": 0.0,
+        "01000": 0.0,
+        "00100": -1.0,
+        "00010": 0.0,
+        "00001": -1.0,
+        "11000": 0.0,
+        "10100": 0.0,
+        "10010": 0.0,
+        "10001": 0.0,
+        "01100": 0.0,
+        "01010": 0.0,
+        "01001": 0.0,
+        "00110": 0.0,
+        "00101": 1.0,
+        "00011": 0.0,
+        "11100": 0.0,
+        "11010": 0.0,
+        "11001": 0.0,
+        "10110": 0.0,
+        "10101": 0.0,
+        "10011": 0.0,
+        "01110": 0.0,
+        "01101": 0.0,
+        "01011": 0.0,
+        "00111": 0.0,
+        "11110": 0.0,
+        "11101": 0.0,
+        "11011": 0.0,
+        "10111": 0.0,
+        "01111": 0.0,
+        "11111": 0.0,
+    }
+
+
+def test_get_single_shot_pauli_fidelity_with_locality():
+    b_list = "11101"
+    u_list = "XYZYZ"
+    assert get_single_shot_pauli_fidelity(b_list, u_list, locality=2) == {
+        "00000": 1.0,
+        "10000": 0.0,
+        "01000": 0.0,
+        "00100": -1.0,
+        "00010": 0.0,
+        "00001": -1.0,
+        "11000": 0.0,
+        "10100": 0.0,
+        "10010": 0.0,
+        "10001": 0.0,
+        "01100": 0.0,
+        "01010": 0.0,
+        "01001": 0.0,
+        "00110": 0.0,
+        "00101": 1.0,
+        "00011": 0.0,
+    }
 
 
 def test_get_pauli_fidelity():
@@ -32,24 +90,16 @@ def test_get_pauli_fidelity():
         ["XX", "YY", "ZZ", "XY"],
     )
     k_calibration = 2
-    expected_result = {
-        "00": (1 + 0j),
-        "10": (-0.25 + 0j),
-        "01": (0.25 + 0j),
-        "11": (-0.25 + 0j),
-    }
+    expected_result = {"00": 1, "10": -0.25, "01": 0.25, "11": -0.25}
     result = get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration
     )
-
-    for key in expected_result.keys():
-        assert np.isclose(result[key], expected_result[key])
+    assert result == expected_result
 
 
 def test_classical_snapshot_cal():
     b_list_shadow = "01"
     u_list_shadow = "XY"
-    pauli_twirling_calibration = True
     f_est = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
     expected_result = operator_ptm_vector_rep(
         np.array(
@@ -62,9 +112,7 @@ def test_classical_snapshot_cal():
         )
     )
     np.testing.assert_array_almost_equal(
-        classical_snapshot(
-            b_list_shadow, u_list_shadow, pauli_twirling_calibration, f_est
-        ),
+        classical_snapshot(b_list_shadow, u_list_shadow, f_est),
         expected_result,
     )
 
@@ -74,166 +122,73 @@ def test_classical_snapshot():
     u_list = "XY"
     expected_result = np.array(
         [
-            [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
-            [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
-            [0.75 + 0.0j, 0.0 + 2.25j, 0.25 + 0.0j, 0.0 + 0.75j],
-            [0.0 - 2.25j, 0.75 + 0.0j, 0.0 - 0.75j, 0.25 + 0.0j],
+            [0.25, 0.75j, 0.75, 2.25j],
+            [-0.75j, 0.25, -2.25j, 0.75],
+            [0.75, 2.25j, 0.25, 0.75j],
+            [-2.25j, 0.75, -0.75j, 0.25],
         ]
     )
     result = classical_snapshot(b_list, u_list, False)
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (
-        2 ** len(b_list),
-        2 ** len(b_list),
-    )
-    assert np.allclose(result, expected_result)
+    np.testing.assert_allclose(result, expected_result)
 
 
 def test_shadow_state_reconstruction():
-    b_lists = ["010", "001", "000"]
-    u_lists = ["XYZ", "ZYX", "YXZ"]
+    bitstrings = ["010", "001", "000"]
+    paulistrings = ["XYZ", "ZYX", "YXZ"]
+    measurement_outcomes = (bitstrings, paulistrings)
 
-    measurement_outcomes = (b_lists, u_lists)
-
-    expected_result = np.array(
+    expected_state = np.array(
         [
-            [
-                [
-                    0.5 + 0.0j,
-                    -0.5 + 0.0j,
-                    0.5 + 0.0j,
-                    0.0 + 1.5j,
-                    0.5 - 0.5j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                ],
-                [
-                    -0.5 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 1.5j,
-                    -0.25 - 0.75j,
-                    0.0 + 0.0j,
-                    -0.25 + 0.25j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                ],
-                [
-                    0.5 + 0.0j,
-                    0.0 - 1.5j,
-                    0.5 + 0.0j,
-                    -0.5 + 0.0j,
-                    0.0 - 3.0j,
-                    0.0 + 0.0j,
-                    0.5 - 0.5j,
-                    0.0 + 0.0j,
-                ],
-                [
-                    0.0 - 1.5j,
-                    -0.25 + 0.75j,
-                    -0.5 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 1.5j,
-                    0.0 + 0.0j,
-                    -0.25 + 0.25j,
-                ],
-                [
-                    0.5 + 0.5j,
-                    0.0 + 0.0j,
-                    0.0 + 3.0j,
-                    0.0 + 0.0j,
-                    0.25 + 0.0j,
-                    0.25 + 0.0j,
-                    0.5 + 0.75j,
-                    0.0 - 0.75j,
-                ],
-                [
-                    0.0 + 0.0j,
-                    -0.25 - 0.25j,
-                    0.0 + 0.0j,
-                    0.0 - 1.5j,
-                    0.25 + 0.0j,
-                    -0.25 + 0.0j,
-                    0.0 - 0.75j,
-                    -0.25 + 0.0j,
-                ],
-                [
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.5 + 0.5j,
-                    0.0 + 0.0j,
-                    0.5 - 0.75j,
-                    0.0 + 0.75j,
-                    0.25 + 0.0j,
-                    0.25 + 0.0j,
-                ],
-                [
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    0.0 + 0.0j,
-                    -0.25 - 0.25j,
-                    0.0 + 0.75j,
-                    -0.25 + 0.0j,
-                    0.25 + 0.0j,
-                    -0.25 + 0.0j,
-                ],
-            ]
+            [0.5, -0.5, 0.5, 1.5j, 0.5 - 0.5j, 0, 0, 0],
+            [-0.5, 0, 1.5j, -0.25 - 0.75j, 0, -0.25 + 0.25j, 0, 0],
+            [0.5, -1.5j, 0.5, -0.5, -3.0j, 0, 0.5 - 0.5j, 0],
+            [-1.5j, -0.25 + 0.75j, -0.5, 0, 0, 1.5j, 0, -0.25 + 0.25j],
+            [0.5 + 0.5j, 0, 3.0j, 0, 0.25, 0.25, 0.5 + 0.75j, -0.75j],
+            [0, -0.25 - 0.25j, 0, -1.5j, 0.25, -0.25, -0.75j, -0.25],
+            [0, 0, 0.5 + 0.5j, 0, 0.5 - 0.75j, 0.75j, 0.25, 0.25],
+            [0, 0, 0, -0.25 - 0.25j, 0.75j, -0.25, 0.25, -0.25],
         ]
     )
 
-    result = shadow_state_reconstruction(measurement_outcomes, False)
-    num_qubits = len(measurement_outcomes[0])
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (
-        2**num_qubits,
-        2**num_qubits,
-    )
-    assert np.allclose(result, expected_result)
+    state = shadow_state_reconstruction(measurement_outcomes)
+    np.testing.assert_almost_equal(state, expected_state)
 
 
 def test_shadow_state_reconstruction_cal():
-    b_lists = ["01", "01"]
-    u_lists = ["XY", "XY"]
-    measurement_outcomes = (b_lists, u_lists)
-    f_est = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
-    expected_result_vec = operator_ptm_vector_rep(
+    bitstrings, paulistrings = ["01", "01"], ["XY", "XY"]
+    measurement_outcomes = (bitstrings, paulistrings)
+    fidelities = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
+
+    expected_state_vec = operator_ptm_vector_rep(
         np.array(
             [
-                [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
-                [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
-                [0.75 + 0.0j, 0.0 + 2.25j, 0.25 + 0.0j, 0.0 + 0.75j],
-                [0.0 - 2.25j, 0.75 + 0.0j, 0.0 - 0.75j, 0.25 + 0.0j],
+                [0.25, 0.75j, 0.75, 2.25j],
+                [-0.75j, 0.25, -2.25j, 0.75],
+                [0.75, 2.25j, 0.25, 0.75j],
+                [-2.25j, 0.75, -0.75j, 0.25],
             ]
         )
     )
-    result = shadow_state_reconstruction(measurement_outcomes, True, f_est)
-    num_qubits = len(measurement_outcomes[0])
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (4**num_qubits,)
-    assert np.allclose(result, expected_result_vec)
+    state = shadow_state_reconstruction(measurement_outcomes, fidelities)
+    np.testing.assert_almost_equal(state, expected_state_vec)
 
 
 def test_expectation_estimation_shadow():
-    b_lists = ["0101", "0110"]
-    u_lists = ["ZZXX", "ZZXX"]
-
-    measurement_outcomes = (b_lists, u_lists)
-    observable = mitiq.PauliString("ZZ", support=(0, 1))
-    k = 1
+    measurement_outcomes = ["0101", "0110"], ["ZZXX", "ZZXX"]
+    pauli = mitiq.PauliString("ZZ")
+    batch_size = 1
     expected_result = -9
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k, False
+        measurement_outcomes, pauli, batch_size
     )
-    assert isinstance(result, float), f"Expected a float, got {type(result)}"
     assert np.isclose(result, expected_result)
 
 
 def test_expectation_estimation_shadow_cal():
-    b_lists = ["0101", "0110"]
-    u_lists = ["YXZZ", "XXXX"]
-    f_est = {
+    bitstrings = ["0101", "0110"]
+    paulistrings = ["YXZZ", "XXXX"]
+    fidelities = {
         "0000": 1,
         "0001": 1 / 3,
         "0010": 1 / 3,
@@ -252,16 +207,14 @@ def test_expectation_estimation_shadow_cal():
         "1111": 1 / 81,
     }
 
-    measurement_outcomes = b_lists, u_lists
-    observable = mitiq.PauliString("YXZZ", support=(0, 1, 2, 3))
-    k = 1
+    measurement_outcomes = bitstrings, paulistrings
+    pauli = mitiq.PauliString("YXZZ")
+    batch_size = 1
     expected_result = 81 / 2
-    print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k, True, f_est
+        measurement_outcomes, pauli, batch_size, fidelities
     )
-    assert isinstance(result, float), f"Expected a float, got {type(result)}"
     assert np.isclose(result, expected_result)
 
 
@@ -270,13 +223,12 @@ def test_expectation_estimation_shadow_no_indices():
     Test expectation estimation for a shadow with no matching indices.
     The result should be 0 as there are no matching
     """
-    q0, q1, q2 = cirq.LineQubit.range(3)
-    observable = mitiq.PauliString("XYZ", support=(0, 1, 2))
+    pauli = mitiq.PauliString("XYZ")
     measurement_outcomes = ["101", "010", "101"], ["ZXY", "YZX", "ZZY"]
-    k_shadows = 1
+    batch_size = 1
 
     result = expectation_estimation_shadow(
-        measurement_outcomes, observable, k_shadows, False
+        measurement_outcomes, pauli, batch_size
     )
 
-    assert result == 0.0
+    assert result == 0

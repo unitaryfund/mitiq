@@ -70,7 +70,7 @@ Error w Mitiq:    0.073
 ### Calibration
 
 Unsure which error mitigation technique or parameters to use?
-Try out the calibration module demonstrated below to help find the best parameters for you particular backend!
+Try out the calibration module demonstrated below to help find the best parameters for your particular backend!
 
 ![](docs/source/img/calibration.gif)
 
