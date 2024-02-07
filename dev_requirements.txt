@@ -1,6 +1,6 @@
 # Third-party integration.
 qiskit~=0.45.1
-qiskit-aer~=0.13.2
+qiskit-aer~=0.13.3
 qiskit-ibm-provider~=0.8.0
 pyquil~=3.5.4
 pennylane-qiskit~=0.34.0
