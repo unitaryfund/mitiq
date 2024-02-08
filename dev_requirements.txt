@@ -31,7 +31,7 @@ nbsphinx==0.9.1
 matplotlib==3.8.1
 pandas==2.1.3
 pyscf==2.5.0; sys_platform != 'win32'
-openfermion @ git+https://github.com/quantumlib/OpenFermion.git@main; sys_platform != 'win32'
+openfermion @ git+https://github.com/quantumlib/OpenFermion.git@07cfa0a; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
 bqskit[ext]==1.0.4
 seaborn==0.13.0
