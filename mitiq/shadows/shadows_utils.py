@@ -9,39 +9,13 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-from typing import Iterable, List, Tuple
+from typing import Generator, List, Optional, Tuple
 
 import numpy as np
-from numpy.typing import NDArray
+import numpy.typing as npt
 from scipy.linalg import sqrtm
 
 import mitiq
-
-
-def eigenvalues_to_bitstring(values: Iterable[int]) -> str:
-    """Converts eigenvalues to bitstring. e.g., ``[-1,1,1] -> "100"``
-
-    Args:
-        values: A list of eigenvalues (must be $-1$ and $1$).
-
-    Returns:
-        A string of 1s and 0s corresponding to the states associated to
-        eigenvalues.
-    """
-    return "".join(["1" if v == -1 else "0" for v in values])
-
-
-def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
-    """Converts bitstring to eigenvalues. e.g., ``"100" -> [-1,1,1]``
-
-    Args:
-        bitstring: A string of 1s and 0s.
-
-    Returns:
-        A list of eigenvalues (either $-1$ or $1$) corresponding to the
-        bitstring.
-    """
-    return [1 if b == "0" else -1 for b in bitstring]
 
 
 def create_string(str_len: int, loc_list: List[int]) -> str:
@@ -65,6 +39,80 @@ def create_string(str_len: int, loc_list: List[int]) -> str:
     return "".join(
         map(lambda i: "1" if i in set(loc_list) else "0", range(str_len))
     )
+
+
+def valid_bitstrings(
+    num_qubits: int, max_hamming_weight: Optional[int] = None
+) -> set[str]:
+    """
+    Description.
+
+    Args:
+        num_qubits:
+        max_hamming_weight:
+
+    Returns:
+        The set of all valid bitstrings on ``num_qubits`` bits, with a maximum
+        hamming weight.
+    Raises:
+        Value error when ``max_hamming_weight`` is not greater than 0.
+    """
+    if max_hamming_weight and max_hamming_weight < 1:
+        raise ValueError(
+            "max_hamming_weight must be greater than 0. "
+            f"Got {max_hamming_weight}."
+        )
+
+    bitstrings = {
+        bin(i)[2:].zfill(num_qubits)
+        for i in range(2**num_qubits)
+        if bin(i).count("1") <= (max_hamming_weight or num_qubits)
+    }
+    return bitstrings
+
+
+def fidelity(
+    sigma: npt.NDArray[np.complex64], rho: npt.NDArray[np.complex64]
+) -> float:
+    """
+    Calculate the fidelity between two states.
+
+    Args:
+        sigma: A state in terms of square matrix or vector.
+        rho: A state in terms square matrix or vector.
+
+    Returns:
+        Scalar corresponding to the fidelity.
+    """
+    if sigma.ndim == 1 and rho.ndim == 1:
+        val = np.abs(np.dot(sigma.conj(), rho)) ** 2.0
+    elif sigma.ndim == 1 and rho.ndim == 2:
+        val = np.abs(sigma.conj().T @ rho @ sigma)
+    elif sigma.ndim == 2 and rho.ndim == 1:
+        val = np.abs(rho.conj().T @ sigma @ rho)
+    elif sigma.ndim == 2 and rho.ndim == 2:
+        val = np.abs(np.trace(sqrtm(sigma) @ rho @ sqrtm(sigma)))
+    else:
+        raise ValueError("Invalid input dimensions")
+    return float(val)
+
+
+def batch_calibration_data(
+    data: Tuple[List[str], List[str]], num_batches: int
+) -> Generator[Tuple[List[str], List[str]], None, None]:
+    """Batch calibration into chunks of size batch_size.
+
+    Args:
+        data: The random Pauli measurement outcomes.
+        batch_size: Size of each batch that will be processed.
+
+    Yields:
+        Tuples of bit strings and pauli strings.
+    """
+    bits, paulis = data
+    batch_size = len(bits) // num_batches
+    for i in range(0, len(bits), batch_size):
+        yield bits[i : i + batch_size], paulis[i : i + batch_size]
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
@@ -135,29 +183,3 @@ def n_measurements_opts_expectation_bound(
         / error**2
     )
     return int(np.ceil(N * K)), int(K)
-
-
-def fidelity(
-    sigma: NDArray[np.complex64], rho: NDArray[np.complex64]
-) -> float:
-    """
-    Calculate the fidelity between two states.
-
-    Args:
-        sigma: A state in terms of square matrix or vector.
-        rho: A state in terms square matrix or vector.
-
-    Returns:
-        Scalar corresponding to the fidelity.
-    """
-    if sigma.ndim == 1 and rho.ndim == 1:
-        val = np.abs(np.dot(sigma.conj(), rho)) ** 2.0
-    elif sigma.ndim == 1 and rho.ndim == 2:
-        val = np.abs(sigma.conj().T @ rho @ sigma)
-    elif sigma.ndim == 2 and rho.ndim == 1:
-        val = np.abs(rho.conj().T @ sigma @ rho)
-    elif sigma.ndim == 2 and rho.ndim == 2:
-        val = np.abs(np.trace(sqrtm(sigma) @ rho @ sqrtm(sigma)))
-    else:
-        raise ValueError("Invalid input dimensions")
-    return float(val)

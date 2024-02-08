@@ -10,43 +10,45 @@ kernelspec:
   language: python
   name: python3
 ---
+
 ```{admonition} Note:
-The documentation for Classical Shadows in Mitiq is still under construction. This users guide will change in the future. 
+The documentation for Classical Shadows in Mitiq is still under construction. This users guide will change in the future.
 ```
 
 # How Do I Use Classical Shadows Estimation?
-
 
 The `mitiq.shadows` module facilitates the application of the classical shadows protocol on quantum circuits, designed for tasks like quantum state tomography or expectation value estimation. In addition this module integrates a robust shadow estimation protocol that's tailored to counteract noise. The primary objective of the classical shadow protocol is to extract information from a quantum state using repeated measurements.
 
 The procedure can be broken down as follows:
 
-1. `shadow_quantum_processing`: 
+1. `shadow_quantum_processing`:
+
    - Purpose: Execute quantum processing on the provided quantum circuit.
    - Outcome: Measurement results from the processed circuit.
 
-2. `classical_post_processing`: 
+2. `classical_post_processing`:
    - Purpose: Handle classical processing of the measurement results.
    - Outcome: Estimation based on user-defined inputs.
 
 For users aiming to employ the robust shadow estimation protocol, an initial step is needed which entails characterizing the noisy quantum channel. This is done by:
 
 0. `pauli_twirling_calibration`
+
    - Purpose: Characterize the noisy quantum channel.
    - Outcome: A dictionary of `calibration_results`.
 
 1. `shadow_quantum_processing`: same as above.
 
 2. `classical_post_processing`
-   - Args: `use_calibration` = True, 
-           `calibration_results` = output of `pauli_twirling_calibration`
+   - Args: `calibration_results` = output of `pauli_twirling_calibration`
    - Outcome: Error mitigated estimation based on user-defined inputs.
 
 Notes:
-   - The calibration process is specifically designed to mitigate noise encountered during the classical shadow protocol, such as rotation and computational basis measurements. It does not address noise that occurs during state preparation.
-   - Do not need to redo the calibration stage (0. `pauli_twirling_calibration`) if:
-       1. The input circuit has a consistent number of qubits.
-       2. The estimated observables have the same or fewer qubit support.
+
+- The calibration process is specifically designed to mitigate noise encountered during the classical shadow protocol, such as rotation and computational basis measurements. It does not address noise that occurs during state preparation.
+- Do not need to redo the calibration stage (0. `pauli_twirling_calibration`) if:
+  1.  The input circuit has a consistent number of qubits.
+  2.  The estimated observables have the same or fewer qubit support.
 
 ## Protocol Overview
 
@@ -54,8 +56,9 @@ The classical shadow protocol aims to create an approximate classical representa
 
 One can use the `mitiq.shadows' module as follows.
 
-### User-defined inputs 
-Define a quantum circuit, e.g., a circuit which prepares a GHZ state with $n$ = `3` qubits, 
+### User-defined inputs
+
+Define a quantum circuit, e.g., a circuit which prepares a GHZ state with $n$ = `3` qubits,
 
 ```{code-cell} ipython3
 import numpy as np
@@ -76,12 +79,11 @@ circuit = cirq.Circuit(
 print(circuit)
 ```
 
-Define an executor to run the circuit on a quantum computer or a noisy simulator. Note that the *robust shadow estimation* technique can only calibrate and mitigate the noise acting on the operations associated to the classical shadow protocol. So, in order to test the technique, we assume that the state preparation part of the circuit is noiseless. In particular, we define an executor in which:
+Define an executor to run the circuit on a quantum computer or a noisy simulator. Note that the _robust shadow estimation_ technique can only calibrate and mitigate the noise acting on the operations associated to the classical shadow protocol. So, in order to test the technique, we assume that the state preparation part of the circuit is noiseless. In particular, we define an executor in which:
 
 1. A noise channel is added to circuit right before the measurements. I.e. $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$.
 
 2. A single measurement shot is taken for each circuit, as required by classical shadow protocol.
-
 
 ```{code-cell} ipython3
 from mitiq import MeasurementResult
@@ -125,8 +127,7 @@ def cirq_executor(
     return executor
 ```
 
-Given the above general executor, we define a specific example of a noisy executor, assuming a bit flip channel with a  probability of `0.1'
-
+Given the above general executor, we define a specific example of a noisy executor, assuming a bit flip channel with a probability of `0.1'
 
 ```{code-cell} ipython3
 from functools import partial
@@ -164,24 +165,28 @@ f_est
 
 the varible `locality` is the maximum number of qubits on which our operators of interest are acting on. E.g. if our operator is a sequence of two point correlation terms $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, then `locality` = 2. We note that one could also split the calibration process into two stages:
 
-01. `shadow_quantum_processing`
-   - Outcome: Get quantum measurement result of the calibration circuit $|0\rangle^{\otimes n}$ `zero_state_shadow_outcomes`.
+1.  `shadow_quantum_processing`
 
-02. `pauli_twirling_calibration`
-   - Outcome: A dictionary of `calibration_results`.
-For more details, please refer to  [this tutorial](../examples/rshadows_tutorial.md)
+- Outcome: Get quantum measurement result of the calibration circuit $|0\rangle^{\otimes n}$ `zero_state_shadow_outcomes`.
+
+2.  `pauli_twirling_calibration`
+
+- Outcome: A dictionary of `calibration_results`.
+  For more details, please refer to [this tutorial](../examples/rshadows_tutorial.md)
 
 ### 1. Quantum Processing
+
 In this step, we obtain classical shadow snapshots from the input state (before applying the invert channel).
 
 #### 1.1 Add Rotation Gate and Meausure the Rotated State in Computational Basis
+
 At present, the implementation supports random Pauli measurement. This is equivalent to randomly sampling $U$ from the local Clifford group $Cl_2^n$, followed by a $Z$-basis measurement (see [this tutorial](../examples/shadows_tutorial.md) for a clear explanation).
 
 #### 1.2 Get the Classical Shadows
+
 One can obtain the list of measurement results of local Pauli measurements in terms of bitstrings, and the related Pauli-basis measured in terms of strings as follows.
 
-
-You have two choices: run the quantum measurement or directly use the results from the previous run. 
+You have two choices: run the quantum measurement or directly use the results from the previous run.
 
 - If **True**, the measurement will be run again.
 - If **False**, the results from the previous run will be used.
@@ -206,10 +211,8 @@ else:
         num_total_measurements_shadow=5000,
     )
 ```
-                                                                     
 
 As an example, we print out one of those measurement outcomes and the associated measured operator:
-
 
 ```{code-cell} ipython3
 print("one snapshot measurement result = ", shadow_measurement_output[0][0])
@@ -217,9 +220,11 @@ print("one snapshot measurement basis = ", shadow_measurement_output[1][0])
 ```
 
 ### 2. Classical Post-Processing
-In this step, we estimate our object of interest (expectation value or density matrix) by post-processing the (previously obtained) measurement outcomes. 
+
+In this step, we estimate our object of interest (expectation value or density matrix) by post-processing the (previously obtained) measurement outcomes.
 
 #### 2.1 Example: Operator Expectation Value Esitimation
+
 For example, if we want to estimate the two point correlation function $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, we will define the corresponding Puali strings:
 
 ```{code-cell} ipython3
@@ -238,13 +243,11 @@ The corresponding expectation values can be estimated (with and without calibrat
 ```{code-cell} ipython3
 est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    use_calibration=False,
     observables=two_pt_correlations,
     k_shadows=1,
 )
 cal_est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    use_calibration=True,
     calibration_results=f_est,
     observables=two_pt_correlations,
     k_shadows=1,
@@ -252,7 +255,6 @@ cal_est_corrs = classical_post_processing(
 ```
 
 Let's compare the results with the exact theoretical values:
-
 
 ```{code-cell} ipython3
 expval_exact = []
@@ -263,7 +265,6 @@ for i, pauli_string in enumerate(two_pt_correlations):
     )
     expval_exact.append(exp.real)
 ```
-
 
 ```{code-cell} ipython3
 print("Classical shadow estimation:", est_corrs)
@@ -277,12 +278,10 @@ print(
 )
 ```
 
-
 #### 2.2 Example: GHZ State Reconstruction
-In addition to the estimation of expectation values, the `mitiq.shadow` module can also be used to reconstruct an approximated version of the density matrix. 
+
+In addition to the estimation of expectation values, the `mitiq.shadow` module can also be used to reconstruct an approximated version of the density matrix.
 As an example, we use the 3-qubit GHZ circuit, previously defined. As a first step, we calculate the Pauli fidelities $f_b$ characterizing the noisy quantum channel $\mathcal{M}=\sum_{b\in\{0,1\}^n}f_b\Pi_b$:
-
-
 
 ```{code-cell} ipython3
 noisy_executor = partial(
@@ -307,9 +306,7 @@ else:
 f_est
 ```
 
-
-Similar to the previous case (estimation of expectation values), the quantum processing for estimating the density matrix  is done as follows.
-
+Similar to the previous case (estimation of expectation values), the quantum processing for estimating the density matrix is done as follows.
 
 ```{code-cell} ipython3
 if not run_quantum_processing:
@@ -328,12 +325,10 @@ else:
 ```{code-cell} ipython3
 est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    use_calibration=False,
     state_reconstruction=True,
 )
 cal_est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    use_calibration=True,
     calibration_results=f_est,
     state_reconstruction=True,
 )
@@ -348,7 +343,6 @@ ghz_state = circuit.final_state_vector().reshape(-1, 1)
 ghz_true = ghz_state @ ghz_state.conj().T
 ptm_ghz_state = operator_ptm_vector_rep(ghz_true)
 ```
-
 
 ```{code-cell} ipython3
 from mitiq.shadows.shadows_utils import fidelity

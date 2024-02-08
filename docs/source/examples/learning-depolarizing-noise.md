@@ -50,7 +50,7 @@ Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibi
 
 ```{code-cell} ipython3
 circuit = random_x_z_cnot_circuit(
-    LineQubit.range(2), n_moments=10, random_state=np.random.RandomState(1)
+    LineQubit.range(2), n_moments=5, random_state=np.random.RandomState(1)
 )
 print(circuit)
 ```
@@ -110,7 +110,8 @@ warnings.simplefilter("ignore", UserWarning)
 ```
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
+:tags: [skip-execution]
+
 training_circuits = generate_training_circuits(
     circuit=circuit,
     num_training_circuits=5,
@@ -163,6 +164,35 @@ Here we use the Nelder-Mead method in [`scipy.optimize.minimize`](https://docs.s
 to find the value of epsilon that minimizes the depolarizing noise loss function.
 
 ```{code-cell} ipython3
+:tags: [remove-cell]
+
+import os
+
+eps_string = str(epsilon).replace(".", "_")
+pec_data = np.loadtxt(
+        os.path.join(
+            "../../../mitiq/pec/representations/tests/learning_pec_data",
+            f"learning_pec_data_eps_{eps_string}.txt",
+        )
+    )
+
+[success, epsilon_opt] = learn_depolarizing_noise_parameter(
+    operations_to_learn,
+    circuit,
+    ideal_executor,
+    noisy_executor,
+    num_training_circuits=5,
+    fraction_non_clifford=0.2,
+    training_random_state=np.random.RandomState(1),
+    epsilon0=epsilon0,
+    observable=observable,
+    learning_kwargs={"pec_data": pec_data},
+)
+```
+
+```{code-cell} ipython3
+:tags: [skip-execution]
+
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
     operations_to_learn,
     circuit,
@@ -175,7 +205,9 @@ to find the value of epsilon that minimizes the depolarizing noise loss function
     epsilon0=epsilon0,
     observable=observable,
 )
+```
 
+```{code-cell} ipython3
 print(success)
 print(f"Difference of learned value from true value: {abs(epsilon_opt - epsilon) :.5f}")
 print(f"Difference of initial guess from true value: {abs(epsilon0 - epsilon) :.5f}")
