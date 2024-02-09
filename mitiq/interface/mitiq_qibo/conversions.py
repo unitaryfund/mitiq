@@ -378,5 +378,15 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
     qasm = '\n'.join([line for line in qasm.split('\n') if not line.strip().startswith('//')])
     # Remove problematic spaces in gate arguments
     qasm = '\n'.join([line.replace(', ', ',') for line in qasm.split('\n')])
+    #Remove in line problematic comments 
+    lines = qasm.split('\n')
+    clean_lines = []
+    for line in lines:
+        clean_line = line.split('//')[0].strip()
+        if clean_line:
+            clean_lines.append(clean_line)
+    qasm = '\n'.join(clean_lines)
 
+    print(qasm) 
+    
     return QiboCircuit.from_qasm(qasm)
