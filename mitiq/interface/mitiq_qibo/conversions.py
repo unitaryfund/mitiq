@@ -366,14 +366,8 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
 
     Returns:
         QiboCircuit object equivalent to the input Mitiq circuit.
-    """
-    try:  
-        qasm = cirq_to_qasm(circuit)
-
-    except ValueError: 
-        decomp_circuit = Circuit(decompose(circuit)) 
-        qasm = cirq_to_qasm(decomp_circuit)
-
+    """  
+    qasm = cirq_to_qasm(circuit)
     # Remove problematic comment lines in the qasm code 
     qasm = '\n'.join([line for line in qasm.split('\n') if not line.strip().startswith('//')])
     # Remove problematic spaces in gate arguments
@@ -387,6 +381,4 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
             clean_lines.append(clean_line)
     qasm = '\n'.join(clean_lines)
 
-    print(qasm) 
-    
     return QiboCircuit.from_qasm(qasm)
