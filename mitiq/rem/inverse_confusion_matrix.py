@@ -37,7 +37,7 @@ def sample_probability_vector(
     # split the binary strings into an array of ints
     bitstrings = (
         np.apply_along_axis(  # type: ignore
-            func1d=np.fromstring,
+            func1d=np.fromstring,  # type: ignore
             axis=1,
             arr=binary_strings[:, None],
             dtype="U1",  # type: ignore
