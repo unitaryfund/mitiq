@@ -9,13 +9,15 @@ import cirq
 import numpy as np
 import pytest
 import qibo
+from qibo.models.circuit import Circuit as QiboCircuit
+
 from mitiq.interface.mitiq_qibo import (
     UnsupportedQiboCircuitError,
     from_qibo,
     to_qibo,
 )
 from mitiq.utils import _equal
-from qibo.models.circuit import Circuit as QiboCircuit
+
 
 def test_from_qibo():
     qibo_circuit = QiboCircuit(2)
@@ -78,6 +80,7 @@ def test_from_qibo_unknown_cirq_gate():
     correct.append(cirq.measure(q1))
 
     assert _equal(circuit, correct, require_qubit_equality=False)
+
 
 @pytest.mark.parametrize("random_state", range(10))
 def test_to_from_qibo(random_state):
@@ -161,9 +164,3 @@ def test_qibo_integration(i):
     u_1 = cirq.unitary(base_circ)
     u_2 = cirq.unitary(circ_recovered)
     cirq.testing.assert_allclose_up_to_global_phase(u_1, u_2, atol=0)
-
-
-
-
-
-

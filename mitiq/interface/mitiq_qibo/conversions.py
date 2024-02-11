@@ -6,12 +6,14 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qibo's circuit representation.
 """
+from typing import List
+
 from cirq import Circuit, decompose
 from numpy import pi
 from qibo import gates
 from qibo.gates.abstract import Gate, ParametrizedGate
 from qibo.models.circuit import Circuit as QiboCircuit
-from typing import List
+
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
 from mitiq.interface.mitiq_qiskit import to_qasm as cirq_to_qasm
 
@@ -121,6 +123,7 @@ def cu3_decomp(gate: ParametrizedGate) -> List[Gate]:
         gates.U3(q1, theta / 2, phi, 0),
     ]
     return decomp_gate
+
 
 def csx_decomp(gate: ParametrizedGate) -> List[Gate]:
     """Decomposes CSX gate to Cirq known gates.
@@ -366,19 +369,25 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
 
     Returns:
         QiboCircuit object equivalent to the input Mitiq circuit.
-    """  
+    """
     qasm = cirq_to_qasm(circuit)
-    # Remove problematic comment lines in the qasm code 
-    qasm = '\n'.join([line for line in qasm.split('\n') if not line.strip().startswith('//')])
+    # Remove problematic comment lines in the qasm code
+    qasm = "\n".join(
+        [
+            line
+            for line in qasm.split("\n")
+            if not line.strip().startswith("//")
+        ]
+    )
     # Remove problematic spaces in gate arguments
-    qasm = '\n'.join([line.replace(', ', ',') for line in qasm.split('\n')])
-    #Remove in line problematic comments 
-    lines = qasm.split('\n')
+    qasm = "\n".join([line.replace(", ", ",") for line in qasm.split("\n")])
+    # Remove in line problematic comments
+    lines = qasm.split("\n")
     clean_lines = []
     for line in lines:
-        clean_line = line.split('//')[0].strip()
+        clean_line = line.split("//")[0].strip()
         if clean_line:
             clean_lines.append(clean_line)
-    qasm = '\n'.join(clean_lines)
+    qasm = "\n".join(clean_lines)
 
     return QiboCircuit.from_qasm(qasm)

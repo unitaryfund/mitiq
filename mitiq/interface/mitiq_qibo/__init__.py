@@ -6,5 +6,5 @@
 from mitiq.interface.mitiq_qibo.conversions import (
     from_qibo,
     to_qibo,
-    UnsupportedQiboCircuitError
+    UnsupportedQiboCircuitError,
 )
