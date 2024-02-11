@@ -42,7 +42,7 @@ def test_from_qibo_register_name_error():
         match=(
             "OpenQASM does not support capital letters in "
             "register names but K was used."
-        )
+        ),
     ):
         from_qibo(qibo_circuit)
 
