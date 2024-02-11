@@ -8,7 +8,7 @@ Qibo's circuit representation.
 """
 from typing import List
 
-from cirq import Circuit, decompose
+from cirq import Circuit
 from numpy import pi
 from qibo import gates
 from qibo.gates.abstract import Gate, ParametrizedGate
@@ -339,7 +339,8 @@ def from_qibo(qibo_circuit: QiboCircuit) -> Circuit:
         reg_name = measurement.register_name
         if not reg_name.islower():
             raise UnsupportedQiboCircuitError(
-                f"OpenQASM does not support capital letters in register names but {reg_name} was used."
+                f"OpenQASM does not support capital letters in register names but "
+                f"{reg_name} was used."
             )
     for gate in qibo_circuit.queue:
         if isinstance(gate, gates.M):

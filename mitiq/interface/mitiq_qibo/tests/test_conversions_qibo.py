@@ -39,8 +39,10 @@ def test_from_qibo_register_name_error():
 
     with pytest.raises(
         UnsupportedQiboCircuitError,
-        match="OpenQASM does not support capital letters in"
-        + f" register names but K was used.",
+        match=(
+        "OpenQASM does not support capital letters in "
+        "register names but K was used."
+        )
     ):
         from_qibo(qibo_circuit)
 
