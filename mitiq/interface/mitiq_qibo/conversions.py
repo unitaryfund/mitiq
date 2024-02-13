@@ -372,16 +372,17 @@ def to_qibo(circuit: Circuit) -> QiboCircuit:
         QiboCircuit object equivalent to the input Mitiq circuit.
     """
     qasm = cirq_to_qasm(circuit)
-    
+ 
     # Remove problematic comment lines in the qasm code
-    qasm = [
+    lines = [
         line.replace(", ", ",") # remove spaces in gate arguments
         for line in qasm.split("\n")
         if not line.strip().startswith("//")
     ]
-
+    
+    # Remove in line problematic comments
     clean_lines = []
-    for line in qasm:
+    for line in lines:
         clean_line = line.split("//")[0].strip()
         if clean_line:
             clean_lines.append(clean_line)
