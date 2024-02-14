@@ -328,7 +328,6 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
 
     # Check common single-qubit gates.
     if isinstance(op, cirq_ops.Operation):
-
         if isinstance(op.gate, cirq_ops.XPowGate):
             exponent = cast(float, op.gate.exponent)
             if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):

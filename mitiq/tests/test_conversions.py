@@ -11,6 +11,7 @@ import cirq
 import numpy as np
 import pennylane as qml
 import pytest
+import qibo
 import qiskit
 from braket.circuits import Circuit as BKCircuit
 from braket.circuits import Instruction
@@ -63,6 +64,7 @@ circuit_types = {
     "pyquil": Program,
     "braket": BKCircuit,
     "pennylane": qml.tape.QuantumTape,
+    "qibo": qibo.models.circuit.Circuit,
 }
 
 
