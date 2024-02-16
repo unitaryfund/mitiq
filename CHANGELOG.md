@@ -1,6 +1,55 @@
 # Changelog
 
 ## Version 0.34.0
+Announcing support for [Qibo](https://qibo.science/), a newly integrated frontend in Mitiq! 📣
+Qibo is an "end-to-end open source platform for quantum simulation, self-hosted quantum hardware control, calibration and characterization".
+
+```py
+from qibo import Circuit
+from mitiq.conversions import convert_to_mitiq
+
+circuit = Circuit(2)
+circuit.add(gates.H(0))
+circuit.add(gates.H(1))
+
+print(circuit)
+
+def executor(circuit):
+    return circuit.execute()
+
+
+mitigated = mitiq.zne.execute_with_zne(convert_to_mitiq(circuit), executor)
+```
+
+Thank you to new contributor Francesc Sabater for excellent work integrating Qibo and Mitiq!
+Thanks also to new contibutor Sam Burdick for fixing our readme.
+
+This release also includes a refactoring of part of the Mitiq shadows module, `mitiq.shadows.classical_postprocessing`, for speed of execution and code readability.
+
+### 📓 Documentation
+We've continued to enhance our (legendary!) documentation with:
+1. Addition of a security policy document
+2. Faster execution of the learning-based PEC tutorial in CI
+
+### Commits
+- Add support for qibo circuits (#2102) [@francescsabater]
+- Reduce doc build time for learning representations (#2165) [@Misty-W]
+- Create SECURITY.md (#2162) [@nathanshammah]
+- Fix typo in README.md (#2173) [@smburdick]
+- Refactor classical postprocessing in shadows module (#2152) [@natestemen]
+- Fix broken link in `combine_rem_zne.md` (#2156) [@Misty-W]
+
+#### 📦 Dependency updates
+- Bump openfermion from 1.6.0 to 1.6.1 (#2182) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.68.3 to ~=1.69.0 (#2177) [@dependabot]
+- Bump pyscf from 2.4.0 to 2.5.0 (#2176) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.66.0 to ~=1.68.3 (#2175) [@dependabot]
+- Update qiskit-aer requirement from ~=0.13.1 to ~=0.13.2 (#2157) [@dependabot]
+- Bump pytest from 7.1.3 to 8.0.0 (#2167) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.65.1 to ~=1.66.0 (#2155) [@dependabot]
+- Update pennylane-qiskit requirement from ~=0.33.1 to ~=0.34.0 (#2154) [@dependabot]
+- Update pennylane requirement from ~=0.33.1 to ~=0.34.0 (#2153) [@dependabot]
+- Update qiskit-ibm-provider requirement from ~=0.7.3 to ~=0.8.0 (#2151) [@dependabot]
 
 ## Version 0.33.0
 
