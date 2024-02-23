@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.35.0 (under development)
+
 ## Version 0.34.0
 Announcing support for [Qibo](https://qibo.science/), a newly integrated frontend in Mitiq! 📣
 Qibo is an "end-to-end open source platform for quantum simulation, self-hosted quantum hardware control, calibration and characterization".
