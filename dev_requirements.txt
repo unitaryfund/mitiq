@@ -17,6 +17,9 @@ black==22.10
 mypy==1.0.0
 isort==5.13.2
 types-tabulate
+# https://github.com/virtuald/pyhcl/issues/39#issuecomment-370595465
+pyhcl
+ply
 
 # Documentation and examples.
 Sphinx==5.2.3
