@@ -43,7 +43,7 @@ cirq_circuit = cirq.Circuit(
 qiskit_qreg = qiskit.QuantumRegister(2)
 qiskit_circuit = qiskit.QuantumCircuit(qiskit_qreg)
 qiskit_circuit.h(qiskit_qreg[0])
-qiskit_circuit.cnot(*qiskit_qreg)
+qiskit_circuit.cx(*qiskit_qreg)
 qasm_str = qiskit_circuit.qasm()
 
 
