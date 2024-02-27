@@ -10,6 +10,7 @@ import cirq
 import numpy as np
 import pytest
 import qiskit
+from qiskit.qasm2 import dumps
 
 from mitiq.interface import convert_to_mitiq
 from mitiq.interface.mitiq_qiskit.conversions import (
@@ -209,7 +210,7 @@ def test_convert_with_barrier(as_qasm):
     qiskit_circuit.barrier()
 
     if as_qasm:
-        cirq_circuit = from_qasm(qiskit_circuit.qasm())
+        cirq_circuit = from_qasm(dumps(qiskit_circuit))
     else:
         cirq_circuit = from_qiskit(qiskit_circuit)
 
@@ -229,7 +230,7 @@ def test_convert_with_multiple_barriers(as_qasm):
         qiskit_circuit.barrier()
 
     if as_qasm:
-        cirq_circuit = from_qasm(qiskit_circuit.qasm())
+        cirq_circuit = from_qasm(dumps(qiskit_circuit))
     else:
         cirq_circuit = from_qiskit(qiskit_circuit)
 

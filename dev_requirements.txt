@@ -2,6 +2,7 @@
 qiskit~=1.0.1
 qiskit-aer~=0.13.2
 qiskit-ibm-provider~=0.8.0
+qiskit-ibm-runtime
 pyquil~=3.5.4
 pennylane-qiskit~=0.34.0
 pennylane~=0.34.0

@@ -17,6 +17,7 @@ from braket.circuits import Circuit as BKCircuit
 from braket.circuits import Instruction
 from braket.circuits import gates as braket_gates
 from pyquil import Program, gates
+from qiskit.qasm2 import dumps
 
 from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import (
@@ -44,7 +45,7 @@ qiskit_qreg = qiskit.QuantumRegister(2)
 qiskit_circuit = qiskit.QuantumCircuit(qiskit_qreg)
 qiskit_circuit.h(qiskit_qreg[0])
 qiskit_circuit.cx(*qiskit_qreg)
-qasm_str = qiskit_circuit.qasm()
+qasm_str = dumps(qiskit_circuit)
 
 
 # pyQuil Bell circuit.

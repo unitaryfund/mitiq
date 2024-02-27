@@ -43,7 +43,7 @@ from mitiq import (
     MeasurementResult,
 )
 
-from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPU
+from qiskit_ibm_runtime.fake_provider import FakeJakarta  # Fake (simulated) QPU
 ```
 
 ### Define the circuit to study
