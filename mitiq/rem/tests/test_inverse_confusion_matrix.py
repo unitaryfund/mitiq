@@ -184,6 +184,7 @@ def test_closest_positive_distribution():
         )
 
 
+@pytest.mark.filterwarnings("ignore:invalid value encountered in divide")
 def test_closest_positive_distribution_error():
     """Test unfeasible problem to trigger error."""
     with pytest.raises(ValueError, match="REM failed to determine"):
