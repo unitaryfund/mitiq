@@ -66,16 +66,16 @@ for i in range(4):
     circuit_qiskit_validated.x(i)
     circuit_qiskit_validated.x(3)
     if i != 3 and i != 0:
-        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.id(i)
         circuit_qiskit_validated.x(i)
-        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.id(i)
         circuit_qiskit_validated.x(i)
-        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.id(i)
     elif i == 0:
-        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.id(i)
         circuit_qiskit_validated.x(i)
         circuit_qiskit_validated.x(i)
-        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.id(i)
 circuit_qiskit_validated.cx(0, 3)
 
 # Qiskit validate with measurement
@@ -86,17 +86,17 @@ for i in range(4):
     circuit_qiskit_two_validated.x(3)
     if i != 3 and i != 0:
         if i == 1:
-            circuit_qiskit_two_validated.i(i)
-        circuit_qiskit_two_validated.i(i)
+            circuit_qiskit_two_validated.id(i)
+        circuit_qiskit_two_validated.id(i)
         circuit_qiskit_two_validated.x(i)
-        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.id(i)
         circuit_qiskit_two_validated.x(i)
-        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.id(i)
     elif i == 0:
-        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.id(i)
         circuit_qiskit_two_validated.x(i)
         circuit_qiskit_two_validated.x(i)
-        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.id(i)
 circuit_qiskit_two_validated.cx(0, 3)
 circuit_qiskit_two_validated.measure(2, 3)
 

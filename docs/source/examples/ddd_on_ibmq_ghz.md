@@ -16,7 +16,7 @@ kernelspec:
 
 In this notebook DDD is applied to improve the success rate of the computation on a real hardware backend. 
 A similar approach can be taken on a simulated backend, by setting the ``USE_REAL_HARDWARE`` option to ``False``
-and specifying a simulated backend from `qiskit.providers.fake_provider`, which includes a noise model that approximates the noise of the
+and specifying a simulated backend from `qiskit_ibm_runtime.fake_provider`, which includes a noise model that approximates the noise of the
 real device.
 
 In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 
@@ -148,7 +148,7 @@ if USE_REAL_HARDWARE:
     provider = IBMProvider()
     backend = provider.get_backend("ibmq_lima")
 else:
-    from qiskit.providers.fake_provider import FakeLima as FakeLima
+    from qiskit_ibm_runtime.fake_provider import FakeLima as FakeLima
     backend = FakeLima()
 
 

@@ -14,6 +14,7 @@ import cirq
 import numpy as np
 import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
+from qiskit.qasm2 import dumps
 
 from mitiq.utils import _simplify_circuit_exponents
 
@@ -283,7 +284,7 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    return from_qasm(circuit.qasm())
+    return from_qasm(dumps(circuit))
 
 
 def from_qasm(qasm: QASMType) -> cirq.Circuit:

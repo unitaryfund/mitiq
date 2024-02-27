@@ -76,7 +76,7 @@ def test_init_with_qiskit_circuit():
     qreg = qiskit.QuantumRegister(2)
     circ = qiskit.QuantumCircuit(qreg)
     _ = circ.h(qreg[0])
-    _ = circ.cnot(*qreg)
+    _ = circ.cx(*qreg)
 
     cirq_qreg = cirq.LineQubit.range(2)
     cirq_circ = cirq.Circuit(cirq.H.on(cirq_qreg[0]), cirq.CNOT.on(*cirq_qreg))
@@ -100,8 +100,8 @@ def test_init_with_qiskit_circuit():
     (
         cirq.H,
         cirq.H(cirq.LineQubit(0)),
-        qiskit.extensions.HGate,
-        qiskit.extensions.CHGate,
+        qiskit.circuit.library.HGate,
+        qiskit.circuit.library.CHGate,
         pyquil.gates.H,
     ),
 )
@@ -142,7 +142,7 @@ def test_unknown_channel_matrix():
     qreg = qiskit.QuantumRegister(2)
     circ = qiskit.QuantumCircuit(qreg)
     _ = circ.h(qreg[0])
-    _ = circ.cnot(*qreg)
+    _ = circ.cx(*qreg)
 
     cirq_qreg = cirq.LineQubit.range(2)
     cirq_circ = cirq.Circuit(cirq.H.on(cirq_qreg[0]), cirq.CNOT.on(*cirq_qreg))

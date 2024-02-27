@@ -116,7 +116,7 @@ from qiskit import QuantumCircuit
 from qiskit.providers.aer import AerSimulator
 from qiskit.tools.visualization import plot_histogram
 from qiskit import transpile
-from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPUs
+from qiskit_ibm_runtime.fake_provider import FakeJakarta  # Fake (simulated) QPUs
 
 # Number of measurements
 shots = 10 ** 5
