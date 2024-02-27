@@ -1,16 +1,16 @@
 # Third-party integration.
 qiskit~=1.0.1
-qiskit-aer~=0.13.2
-qiskit-ibm-provider~=0.8.0
-qiskit-ibm-runtime
+qiskit-aer~=0.13.3
+qiskit-ibm-provider~=0.10.0
+qiskit-ibm-runtime~=0.20.0
 pyquil~=3.5.4
 pennylane-qiskit~=0.34.0
 pennylane~=0.34.0
-amazon-braket-sdk~=1.69.0
+amazon-braket-sdk~=1.72.0
 qibo~=0.2.4
 
 # Unit tests, coverage, and formatting/style.
-pytest==8.0.0
+pytest~=8.0.2
 pytest-xdist[psutil]==3.0.2
 pytest-cov==4.0.0
 flake8==7.0.0
@@ -19,15 +19,15 @@ mypy==1.0.0
 isort==5.13.2
 types-tabulate
 # https://github.com/virtuald/pyhcl/issues/39#issuecomment-370595465
-pyhcl
-ply
+pyhcl~=0.4.5
+ply~=3.11
 
 # Documentation and examples.
 Sphinx==5.2.3
 sphinxcontrib-bibtex==2.5.0
 sphinx-copybutton==0.5.0
 sphinx-autodoc-typehints==1.19.4
-myst-nb==1.0.0
+myst-nb==0.17.2
 pydata-sphinx-theme==0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
