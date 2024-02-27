@@ -8,7 +8,6 @@ Qibo is an "end-to-end open source platform for quantum simulation, self-hosted 
 
 ```py
 from qibo import Circuit
-from mitiq.conversions import convert_to_mitiq
 
 circuit = Circuit(2)
 circuit.add(gates.H(0))
@@ -20,7 +19,7 @@ def executor(circuit):
     return circuit.execute()
 
 
-mitigated = mitiq.zne.execute_with_zne(convert_to_mitiq(circuit), executor)
+mitigated = mitiq.zne.execute_with_zne(circuit, executor)
 ```
 
 Thank you to new contributor Francesc Sabater for excellent work integrating Qibo and Mitiq!
