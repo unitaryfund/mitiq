@@ -18,15 +18,9 @@ from mitiq.typing import (
 from mitiq.executor import Executor
 from mitiq.observable import PauliString, Observable
 
-# Interface between Cirq circuits and supported frontends.
-from mitiq import interface
-
 # About and version.
 from mitiq._about import about
 from mitiq._version import __version__
-
-# Error mitigation modules.
-from mitiq import cdr, pec, rem, zne, ddd
 
 # Calibration
 from mitiq.calibration import (
@@ -35,6 +29,3 @@ from mitiq.calibration import (
     ZNE_SETTINGS,
     Settings,
 )
-
-# Parallel interface for no error mitigation (for examples/benchmarking).
-from mitiq import raw
