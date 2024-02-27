@@ -183,6 +183,7 @@ def test_closest_positive_distribution():
             atol=1e-5,
         )
 
+
 @pytest.mark.filterwarnings("ignore:invalid value encountered in divide")
 def test_closest_positive_distribution_error():
     """Test unfeasible problem to trigger error."""
