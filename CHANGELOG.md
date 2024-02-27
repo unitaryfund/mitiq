@@ -7,7 +7,8 @@ Announcing support for [Qibo](https://qibo.science/), a newly integrated fronten
 Qibo is an "end-to-end open source platform for quantum simulation, self-hosted quantum hardware control, calibration and characterization".
 
 ```py
-from qibo import Circuit
+from qibo import Circuit, gates
+import mitiq
 
 circuit = Circuit(2)
 circuit.add(gates.H(0))
