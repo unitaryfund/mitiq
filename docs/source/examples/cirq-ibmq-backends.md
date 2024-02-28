@@ -15,17 +15,9 @@ kernelspec:
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ backends with the [Cirq frontend](https://quantumai.google/cirq).
-It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
-Mitiq to use supported frontends with supported backends. Below, we show how to run a Cirq circuit on an
-IBMQ backend, broken down in the following steps.
-
-- [](#settings)
-- [](#setup-defining-a-circuit-in-cirq)
-- [](#high-level-usage)
-- [](#options)
-- [](#lower-level-usage)
-
-+++
+It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends.
+We can use conversions in Mitiq to use supported frontends with supported backends.
+Below, we show how to run a Cirq circuit on an IBMQ backend.
 
 ## Settings
 
