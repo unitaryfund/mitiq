@@ -368,8 +368,8 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 #### Qibo Conversions
 
 ```{eval-rst}
-.. automodule:: mitiq.interface.mitiq_qibo.conversions
-   :members:
+.. autofunction:: mitiq.interface.mitiq_qibo.conversions.from_qibo
+.. autofunction:: mitiq.interface.mitiq_qibo.conversions.to_qibo
 ```
 
 #### Qiskit Conversions
