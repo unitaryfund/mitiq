@@ -365,6 +365,12 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.interface.mitiq_pyquil.conversions
    :members:
 ```
+#### Qibo Conversions
+
+```{eval-rst}
+.. autofunction:: mitiq.interface.mitiq_qibo.conversions.from_qibo
+.. autofunction:: mitiq.interface.mitiq_qibo.conversions.to_qibo
+```
 
 #### Qiskit Conversions
 
