@@ -55,7 +55,7 @@ def executor(circuit, shots=100):
 
     result = noisy_c(nshots=shots)
     result_freq = result.frequencies(binary=True)
-    counts_0 = result_freq.get(0, 0)
+    counts_0 = result_freq.get('0', 0)
 
     return counts_0 / shots
 ```
