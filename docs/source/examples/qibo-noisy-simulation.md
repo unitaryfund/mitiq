@@ -22,6 +22,9 @@ For simplicity, we will use a single-qubit circuit with ten Pauli _X_ gates that
 This will give us a simple circuit whose probability of measuring the $|0\rangle$ state at the end, ideally, should be 1.
 
 ```{code-cell} ipython3
+import os 
+os.environ['QIBO_LOG_LEVEL'] = '3' #Supress Qibo INFO messages
+
 from qibo import Circuit, gates
 
 c = Circuit(1)
