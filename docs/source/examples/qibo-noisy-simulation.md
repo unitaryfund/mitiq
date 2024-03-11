@@ -80,7 +80,7 @@ scale_factors = [1, 2, 3]
 factory = RichardsonFactory(
     scale_factors=scale_factors
 )  # default ZNE configuration
-mitigated = zne.execute_with_zne(c, executor, factory=factory)
+mitigated = zne.execute_with_zne(c, executor, factory=factory, num_to_average=3)
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
