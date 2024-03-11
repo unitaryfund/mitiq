@@ -6,8 +6,7 @@
 <!--
 If the validation checks fail
   1. Run `make check-types` (from the root directory of the repository) and fix any mypy (https://mypy.readthedocs.io/en/stable/) errors.
-  2. Run `make check-format` and fix any ruff linting errors.
-  3. Run `make format` to format your code.
+  2. Run `make format` to fix any linting/formatting errors. There may be some issues that require manual intervention for you to fix.
 
 For more information, check the Mitiq style guidelines (https://mitiq.readthedocs.io/en/stable/contributing.html#style-guidelines).
 -->
