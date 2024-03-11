@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for zero-noise extrapolation."""
+
 import functools
 from typing import List
 

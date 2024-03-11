@@ -6,6 +6,7 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
+
 from itertools import cycle
 from typing import List
 

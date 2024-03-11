@@ -11,9 +11,8 @@ import numpy.typing as npt
 from braket.circuits import Circuit as BKCircuit
 from braket.circuits import Instruction
 from braket.circuits import gates as braket_gates
-from cirq import Circuit, LineQubit
+from cirq import Circuit, LineQubit, protocols
 from cirq import ops as cirq_ops
-from cirq import protocols
 from cirq.linalg.decompositions import (
     deconstruct_single_qubit_matrix_into_angles,
     kak_decomposition,

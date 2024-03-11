@@ -5,7 +5,6 @@
 
 """Tests for mirror quantum volume circuits."""
 
-
 import cirq
 import pytest
 

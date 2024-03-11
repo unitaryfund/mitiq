@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-"""Classical shadow estimation for quantum circuits. """
+"""Classical shadow estimation for quantum circuits."""
 
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 

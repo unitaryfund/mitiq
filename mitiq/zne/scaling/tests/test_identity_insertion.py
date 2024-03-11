@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for scaling noise by inserting identity layers."""
+
 import pytest
 from cirq import Circuit, LineQubit, ops
 

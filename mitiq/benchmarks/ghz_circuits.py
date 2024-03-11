@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for creating GHZ circuits for benchmarking purposes."""
+
 from typing import Optional
 
 import cirq

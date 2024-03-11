@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for layer-wise unitary folding on supported circuits."""
+
 from copy import deepcopy
 from typing import Callable, List
 

@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
+
 from typing import Callable
 
 import numpy as np

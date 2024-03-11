@@ -177,9 +177,5 @@ def n_measurements_opts_expectation_bound(
     M = len(observables)
     K = 2 * np.log(2 * M / failure_rate)
 
-    N = (
-        34
-        * max(local_clifford_shadow_norm(o) for o in observables)
-        / error**2
-    )
+    N = 34 * max(local_clifford_shadow_norm(o) for o in observables) / error**2
     return int(np.ceil(N * K)), int(K)

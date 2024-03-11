@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for utility functions."""
+
 from copy import deepcopy
 
 import cirq

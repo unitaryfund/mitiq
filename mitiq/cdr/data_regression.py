@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """The data regression portion of Clifford data regression."""
+
 from typing import Sequence
 
 import numpy as np

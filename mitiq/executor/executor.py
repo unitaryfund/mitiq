@@ -302,7 +302,7 @@ class Executor:
 
     @staticmethod
     def is_batched_executor(
-        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any]
+        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
     ) -> bool:
         """Returns True if the input function is recognized as a "batched
         executor", else False.

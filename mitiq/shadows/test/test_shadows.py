@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Test classical shadow estimation process."""
+
 from numbers import Number
 
 import cirq
