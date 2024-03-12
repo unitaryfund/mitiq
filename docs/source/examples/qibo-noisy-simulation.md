@@ -66,18 +66,18 @@ def executor(circuit, shots=100):
 ## Applying ZNE
 
 We can now test the mitigated version of the circuit against the unmitigated one to ensure it is working as expected.
-We apply ZNE with scale factors 1, 2 and 3 and using `RichardsonFactory` (which extrapolates the measured expectation values using the Richardson Extrapolation technique).
+We apply ZNE with scale factors 1, 2 and 3 and using `LinearFactory` (which extrapolates the measured expectation values using a linear extrapolation).
 For each scaling factor we average over three circuits.
 
 ```{code-cell} ipython3
 from mitiq import zne
-from mitiq.zne.inference import RichardsonFactory
+from mitiq.zne.inference import LinearFactory
 
 unmitigated = executor(c)
 print(f"Unmitigated result {unmitigated:.3f}")
 
 scale_factors = [1, 2, 3]
-factory = RichardsonFactory(
+factory = LinearFactory(
     scale_factors=scale_factors
 )  # default ZNE configuration
 mitigated = zne.execute_with_zne(c, executor, factory=factory, num_to_average=3)
