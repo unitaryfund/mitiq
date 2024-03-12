@@ -334,6 +334,7 @@ nbsphinx_custom_formats = {
 nbsphinx_execute = "always"
 
 nbsphinx_thumbnails = {
+    "examples/qibo-noisy-simulation": "_static/qibo-mitiq.png",
     "examples/hamiltonians": "_static/vqe-cirq-pauli-sum-mitigation-plot.png",
     "examples/braket_mirror_circuit": "_static/mirror-circuits.png",
     "examples/maxcut-demo": "_static/max-cut.png",
