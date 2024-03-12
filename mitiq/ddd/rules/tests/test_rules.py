@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for DDD rules."""
+
 import pytest
 from cirq import CNOT, Circuit, I, LineQubit, X, Y, Z, bit_flip
 

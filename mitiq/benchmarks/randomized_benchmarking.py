@@ -10,6 +10,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for generating randomized benchmarking circuits."""
+
 from typing import List, Optional
 
 import cirq

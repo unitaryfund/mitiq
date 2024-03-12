@@ -5,14 +5,15 @@
 
 """Defines input / output types for a quantum computer (simulator):
 
-  * SUPPORTED_PROGRAM_TYPES: All supported packages / circuits which Mitiq can
-       interface with,
-  * QPROGRAM: All supported packages / circuits which are installed in the
-       environment Mitiq is run in, and
-  * QuantumResult: An object returned by a quantum computer (simulator) running
-       a quantum program from which expectation values to be mitigated can be
-       computed. Note this includes expectation values themselves.
+* SUPPORTED_PROGRAM_TYPES: All supported packages / circuits which Mitiq can
+     interface with,
+* QPROGRAM: All supported packages / circuits which are installed in the
+     environment Mitiq is run in, and
+* QuantumResult: An object returned by a quantum computer (simulator) running
+     a quantum program from which expectation values to be mitigated can be
+     computed. Note this includes expectation values themselves.
 """
+
 from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union

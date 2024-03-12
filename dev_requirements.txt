@@ -3,7 +3,7 @@ qiskit~=0.45.1
 qiskit-aer~=0.13.2
 qiskit-ibm-provider~=0.10.0
 pyquil~=3.5.4
-pennylane-qiskit~=0.34.1
+pennylane-qiskit~=0.35.1
 pennylane~=0.35.1
 amazon-braket-sdk~=1.69.0
 qibo==0.2.4 # TODO: unpin this
@@ -12,10 +12,8 @@ qibo==0.2.4 # TODO: unpin this
 pytest==8.0.0
 pytest-xdist[psutil]==3.0.2
 pytest-cov==4.0.0
-flake8==7.0.0
-black==22.10
+ruff==0.3.1
 mypy==1.0.0
-isort==5.13.2
 types-tabulate
 
 # Documentation and examples.

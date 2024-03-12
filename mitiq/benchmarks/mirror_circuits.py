@@ -6,6 +6,7 @@
 """Functions for creating mirror circuits as defined in
 :cite:`Proctor_2021_NatPhys` for benchmarking quantum computers
 (with error mitigation)."""
+
 from typing import List, Optional, Tuple
 
 import cirq

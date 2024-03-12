@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for the Clifford data regression top-level API."""
+
 from typing import List
 
 import cirq

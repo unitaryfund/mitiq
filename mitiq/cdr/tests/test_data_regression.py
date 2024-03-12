@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for the data regression portion of Clifford data regression."""
+
 import numpy as np
 import pytest
 

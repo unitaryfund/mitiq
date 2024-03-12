@@ -10,6 +10,7 @@ Ideally these tests should touch all of Mitiq except for
 mitiq.interface.mitiq_[package], where [package] is any supported package that
 interfaces with Mitiq (see mitiq.SUPPORTED_PROGRAM_TYPES).
 """
+
 from abc import ABCMeta
 
 

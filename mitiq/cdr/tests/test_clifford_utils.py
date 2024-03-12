@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for generating (near) Clifford circuits."""
+
 import cirq
 import numpy as np
 import pytest

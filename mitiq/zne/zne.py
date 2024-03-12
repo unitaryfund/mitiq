@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """High-level zero-noise extrapolation tools."""
+
 from functools import wraps
 from typing import Callable, List, Optional, Union
 
@@ -18,9 +19,7 @@ def execute_with_zne(
     observable: Optional[Observable] = None,
     *,
     factory: Optional[Factory] = None,
-    scale_noise: Callable[
-        [QPROGRAM, float], QPROGRAM
-    ] = fold_gates_at_random,  # type: ignore [has-type]
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,  # type: ignore [has-type]
     num_to_average: int = 1,
 ) -> float:
     """Estimates the error-mitigated expectation value associated to the
@@ -69,9 +68,7 @@ def mitigate_executor(
     observable: Optional[Observable] = None,
     *,
     factory: Optional[Factory] = None,
-    scale_noise: Callable[
-        [QPROGRAM, float], QPROGRAM
-    ] = fold_gates_at_random,  # type:ignore [has-type]
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,  # type:ignore [has-type]
     num_to_average: int = 1,
 ) -> Callable[[QPROGRAM], float]:
     """Returns a modified version of the input 'executor' which is
@@ -130,9 +127,7 @@ def zne_decorator(
     observable: Optional[Observable] = None,
     *,
     factory: Optional[Factory] = None,
-    scale_noise: Callable[
-        [QPROGRAM, float], QPROGRAM
-    ] = fold_gates_at_random,  # type: ignore [has-type]
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,  # type: ignore [has-type]
     num_to_average: int = 1,
 ) -> Callable[
     [Callable[[QPROGRAM], QuantumResult]], Callable[[QPROGRAM], float]
@@ -164,7 +159,7 @@ def zne_decorator(
         )
 
     def decorator(
-        executor: Callable[[QPROGRAM], QuantumResult]
+        executor: Callable[[QPROGRAM], QuantumResult],
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor,

@@ -5,6 +5,7 @@
 
 """Reads in version information.
 Note: This file will be overwritten by the packaging process."""
+
 import os
 
 directory_of_this_file = os.path.dirname(os.path.abspath(__file__))

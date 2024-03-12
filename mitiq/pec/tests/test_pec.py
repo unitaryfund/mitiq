@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for PEC."""
+
 import warnings
 from functools import partial
 from typing import List, Optional

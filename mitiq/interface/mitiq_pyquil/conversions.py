@@ -6,6 +6,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 pyQuil's circuit representation (Quil programs).
 """
+
 from cirq import Circuit, LineQubit
 from cirq_rigetti import circuit_from_quil
 from cirq_rigetti.quil_output import QuilOutput

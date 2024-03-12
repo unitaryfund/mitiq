@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for scaling noise by unitary folding."""
+
 import numpy as np
 import pytest
 from cirq import (
@@ -296,7 +297,7 @@ def test_fold_from_left_no_stretch():
     circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
     folded = fold_gates_from_left(circuit, scale_factor=1)
     assert _equal(folded, _squash_moments(circuit))
-    assert not (folded is circuit)
+    assert folded is not circuit
 
 
 def test_fold_from_left_scale_factor_larger_than_three():

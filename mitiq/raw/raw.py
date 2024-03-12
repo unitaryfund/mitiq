@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Run experiments without error mitigation."""
+
 from typing import Callable, Optional, Union
 
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult

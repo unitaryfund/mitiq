@@ -5,16 +5,17 @@ all: dist
 build: check-all docs test-all
 
 .PHONY: check-all
-check-all: check-format check-style check-types
+check-all: check-format check-types
 
 .PHONY: check-format
 check-format:
-	isort --check mitiq
-	black --check --diff mitiq
+	ruff check
+	ruff format --check
 
-.PHONY: check-style
-check-style:
-	flake8
+.PHONY: format
+format:
+	ruff check --fix
+	ruff format
 
 .PHONY: check-types
 check-types:
@@ -42,11 +43,6 @@ docs-clean:
 .PHONY: linkcheck
 linkcheck:
 	make -C docs linkcheck
-
-.PHONY: format
-format:
-	isort mitiq
-	black mitiq
 
 .PHONY: install
 install:

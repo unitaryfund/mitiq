@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Classes corresponding to different zero-noise extrapolation methods."""
+
 import warnings
 from abc import ABC, abstractmethod
 from copy import deepcopy

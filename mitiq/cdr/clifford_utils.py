@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for mapping circuits to (near) Clifford circuits."""
+
 from typing import List
 
 import cirq
