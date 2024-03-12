@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for zne.py with PyQuil backend."""
+
 import numpy as np
 import pyquil
 

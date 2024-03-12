@@ -3,6 +3,7 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 """Function to generate representations with biased noise."""
+
 import copy
 from typing import List
 
@@ -84,20 +85,10 @@ def represent_operation_with_local_biased_noise(
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
     c = epsilon / (3 * (eta + 1))
     alpha = (a**2 + a * b - 2 * c**2) / (
-        a**3
-        + a**2 * b
-        - a * b**2
-        - 4 * a * c**2
-        - b**3
-        + 4 * b * c**2
+        a**3 + a**2 * b - a * b**2 - 4 * a * c**2 - b**3 + 4 * b * c**2
     )
     beta = (-a * b - b**2 + 2 * c**2) / (
-        a**3
-        + a**2 * b
-        - a * b**2
-        - 4 * a * c**2
-        - b**3
-        + 4 * b * c**2
+        a**3 + a**2 * b - a * b**2 - 4 * a * c**2 - b**3 + 4 * b * c**2
     )
     gamma = -c / (a**2 + 2 * a * b + b**2 - 4 * c**2)
     if len(qubits) == 1:

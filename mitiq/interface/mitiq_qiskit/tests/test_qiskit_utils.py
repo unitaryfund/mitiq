@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for qiskit executors (qiskit_utils.py)."""
+
 import numpy as np
 import pytest
 from qiskit import QuantumCircuit

@@ -19,7 +19,6 @@ import pybtex.style.formatting.unsrt
 import pybtex.style.template
 from pybtex.plugin import register_plugin as pybtex_register_plugin
 
-
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath(".."))
 sys.path.insert(0, os.path.abspath("../../"))

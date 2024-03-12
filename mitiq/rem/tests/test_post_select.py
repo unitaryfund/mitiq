@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for postselection of measurement results."""
+
 import pytest
 
 from mitiq import MeasurementResult

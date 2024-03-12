@@ -136,7 +136,7 @@ def rem_decorator(
     #   since arguments are required.
 
     def decorator(
-        executor: Callable[[QPROGRAM], MeasurementResult]
+        executor: Callable[[QPROGRAM], MeasurementResult],
     ) -> Callable[[QPROGRAM], MeasurementResult]:
         mitigated_executor = mitigate_executor(
             executor,

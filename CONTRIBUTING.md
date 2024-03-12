@@ -77,21 +77,18 @@ Mitiq code is developed according the best practices of Python development.
 - Use annotations for type hints in the objects' signature.
 - Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods).
 
-We use [Black](https://black.readthedocs.io/en/stable/index.html) and `flake8` to automatically lint the code and enforce style requirements as part of the CI pipeline.
+We use [Ruff](https://docs.astral.sh/ruff/) to automatically lint the code and enforce style requirements as part of the CI pipeline.
 You can run these style tests yourself locally in the top-level directory of the repository.
 
-You can check for violations of the `flake8` rules with
-```bash
-make check-style
-```
-In order to check if `black` would reformat the code, use
+You can check for linting/formatting violations with
 ```bash
 make check-format
 ```
-If above format check fails then you will be presented with a [diff](https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#diff) which can be resolved by running
+Many common issues can be fixed automatically using the following command, but some will require manual intervention to appease Ruff.
 ```bash
 make format
 ```
+
 We also use [Mypy](https://mypy.readthedocs.io/en/stable/) as a type checker to find incompatible types compared to the type
 hints in your code. To test this locally, run the type check test in the top-level directory of the repository.
 

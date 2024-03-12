@@ -6,6 +6,7 @@
 """Tests for zero-noise inference and extrapolation methods (factories) with
 classically generated data.
 """
+
 from typing import Callable, List
 
 import cirq

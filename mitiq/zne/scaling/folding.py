@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for local and global unitary folding on supported circuits."""
+
 import warnings
 from copy import deepcopy
 from typing import Any, Dict, FrozenSet, List, Optional, cast

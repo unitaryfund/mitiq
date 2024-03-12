@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Information about Mitiq and dependencies."""
+
 import platform
 
 from cirq import __version__ as cirq_version

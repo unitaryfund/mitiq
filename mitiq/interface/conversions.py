@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
+
 from functools import wraps
 from typing import Any, Callable, Dict, Iterable, Optional, Tuple, cast
 
@@ -199,7 +200,7 @@ def convert_from_mitiq(
 
 
 def accept_any_qprogram_as_input(
-    accept_cirq_circuit_function: Callable[[cirq.Circuit], Any]
+    accept_cirq_circuit_function: Callable[[cirq.Circuit], Any],
 ) -> Callable[[QPROGRAM], Any]:
     @wraps(accept_cirq_circuit_function)
     def accept_any_qprogram_function(
@@ -212,7 +213,7 @@ def accept_any_qprogram_as_input(
 
 
 def atomic_converter(
-    cirq_circuit_modifier: Callable[..., Any]
+    cirq_circuit_modifier: Callable[..., Any],
 ) -> Callable[..., Any]:
     """Decorator which allows for a function which inputs and returns a Cirq
     circuit to input and return any QPROGRAM.
@@ -244,7 +245,7 @@ def atomic_converter(
 
 
 def atomic_one_to_many_converter(
-    cirq_circuit_modifier: Callable[..., Iterable[cirq.Circuit]]
+    cirq_circuit_modifier: Callable[..., Iterable[cirq.Circuit]],
 ) -> Callable[..., Iterable[QPROGRAM]]:
     @wraps(cirq_circuit_modifier)
     def qprogram_modifier(

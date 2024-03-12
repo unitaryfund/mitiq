@@ -3,7 +3,7 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("VERSION.txt", "r") as f:
     __version__ = f.read().strip()

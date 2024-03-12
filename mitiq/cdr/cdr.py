@@ -328,7 +328,7 @@ def cdr_decorator(
     """
 
     def decorator(
-        executor: Callable[[QPROGRAM], QuantumResult]
+        executor: Callable[[QPROGRAM], QuantumResult],
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor,

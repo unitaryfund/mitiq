@@ -197,7 +197,7 @@ def ddd_decorator(
     """
 
     def decorator(
-        executor: Callable[[QPROGRAM], QuantumResult]
+        executor: Callable[[QPROGRAM], QuantumResult],
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,

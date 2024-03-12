@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests conversions to/from pyQuil circuits."""
+
 import numpy as np
 from pyquil import Program
 from pyquil.gates import CNOT, CZ, RZ, H, X, Y, Z
