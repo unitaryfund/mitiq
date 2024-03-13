@@ -20,15 +20,7 @@ with the [Braket](https://github.com/aws/amazon-braket-sdk-python)
 frontend to mitigate errors on an [IonQ](https://ionq.com/) backend.
 More details on the Mitiq notions of frontends and backends are given [here](../guide/frontends-backends.md).
 
-Below, we show how to run a simple Braket circuit on an IonQ device, broken down in the following steps.
-
-- [](#settings)
-- [](#setup-defining-a-circuit-in-braket)
-- [](#high-level-usage)
-- [](#options)
-- [](#lower-level-usage)
-
-+++
+Below, we show how to run a simple Braket circuit on an IonQ device.
 
 ## Settings
 

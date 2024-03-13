@@ -35,15 +35,6 @@ name: figzne2
 The diagram shows the workflow of the zero noise extrapolation (ZNE) technique in Mitiq.
 ```
 
-The lab is split into the following sections :
-
-- [](#checking-python-packages-are-installed-correctly)
-- [](#computing-a-quantum-expectation-value-without-error-mitigation)
-- [](#apply-zero-noise-extrapolation-with-mitiq)
-- [](#explicitly-selecting-the-noise-scaling-method-and-the-extrapolation-method)
-- [](#what-happens-behind-the-scenes-a-low-level-application-of-zne)
-+++
-
 ## Checking Python packages are installed correctly
 
 This notebook was tested with **Mitiq v0.20.0** and **qiskit v0.39.0**. It probably works with other versions too. Moreover, with minor changes, it can be adapted to quantum libraries that are different from Qiskit: Cirq, Braket, PyQuil, etc..

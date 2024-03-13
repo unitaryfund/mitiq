@@ -1,15 +1,7 @@
 # About Error Mitigation
 
-This is intended as a primer on quantum error mitigation, providing a
-collection of up-to-date resources from the academic literature, as well
-as other external links framing this topic in the open-source software
-ecosystem. This recent review article {cite}`Endo_2021_JPSJ` summarizes the theory behind many error-mitigating
-techniques.
-
-- [](#what-is-quantum-error-mitigation)
-- [](#why-is-quantum-error-mitigation-important)
-- [](#related-fields)
-- [](#external-references)
+This is intended as a primer on quantum error mitigation, providing a collection of up-to-date resources from the academic literature, as well as other external links framing this topic in the open-source software ecosystem.
+This recent review article {cite}`Endo_2021_JPSJ` summarizes the theory behind many error-mitigating techniques.
 
 ## What is quantum error mitigation?
 

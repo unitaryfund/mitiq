@@ -14,16 +14,7 @@ kernelspec:
 # Error mitigation on IBMQ backends with Qiskit
 
 
-This tutorial shows an example of how to mitigate noise on IBMQ
-backends, broken down in the following steps.
-
-- [](#settings)
-- [](#setup-defining-a-circuit)
-- [](#high-level-usage)
-- [](#options)
-- [](#lower-level-usage)
-
-+++
+This tutorial shows an example of how to mitigate noise on IBMQ backends.
 
 ## Settings
 
