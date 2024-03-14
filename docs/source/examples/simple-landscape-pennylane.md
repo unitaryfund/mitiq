@@ -18,31 +18,27 @@ This tutorial shows an example in which the energy landscape for a two-qubit var
 using the [PennyLane](https://pennylane.ai/) frontend, with and without error mitigation in Mitiq.
 
 ```{code-cell} ipython3
-import pennylane as qml
-from pennylane import numpy as np
 import matplotlib.pyplot as plt
+import pennylane as qml
+import pennylane_qiskit
+from pennylane import numpy as np
+
 from mitiq.zne import mitigate_executor
 from mitiq.zne.inference import RichardsonFactory
 from mitiq.zne.scaling import fold_global as folding
-import pennylane_qiskit
 ```
 
 ## Defining the ideal variational circuit in PennyLane
 
-We define a function which returns a simple two-qubit variational circuit depending on a single parameter $\gamma$ (“gamma”).
+We define a function which returns a simple two-qubit variational circuit depending on a single parameter $\gamma$ ("gamma").
 
 ```{code-cell} ipython3
-# Describe noise
 noise_strength = 0.04
 
-#Ideal device
-dev = qml.device('default.mixed', wires=2)
-#noisy device
-dev_noisy = qml.transforms.insert(
-    dev,
-    qml.DepolarizingChannel,
-    noise_strength
-)
+# Ideal device
+dev = qml.device("default.mixed", wires=2)
+# noisy device
+dev_noisy = qml.transforms.insert(dev, qml.DepolarizingChannel, noise_strength)
 ```
 
 ```{code-cell} ipython3
@@ -163,8 +159,7 @@ We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mi
 ```{code-cell} ipython3
 extrapolate = RichardsonFactory.extrapolate
 scale_factors = [1, 3, 5]
-@qml.transforms.mitigate_with_zne(scale_factors, folding, extrapolate)
-@qml.qnode(dev_noisy)#using noisy simulator with mitigation
+@qml.qnode(dev_noisy)
 def circuit(gamma: float):
     """Returns a two-qubit circuit for a given variational parameter.
 
@@ -176,9 +171,11 @@ def circuit(gamma: float):
     """
     variational_circuit(gamma)
     return qml.expval(qml.PauliZ(0) @ qml.PauliZ(1))
+
+circuit = qml.transforms.mitigate_with_zne(circuit, scale_factors, folding, extrapolate)
 ```
 
-We then run the same code above to compute the energy landscape, but this time use the `mitigated_executor` instead of just the executor.
+We then run the same code above to compute the energy landscape, but this time use the mitigated executor.
 
 ```{code-cell} ipython3
 mitigated_expectations = [circuit(g) for g in gammas]
