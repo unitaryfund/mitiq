@@ -7,7 +7,7 @@
 volume experiments as defined in https://arxiv.org/abs/1811.12926.
 
 Useful overview of quantum volume experiments:
-https://pennylane.ai/qml/demos/quantum_volume.html
+https://pennylane.ai/qml/demos/quantum_volume
 
 Cirq implementation of quantum volume circuits:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume.py
