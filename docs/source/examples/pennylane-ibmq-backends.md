@@ -175,4 +175,4 @@ circuit = qml.transforms.mitigate_with_zne(
 print(f"Zero-noise extrapolated value: {circuit():.3f}")
 ```
 
-Finally, more information about using PennyLane together with Mitiq can be found in PennyLane's [tutorial](https://pennylane.ai/qml/demos/tutorial_error_mitigation.html) on error mitigation.
+Finally, more information about using PennyLane together with Mitiq can be found in PennyLane's [tutorial](https://pennylane.ai/qml/demos/tutorial_error_mitigation) on error mitigation.
