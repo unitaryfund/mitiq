@@ -1,11 +1,11 @@
 # Contributing to Mitiq
 
 All contributions to this project are welcome, and they are greatly appreciated; every little bit helps.
-The two most common ways to contribute here are
+The most common ways to contribute here are
+
 1. opening an [issue](https://github.com/unitaryfund/mitiq/issues/new) to report a bug or propose a new feature, or ask a question, and
 2. opening a [pull request](https://github.com/unitaryfund/mitiq/pulls) to fix a bug, or implement a desired feature.
-
-That said, feel free to open an issue to ask a question, provide general feedback, etc.
+3. opening a [discussion post](https://github.com/unitaryfund/mitiq/discussions) to ask a question (no stupid questions!), provide feedback, or show something off!
 
 The rest of this document describes the technical details of getting set up to develop, and make your first contribution to Mitiq.
 
