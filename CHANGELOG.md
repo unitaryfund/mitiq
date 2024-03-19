@@ -7,8 +7,8 @@ Announcing support for [Qibo](https://qibo.science/), a newly integrated fronten
 Qibo is an "end-to-end open source platform for quantum simulation, self-hosted quantum hardware control, calibration and characterization".
 
 ```py
-from qibo import Circuit
-from mitiq.conversions import convert_to_mitiq
+from qibo import Circuit, gates
+import mitiq
 
 circuit = Circuit(2)
 circuit.add(gates.H(0))
@@ -20,7 +20,7 @@ def executor(circuit):
     return circuit.execute()
 
 
-mitigated = mitiq.zne.execute_with_zne(convert_to_mitiq(circuit), executor)
+mitigated = mitiq.zne.execute_with_zne(circuit, executor)
 ```
 
 Thank you to new contributor Francesc Sabater for excellent work integrating Qibo and Mitiq!
