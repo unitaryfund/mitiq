@@ -124,7 +124,7 @@ nb_execution_timeout = 600
 
 # By default, if nothing has changed in the source, a notebook won't be
 # re-run for a subsequent docs build.
-nb_execution_mode = "cache"
+# nb_execution_mode = "cache"
 
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
