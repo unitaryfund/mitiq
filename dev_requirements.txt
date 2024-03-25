@@ -11,7 +11,7 @@ qibo==0.2.4 # TODO: unpin this
 # Unit tests, coverage, and formatting/style.
 pytest==8.0.0
 pytest-xdist[psutil]==3.0.2
-pytest-cov==4.0.0
+pytest-cov==5.0.0
 ruff==0.3.1
 mypy==1.0.0
 types-tabulate
