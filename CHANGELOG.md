@@ -1301,7 +1301,7 @@ Another important change is the integration with Amazon Braket, such that Mitiq 
 
 In the context of probabilistic error cancellation, the sub-module `mitiq.pec.representations` has been significantly improved. Now one can easily compute the optimal quasi-probabiliy representation of an ideal gate as a linear combination of `NoisyOperation` objects.
 
-Thanks to all contributors (@L-P-B, @Aaron-Robertson, @francespoblete, @LaurentAjdnik, @maxtremblay, @andre-a-alves, @paniash, @purva-thakre) and in particular to the participants of [unitaryHACK](https://unitaryhack.dev/)!
+Thanks to all contributors (@L-P-B, @Aaron-Robertson, @francespoblete, @LaurentAjdnik, @maxtremblay, @andre-a-alves, @paniash, @purva-thakre) and in particular to the participants of [unitaryHACK](https://2021.unitaryhack.dev/)!
 
 ### All Changes
 
