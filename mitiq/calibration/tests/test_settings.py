@@ -6,6 +6,7 @@ import json
 
 import cirq
 import pytest
+import numpy as np
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
