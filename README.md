@@ -74,7 +74,7 @@ Try out the calibration module demonstrated below to help find the best paramete
 
 ![](docs/source/img/calibration.gif)
 
-See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
+See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io/en/stable/examples/examples.html) for more explanation, techniques, and benchmarks.
 
 ## Quick Tour
 
