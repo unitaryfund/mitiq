@@ -344,10 +344,8 @@ class Settings:
                     circuit = generate_rotated_rb_circuits(num_qubits, depth)[
                         0
                     ]
-                    ideal = {
-                        "0": (2 / 3) * np.sin(theta / 2) ** 2,
-                        "1": 1 - (2 / 3) * np.sin(theta / 2) ** 2,
-                    }
+                    p = (2 / 3) * np.sin(theta / 2) ** 2
+                    ideal = {"0": p, "1": 1 - p}
                 else:
                     raise NotImplementedError(
                         """rotated rb circuits with >1 qubits

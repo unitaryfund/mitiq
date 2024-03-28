@@ -209,6 +209,28 @@ def test_make_circuits_rotated_rb_circuits():
     assert problems[0].type == "rotated_rb"
 
 
+def test_make_circuits_rotated_rb_circuits_invalid_qubits():
+    settings = Settings(
+        benchmarks=[
+            {
+                "circuit_type": "rotated_rb",
+                "num_qubits": 2,
+                "circuit_depth": 10,
+                "theta": np.pi / 3,
+            }
+        ],
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+        ],
+    )
+    with pytest.raises(NotImplementedError, match="rotated rb circuits"):
+        settings.make_problems()
+
+
 def test_make_circuits_qv_circuits():
     settings = Settings(
         [
