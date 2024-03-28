@@ -5,8 +5,8 @@
 import json
 
 import cirq
-import pytest
 import numpy as np
+import pytest
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
@@ -188,22 +188,22 @@ def test_Strategy_pretty_dict():
 
 def test_make_circuits_rotated_rb_circuits():
     settings = Settings(
-    benchmarks=[
-        {
-            "circuit_type": "rotated_rb",
-            "num_qubits": 1,
-            "circuit_depth": 10,
-            "theta": np.pi/3
-        }
-    ],
-    strategies=[
-        {
-            "technique": "zne",
-            "scale_noise": fold_global,
-            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
-        },
-    ],
-)
+        benchmarks=[
+            {
+                "circuit_type": "rotated_rb",
+                "num_qubits": 1,
+                "circuit_depth": 10,
+                "theta": np.pi / 3,
+            }
+        ],
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+        ],
+    )
     problems = settings.make_problems()
     assert len(problems) == 1
     assert problems[0].type == "rotated_rb"

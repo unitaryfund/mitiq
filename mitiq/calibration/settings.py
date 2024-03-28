@@ -18,8 +18,8 @@ from mitiq.benchmarks import (
     generate_mirror_circuit,
     generate_quantum_volume_circuit,
     generate_rb_circuits,
+    generate_rotated_rb_circuits,
     generate_w_circuit,
-    generate_rotated_rb_circuits
 )
 from mitiq.interface import convert_from_mitiq
 from mitiq.pec import execute_with_pec
@@ -341,12 +341,17 @@ class Settings:
             elif circuit_type == "rotated_rb":
                 theta = benchmark["theta"]
                 if num_qubits == 1:
-                    circuit = generate_rotated_rb_circuits(num_qubits, depth)[0]
-                    ideal = {"0": (2/3) * np.sin(theta/2)**2, "1": 1 - (2/3) * np.sin(theta/2)**2}
+                    circuit = generate_rotated_rb_circuits(num_qubits, depth)[
+                        0
+                    ]
+                    ideal = {
+                        "0": (2 / 3) * np.sin(theta / 2) ** 2,
+                        "1": 1 - (2 / 3) * np.sin(theta / 2) ** 2,
+                    }
                 else:
                     raise NotImplementedError(
-                    "rotated rb circuits with > 1 qubits not yet supported in calibration"
-                )
+                        "rotated rb with >1 qubits not supported in calibration"
+                    )
 
             elif circuit_type == "mirror":
                 seed = benchmark.get("circuit_seed", None)

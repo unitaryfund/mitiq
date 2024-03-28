@@ -41,7 +41,7 @@ light_zne_settings = Settings(
             "circuit_type": "rotated_rb",
             "num_qubits": 1,
             "circuit_depth": 10,
-            "theta": np.pi/3
+            "theta": np.pi / 3,
         },
     ],
     strategies=[
