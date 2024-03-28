@@ -350,7 +350,8 @@ class Settings:
                     }
                 else:
                     raise NotImplementedError(
-                        "rotated rb with >1 qubits not supported in calibration"
+                        """rotated rb circuits with >1 qubits
+                        not yet supported in calibration"""
                     )
 
             elif circuit_type == "mirror":
