@@ -38,9 +38,10 @@ light_zne_settings = Settings(
             "circuit_depth": 1,
         },
         {
-            "circuit_type": "mirror",
-            "num_qubits": 2,
-            "circuit_depth": 1,
+            "circuit_type": "rotated_rb",
+            "num_qubits": 1,
+            "circuit_depth": 10,
+            "theta": np.pi / 3,
         },
     ],
     strategies=[
