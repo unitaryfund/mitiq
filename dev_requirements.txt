@@ -6,7 +6,7 @@ pyquil~=3.5.4
 pennylane-qiskit~=0.35.1
 pennylane~=0.35.1
 amazon-braket-sdk~=1.69.0
-qibo==0.2.4 # TODO: unpin this
+qibo==0.2.6 # TODO: unpin this
 
 # Unit tests, coverage, and formatting/style.
 pytest==8.0.0
