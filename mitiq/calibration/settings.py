@@ -15,7 +15,6 @@ from mitiq import QPROGRAM, Executor
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
-    generate_quantum_volume_circuit,
     generate_rb_circuits,
     generate_w_circuit,
 )
