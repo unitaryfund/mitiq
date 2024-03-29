@@ -5,6 +5,7 @@
 import json
 
 import cirq
+import numpy as np
 import pytest
 import qiskit
 
@@ -183,6 +184,51 @@ def test_Strategy_pretty_dict():
             strategy_pretty_dict["representation_function"]
             == strategy_dict["representation_function"][25:]
         )
+
+
+def test_make_circuits_rotated_rb_circuits():
+    settings = Settings(
+        benchmarks=[
+            {
+                "circuit_type": "rotated_rb",
+                "num_qubits": 1,
+                "circuit_depth": 10,
+                "theta": np.pi / 3,
+            }
+        ],
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+        ],
+    )
+    problems = settings.make_problems()
+    assert len(problems) == 1
+    assert problems[0].type == "rotated_rb"
+
+
+def test_make_circuits_rotated_rb_circuits_invalid_qubits():
+    settings = Settings(
+        benchmarks=[
+            {
+                "circuit_type": "rotated_rb",
+                "num_qubits": 2,
+                "circuit_depth": 10,
+                "theta": np.pi / 3,
+            }
+        ],
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+        ],
+    )
+    with pytest.raises(NotImplementedError, match="rotated rb circuits"):
+        settings.make_problems()
 
 
 def test_make_circuits_qv_circuits():

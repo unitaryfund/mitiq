@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, List, cast
 
 import cirq
 import networkx as nx
+import numpy as np
 
 from mitiq import QPROGRAM, Executor
 from mitiq.benchmarks import (
@@ -17,6 +18,7 @@ from mitiq.benchmarks import (
     generate_mirror_circuit,
     generate_quantum_volume_circuit,
     generate_rb_circuits,
+    generate_rotated_rb_circuits,
     generate_w_circuit,
 )
 from mitiq.interface import convert_from_mitiq
@@ -336,6 +338,20 @@ class Settings:
             elif circuit_type == "rb":
                 circuit = generate_rb_circuits(num_qubits, depth)[0]
                 ideal = {"0" * num_qubits: 1.0}
+            elif circuit_type == "rotated_rb":
+                theta = benchmark["theta"]
+                if num_qubits == 1:
+                    circuit = generate_rotated_rb_circuits(num_qubits, depth)[
+                        0
+                    ]
+                    p = (2 / 3) * np.sin(theta / 2) ** 2
+                    ideal = {"0": p, "1": 1 - p}
+                else:
+                    raise NotImplementedError(
+                        """rotated rb circuits with >1 qubits
+                        not yet supported in calibration"""
+                    )
+
             elif circuit_type == "mirror":
                 seed = benchmark.get("circuit_seed", None)
                 circuit, bitstring_list = generate_mirror_circuit(
