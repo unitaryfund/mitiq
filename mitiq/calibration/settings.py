@@ -16,7 +16,6 @@ from mitiq import QPROGRAM, Executor
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
-    generate_quantum_volume_circuit,
     generate_rb_circuits,
     generate_rotated_rb_circuits,
     generate_w_circuit,
@@ -363,11 +362,9 @@ class Settings:
                 ideal_bitstring = "".join(map(str, bitstring_list))
                 ideal = {ideal_bitstring: 1.0}
             elif circuit_type == "qv":
-                circuit, _ = generate_quantum_volume_circuit(num_qubits, depth)
                 raise NotImplementedError(
                     "quantum volume circuits not yet supported in calibration"
                 )
-
             else:
                 raise ValueError(
                     "invalid value passed for `circuit_types`. Must be "
