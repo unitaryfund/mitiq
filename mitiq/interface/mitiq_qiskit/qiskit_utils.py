@@ -109,15 +109,15 @@ def execute_with_noise(
         basis_gates = noise_model.basis_gates + ["save_density_matrix"]
 
     # execution of the experiment
-    job = qiskit.execute(
+    new_circuit = qiskit.transpile(
         circ,
-        backend=AerSimulator(method="density_matrix", noise_model=noise_model),
-        basis_gates=basis_gates,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
+        basis_gates=basis_gates,
         optimization_level=0,
-        shots=1,
     )
+    backend = AerSimulator(method="density_matrix", noise_model=noise_model)
+    job = backend.run(new_circuit, shots=1)
     rho = job.result().data()["density_matrix"]
 
     expectation = np.real(np.trace(rho @ obs))
@@ -160,16 +160,15 @@ def execute_with_shots_and_noise(
         basis_gates = noise_model.basis_gates
 
     # execution of the experiment
-    job = qiskit.execute(
+    new_circuit = qiskit.transpile(
         circ,
-        backend=AerSimulator(method="density_matrix", noise_model=noise_model),
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
         basis_gates=basis_gates,
         optimization_level=0,
-        shots=shots,
-        seed_simulator=seed,
     )
+    backend = AerSimulator(method="density_matrix", noise_model=noise_model)
+    job = backend.run(new_circuit, shots=shots, seed_simulator=seed)
     counts = job.result().get_counts()
     expectation = 0
 
@@ -217,17 +216,15 @@ def sample_bitstrings(
     if backend:
         job = backend.run(circuit, shots=shots)
     elif noise_model:
-        job = qiskit.execute(
+        new_circuit = qiskit.transpile(
             circuit,
-            backend=AerSimulator(
-                method="density_matrix", noise_model=noise_model
-            ),
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
             basis_gates=noise_model.basis_gates,
             optimization_level=0,
-            shots=shots,
         )
+        backend = AerSimulator(method="density_matrix", noise_model=noise_model)
+        job = backend.run(new_circuit, shots=shots)
     else:
         raise ValueError(
             "Either a backend or a noise model must be given as input."
