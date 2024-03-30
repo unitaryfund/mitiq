@@ -133,7 +133,7 @@ def _add_identity_to_idle(
     idle_qubits = all_qubits - used_qubits
     # Modify input circuit applying I to idle qubits
     for q in idle_qubits:
-        circuit.i(q)
+        circuit.id(q)
 
     return idle_qubits
 
