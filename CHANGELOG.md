@@ -1,6 +1,48 @@
 # Changelog
 
-## Version 0.35.0 (under development)
+## Version 0.35.0
+
+Q1 comes to an end with a quieter release of Mitiq 0.35.0.
+We've continued our work to support Qibo by providing a new tutorial, adding related Qibo-conversion functionality to the API-doc, and added Qibo to our main list of supported frontends.
+We've also added the capability to use rotated randomized benchmarking circuits as part of the calibrator.
+This circuits provide expectation values ranging from 0 to 1 when measuring the probability that the output state is in the ground state.
+Having circuits with a wide range of expectation values is an important benchmarking task, and make a great test for finding the correct error mitigation technique/parameters.
+If you find any bugs/inconveniences in working with these updates make sure to open an issue so we are able to fix it ASAP!
+
+This release also contains contributions from two new Mitiq contributors, and Unitary Fund team members Alessandro and Jordan!
+Welcome both, and looking forward to many more contributions!
+Well done making your first contribution so quickly 🏎️💨!
+
+### Commits
+
+- Exit early when circuit type is not supported (#2252) [@cosenal]
+- adding rotated randomized benchmarking circuits to calibrator (#2248) [@farlab]
+- add qibo + rearrange frontend order (#2249) [@purva-thakre]
+- Fix examples link in README.md (#2242) [@jordandsullivan]
+- add link to discussions as a way to contribute (#2234) [@natestemen]
+- use python 3.11 for RTD (#2231) [@natestemen]
+- fix pennylane tutorial (#2232) [@natestemen]
+- Add qibo example to docs (#2220) [@francescsabater]
+- replace `black`, `flake8`, and `isort` with `ruff` (#2222) [@natestemen]
+- pin qibo version (#2221) [@natestemen]
+- Add Qibo conversions to documentation (#2214) [@nathanshammah]
+- Added warning filter to ignore warning (#2211) [@bdg221]
+- remove redundant imports (#2206) [@natestemen]
+- Indicate master is under development (#2205) [@natestemen]
+
+#### 📦 Dependency updates
+
+- Update pennylane-qiskit requirement from ~=0.34.0 to ~=0.34.1 (#2198) [@dependabot]
+- Update qiskit-ibm-provider requirement from ~=0.8.0 to ~=0.10.0 (#2196) [@dependabot]
+- Update pennylane requirement from ~=0.34.0 to ~=0.35.1 (#2227) [@dependabot]
+- Update pennylane-qiskit requirement from ~=0.34.1 to ~=0.35.1 (#2225) [@dependabot]
+- Bump stimcirq from 1.12.1 to 1.13.0 (#2236) [@dependabot]
+- Bump stim from 1.12.1 to 1.13.0 (#2237) [@dependabot]
+
+#### 🧑‍💻 Dev Dependency updates
+
+- Bump all documentation dependencies (#2179) [@dependabot]
+- Bump pytest-cov from 4.0.0 to 5.0.0 (#2240) [@dependabot]
 
 ## Version 0.34.0
 Announcing support for [Qibo](https://qibo.science/), a newly integrated frontend in Mitiq! 📣
