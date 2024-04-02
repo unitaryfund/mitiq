@@ -69,8 +69,9 @@ intersphinx_mapping = {
     # Cirq is no longer using sphinx docs so interlinking is not possible.
     # "cirq": ("https://quantumai.google/cirq", None),
     "pyquil": ("https://pyquil-docs.rigetti.com/en/stable/", None),
-    "qiskit": ("https://qiskit.org/documentation/", None),
-    "qutip": ("https://qutip.org/docs/latest/", None),
+    "qiskit": ("https://docs.quantum.ibm.com/api/qiskit/", None),
+    # TODO: qutip docs moved and the objects.inv file not yet found
+    # "qutip": ("https://qutip.org/docs/latest/", None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
