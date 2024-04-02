@@ -26,5 +26,5 @@ Before opening the PR, please ensure you have completed the following where appr
 - [ ] I added unit tests for new code.
 - [ ] I used [type hints](https://www.python.org/dev/peps/pep-0484/) in function signatures.
 - [ ] I used [Google-style](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods) docstrings for functions.
-- [ ] I [updated the documentation](../blob/master/docs/CONTRIBUTING_DOCS.md) where relevant.
+- [ ] I [updated the documentation](../blob/main/docs/CONTRIBUTING_DOCS.md) where relevant.
 - [ ] Added myself / the copyright holder to the AUTHORS file

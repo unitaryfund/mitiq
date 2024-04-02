@@ -3,7 +3,7 @@
 # module.
 # Original authors: Cirq developers: Xiao Mi, Dave Bacon, Craig Gidney,
 # Ping Yeh, Matthew Neely.
-# Code URL = ('https://github.com/quantumlib/Cirq/blob/master/cirq-core/cirq/
+# Code URL = ('https://github.com/quantumlib/Cirq/blob/main/cirq-core/cirq/
 # experiments/qubit_characterizations.py').
 #
 # This source code is licensed under the GPL license (v3) found in the

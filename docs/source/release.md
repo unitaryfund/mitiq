@@ -13,7 +13,7 @@ instructions of this document to go through all the steps below:
    :depth: 3
 ```
 
-## Prepare the master branch
+## Prepare the main branch
 
 The start of any release is drafting the changelog and bumping the version number.
 Ensure the commit where these changes are made include authorship for all contributors for the given milestone (code, or not).
@@ -47,9 +47,9 @@ SemVer, so typically a release will involve changing the version from
 ### Create a new tag
 
 Once the above changes (new changelog and new version) are merged into
-the master branch, checkout and pull the latest on the master branch
+the main branch, checkout and pull the latest on the main branch
 from your local machine. Then once you are up to date, tag the most
-recent commit on master (using `git tag`) with a tag that matches the
+recent commit on main (using `git tag`) with a tag that matches the
 number `VERSION.txt` (with a preceding "v", so `0.1.0` is `v0.1.0`)
 and push this tag to the Github repository.
 
@@ -66,7 +66,7 @@ new release.
 ```
 
 There should be a new draft release on GitHub created by the
-[gh-release](https://github.com/unitaryfund/mitiq/blob/master/.github/workflows/gh-release.yml) action, triggered by the tag you made in the
+[gh-release](https://github.com/unitaryfund/mitiq/blob/main/.github/workflows/gh-release.yml) action, triggered by the tag you made in the
 previous step [here](https://github.com/unitaryfund/mitiq/releases). You
 will need to review it and publish the release.
 
@@ -86,7 +86,7 @@ significant amount of time. You can check the build status
 ### Release the new version on PyPI
 
 Once the GitHub release is published, the release is also published on
-PyPI by the [publish-pypi](https://github.com/unitaryfund/mitiq/blob/master/.github/workflows/publish-pypi.yml) action. This may require a few
+PyPI by the [publish-pypi](https://github.com/unitaryfund/mitiq/blob/main/.github/workflows/publish-pypi.yml) action. This may require a few
 minutes. If it seems like it didn't push a new version to PyPI, you can
 trigger it manually. Go to
 <https://github.com/unitaryfund/mitiq/actions/workflows/publish-pypi.yml>
