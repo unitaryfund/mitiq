@@ -44,6 +44,8 @@ SemVer, so typically a release will involve changing the version from
 
 ## Do the release
 
+Once the above changes in the `CHANGELOG.md` and `VERSION.txt` are merged into master, you are ready to do the release.
+
 ### Create a new tag
 
 Once the above changes (new changelog and new version) are merged into
