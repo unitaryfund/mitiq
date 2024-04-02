@@ -2,10 +2,9 @@
 
 ## Version 0.35.0
 
-Q1 comes to an end with a quieter release of Mitiq 0.35.0.
-We've continued our work to support Qibo by providing a new tutorial, adding related Qibo-conversion functionality to the API-doc, and added Qibo to our main list of supported frontends.
+In this milestone, we've continued our work to support Qibo by providing a new tutorial, adding related Qibo-conversion functionality to the API-doc, and added Qibo to our main list of supported frontends.
 We've also added the capability to use rotated randomized benchmarking circuits as part of the calibrator.
-This circuits provide expectation values ranging from 0 to 1 when measuring the probability that the output state is in the ground state.
+These circuits provide expectation values ranging from 0 to 1 when measuring the probability that the output state is in the ground state.
 Having circuits with a wide range of expectation values is an important benchmarking task, and make a great test for finding the correct error mitigation technique/parameters.
 If you find any bugs/inconveniences in working with these updates make sure to open an issue so we are able to fix it ASAP!
 
