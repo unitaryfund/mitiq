@@ -125,7 +125,7 @@ Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedo
 The basic development workflow for Mitiq is done in units of milestones which are usually one month periods where we focus our efforts on thrusts decided by the development team, alongside community members.
 Milestones are tracked using the [GitHub milestone feature](https://github.com/unitaryfund/mitiq/milestones) and all issues that are planned to be addressed should be tagged accordingly.
 
-All releases for Mitiq are tagged on the `master` branch with tags for the version number of the release.
+All releases for Mitiq are tagged on the `main` branch with tags for the version number of the release.
 Find all the previous releases [here](https://github.com/unitaryfund/mitiq/releases).
 
 ## Code of conduct
