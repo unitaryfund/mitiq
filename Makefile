@@ -48,6 +48,12 @@ linkcheck:
 install:
 	pip install -e .[development]
 
+.PHONY: install-hooks
+install-hooks:
+	@git config --local core.hooksPath .git-hooks/
+	@chmod +x .git-hooks/*
+	@echo "Git hooks installed."
+
 .PHONY: requirements
 requirements: requirements.txt
 	pip install -r requirements.txt
