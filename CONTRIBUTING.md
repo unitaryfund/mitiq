@@ -99,6 +99,9 @@ make check-types
 
 If you aren't presented with any errors, then that means your code is ready to commit!
 
+It is recommended to install pre-configured [Git hooks](../blob/main/.git-hooks/) from Mitiq repository by running `make install-hooks` from the root of the repository immediately after cloning.
+In particular, the pre-commit hook will run both `make check-format` and `make check-types` before each commit.
+
 ## Proposing a new feature to Mitiq
 If you are interested in adding a substantial new feature or functionality to Mitiq, please make a copy of our Request For Comments (RFC) [template](https://docs.google.com/document/d/1adomheXpbqp4YIBFQ49IsAJzuJKWyr75GRO1NeWg0Fo/) and fill out the details of your enhancement proposal.
 Take a look at [previous RFCs](#list-of-accepted-rfcs) for examples on how to fill out your proposal.

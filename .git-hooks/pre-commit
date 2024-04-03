@@ -1,0 +1,10 @@
+#!/bin/sh
+
+make check-format && make check-types
+
+if [ $? -ne 0 ]; then
+  echo "Code checks have failed. Fix issues before committing."
+  exit 1
+fi
+
+exit 0
