@@ -8,10 +8,10 @@ on:
       - synchronize
       - ready_for_review
     branches:
-      - master
+      - main
   push:
     branches:
-      - master
+      - main
 
 jobs:
   validate:
