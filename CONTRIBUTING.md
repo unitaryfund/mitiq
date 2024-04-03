@@ -99,7 +99,7 @@ make check-types
 
 If you aren't presented with any errors, then that means your code is ready to commit!
 
-It is recommended to install pre-configured [Git hooks](../blob/main/.git-hooks/) from Mitiq repository by running `make install-hooks` from the root of the repository immediately after cloning.
+It is recommended to install pre-configured [Git hooks](https://github.com/unitaryfund/mitiq/blob/main/.git-hooks/) from Mitiq repository by running `make install-hooks` from the root of the repository immediately after cloning.
 In particular, the pre-commit hook will run both `make check-format` and `make check-types` before each commit.
 
 ## Proposing a new feature to Mitiq

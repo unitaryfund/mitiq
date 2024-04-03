@@ -1,6 +1,6 @@
 #!/bin/sh
 
-make check-format && make check-types
+make check-all
 
 if [ $? -ne 0 ]; then
   echo "Code checks have failed. Fix issues before committing."
