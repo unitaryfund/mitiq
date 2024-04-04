@@ -5,6 +5,7 @@
 .coverage
 *.dat
 *.ipynp
+*.hdf5
 *.ipynb_checkpoints
 *.jupyter_cache
 _build
