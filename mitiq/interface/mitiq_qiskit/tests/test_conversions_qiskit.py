@@ -272,7 +272,7 @@ def test_transform_qregs_one_qubit_ops(nqubits, with_ops, measure):
     assert circ.qregs == [qreg]
 
     new_qregs = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
-    _transform_registers(circ, new_qregs=new_qregs)
+    circ = _transform_registers(circ, new_qregs=new_qregs)
 
     assert circ.qregs == new_qregs
     assert circ.cregs == orig.cregs
@@ -290,7 +290,7 @@ def test_transform_qregs_two_qubit_ops(new_reg_sizes):
     orig = circ.copy()
 
     new_qregs = [qiskit.QuantumRegister(s) for s in new_reg_sizes]
-    _transform_registers(circ, new_qregs=new_qregs)
+    circ = _transform_registers(circ, new_qregs=new_qregs)
 
     assert circ.qregs == new_qregs
     assert circ.cregs == orig.cregs
@@ -313,7 +313,7 @@ def test_transform_qregs_random_circuit(new_reg_sizes, measure):
     orig = circ.copy()
 
     new_qregs = [qiskit.QuantumRegister(s) for s in new_reg_sizes]
-    _transform_registers(circ, new_qregs=new_qregs)
+    circ = _transform_registers(circ, new_qregs=new_qregs)
 
     assert circ.qregs == new_qregs
     assert _equal(from_qiskit(circ), from_qiskit(orig))
@@ -322,7 +322,7 @@ def test_transform_qregs_random_circuit(new_reg_sizes, measure):
 def test_transform_qregs_no_new_qregs():
     qreg = qiskit.QuantumRegister(5)
     circ = qiskit.QuantumCircuit(qreg)
-    _transform_registers(circ, new_qregs=None)
+    circ = _transform_registers(circ, new_qregs=None)
     assert circ.qregs == [qreg]
 
 
@@ -348,7 +348,9 @@ def test_transform_registers_adds_idle_qubits():
     assert circuit.num_qubits == 1
     old_data = copy.deepcopy(circuit.data)
 
-    _transform_registers(circuit, new_qregs=[qreg, qiskit.QuantumRegister(4)])
+    circuit = _transform_registers(
+        circuit, new_qregs=[qreg, qiskit.QuantumRegister(4)]
+    )
 
     assert len(circuit.qregs) == 2
     assert circuit.num_qubits == 5

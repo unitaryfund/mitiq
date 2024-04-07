@@ -16,3 +16,7 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
     execute_with_shots_and_noise,
     initialized_depolarizing_noise,
 )
+from mitiq.interface.mitiq_qiskit.transpiler import (
+    ApplyMitiqLayout,
+    ClearLayout,
+)
