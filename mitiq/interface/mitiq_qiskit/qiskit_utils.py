@@ -223,7 +223,9 @@ def sample_bitstrings(
             basis_gates=noise_model.basis_gates,
             optimization_level=0,
         )
-        backend = AerSimulator(method="density_matrix", noise_model=noise_model)
+        backend = AerSimulator(
+            method="density_matrix", noise_model=noise_model
+        )
         job = backend.run(new_circuit, shots=shots)
     else:
         raise ValueError(
