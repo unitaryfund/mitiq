@@ -32,7 +32,7 @@ from mitiq import QPROGRAM, QuantumResult
 from mitiq.executor import Executor
 from mitiq.interface import accept_any_qprogram_as_input
 from mitiq.observable import Observable
-from mitiq.zne.scaling import fold_gates_at_random
+from mitiq.qem.zne.scaling import fold_gates_at_random
 
 ExtrapolationResult = Union[
     float,  # The zero-noise value.

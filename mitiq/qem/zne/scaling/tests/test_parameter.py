@@ -12,7 +12,7 @@ import pytest
 from cirq import CSWAP, Circuit, LineQubit, ZPowGate, ops
 
 from mitiq.utils import _equal
-from mitiq.zne.scaling.parameter import (
+from mitiq.qem.zne.scaling.parameter import (
     CircuitMismatchException,
     GateTypeException,
     _generate_parameter_calibration_circuit,

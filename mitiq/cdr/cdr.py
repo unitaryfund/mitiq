@@ -18,7 +18,7 @@ from mitiq.cdr import (
     linear_fit_function_no_intercept,
 )
 from mitiq.cdr.clifford_utils import is_clifford
-from mitiq.zne.scaling import fold_gates_at_random
+from mitiq.qem.zne.scaling import fold_gates_at_random
 
 
 def execute_with_cdr(

@@ -22,6 +22,9 @@ from mitiq.observable import PauliString, Observable
 from mitiq._about import about
 from mitiq._version import __version__
 
+# Quantum Error Correction (QEM) modules
+from mitiq.qem import zne 
+
 # Calibration
 from mitiq.calibration import (
     Calibrator,
@@ -29,3 +32,4 @@ from mitiq.calibration import (
     ZNE_SETTINGS,
     Settings,
 )
+

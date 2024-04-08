@@ -26,20 +26,20 @@ from mitiq.interface.mitiq_qiskit import (
     initialized_depolarizing_noise,
 )
 from mitiq.observable import Observable, PauliString
-from mitiq.zne import (
+from mitiq.qem.zne import (
     execute_with_zne,
     inference,
     mitigate_executor,
     scaling,
     zne_decorator,
 )
-from mitiq.zne.inference import (
+from mitiq.qem.zne.inference import (
     AdaExpFactory,
     LinearFactory,
     PolyFactory,
     RichardsonFactory,
 )
-from mitiq.zne.scaling import (
+from mitiq.qem.zne.scaling import (
     fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,

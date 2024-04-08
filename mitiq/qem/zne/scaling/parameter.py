@@ -80,7 +80,7 @@ def compute_parameter_variance(
 ) -> float:
     """Given an executor and a gate, determines the effective variance in the
     control parameter that can be used as the ``base_variance`` argument in
-    ``mitiq.zne.scaling.scale_parameters``.
+    ``mitiq.qem.zne.scaling.scale_parameters``.
 
     Note: Only works for one qubit gates for now.
 

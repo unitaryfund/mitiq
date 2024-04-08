@@ -7,7 +7,7 @@
 
 from cirq import Circuit, LineQubit, ops
 
-from mitiq.zne.scaling import layer_folding
+from mitiq.qem.zne.scaling import layer_folding
 
 
 def test_layer_folding_with_measurements():

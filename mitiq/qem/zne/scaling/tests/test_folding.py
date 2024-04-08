@@ -31,7 +31,7 @@ from mitiq.interface import (
     convert_to_mitiq,
 )
 from mitiq.utils import _equal
-from mitiq.zne.scaling.folding import (
+from mitiq.qem.zne.scaling.folding import (
     UnfoldableCircuitError,
     _apply_fold_mask,
     _create_fold_mask,

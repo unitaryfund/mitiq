@@ -15,7 +15,7 @@ from cirq import H, LineQubit, X
 from numpy.random import RandomState
 from pytest import mark, raises, warns
 
-from mitiq.zne.inference import (
+from mitiq.qem.zne.inference import (
     AdaExpFactory,
     ConvergenceWarning,
     ExpFactory,

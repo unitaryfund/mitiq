@@ -27,9 +27,9 @@ from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.raw import execute
-from mitiq.zne import execute_with_zne
-from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import fold_gates_at_random, fold_global
+from mitiq.qem.zne import execute_with_zne
+from mitiq.qem.zne.inference import LinearFactory, RichardsonFactory
+from mitiq.qem.zne.scaling import fold_gates_at_random, fold_global
 
 
 class MitigationTechnique(Enum):

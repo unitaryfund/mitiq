@@ -9,7 +9,7 @@ import pytest
 from cirq import Circuit, LineQubit, ops
 
 from mitiq.utils import _equal
-from mitiq.zne.scaling.identity_insertion import (
+from mitiq.qem.zne.scaling.identity_insertion import (
     UnscalableCircuitError,
     _calculate_id_layers,
     insert_id_layers,

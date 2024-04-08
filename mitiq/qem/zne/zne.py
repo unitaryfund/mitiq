@@ -9,8 +9,8 @@ from functools import wraps
 from typing import Callable, List, Optional, Union
 
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
-from mitiq.zne.inference import Factory, RichardsonFactory
-from mitiq.zne.scaling import fold_gates_at_random
+from mitiq.qem.zne.inference import Factory, RichardsonFactory
+from mitiq.qem.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
@@ -36,7 +36,7 @@ def execute_with_zne(
         factory: ``Factory`` object that determines the zero-noise
             extrapolation method.
         scale_noise: The function for scaling the noise of a quantum circuit.
-            A list of built-in functions can be found in ``mitiq.zne.scaling``.
+            A list of built-in functions can be found in ``mitiq.qem.zne.scaling``.
         num_to_average: Number of times expectation values are computed by
             the executor after each call to ``scale_noise``, then averaged.
 

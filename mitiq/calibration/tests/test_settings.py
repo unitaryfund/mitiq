@@ -21,8 +21,8 @@ from mitiq.pec import (
     represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.raw import execute
-from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import fold_global
+from mitiq.qem.zne.inference import LinearFactory, RichardsonFactory
+from mitiq.qem.zne.scaling import fold_global
 
 light_pec_settings = Settings(
     [

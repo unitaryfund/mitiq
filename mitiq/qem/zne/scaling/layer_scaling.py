@@ -15,7 +15,7 @@ from cirq import Moment, inverse
 from mitiq import QPROGRAM
 from mitiq.interface import accept_qprogram_and_validate
 from mitiq.utils import _append_measurements, _pop_measurements
-from mitiq.zne.scaling.folding import _check_foldable
+from mitiq.qem.zne.scaling.folding import _check_foldable
 
 
 @accept_qprogram_and_validate
