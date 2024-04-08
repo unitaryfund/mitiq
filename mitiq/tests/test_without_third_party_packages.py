@@ -11,7 +11,9 @@ mitiq.interface.mitiq_[package], where [package] is any supported package that
 interfaces with Mitiq (see mitiq.SUPPORTED_PROGRAM_TYPES).
 """
 
-from abc import ABCMeta
+from typing import Union, get_origin
+
+from cirq import Circuit
 
 
 def test_import():
@@ -20,14 +22,14 @@ def test_import():
     """
     import mitiq
 
-    if isinstance(mitiq.QPROGRAM, ABCMeta):
-        pass  # If only Cirq is installed, QPROGRAM is not a typing.Union.
-    else:
+    if get_origin(mitiq.QPROGRAM) is Union:
         assert (
             1  # cirq.Circuit is always supported.
             <= len(mitiq.QPROGRAM.__args__)  # All installed types.
             <= len(mitiq.SUPPORTED_PROGRAM_TYPES.keys())  # All types.
         )
+    else:
+        assert mitiq.QPROGRAM is Circuit
 
 
 # TODO: More tests wanted!
