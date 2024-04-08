@@ -116,6 +116,7 @@ jobs:
       - name: Submit coverage report to Codecov
         # Only submit to Codecov once.
         if: ${{ matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'}}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
