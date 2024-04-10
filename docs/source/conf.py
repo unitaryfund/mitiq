@@ -166,6 +166,8 @@ linkcheck_ignore = [
     r"https://arxiv.org/abs/1807.05572",
 ]
 
+linkcheck_retries = 3
+
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
     """Style that mimicks APS journals."""
