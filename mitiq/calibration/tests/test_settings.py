@@ -316,7 +316,7 @@ def test_PEC_SETTINGS():
     assert len(strategies) == 2
 
 
-@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES)
 def test_benchmark_problem_class(circuit_type):
     qubit = cirq.LineQubit(0)
     circuit = cirq.Circuit(cirq.X(qubit))
