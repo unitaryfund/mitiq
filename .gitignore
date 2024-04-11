@@ -4,7 +4,7 @@
 .idea/
 .coverage
 *.dat
-*.ipynp
+*.ipynb
 *.hdf5
 *.ipynb_checkpoints
 *.jupyter_cache
