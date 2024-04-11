@@ -80,8 +80,6 @@ The Mitiq function for global folding is:
 
 The Mitiq functions for local folding are: 
 - {func}`.fold_gates_at_random()`;
-- {func}`.fold_gates_from_left()`;
-- {func}`.fold_gates_from_right()`;
 - {func}`.fold_all()`.
 
 There are multiple functions for local folding since it can be applied to the gates of a circuit according to different orderings:
@@ -137,9 +135,7 @@ for scale_factor in [1, 3, 5, 7]:
     print(f"For scale_factor={scale_factor}, the number of gates was scaled by {scaled_num_gates / num_gates}")
 ```
 
-**Note:** *When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.
-In this case, since all gates are folded the same number of times, the three local folding functions 
-{func}`.fold_gates_at_random()`, {func}`.fold_gates_from_left()` and {func}`.fold_gates_from_right()` have the same (deterministic) effect.*
+**Note:** *When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.*
 
 +++
 

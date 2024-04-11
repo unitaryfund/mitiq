@@ -41,8 +41,6 @@ from mitiq.zne.inference import (
 )
 from mitiq.zne.scaling import (
     fold_gates_at_random,
-    fold_gates_from_left,
-    fold_gates_from_right,
     get_layer_folding,
     insert_id_layers,
 )
@@ -154,8 +152,6 @@ def test_with_observable_two_qubits():
 @pytest.mark.parametrize(
     "fold_method",
     [
-        fold_gates_from_left,
-        fold_gates_from_right,
         fold_gates_at_random,
         insert_id_layers,
     ],
@@ -178,8 +174,6 @@ def test_execute_with_zne_no_noise(fold_method, factory, num_to_average):
 @pytest.mark.parametrize(
     "fold_method",
     [
-        fold_gates_from_left,
-        fold_gates_from_right,
         fold_gates_at_random,
         insert_id_layers,
     ],
