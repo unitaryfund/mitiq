@@ -958,7 +958,6 @@ def test_fold_left_squash_moments():
 @pytest.mark.parametrize(
     "fold_method",
     [
-        
         fold_gates_at_random,
     ],
 )
@@ -1221,7 +1220,6 @@ def test_folding_circuit_conversion_error_qiskit(fold_method):
 @pytest.mark.parametrize(
     "fold_method",
     (
-        
         fold_gates_at_random,
         fold_global,
     ),
