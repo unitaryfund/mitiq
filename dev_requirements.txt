@@ -5,7 +5,7 @@ qiskit-ibm-provider~=0.10.0
 pyquil~=3.5.4
 pennylane-qiskit~=0.35.1
 pennylane~=0.35.1
-amazon-braket-sdk~=1.69.0
+amazon-braket-sdk~=1.77.3
 qibo==0.2.7 # TODO: unpin this
 
 # Unit tests, coverage, and formatting/style.
