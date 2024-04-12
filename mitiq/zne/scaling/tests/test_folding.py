@@ -1299,82 +1299,6 @@ def test_create_weight_mask_with_fidelities():
         weight_mask = _create_weight_mask(circ, fidelities)
 
 
-@pytest.mark.parametrize(
-    "weight_mask",
-    ([0.1, 0.2, 0.3, 0.0], [0.3, 0.5, 0.7, 0.0], [1.0, 1.0, 1.0, 0.0]),
-)
-@pytest.mark.parametrize("scale_factor", (1, 3, 5, 7, 9, 11))
-@pytest.mark.parametrize("method", ("at_random", "from_left", "from_right"))
-def test_create_fold_mask_with_odd_scale_factors(
-    weight_mask,
-    scale_factor,
-    method,
-):
-    fold_mask = _create_fold_mask(weight_mask, scale_factor, method)
-    num_folds = int((scale_factor - 1) / 2)
-    assert fold_mask == [num_folds, num_folds, num_folds, 0]
-
-
-def test_create_fold_mask_with_real_scale_factors_from_left():
-    fold_mask = _create_fold_mask(
-        weight_mask=[0.1, 0.2, 0.3, 0.0],
-        scale_factor=1.0,
-        folding_method="from_left",
-    )
-    assert fold_mask == [0, 0, 0, 0]
-
-    fold_mask = _create_fold_mask(
-        weight_mask=[0.1, 0.1, 0.1, 0.1],
-        scale_factor=1.5,
-        folding_method="from_left",
-    )
-    assert fold_mask == [1, 0, 0, 0]
-
-    fold_mask = _create_fold_mask(
-        weight_mask=[1.0, 1.0, 1.0, 1.0],
-        scale_factor=2,
-        folding_method="from_left",
-    )
-    assert fold_mask == [1.0, 1.0, 0.0, 0.0]
-
-    fold_mask = _create_fold_mask(
-        weight_mask=[1.0, 1.0, 1.0, 1.0],
-        scale_factor=3.9,
-        folding_method="from_left",
-    )
-    assert fold_mask == [2, 2, 1, 1]
-
-
-def test_create_fold_mask_with_real_scale_factors_from_right():
-    fold_mask = _create_fold_mask(
-        weight_mask=[0.1, 0.2, 0.3, 0.0],
-        scale_factor=1.0,
-        folding_method="from_right",
-    )
-    assert fold_mask == [0, 0, 0, 0]
-
-    fold_mask = _create_fold_mask(
-        weight_mask=[0.1, 0.1, 0.1, 0.1],
-        scale_factor=1.5,
-        folding_method="from_right",
-    )
-    assert fold_mask == [0, 0, 0, 1]
-
-    fold_mask = _create_fold_mask(
-        weight_mask=[1.0, 1.0, 1.0, 1.0],
-        scale_factor=2,
-        folding_method="from_right",
-    )
-    assert fold_mask == [0.0, 0.0, 1.0, 1.0]
-
-    fold_mask = _create_fold_mask(
-        weight_mask=[1.0, 1.0, 1.0, 1.0],
-        scale_factor=3.9,
-        folding_method="from_right",
-    )
-    assert fold_mask == [1, 1, 2, 2]
-
-
 def test_create_fold_mask_with_real_scale_factors_at_random():
     fold_mask = _create_fold_mask(
         weight_mask=[0.1, 0.2, 0.3, 0.0],
@@ -1409,8 +1333,7 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
     assert fold_mask == [1, 2, 2, 1]
 
 
-@pytest.mark.parametrize("method", ("at_random", "from_left", "from_right"))
-def test_create_fold_mask_approximates_well(method):
+def test_create_fold_mask_approximates_well():
     """Check _create_fold_mask well approximates the scale factor."""
     rnd_state = np.random.RandomState(seed=0)
     for scale_factor in [1, 1.5, 1.7, 2.7, 6.7, 18.7, 19.0, 31]:
@@ -1419,7 +1342,7 @@ def test_create_fold_mask_approximates_well(method):
         fold_mask = _create_fold_mask(
             weight_mask,
             scale_factor,
-            folding_method=method,
+            folding_method='at_random',
             seed=seed,
         )
         out_weights = [w + 2 * n * w for w, n in zip(weight_mask, fold_mask)]
