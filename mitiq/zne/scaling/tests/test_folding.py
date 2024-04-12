@@ -1342,7 +1342,7 @@ def test_create_fold_mask_approximates_well():
         fold_mask = _create_fold_mask(
             weight_mask,
             scale_factor,
-            folding_method='at_random',
+            folding_method="at_random",
             seed=seed,
         )
         out_weights = [w + 2 * n * w for w, n in zip(weight_mask, fold_mask)]

@@ -401,7 +401,8 @@ def _create_fold_mask(
             Highly noisy gates should have a corresponding high weight.
             Gates with zero weight are assumed to be ideal and are not folded.
         scale_factor: The effective noise scale factor.
-        folding_method: Currently only supports "at_random" argument. Implementation of a folding method described in
+        folding_method: Currently only supports "at_random" argument
+            Implementation of a folding method described in
             :cite:`Giurgica_Tiron_2020_arXiv`. If scale_factor is an odd
             integer, all methods are equivalent and this option is irrelevant.
         seed: A seed for the random number generator. This is used only when
