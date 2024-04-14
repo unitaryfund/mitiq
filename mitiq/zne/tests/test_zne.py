@@ -528,8 +528,7 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     backend = AerSimulator.from_backend(santiago)
 
     def execute(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
-        new_circuit = qiskit.transpile(circuit, optimization_level=0)
-        job = backend.run(new_circuit, shots=shots)
+        job = backend.run(circuit, shots=shots)
         return job.result().get_counts().get("00", 0.0) / shots
 
     qreg = qiskit.QuantumRegister(2)
