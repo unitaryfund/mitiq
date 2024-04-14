@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.16.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -48,9 +48,9 @@ def variational_circuit(gamma: float) -> QuantumCircuit:
     """
     circuit = QuantumCircuit(2)
     circuit.rx(gamma, 0)
-    circuit.cnot(0, 1)
+    circuit.cx(0, 1)
     circuit.rx(gamma, 1)
-    circuit.cnot(0, 1)
+    circuit.cx(0, 1)
     circuit.rx(gamma, 0)
     
     return circuit
@@ -85,15 +85,8 @@ def noiseless_executor(circuit: QuantumCircuit) -> float:
     circ.save_density_matrix()
 
     # execute experiment without noise
-    job = qiskit.execute(
-        experiments=circ,
-        backend=AerSimulator(method="density_matrix"),
-        noise_model=None,
-        # we want all gates to be actually applied,
-        # so we skip any circuit optimization 
-        optimization_level=0,
-        shots=1,
-    )
+    job = AerSimulator(method="density_matrix", noise_model=None).run(circ, shots=1)
+    
     rho = job.result().data()["density_matrix"]
 
     expectation = np.real(np.trace(rho @ hamiltonian))
@@ -127,18 +120,18 @@ def executor_with_noise(circuit: QuantumCircuit) -> float:
         depolarizing_error(noise_level, 2), ["cx"]
     ) 
     
-
     # execute experiment with depolarizing noise
-    job = qiskit.execute(
-        experiments=circ,
-        backend=AerSimulator(method="density_matrix"),
-        noise_model=noise_model,
+    backend = AerSimulator(method="density_matrix", noise_model=noise_model)
+    # Transpile the circuit so it can be properly run
+    exec_circuit = qiskit.transpile(
+        circ,
+        backend=backend,
         basis_gates=noise_model.basis_gates + ["save_density_matrix"],
-        # we want all gates to be actually applied,
-        # so we skip any circuit optimization 
-        optimization_level=0,
-        shots=1,
+        optimization_level=0, # Important to preserve folded gates
     )
+    # Run the circuit
+    job = backend.run(exec_circuit, shots=1)
+
     rho = job.result().data()["density_matrix"]
 
     expectation = np.real(np.trace(rho @ hamiltonian))

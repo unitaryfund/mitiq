@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.16.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -43,7 +43,7 @@ from mitiq import (
     MeasurementResult,
 )
 
-from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPU
+from qiskit_ibm_runtime.fake_provider import FakeJakartaV2  # Fake (simulated) QPU
 ```
 
 ### Define the circuit to study
@@ -74,7 +74,7 @@ This is consumed by Mitiq's `execute_with_zne`. In this example, the expectation
 ```{code-cell} ipython3
 def execute_circuit(circuit):
     """Execute the input circuit and return the expectation value of |00..0><00..0|"""
-    noisy_backend = FakeJakarta()
+    noisy_backend = FakeJakartaV2()
     noisy_result = noisy_backend.run(circuit, shots=shots).result()
     noisy_counts = noisy_result.get_counts(circuit)
     noisy_expectation_value = noisy_counts[n_qubits * "0"] / shots
@@ -98,7 +98,7 @@ Let's consider a noisy backend using the Qiskit noisy simulator, `FakeJakarta`. 
 ```{code-cell} ipython3
 def execute_calibration(qiskit_circuit):
     """Execute the input circuits and return the measurement results."""
-    noisy_backend = FakeJakarta()
+    noisy_backend = FakeJakartaV2()
     noisy_result = noisy_backend.run(qiskit_circuit, shots=shots).result()
     noisy_counts = noisy_result.get_counts(qiskit_circuit)
     noisy_counts = { k.replace(" ",""):v for k, v in noisy_counts.items()}

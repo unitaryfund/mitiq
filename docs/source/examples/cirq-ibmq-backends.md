@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -37,7 +37,6 @@ USE_REAL_HARDWARE = False
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-
 ```{code-cell} ipython3
 import cirq
 
@@ -45,7 +44,6 @@ qbit = cirq.LineQubit(0)
 cirq_circuit = cirq.Circuit([cirq.X(qbit)] * 10, cirq.measure(qbit))
 print(cirq_circuit)
 ```
-
 
 We will use the probability of the ground state as our observable to mitigate, the expectation value of which should
 evaluate to one in the noiseless setting.
@@ -72,16 +70,18 @@ for instructions to create an account, save credentials, and see online quantum 
 
 ```{code-cell} ipython3
 import qiskit
-from qiskit_aer import Aer
+from qiskit_aer import QasmSimulator
 from qiskit_ibm_provider import IBMProvider
 from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
 if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
     provider = IBMProvider()
-    backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
+    backend = provider.get_backend("ibm_brisbane")  # Set quantum computer here!
 else:
+    # Simulate the circuit with noise
+    noise_model = initialized_depolarizing_noise(noise_level=0.02)
     # Default to a simulator.
-    backend = Aer.get_backend("qasm_simulator"),
+    backend = QasmSimulator(noise_model=noise_model)
 
 
 def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
@@ -91,29 +91,20 @@ def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
         circuit: Circuit to run.
         shots: Number of times to execute the circuit to compute the expectation value.
     """
-    # convert from Cirq circuit to Qiskit circuit.
+    # Convert from Cirq circuit to Qiskit circuit.
     circuit = to_qiskit(cirq_circuit) 
-    
-    if USE_REAL_HARDWARE:
-        # Run the circuit on hardware
-        job = qiskit.execute(
-            experiments=circuit,
-            backend=backend,
-            optimization_level=0,  # Important to preserve folded gates.
-            shots=shots
-        )
-    else:
-        # Simulate the circuit with noise
-        noise_model = initialized_depolarizing_noise(noise_level=0.02)
-        job = qiskit.execute(
-            experiments=circuit,
-            backend=qiskit.Aer.get_backend("qasm_simulator"),
-            noise_model=noise_model,
-            basis_gates=noise_model.basis_gates,
-            optimization_level=0,  # Important to preserve folded gates.
-            shots=shots,
-        )
 
+    # Transpile the circuit so it can be properly run
+    exec_circuit = qiskit.transpile(
+        circuit,
+        backend=backend,
+        basis_gates=noise_model.basis_gates if noise_model else None,
+        optimization_level=0, # Important to preserve folded gates.
+    )
+
+    # Run the circuit
+    job = backend.run(exec_circuit, shots=shots)
+    
     # Convert from raw measurement counts to the expectation value
     counts = job.result().get_counts()
     if counts.get("0") is None:
@@ -122,7 +113,6 @@ def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
         expectation_value = counts.get("0") / shots
     return expectation_value
 ```
-
 
 At this point, the circuit can be executed to return a mitigated expectation value by running Mitiq's {func}`.zne.execute_with_zne` function as follows.
 
@@ -197,25 +187,16 @@ Below we execute the folded circuits using the ``backend`` defined at the start 
 ```{code-cell} ipython3
 shots = 8192
 
-if USE_REAL_HARDWARE:
-    # Run the circuit on hardware
-    job = qiskit.execute(
-        experiments=folded_circuits,
-        backend=backend,
-        optimization_level=0,  # Important to preserve folded gates.
-        shots=shots
-    )
-else:
-    # Simulate the circuit with noise
-    noise_model = initialized_depolarizing_noise(noise_level=0.05)
-    job = qiskit.execute(
-        experiments=folded_circuits,
-        backend=qiskit.Aer.get_backend("qasm_simulator"),
-        noise_model=noise_model,
-        basis_gates=noise_model.basis_gates,
-        optimization_level=0,  # Important to preserve folded gates.
-        shots=shots,
-    )
+# Transpile the circuit so it can be properly run
+exec_circuit = qiskit.transpile(
+    folded_circuits,
+    backend=backend,
+    basis_gates=noise_model.basis_gates if noise_model else None,
+    optimization_level=0, # Important to preserve folded gates.
+)
+
+# Run the circuit
+job = backend.run(exec_circuit, shots=shots)
 ```
 
 **Note:** We set the ``optimization_level=0`` to prevent any compilation by Qiskit transpilers.
