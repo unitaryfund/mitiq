@@ -12,7 +12,7 @@ import cirq
 import networkx as nx
 import numpy as np
 
-from mitiq import QPROGRAM, Executor
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Executor
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -81,7 +81,9 @@ class BenchmarkProblem:
     def largest_probability(self) -> float:
         return max(self.ideal_distribution.values())
 
-    def converted_circuit(self, circuit_type: str) -> QPROGRAM:
+    def converted_circuit(
+        self, circuit_type: SUPPORTED_PROGRAM_TYPES
+    ) -> QPROGRAM:
         """Adds measurements to all qubits and convert
         to the input frontend type.
 
@@ -93,7 +95,7 @@ class BenchmarkProblem:
         """
         circuit = self.circuit.copy()
         circuit.append(cirq.measure(circuit.all_qubits()))
-        return convert_from_mitiq(circuit, circuit_type)
+        return convert_from_mitiq(circuit, circuit_type.value)
 
     @property
     def num_qubits(self) -> int:
