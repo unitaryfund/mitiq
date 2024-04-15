@@ -184,12 +184,11 @@ def _transform_registers(
     """Transforms the registers in the circuit to the new registers.
 
     Args:
-        circuit: Qiskit circuit with at most one quantum register.
+        circuit: Qiskit circuit.
         new_qregs: The new quantum registers for the circuit.
 
     Raises:
         ValueError:
-            * If the input circuit has more than one quantum register.
             * If the number of qubits in the new quantum registers is
             greater than the number of qubits in the circuit.
     """

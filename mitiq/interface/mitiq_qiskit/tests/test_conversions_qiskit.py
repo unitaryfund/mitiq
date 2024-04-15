@@ -279,6 +279,33 @@ def test_transform_qregs_one_qubit_ops(nqubits, with_ops, measure):
     assert _equal(from_qiskit(circ), from_qiskit(orig))
 
 
+@pytest.mark.parametrize("nqubits", [1, 5])
+@pytest.mark.parametrize("with_ops", [True, False])
+@pytest.mark.parametrize("measure", [True, False])
+def test_transform_circuit_with_multiple_qregs(nqubits, with_ops, measure):
+    qreg_1 = qiskit.QuantumRegister(nqubits)
+    qreg_2 = qiskit.QuantumRegister(nqubits)
+    circ = qiskit.QuantumCircuit(qreg_1, qreg_2)
+    if with_ops:
+        circ.h(qreg_1)
+        circ.h(qreg_2)
+    if measure:
+        circ.add_register(qiskit.ClassicalRegister(nqubits))
+        circ.measure(qreg_1, circ.cregs[0])
+        circ.measure(qreg_2, circ.cregs[0])
+
+    orig = circ.copy()
+    assert circ.qregs == [qreg_1, qreg_2]
+
+    new_qregs_1 = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
+    new_qregs_2 = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
+    circ = _transform_registers(circ, new_qregs=new_qregs_1 + new_qregs_2)
+
+    assert circ.qregs == new_qregs_1 + new_qregs_2
+    assert circ.cregs == orig.cregs
+    assert _equal(from_qiskit(circ), from_qiskit(orig))
+
+
 @pytest.mark.parametrize("new_reg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
 def test_transform_qregs_two_qubit_ops(new_reg_sizes):
     nqubits = sum(new_reg_sizes)
