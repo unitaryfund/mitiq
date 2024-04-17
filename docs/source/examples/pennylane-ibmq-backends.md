@@ -156,7 +156,7 @@ Finally, it is perhaps more common to define a circuit using a decorator when yo
 For this our circuit will be defined as above, but we will use decorators to indicate which device we would like to run it on, and that we would like to error-mitigate it.
 
 ```{code-cell} ipython3
-from mitiq.zne.scaling import fold_gates_from_left
+from mitiq.zne.scaling import fold_gates_at_random
 
 
 @qml.qnode(dev)
@@ -168,7 +168,7 @@ def circuit():
 circuit = qml.transforms.mitigate_with_zne(
     circuit,
     [1, 2, 3],
-    fold_gates_from_left,
+    fold_gates_at_random,
     RichardsonFactory.extrapolate,
 )
 
