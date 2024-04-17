@@ -441,16 +441,16 @@ def test_operator_ptm_vector_rep_raised_error():
 
 
 def test_qem_methods_check_module():
-    """Checks if each method (e.g. 'cdr', 'zne') is in fact a mitiq module.
-    """
+    """Checks if each method (e.g. 'cdr', 'zne') is in fact a mitiq module."""
     exceptions = []
     for module, _ in qem_methods().items():
         try:
-            assert isinstance(eval(f'mitiq.{module}'), ModuleType)
+            assert isinstance(eval(f"mitiq.{module}"), ModuleType)
         except Exception as e:
             exceptions.append((module, e))
     print(exceptions)
 
+
 def test_qem_methods_basic():
     for module, _ in qem_methods().items():
-        assert len(module) <=3
+        assert len(module) <= 3

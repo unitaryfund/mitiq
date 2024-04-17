@@ -365,12 +365,12 @@ def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
 
 def qem_methods() -> Dict[str, str]:
     """
-    Returns a dictionary of Quantum Error Mitigation techniques 
+    Returns a dictionary of Quantum Error Mitigation techniques
     currently available in Mitiq. Updated v0.36.0
 
     Returns:
-        dict: Dictionary whose keys are the names of available QEM  
-        technique modules in Mitiq and whose values are the full names 
+        dict: Dictionary whose keys are the names of available QEM
+        technique modules in Mitiq and whose values are the full names
         of these techniques
 
     """
