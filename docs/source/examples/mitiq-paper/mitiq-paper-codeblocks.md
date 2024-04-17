@@ -171,11 +171,11 @@ print("Original circuit:", circ, sep="\n")
 
 > Note: The method `zne.scaling.fold_gates_from_left` has been deprecated as of v0.36.0
 
-```python colab={"base_uri": "https://localhost:8080/"} id="tSWVDcJIeuck" outputId="e9d0c874-8814-4da0-c54b-a6881d3e614a"
-# folded = zne.scaling.fold_gates_from_left(
-#     circ, scale_factor=2
-# )
-# print("Folded circuit:", folded, sep="\n")
+```python
+folded = zne.scaling.fold_gates_from_left(
+    circ, scale_factor=2
+)
+print("Folded circuit:", folded, sep="\n")
 ```
 
 +++ {"id": "4ocoSlNIfnV0"}
