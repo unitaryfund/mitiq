@@ -5,12 +5,10 @@ the Python toolkit for implementing error mitigation on quantum computers.
 ## Requirements
 Our documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
-The necessary packages can be installed, from the root Mitiq directory
+The necessary packages can be installed, from the root Mitiq directory with the command
 ```bash
-pip install -e .
-pip install -r dev_requirements.txt
+make install
 ```
-as they are included in the `dev_requirements.txt` file.
 Alternately, you can use the docker image provided in the repo and all requirements for working with the docs are already installed there.
 
 ### Sphinx extensions used to build the docs

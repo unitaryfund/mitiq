@@ -1,0 +1,2 @@
+pennylane-qiskit~=0.35.1
+pennylane~=0.35.1

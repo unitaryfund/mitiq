@@ -1,0 +1,1 @@
+amazon-braket-sdk~=1.69.0

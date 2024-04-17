@@ -1,0 +1,3 @@
+# This file is redundant, since the internal representation of choice is Cirq.
+# Keeping it for consistency with other integrations.
+cirq>=1.0.0,<1.4.0
