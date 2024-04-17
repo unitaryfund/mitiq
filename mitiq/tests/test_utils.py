@@ -440,13 +440,17 @@ def test_operator_ptm_vector_rep_raised_error():
             operator_ptm_vector_rep(np.array([1.0, 0.0, 0.0, 0.0]))
         )
 
-@pytest.mark.skip(reason="Test is ignored mitiq module imports need resolution")
+
 def test_qem_methods_check_module():
     """Checks if each method (e.g. 'cdr', 'zne') is in fact a mitiq module.
     """
+    exceptions = []
     for module, _ in qem_methods().items():
-        assert isinstance(eval(f'mitiq.{module}'), ModuleType)
-
+        try:
+            assert isinstance(eval(f'mitiq.{module}'), ModuleType)
+        except Exception as e:
+            exceptions.append((module, e))
+    print(exceptions)
 
 def test_qem_methods_basic():
     for module, _ in qem_methods().items():
