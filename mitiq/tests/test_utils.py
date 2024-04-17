@@ -27,7 +27,6 @@ from cirq import (
     ops,
 )
 
-import mitiq
 from mitiq.utils import (
     _append_measurements,
     _are_close_dict,
