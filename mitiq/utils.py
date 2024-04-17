@@ -377,7 +377,7 @@ def qem_methods() -> Dict[str, str]:
     techniques = {
         "cdr": "Clifford Data Regression",
         "ddd": "Digital Dynamical Decoupling",
-        "pec": "Probabilistic Error Cancelation",
+        "pec": "Probabilistic Error Cancellation",
         "pt": "Pauli Twirling",
         "qse": "Quantum Subspace Expansion",
         "rem": "Readout Error Mitigation (confusion inversion)",
