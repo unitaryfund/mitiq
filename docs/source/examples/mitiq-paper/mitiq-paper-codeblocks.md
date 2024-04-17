@@ -11,13 +11,9 @@ kernelspec:
   name: python3
 ---
 
-+++ {"id": "wjnIQWX8d5UY"}
-
 # Mitiq paper codeblocks
 
 Codeblocks from the main text of the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) {cite}`LaRose_2022_Quantum` published in [Quantum](https://quantum-journal.org/).
-
-+++ {"id": "DRplhovffVfk"}
 
 **Codeblock 1**
 
@@ -31,8 +27,6 @@ outputId: 38c2ce43-463f-4ab8-e402-fbc1d5877ce3
 # !pip install mitiq --quiet
 ```
 
-+++ {"id": "Pghlsxv0fXA2"}
-
 **Codeblock 2**
 
 ```{code-cell} ipython3
@@ -44,15 +38,10 @@ outputId: b0419328-2fba-42eb-b27b-a8b20ed24f13
 ---
 import mitiq
 
-
 mitiq.about()
 ```
 
-+++ {"id": "lK7iAVVShWu3"}
-
 **Codeblock 4**
-
-+++ {"id": "IXykFfZ6hYW7"}
 
 > Note: The paper just shows the signature of an executor function, but here we explicitly define one to use in examples.
 
@@ -69,8 +58,6 @@ def executor(circuit: mitiq.QPROGRAM) -> float:
         circuit.with_noise(cirq.depolarize(p=0.01))
     ).final_density_matrix[0, 0].real
 ```
-
-+++ {"id": "LxQh9Vehh_2Q"}
 
 **Codeblock 5**
 
@@ -90,11 +77,8 @@ zne_value = zne.execute_with_zne(circuit, executor)
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "3Q2MyAxBiW0C"}
-
 **Codeblock 6**
 
-+++ {"id": "CqiFB4q0ib06"}
 
 > Note: The paper shows pseudocode; here we show an example.
 
@@ -114,11 +98,7 @@ zne_value = zne.execute_with_zne(
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "VAGU7qZAjKzD"}
-
 **Codeblock 7**
-
-+++ {"id": "-jbnFbQkjN5J"}
 
 > Note: The paper shows pseudocode; here we show an example.
 
@@ -145,7 +125,6 @@ pec_value = pec.execute_with_pec(
 print("\n\nPEC value:", pec_value)
 ```
 
-+++ {"id": "UvTIzr0ZfYuI"}
 
 **Codeblock 8**
 
@@ -164,8 +143,6 @@ circ = cirq.Circuit(
 print("Original circuit:", circ, sep="\n")
 ```
 
-+++ {"id": "_5Q3P1DJfcar"}
-
 **Codeblock 9**
 <!-- #endregion -->
 
@@ -178,7 +155,6 @@ folded = zne.scaling.fold_gates_from_left(
 print("Folded circuit:", folded, sep="\n")
 ```
 
-+++ {"id": "4ocoSlNIfnV0"}
 
 **Codeblock 10**
 <!-- #endregion -->
@@ -192,7 +168,6 @@ print("Folded circuit:", folded, sep="\n")
 # print("Folded circuit:", folded, sep="\n")
 ```
 
-+++ {"id": "4vZ5JMpVfnyO"}
 
 **Codeblock 11**
 
@@ -207,11 +182,9 @@ folded = zne.scaling.fold_global(circ, scale_factor=3.)
 print("Folded circuit:", folded, sep="\n")
 ```
 
-+++ {"id": "97Jtd6hNk2cg"}
 
 **Codeblock 12**
 
-+++ {"id": "FYJbOqK3k3zT"}
 
 > Note: The paper shows pseudocode; here we show an example.
 
@@ -257,7 +230,6 @@ zne_value = zne.execute_with_zne(
 print("ZNE value via parameter noise scaling:", zne_value)
 ```
 
-+++ {"id": "ye9I9WLNrGxU"}
 
 **Codeblock 14**
 
@@ -276,7 +248,6 @@ zne_value = zne.execute_with_zne(
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "vm3EwufPfn_B"}
 
 **Codeblock 15**
 
@@ -286,7 +257,6 @@ print("ZNE value:", zne_value)
 linear_factory = zne.inference.LinearFactory(scale_factors=[1.0, 2.0, 3.0])
 ```
 
-+++ {"id": "3ubB9KrvfoLo"}
 
 **Codeblock 16**
 
@@ -305,7 +275,6 @@ zne_value = zne.execute_with_zne(
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "doyAREdJfoWC"}
 
 **Codeblock 17**
 
@@ -326,7 +295,6 @@ zne_value = zne.execute_with_zne(
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "zvIc-aLuGAut"}
 
 **Codeblock 18**
 
@@ -347,7 +315,6 @@ zne_value = zne.execute_with_zne(
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "bbaOzdc-GLeM"}
 
 **Codeblock 19**
 
@@ -381,7 +348,6 @@ zne_value = zne.execute_with_zne(
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "t3o-Xc5rGLsR"}
 
 **Codeblock 20**
 
@@ -402,7 +368,6 @@ noisy_z = pec.NoisyOperation(
 )
 ```
 
-+++ {"id": "J0rb6P6XGL42"}
 
 **Codeblock 21 & 22**
 
@@ -416,7 +381,6 @@ h_rep = pec.OperationRepresentation(
 )
 ```
 
-+++ {"id": "D2NVsYKVGMJ-"}
 
 **Codeblock 23**
 
@@ -426,7 +390,6 @@ h_rep = pec.OperationRepresentation(
 noisy_op, sign, coeff = h_rep.sample()
 ```
 
-+++ {"id": "F8Ryo8cGGMWu"}
 
 **Codeblock 24**
 
@@ -445,15 +408,12 @@ print("Sampled circuit:", sampled, sep="\n")  # Run many times to see different 
 
 > Note: For a runnable code block in which PEC is applied to estimate an expectation value, see _Codeblock 7_.
 
-+++ {"id": "RYh92EfKGMix"}
 
 **Codeblock 25 & 26**
 
-+++ {"id": "C6K0VzUCLkcw"}
 
 See https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html.
 
-+++ {"id": "T73iRSXLGMud"}
 
 **Codeblock 27**
 
@@ -471,7 +431,6 @@ zne_value = mitigated_executor(circuit)
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "042uqn-fMiYj"}
 
 **Codeblock 28**
 
@@ -493,7 +452,6 @@ zne_value = execute(circuit)
 print("ZNE value:", zne_value)
 ```
 
-+++ {"id": "P5HEyCXwMio8"}
 
 **Codeblock 29**
 
@@ -519,7 +477,6 @@ zne_then_pec_value = execute(circuit3)
 print("ZNE then PEC value:", zne_then_pec_value)  # Note this is not accurate (bad representation).
 ```
 
-+++ {"id": "LQYPqUazMi3b"}
 
 **Codeblock 30**
 
