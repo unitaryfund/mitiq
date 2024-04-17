@@ -1031,7 +1031,10 @@ def test_fold_local_with_fidelities(qiskit):
         circ = convert_from_mitiq(circ, "qiskit")
     # Only fold the Toffoli gate
     fidelities = {"H": 1.0, "T": 1.0, "CNOT": 1.0, "TOFFOLI": 0.95}
-    folded = fold_gates_at_random(circ, scale_factor=3.0, fidelities=fidelities)
+    folded = fold_gates_at_random(
+        circ, 
+        scale_factor=3.0, 
+        fidelities=fidelities)
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -1125,16 +1128,24 @@ def test_all_gates_folded_at_max_scale_with_fidelities(qiskit):
         assert len(list(folded.all_operations())) == 3 * ngates
 
 
-
 def test_fold_local_raises_error_with_bad_fidelities():
     with pytest.raises(ValueError, match="Fidelities should be"):
-        fold_gates_at_random(Circuit(), scale_factor=1.21, fidelities={"H": -1.0})
+        fold_gates_at_random(
+            Circuit(), 
+            scale_factor=1.21, 
+            fidelities={"H": -1.0})
 
     with pytest.raises(ValueError, match="Fidelities should be"):
-        fold_gates_at_random(Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.0})
+        fold_gates_at_random(
+            Circuit(), 
+            scale_factor=1.21, 
+            fidelities={"CNOT": 0.0})
 
     with pytest.raises(ValueError, match="Fidelities should be"):
-        fold_gates_at_random(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})
+        fold_gates_at_random(
+            Circuit(), 
+            scale_factor=1.21, 
+            fidelities={"triple": 1.2})
 
 
 @pytest.mark.parametrize("conversion_type", ("qiskit", "pyquil"))
