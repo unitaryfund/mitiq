@@ -543,9 +543,10 @@ def fold_gates_at_random(
     seed: Optional[int] = None,
     **kwargs: Any,
 ) -> Circuit:
-    r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
-    subset of gates of the input circuit, starting with gates at the
-    right (end) of the circuit.
+    r"""
+    Returns a new folded circuit by applying the map G -> G G^dag G to a
+    subset of gates of the input circuit, different indices randomly sampled
+    without replacement.
 
     The folded circuit has a number of gates approximately equal to
     scale_factor * n where n is the number of gates in the input circuit.
