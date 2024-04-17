@@ -13,6 +13,8 @@ from mitiq.typing import (
     QuantumResult,
 )
 
+# Utils
+from mitiq.utils import qem_methods
 
 # Executors and observables.
 from mitiq.executor import Executor
