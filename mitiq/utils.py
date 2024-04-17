@@ -378,7 +378,6 @@ def qem_methods() -> Dict[str, str]:
         "cdr": "Clifford Data Regression",
         "ddd": "Digital Dynamical Decoupling",
         "pec": "Probabilistic Error Cancelation",
-        # Unsure if we consider PT a full technique or just a subroutine
         "pt": "Pauli Twirling",
         "qse": "Quantum Subspace Expansion",
         "rem": "Readout Error Mitigation (confusion inversion)",
