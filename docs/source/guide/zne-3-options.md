@@ -135,7 +135,9 @@ for scale_factor in [1, 3, 5, 7]:
     print(f"For scale_factor={scale_factor}, the number of gates was scaled by {scaled_num_gates / num_gates}")
 ```
 
-**Note:** *When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.*
+```{note}
+When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.
+```
 
 +++
 
