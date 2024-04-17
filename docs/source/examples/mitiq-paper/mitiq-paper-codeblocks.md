@@ -575,7 +575,3 @@ print(circ)
 
 execute(circ)
 ```
-
-```{code-cell} ipython3
-
-```

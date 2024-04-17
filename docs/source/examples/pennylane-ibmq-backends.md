@@ -61,6 +61,7 @@ from qiskit_ibm_provider import IBMProvider
 
 USE_REAL_HARDWARE = False
 
+# TODO: Remove the below comment when PennyLane supports Qiskit 1.0
 # As of 14 April 2024, PennyLane is not compatible with Qiskit 1.0,
 # but PennyLane plans to support the upgrade, soon
 if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:

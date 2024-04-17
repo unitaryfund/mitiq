@@ -113,9 +113,9 @@ def execute_with_noise(
     exec_circuit = qiskit.transpile(
         circ,
         backend=backend,
+        basis_gates=basis_gates,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
-        basis_gates=basis_gates,
         optimization_level=0,
     )
     job = backend.run(exec_circuit, shots=1)
@@ -165,9 +165,9 @@ def execute_with_shots_and_noise(
     exec_circuit = qiskit.transpile(
         circ,
         backend=backend,
+        basis_gates=basis_gates,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
-        basis_gates=basis_gates,
         optimization_level=0,
     )
     job = backend.run(exec_circuit, shots=shots, seed_simulator=seed)
@@ -224,9 +224,9 @@ def sample_bitstrings(
         exec_circuit = qiskit.transpile(
             circuit,
             backend=backend,
+            basis_gates=noise_model.basis_gates,
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
-            basis_gates=noise_model.basis_gates,
             optimization_level=0,
         )
         job = backend.run(exec_circuit, shots=shots)

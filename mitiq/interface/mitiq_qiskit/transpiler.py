@@ -89,7 +89,6 @@ class ApplyMitiqLayout(TransformationPass):  # type: ignore
         for qreg in dag.qregs.values():
             self.property_set["layout"].add_register(qreg)
         virtual_physical_map = layout.get_virtual_bits()
-        print(virtual_physical_map)
         for node in dag.topological_op_nodes():
             qargs = [q[virtual_physical_map[qarg]] for qarg in node.qargs]
             new_dag.apply_operation_back(
@@ -110,5 +109,4 @@ class ClearLayout(TransformationPass):  # type: ignore
 
     def run(self, dag: DAGCircuit) -> None:
         """Clears the layout from the DAGCircuit's `property_set`."""
-        if self.property_set["layout"]:
-            del self.property_set["layout"]
+        self.property_set.pop("layout", None)

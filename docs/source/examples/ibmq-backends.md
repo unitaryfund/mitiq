@@ -20,7 +20,6 @@ This tutorial shows an example of how to mitigate noise on IBMQ backends.
 
 ```{code-cell} ipython3
 import qiskit
-# from qiskit.test.ibmq_mock import mock_get_backend
 from qiskit_aer import QasmSimulator
 from qiskit_ibm_provider import IBMProvider
 

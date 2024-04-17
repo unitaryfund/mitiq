@@ -3,7 +3,7 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Unit tests for qiskit TransformationPass (qiskit_utils.py)."""
+"""Unit tests for qiskit TransformationPass (transpiler.py)."""
 
 import pytest
 from qiskit import QuantumCircuit, QuantumRegister
