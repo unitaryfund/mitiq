@@ -1030,12 +1030,8 @@ def test_default_weight():
     assert np.isclose(_default_weight(ops.TOFFOLI.on(*qreg[:3])), 0.970299)
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_at_random],
-)
 @pytest.mark.parametrize("qiskit", [True, False])
-def test_fold_local_with_fidelities(fold_method, qiskit):
+def test_fold_local_with_fidelities(qiskit):
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
@@ -1047,7 +1043,7 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
         circ = convert_from_mitiq(circ, "qiskit")
     # Only fold the Toffoli gate
     fidelities = {"H": 1.0, "T": 1.0, "CNOT": 1.0, "TOFFOLI": 0.95}
-    folded = fold_method(circ, scale_factor=3.0, fidelities=fidelities)
+    folded = fold_gates_at_random(circ, scale_factor=3.0, fidelities=fidelities)
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(qreg[0], qreg[1])],
