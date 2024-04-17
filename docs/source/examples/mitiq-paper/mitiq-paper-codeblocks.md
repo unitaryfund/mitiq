@@ -143,10 +143,10 @@ print("Original circuit:", circ, sep="\n")
 ```
 
 **Codeblock 9**
-<!-- #endregion -->
 
-> Note: The method `zne.scaling.fold_gates_from_left` has been removed as of v0.36.0
-
+```{warning}
+The method `zne.scaling.fold_gates_from_left` has been removed as of v0.36.0.
+```
 ```python
 folded = zne.scaling.fold_gates_from_left(
     circ, scale_factor=2
@@ -156,15 +156,16 @@ print("Folded circuit:", folded, sep="\n")
 
 
 **Codeblock 10**
-<!-- #endregion -->
 
-> Note: The method `zne.scaling.fold_gates_from_right` has been removed as of v0.36.0
+```{warning}
+The method `zne.scaling.fold_gates_from_right` has been removed as of v0.36.0.
+```
 
-```python colab={"base_uri": "https://localhost:8080/"} id="k8gLF_fPfneX" outputId="ac0ee6c0-4ad4-4524-dc3d-7c9a413fe2ba"
-# folded = zne.scaling.fold_gates_from_right(
-#     circ, scale_factor=2
-# )
-# print("Folded circuit:", folded, sep="\n")
+```python
+folded = zne.scaling.fold_gates_from_right(
+    circ, scale_factor=2
+)
+print("Folded circuit:", folded, sep="\n")
 ```
 
 
@@ -203,8 +204,6 @@ print("\nScaled circuit:", scaled, sep="\n")
 ```
 
 **Codeblock 13**
-
-+++
 
 > Note: The paper shows pseudocode; here we show an example.
 
