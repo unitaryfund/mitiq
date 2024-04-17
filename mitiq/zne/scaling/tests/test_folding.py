@@ -955,13 +955,7 @@ def test_fold_left_squash_moments():
     assert len(folded_and_squashed) == 10
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [
-        fold_gates_at_random,
-    ],
-)
-def test_fold_and_squash_max_stretch(fold_method):
+def test_fold_and_squash_max_stretch():
     """Tests folding and squashing a two-qubit circuit."""
     # Test circuit:
     # 0: ───────H───────H───────H───────H───────H───
@@ -975,13 +969,13 @@ def test_fold_and_squash_max_stretch(fold_method):
     for i in range(d):
         circuit.insert(0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW)
 
-    folded_not_squashed = fold_method(
+    folded_not_squashed = fold_gates_at_random(
         circuit, scale_factor=3.0, squash_moments=False
     )
-    folded_and_squashed = fold_method(
+    folded_and_squashed = fold_gates_at_random(
         circuit, scale_factor=3.0, squash_moments=True
     )
-    folded_with_squash_moments_not_specified = fold_method(
+    folded_with_squash_moments_not_specified = fold_gates_at_random(
         circuit, scale_factor=3.0
     )  # Checks that the default is to squash moments
 
@@ -990,13 +984,7 @@ def test_fold_and_squash_max_stretch(fold_method):
     assert len(folded_with_squash_moments_not_specified) == 15
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [
-        fold_gates_at_random,
-    ],
-)
-def test_fold_and_squash_random_circuits_random_stretches(fold_method):
+def test_fold_and_squash_random_circuits_random_stretches():
     """Tests folding and squashing random circuits and ensures the number of
     moments in the squashed circuits is never greater than the number of
     moments in the un-squashed circuit.
@@ -1007,13 +995,13 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
             qubits=8, n_moments=8, op_density=0.75
         )
         scale = 2 * rng.random() + 1
-        folded_not_squashed = fold_method(
+        folded_not_squashed = fold_gates_at_random(
             circuit,
             scale_factor=scale,
             squash_moments=False,
             seed=trial,
         )
-        folded_and_squashed = fold_method(
+        folded_and_squashed = fold_gates_at_random(
             circuit,
             scale_factor=scale,
             squash_moments=True,
@@ -1057,12 +1045,9 @@ def test_fold_local_with_fidelities(qiskit):
         assert _equal(folded, correct)
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_at_random],
-)
+
 @pytest.mark.parametrize("qiskit", [True, False])
-def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
+def test_fold_local_with_single_qubit_gates_fidelity_one(qiskit):
     """Tests folding only two-qubit gates by using
     fidelities = {"single": 1.}.
     """
@@ -1075,7 +1060,7 @@ def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
     )
     if qiskit:
         circ = convert_from_mitiq(circ, "qiskit")
-    folded = fold_method(
+    folded = fold_gates_at_random(
         circ,
         scale_factor=3.0,
         fidelities={"single": 1.0, "CNOT": 0.99, "TOFFOLI": 0.95},
@@ -1095,12 +1080,8 @@ def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
         assert _equal(folded, correct)
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_at_random],
-)
 @pytest.mark.parametrize("qiskit", [True, False])
-def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
+def test_all_gates_folded_at_max_scale_with_fidelities(qiskit):
     """Tests that all gates are folded regardless of the input fidelities when
     the scale factor is three.
     """
@@ -1118,7 +1099,7 @@ def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
     if qiskit:
         circ = convert_from_mitiq(circ, "qiskit")
 
-    folded = fold_method(
+    folded = fold_gates_at_random(
         circ,
         scale_factor=3.0,
         fidelities={
@@ -1144,19 +1125,16 @@ def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
         assert len(list(folded.all_operations())) == 3 * ngates
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_at_random],
-)
-def test_fold_local_raises_error_with_bad_fidelities(fold_method):
+
+def test_fold_local_raises_error_with_bad_fidelities():
     with pytest.raises(ValueError, match="Fidelities should be"):
-        fold_method(Circuit(), scale_factor=1.21, fidelities={"H": -1.0})
+        fold_gates_at_random(Circuit(), scale_factor=1.21, fidelities={"H": -1.0})
 
     with pytest.raises(ValueError, match="Fidelities should be"):
-        fold_method(Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.0})
+        fold_gates_at_random(Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.0})
 
     with pytest.raises(ValueError, match="Fidelities should be"):
-        fold_method(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})
+        fold_gates_at_random(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})
 
 
 @pytest.mark.parametrize("conversion_type", ("qiskit", "pyquil"))
@@ -1230,15 +1208,12 @@ def test_folding_circuit_conversion_error_pyquil(fold_method):
         fold_method(prog, scale_factor=2.0)
 
 
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_at_random],
-)
+
 @pytest.mark.parametrize("scale", [1, 3, 5, 9])
-def test_fold_fidelity_large_scale_factor_only_twoq_gates(fold_method, scale):
+def test_fold_fidelity_large_scale_factor_only_twoq_gates(scale):
     qreg = LineQubit.range(2)
     circuit = Circuit(ops.H(qreg[0]), ops.CNOT(*qreg))
-    folded = fold_method(
+    folded = fold_gates_at_random(
         circuit, scale_factor=scale, fidelities={"single": 1.0}
     )
     correct = Circuit(ops.H(qreg[0]), [ops.CNOT(*qreg)] * scale)
