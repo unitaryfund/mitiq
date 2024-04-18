@@ -47,23 +47,6 @@ Well done making your first contribution so quickly 🏎️💨!
 Announcing support for [Qibo](https://qibo.science/), a newly integrated frontend in Mitiq! 📣
 Qibo is an "end-to-end open source platform for quantum simulation, self-hosted quantum hardware control, calibration and characterization".
 
-```py
-from qibo import Circuit
-from mitiq.conversions import convert_to_mitiq
-
-circuit = Circuit(2)
-circuit.add(gates.H(0))
-circuit.add(gates.H(1))
-
-print(circuit)
-
-def executor(circuit):
-    return circuit.execute()
-
-
-mitigated = mitiq.zne.execute_with_zne(convert_to_mitiq(circuit), executor)
-```
-
 Thank you to new contributor Francesc Sabater for excellent work integrating Qibo and Mitiq!
 Thanks also to new contibutor Sam Burdick for fixing our readme.
 
