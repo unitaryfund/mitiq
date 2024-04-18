@@ -221,12 +221,7 @@ def test_folding_with_bad_scale_factor():
 
 def test_create_mask_with_bad_scale_factor():
     with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
-        _create_fold_mask([1], scale_factor=0.999, folding_method="at_random")
-
-
-def test_create_mask_with_bad_folding_method():
-    with pytest.raises(ValueError, match="'folding_method' is not valid."):
-        _create_fold_mask([1], scale_factor=1.5, folding_method=None)
+        _create_fold_mask([1], scale_factor=0.999)
 
 
 def test_fold_all_bad_exclude():
@@ -1279,7 +1274,6 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
     fold_mask = _create_fold_mask(
         weight_mask=[0.1, 0.2, 0.3, 0.0],
         scale_factor=1.0,
-        folding_method="at_random",
         seed=1,
     )
     assert fold_mask == [0, 0, 0, 0]
@@ -1287,7 +1281,6 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
     fold_mask = _create_fold_mask(
         weight_mask=[0.1, 0.1, 0.1, 0.1, 0.0],
         scale_factor=1.5,
-        folding_method="at_random",
         seed=2,
     )
     assert fold_mask == [0, 0, 1, 0, 0]
@@ -1295,7 +1288,6 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
     fold_mask = _create_fold_mask(
         weight_mask=[1, 1, 1, 1],
         scale_factor=2,
-        folding_method="at_random",
         seed=3,
     )
     assert fold_mask == [0, 1, 0, 1]
@@ -1303,7 +1295,6 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
     fold_mask = _create_fold_mask(
         weight_mask=[1, 1, 1, 1],
         scale_factor=3.9,
-        folding_method="at_random",
         seed=7,
     )
     assert fold_mask == [1, 2, 2, 1]
@@ -1318,7 +1309,6 @@ def test_create_fold_mask_approximates_well():
         fold_mask = _create_fold_mask(
             weight_mask,
             scale_factor,
-            folding_method="at_random",
             seed=seed,
         )
         out_weights = [w + 2 * n * w for w, n in zip(weight_mask, fold_mask)]

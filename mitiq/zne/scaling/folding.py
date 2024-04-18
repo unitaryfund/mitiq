@@ -374,7 +374,6 @@ def _create_weight_mask(
 def _create_fold_mask(
     weight_mask: List[float],
     scale_factor: float,
-    folding_method: Optional[str] = "at_random",
     seed: Optional[int] = None,
 ) -> List[int]:
     r"""Returns a list of integers determining how many times each gate a
@@ -394,19 +393,16 @@ def _create_fold_mask(
     total weight of the input circuit.
 
     For equal weights, this function reproduces the local unitary folding
-    method defined in equation (5) of :cite:`Giurgica_Tiron_2020_arXiv`.
+    method defined in equation (5) of :cite:`Giurgica_Tiron_2020_arXiv`, with
+    the layer indices chosen at random.
 
     Args:
         weight_mask: The weights of all the gates of the circuit to fold.
             Highly noisy gates should have a corresponding high weight.
             Gates with zero weight are assumed to be ideal and are not folded.
         scale_factor: The effective noise scale factor.
-        folding_method: Currently only supports "at_random" argument
-            Implementation of a folding method described in
-            :cite:`Giurgica_Tiron_2020_arXiv`. If scale_factor is an odd
-            integer, all methods are equivalent and this option is irrelevant.
-        seed: A seed for the random number generator. This is used only when
-            folding_method is "at_random".
+        seed: A seed for the random number generator used to select the
+            subset of layer indices to fold.
 
     Returns: The list of integers determining to how many times one should
         fold the j_th gate of the circuit to be scaled.
@@ -415,7 +411,6 @@ def _create_fold_mask(
         >>>_create_fold_mask(
             weight_mask=[1.0, 0.5, 2.0, 0.0],
             scale_factor=4,
-            folding_method="at_random",
         )
         [2, 2, 1, 0]
     """
@@ -443,14 +438,9 @@ def _create_fold_mask(
 
     # Express folding order through a list of indices
     folding_order = list(range(len(weight_mask)))
-    if folding_method == "at_random":
-        rnd_state = np.random.RandomState(seed)
-        rnd_state.shuffle(folding_order)
-    else:
-        raise ValueError(
-            "The option 'folding_method' is not valid."
-            "It must be 'at_random'."
-        )
+
+    rnd_state = np.random.RandomState(seed)
+    rnd_state.shuffle(folding_order)
 
     # Fold gates until the input scale_factor is better approximated
     input_circuit_weight = sum(weight_mask)
@@ -618,7 +608,6 @@ def fold_gates_at_random(
     num_folds_mask = _create_fold_mask(
         weight_mask,
         scale_factor,
-        folding_method="at_random",
         seed=seed,
     )
 
