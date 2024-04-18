@@ -1032,9 +1032,8 @@ def test_fold_local_with_fidelities(qiskit):
     # Only fold the Toffoli gate
     fidelities = {"H": 1.0, "T": 1.0, "CNOT": 1.0, "TOFFOLI": 0.95}
     folded = fold_gates_at_random(
-        circ, 
-        scale_factor=3.0, 
-        fidelities=fidelities)
+        circ, scale_factor=3.0, fidelities=fidelities
+    )
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -1046,7 +1045,6 @@ def test_fold_local_with_fidelities(qiskit):
         assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
     else:
         assert _equal(folded, correct)
-
 
 
 @pytest.mark.parametrize("qiskit", [True, False])
@@ -1131,21 +1129,18 @@ def test_all_gates_folded_at_max_scale_with_fidelities(qiskit):
 def test_fold_local_raises_error_with_bad_fidelities():
     with pytest.raises(ValueError, match="Fidelities should be"):
         fold_gates_at_random(
-            Circuit(), 
-            scale_factor=1.21, 
-            fidelities={"H": -1.0})
+            Circuit(), scale_factor=1.21, fidelities={"H": -1.0}
+        )
 
     with pytest.raises(ValueError, match="Fidelities should be"):
         fold_gates_at_random(
-            Circuit(), 
-            scale_factor=1.21, 
-            fidelities={"CNOT": 0.0})
+            Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.0}
+        )
 
     with pytest.raises(ValueError, match="Fidelities should be"):
         fold_gates_at_random(
-            Circuit(), 
-            scale_factor=1.21, 
-            fidelities={"triple": 1.2})
+            Circuit(), scale_factor=1.21, fidelities={"triple": 1.2}
+        )
 
 
 @pytest.mark.parametrize("conversion_type", ("qiskit", "pyquil"))
@@ -1217,7 +1212,6 @@ def test_folding_circuit_conversion_error_pyquil(fold_method):
         CircuitConversionError, match="Circuit could not be converted to"
     ):
         fold_method(prog, scale_factor=2.0)
-
 
 
 @pytest.mark.parametrize("scale", [1, 3, 5, 9])
