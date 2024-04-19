@@ -375,13 +375,13 @@ def qem_methods() -> Dict[str, str]:
 
     """
     techniques = {
-        "cdr": "Clifford Data Regression",
-        "ddd": "Digital Dynamical Decoupling",
-        "pec": "Probabilistic Error Cancellation",
-        "pt": "Pauli Twirling",
-        "qse": "Quantum Subspace Expansion",
-        "rem": "Readout Error Mitigation (confusion inversion)",
-        "zne": "Zero Noise Extrapolation",
+        "mitiq.cdr": "Clifford Data Regression",
+        "mitiq.ddd": "Digital Dynamical Decoupling",
+        "mitiq.pec": "Probabilistic Error Cancellation",
+        "mitiq.pt": "Pauli Twirling",
+        "mitiq.qse": "Quantum Subspace Expansion",
+        "mitiq.rem": "Readout Error Mitigation (confusion inversion)",
+        "mitiq.zne": "Zero Noise Extrapolation",
     }
 
     return techniques

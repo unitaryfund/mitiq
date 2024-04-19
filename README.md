@@ -79,6 +79,10 @@ See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [e
 ## Quick Tour
 
 ### Error mitigation techniques
+You can check out currently available quantum error mitigation techniques by calling 
+```python
+mitiq.qem_methods()
+```
 
 | Technique                                 | Documentation                                                | Mitiq module                                                              | Paper Reference(s)                                                                                                                                 |
 | ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
