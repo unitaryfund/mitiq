@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.5
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -26,7 +26,7 @@ from mitiq import zne
 from mitiq.zne.inference import RichardsonFactory
 ```
 
-## Defining the ideal variational circuit in Qiskit
+## Defining the ideal variational circuit in Braket
 
 +++
 
@@ -104,6 +104,7 @@ def executor_with_noise(circ: Circuit) -> float:
     # Use the noiseless_executor function to return the expectation value of the ZZ observable for the noisy circuit
     return noiseless_executor(circ)
 ```
+
 ```{note}
 The above code block uses depolarizing noise, but any Braket [`Noise`](https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.circuits.noise.html) channel can be substituted in.
 ```

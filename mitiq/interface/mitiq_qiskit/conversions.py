@@ -7,7 +7,6 @@
 Qiskit's circuit representation.
 """
 
-import copy
 import re
 from typing import Any, List, Optional, Set, Tuple
 
@@ -15,7 +14,15 @@ import cirq
 import numpy as np
 import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
+from qiskit import qasm2
+from qiskit.transpiler import PassManager
+from qiskit.transpiler.layout import Layout
+from qiskit.transpiler.passes import SetLayout
 
+from mitiq.interface.mitiq_qiskit.transpiler import (
+    ApplyMitiqLayout,
+    ClearLayout,
+)
 from mitiq.utils import _simplify_circuit_exponents
 
 QASMType = str
@@ -82,31 +89,6 @@ def _map_bit_index(
     )
 
 
-def _map_qubits(
-    qubits: List[qiskit.circuit.Qubit],
-    new_register_sizes: List[int],
-    new_registers: List[qiskit.QuantumRegister],
-) -> List[qiskit.circuit.Qubit]:
-    """Maps qubits to new registers.
-
-    Args:
-        qubits: A list of qubits to map.
-        new_register_sizes: The size(s) of the new registers to map to.
-            Note: These can be determined from ``new_registers``, but this
-            helper function is only called from ``_transform_registers`` where
-            the sizes are already computed.
-        new_registers: The new registers to map the ``qubits`` to.
-
-    Returns:
-        The input ``qubits`` mapped to the ``new_registers``.
-    """
-    indices = [bit.index for bit in qubits]
-    mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
-    return [
-        qiskit.circuit.Qubit(new_registers[i], j) for i, j in mapped_indices
-    ]
-
-
 def _add_identity_to_idle(
     circuit: qiskit.QuantumCircuit,
 ) -> Set[qiskit.circuit.Qubit]:
@@ -132,7 +114,7 @@ def _add_identity_to_idle(
     idle_qubits = all_qubits - used_qubits
     # Modify input circuit applying I to idle qubits
     for q in idle_qubits:
-        circuit.i(q)
+        circuit.id(q)
 
     return idle_qubits
 
@@ -198,27 +180,20 @@ def _measurement_order(
 def _transform_registers(
     circuit: qiskit.QuantumCircuit,
     new_qregs: Optional[List[qiskit.QuantumRegister]] = None,
-) -> None:
+) -> qiskit.QuantumCircuit:
     """Transforms the registers in the circuit to the new registers.
 
     Args:
-        circuit: Qiskit circuit with at most one quantum register.
+        circuit: Qiskit circuit.
         new_qregs: The new quantum registers for the circuit.
 
     Raises:
         ValueError:
-            * If the input circuit has more than one quantum register.
             * If the number of qubits in the new quantum registers is
             greater than the number of qubits in the circuit.
     """
     if new_qregs is None:
-        return
-
-    if len(circuit.qregs) > 1:
-        raise ValueError(
-            "Input circuit is required to have <= 1 quantum register but has "
-            f"{len(circuit.qregs)} quantum registers."
-        )
+        return circuit
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
     nqubits_in_circuit = circuit.num_qubits
@@ -229,22 +204,11 @@ def _transform_registers(
             f"quantum registers have {sum(qreg_sizes)} qubit(s)."
         )
 
-    # Copy the circuit data.
-    data = copy.deepcopy(circuit._data)
-
-    # Remove the old qubits and add the new ones.
-    circuit._qubits = []
-    circuit._qubit_set = set()
-    circuit.qregs = []
-    circuit._data = []
-    circuit._qubit_indices = {}
-    circuit.add_register(*new_qregs)
-
-    # Map the qubits in operations to the new qubits.
-    for op in data:
-        gate, qubits, cbits = op
-        new_qubits = _map_qubits(qubits, qreg_sizes, new_qregs)
-        circuit.append(gate, new_qubits, cbits)
+    circuit_layout = Layout.from_qubit_list(circuit.qubits)
+    pass_manager = PassManager(
+        [SetLayout(circuit_layout), ApplyMitiqLayout(new_qregs), ClearLayout()]
+    )
+    return pass_manager.run(circuit)
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
@@ -284,7 +248,7 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    return from_qasm(circuit.qasm())
+    return from_qasm(qasm2.dumps(circuit))
 
 
 def from_qasm(qasm: QASMType) -> cirq.Circuit:

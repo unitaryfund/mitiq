@@ -280,11 +280,7 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 10000) -> float:
 
 
 def get_counts(circuit: qiskit.QuantumCircuit):
-    return (
-        qiskit.execute(circuit, AerSimulator(), shots=100)
-        .result()
-        .get_counts()
-    )
+    return AerSimulator().run(circuit, shots=100).result().get_counts()
 
 
 def test_qiskit_execute_with_zne():
@@ -526,13 +522,13 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     """Tests ZNE when transpiling to a Qiskit device. Note transpiling can
     introduce idle (unused) qubits to the circuit.
     """
-    from qiskit.providers.fake_provider import FakeSantiago
+    from qiskit_ibm_runtime.fake_provider import FakeSantiago
 
     santiago = FakeSantiago()
-    backend = qiskit.providers.aer.AerSimulator.from_backend(santiago)
+    backend = AerSimulator.from_backend(santiago)
 
     def execute(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
-        job = qiskit.execute(circuit, backend, shots=shots)
+        job = backend.run(circuit, shots=shots)
         return job.result().get_counts().get("00", 0.0) / shots
 
     qreg = qiskit.QuantumRegister(2)

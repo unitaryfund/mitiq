@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.16.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -61,12 +61,15 @@ from qiskit_ibm_provider import IBMProvider
 
 USE_REAL_HARDWARE = False
 
+# TODO: Remove the below comment when PennyLane supports Qiskit 1.0
+# As of 14 April 2024, PennyLane is not compatible with Qiskit 1.0,
+# but PennyLane plans to support the upgrade, soon
 if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
     provider = IBMProvider()
     dev = qml.device(
         "qiskit.ibmq",
         wires=1,
-        backend="ibmq_qasm_simulator",
+        backend="ibm_brisbane",
         provider=provider
     )
 else:

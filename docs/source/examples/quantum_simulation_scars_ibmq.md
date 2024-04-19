@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.6
+    jupytext_version: 1.16.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -91,14 +91,14 @@ def trotter_evolution_H(L: int, V: float,
     # We will give an explicit implementation of the 
     # 2-CNOT implementation of the Rzz gate:
     for ii in range(1, L-1, 2):
-        cq.cnot(ii, ii+1)
+        cq.cx(ii, ii+1)
         cq.rz(2*V*dt, ii + 1)
-        cq.cnot(ii, ii+1)
+        cq.cx(ii, ii+1)
 
     for ii in range(0, L-1, 2):
-        cq.cnot(ii, ii+1)
+        cq.cx(ii, ii+1)
         cq.rz(2*V*dt, ii + 1)
-        cq.cnot(ii, ii+1)
+        cq.cx(ii, ii+1)
         
 
     return cq
@@ -143,7 +143,7 @@ def staggered_mz(L: int, counts: qiskit.result.counts.Counts) -> list:
     return sz_list
 ```
 
-For this tutorial we will not use real (quantum) hardware. If you do wish to do so, you can change the backends below to your desired backend. 
+For this tutorial we will not use real (quantum) hardware. If you do wish to do so, you can change the backends below to your desired backend.
 
 +++
 
@@ -154,17 +154,18 @@ USE_REAL_HARDWARE = False
 ```
 
 ```{code-cell} ipython3
-#from qiskit_ibm_provider import IBMProvider
-#
-#if USE_REAL_HARDWARE:
-#    provider = IBMProvider(token="MY_IBM_QUANTUM_TOKEN")   # Get the API token in https://quantum-computing.ibm.com/account
-#    backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
-#else:
-#    backend = qiskit.Aer.get_backend("qasm_simulator")     # Default to a simulator.
-```
+if USE_REAL_HARDWARE:
+    from qiskit_ibm_provider import IBMProvider
+    
+    provider = IBMProvider(token="MY_IBM_QUANTUM_TOKEN")   # Get the API token in https://quantum-computing.ibm.com/account
+    backend = provider.get_backend("ibm_brisbane")  # Set quantum computer here!
+else:
+    from qiskit_aer import QasmSimulator
 
-```{code-cell} ipython3
-backend = qiskit.Aer.get_backend("qasm_simulator")     # Default to a simulator.
+    # Simulate the circuit with noise
+    noise_model = initialized_depolarizing_noise(noise_level=0.02)
+    backend = QasmSimulator(noise_model=noise_model)     # Default to a simulator.
+    backend_noiseless = QasmSimulator()
 ```
 
 We set up an executor that simulates the desired circuit a certain amount of shots and returns the measurement statistics of our desired expectation value in the following function
@@ -179,34 +180,16 @@ def ibmq_executor_full(circuit: qiskit.QuantumCircuit,
         shots: Number of times to execute the circuit to compute 
         the expectation value.
     """
-    if NO_NOISE:
-        # Simulate the circuit with noise
-        job = qiskit.execute(
-            experiments=circuit,
-            backend=qiskit.Aer.get_backend("qasm_simulator"),
-            optimization_level=0,  # Important to preserve folded gates.
-            shots=shots,
-            )
-    else:
-        if USE_REAL_HARDWARE:
-            # Run the circuit on hardware
-            job = qiskit.execute(
-                experiments=circuit,
-                backend=backend,
-                optimization_level=0,  # Important to preserve folded gates.
-                shots=shots
-            )
-        else:
-            # Simulate the circuit with noise
-            noise_model = initialized_depolarizing_noise(noise_level=0.02)
-            job = qiskit.execute(
-                experiments=circuit,
-                backend=backend,
-                noise_model=noise_model,
-                basis_gates=noise_model.basis_gates,
-                optimization_level=0,  # Important to preserve folded gates.
-                shots=shots,
-            )
+    # Transpile the circuit so it can be properly run
+    exec_circuit = qiskit.transpile(
+        circuit,
+        backend=backend_noiseless if NO_NOISE else backend ,
+        basis_gates=noise_model.basis_gates if noise_model else None,
+        optimization_level=0, # Important to preserve folded gates.
+    )
+
+    # Run the circuit
+    job = backend.run(exec_circuit, shots=shots)
 
     # Convert from raw measurement counts to the expectation value
     if type(circuit) == list:
@@ -407,7 +390,7 @@ t2 = time.time()
 print(f"No noise result {unmitigated:.3f}")
 ```
 
-These results suggest that for this particular choice of scaling factors (and this particular noisy simulation), the linear extrapolation scheme as well as the Richardson extrapolation scheme are closest to the no-noise result. In the following, we will chose the linear extrapolation scheme and peform perform the earlier quantum simulation once more with the scaling factors [1., 1.25, 1.5]. 
+These results suggest that for this particular choice of scaling factors (and this particular noisy simulation), the linear extrapolation scheme as well as the Richardson extrapolation scheme are closest to the no-noise result. In the following, we will chose the linear extrapolation scheme and peform perform the earlier quantum simulation once more with the scaling factors [1., 1.25, 1.5].
 
 +++
 

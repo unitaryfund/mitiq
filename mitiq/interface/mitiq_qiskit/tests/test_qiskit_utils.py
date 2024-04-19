@@ -8,7 +8,7 @@
 import numpy as np
 import pytest
 from qiskit import QuantumCircuit
-from qiskit.providers.fake_provider import FakeLima
+from qiskit_ibm_runtime.fake_provider import FakeLima
 
 from mitiq import MeasurementResult, Observable, PauliString
 from mitiq.interface.mitiq_qiskit.qiskit_utils import (
