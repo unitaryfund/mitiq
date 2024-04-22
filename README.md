@@ -101,7 +101,19 @@ We refer to any programming language you can write quantum circuits in as a _fro
 |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/main/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="65"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="40"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="75"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="75"/></a> | <a href="https://pennylane.ai/"><img src="https://raw.githubusercontent.com/PennyLaneAI/pennylane/c2f96705efd4570e8755e829b11cc869b4c2287d/doc/_static/logo.png" alt="PennyLane logo"  width="30"/></a> | <a href="https://qibo.science/"><img src="https://raw.githubusercontent.com/qiboteam/qibo/master/doc/source/_static/qibo_logo_dark.svg" alt="Qibo logo" width="60"/></a> |
 
-Note: Cirq is a core requirement of Mitiq and is installed when you `pip install mitiq`.
+You can install Mitiq support for these frontends by specifying them during installation, 
+as optional extras, along with the main package.
+To install Mitiq with one or more frontends, you can specify each frontend in square brackets as part of the installation command. 
+
+For example, 
+to install Mitiq with support for Qiskit and Qibo:
+```bash
+pip install mitiq[qiskit,qibo]
+```
+
+[Here](https://github.com/unitaryfund/mitiq/blob/main/INTEGRATIONS.txt) is an up-to-date list of supported frontends. 
+
+Note: Currently, Cirq is a core requirement of Mitiq and is installed when you `pip install mitiq` (even without the optional `[cirq]`)
 
 #### Supported backends
 
