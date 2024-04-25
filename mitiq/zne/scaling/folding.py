@@ -374,7 +374,6 @@ def _create_weight_mask(
 def _create_fold_mask(
     weight_mask: List[float],
     scale_factor: float,
-    folding_method: str,
     seed: Optional[int] = None,
 ) -> List[int]:
     r"""Returns a list of integers determining how many times each gate a
@@ -394,19 +393,16 @@ def _create_fold_mask(
     total weight of the input circuit.
 
     For equal weights, this function reproduces the local unitary folding
-    method defined in equation (5) of :cite:`Giurgica_Tiron_2020_arXiv`.
+    method defined in equation (5) of :cite:`Giurgica_Tiron_2020_arXiv`, with
+    the layer indices chosen at random.
 
     Args:
         weight_mask: The weights of all the gates of the circuit to fold.
             Highly noisy gates should have a corresponding high weight.
             Gates with zero weight are assumed to be ideal and are not folded.
         scale_factor: The effective noise scale factor.
-        folding_method: A string equal to "at_random", or "from_left", or
-            "from_right". Determines the partial folding method described in
-            :cite:`Giurgica_Tiron_2020_arXiv`. If scale_factor is an odd
-            integer, all methods are equivalent and this option is irrelevant.
-        seed: A seed for the random number generator. This is used only when
-            folding_method is "at_random".
+        seed: A seed for the random number generator used to select the
+            subset of layer indices to fold.
 
     Returns: The list of integers determining to how many times one should
         fold the j_th gate of the circuit to be scaled.
@@ -415,7 +411,6 @@ def _create_fold_mask(
         >>>_create_fold_mask(
             weight_mask=[1.0, 0.5, 2.0, 0.0],
             scale_factor=4,
-            folding_method="from_left",
         )
         [2, 2, 1, 0]
     """
@@ -443,18 +438,9 @@ def _create_fold_mask(
 
     # Express folding order through a list of indices
     folding_order = list(range(len(weight_mask)))
-    if folding_method == "from_left":
-        pass
-    elif folding_method == "from_right":
-        folding_order.reverse()
-    elif folding_method == "at_random":
-        rnd_state = np.random.RandomState(seed)
-        rnd_state.shuffle(folding_order)
-    else:
-        raise ValueError(
-            "The option 'folding_method' is not valid."
-            "It must be 'at_random', or 'from_left', or 'from_right'."
-        )
+
+    rnd_state = np.random.RandomState(seed)
+    rnd_state.shuffle(folding_order)
 
     # Fold gates until the input scale_factor is better approximated
     input_circuit_weight = sum(weight_mask)
@@ -541,185 +527,16 @@ def _apply_fold_mask(
 
 
 @accept_qprogram_and_validate
-def fold_gates_from_left(
-    circuit: Circuit, scale_factor: float, **kwargs: Any
-) -> Circuit:
-    """Returns a new folded circuit by applying the map G -> G G^dag G to a
-    subset of gates of the input circuit, starting with gates at the
-    left (beginning) of the circuit.
-
-    The folded circuit has a number of gates approximately equal to
-    scale_factor * n where n is the number of gates in the input circuit.
-
-    For equal gate fidelities, this function reproduces the local unitary
-    folding method defined in equation (5) of
-    :cite:`Giurgica_Tiron_2020_arXiv`.
-
-    Args:
-        circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number >= 1.
-
-    Keyword Args:
-        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-            is a string which specifies the gate and each value is the
-            fidelity of that gate. When this argument is provided, folded
-            gates contribute an amount proportional to their infidelity
-            (1 - fidelity) to the total noise scaling. Fidelity values must be
-            in the interval (0, 1]. Gates not specified have a default
-            fidelity of 0.99**n where n is the number of qubits the gates act
-            on.
-
-            Supported gate keys are listed in the following table.::
-
-                Gate key    | Gate
-                -------------------------
-                "H"         | Hadamard
-                "X"         | Pauli X
-                "Y"         | Pauli Y
-                "Z"         | Pauli Z
-                "I"         | Identity
-                "S"         | Phase gate
-                "T"         | T gate
-                "rx"        | X-rotation
-                "ry"        | Y-rotation
-                "rz"        | Z-rotation
-                "CNOT"      | CNOT
-                "CZ"        | CZ gate
-                "SWAP"      | Swap
-                "ISWAP"     | Imaginary swap
-                "CSWAP"     | CSWAP
-                "TOFFOLI"   | Toffoli gate
-                "single"    | All single qubit gates
-                "double"    | All two-qubit gates
-                "triple"    | All three-qubit gates
-
-            Keys for specific gates override values set by "single", "double",
-            and "triple".
-
-            For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
-            single-qubit gates except Hadamard to have fidelity one.
-
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-        return_mitiq (bool): If True, returns a Mitiq circuit instead of
-            the input circuit type (if different). Default is False.
-
-    Returns:
-        folded: The folded quantum circuit as a QPROGRAM.
-
-    """
-
-    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities", {}))
-
-    num_folds_mask = _create_fold_mask(
-        weight_mask, scale_factor, folding_method="from_left"
-    )
-
-    return _apply_fold_mask(
-        circuit,
-        num_folds_mask,
-        squash_moments=kwargs.get("squash_moments", True),
-    )
-
-
-@accept_qprogram_and_validate
-def fold_gates_from_right(
-    circuit: Circuit, scale_factor: float, **kwargs: Any
-) -> Circuit:
-    r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
-    subset of gates of the input circuit, starting with gates at the
-    right (end) of the circuit.
-
-    The folded circuit has a number of gates approximately equal to
-    scale_factor * n where n is the number of gates in the input circuit.
-
-    For equal gate fidelities, this function reproduces the local unitary
-    folding method defined in equation (5) of
-    :cite:`Giurgica_Tiron_2020_arXiv`.
-
-    Args:
-        circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number >= 1.
-
-    Keyword Args:
-        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-            is a string which specifies the gate and each value is the
-            fidelity of that gate. When this argument is provided, folded
-            gates contribute an amount proportional to their infidelity
-            (1 - fidelity) to the total noise scaling. Fidelity values must be
-            in the interval (0, 1]. Gates not specified have a default
-            fidelity of 0.99**n where n is the number of qubits the gates act
-            on.
-
-            Supported gate keys are listed in the following table.::
-
-                Gate key    | Gate
-                -------------------------
-                "H"         | Hadamard
-                "X"         | Pauli X
-                "Y"         | Pauli Y
-                "Z"         | Pauli Z
-                "I"         | Identity
-                "S"         | Phase gate
-                "T"         | T gate
-                "rx"        | X-rotation
-                "ry"        | Y-rotation
-                "rz"        | Z-rotation
-                "CNOT"      | CNOT
-                "CZ"        | CZ gate
-                "SWAP"      | Swap
-                "ISWAP"     | Imaginary swap
-                "CSWAP"     | CSWAP
-                "TOFFOLI"   | Toffoli gate
-                "single"    | All single qubit gates
-                "double"    | All two-qubit gates
-                "triple"    | All three-qubit gates
-
-            Keys for specific gates override values set by "single", "double",
-            and "triple".
-
-            For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
-            single-qubit gates except Hadamard to have fidelity one.
-
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-        return_mitiq (bool): If True, returns a Mitiq circuit instead of
-            the input circuit type (if different). Default is False.
-
-    Returns:
-        folded: The folded quantum circuit as a QPROGRAM.
-
-    """
-
-    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities", {}))
-
-    num_folds_mask = _create_fold_mask(
-        weight_mask, scale_factor, folding_method="from_right"
-    )
-
-    return _apply_fold_mask(
-        circuit,
-        num_folds_mask,
-        squash_moments=kwargs.get("squash_moments", True),
-    )
-
-
-@accept_qprogram_and_validate
 def fold_gates_at_random(
     circuit: Circuit,
     scale_factor: float,
     seed: Optional[int] = None,
     **kwargs: Any,
 ) -> Circuit:
-    r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
-    subset of gates of the input circuit, starting with gates at the
-    right (end) of the circuit.
+    r"""
+    Returns a new folded circuit by applying the map G -> G G^dag G to a
+    subset of gates of the input circuit, different indices randomly sampled
+    without replacement.
 
     The folded circuit has a number of gates approximately equal to
     scale_factor * n where n is the number of gates in the input circuit.
@@ -791,7 +608,6 @@ def fold_gates_at_random(
     num_folds_mask = _create_fold_mask(
         weight_mask,
         scale_factor,
-        folding_method="at_random",
         seed=seed,
     )
 
