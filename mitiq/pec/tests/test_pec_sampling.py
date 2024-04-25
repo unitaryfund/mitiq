@@ -159,7 +159,7 @@ def test_qubit_independent_representation_qiskit():
 
     different_qreg = QuantumRegister(2, name="q")
     circuit_to_mitigate = QuantumCircuit(different_qreg)
-    _ = circuit_to_mitigate.cnot(*different_qreg)
+    _ = circuit_to_mitigate.cx(*different_qreg)
 
     qreg = QuantumRegister(2, name="rep_register")
     xcircuit = QuantumCircuit(qreg)
@@ -172,7 +172,7 @@ def test_qubit_independent_representation_qiskit():
     noisy_zop = NoisyOperation(zcircuit)
 
     ideal_op = QuantumCircuit(qreg)
-    _ = ideal_op.cnot(*qreg)
+    _ = ideal_op.cx(*qreg)
     rep = OperationRepresentation(
         ideal=ideal_op,
         noisy_operations=[noisy_xop, noisy_zop],
@@ -457,10 +457,10 @@ def test_conversions_in_sample_circuit():
     creg = ClassicalRegister(2, name="C")
     circuit = QuantumCircuit(qreg, creg)
     circuit.h(qreg[0])
-    circuit.cnot(qreg[0], qreg[1])
+    circuit.cx(qreg[0], qreg[1])
     circuit.measure(0, 0)
     cnot_circuit = QuantumCircuit(qreg)
-    cnot_circuit.cnot(qreg[0], qreg[1])
+    cnot_circuit.cx(qreg[0], qreg[1])
     rep = represent_operation_with_global_depolarizing_noise(
         cnot_circuit,
         noise_level=0.0,

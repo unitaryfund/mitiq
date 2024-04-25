@@ -368,7 +368,9 @@ def accept_qprogram_and_validate(
                 )
 
                 out_circuit.remove_final_measurements()
-                _transform_registers(out_circuit, new_qregs=circuit.qregs)
+                out_circuit = _transform_registers(
+                    out_circuit, new_qregs=circuit.qregs
+                )
                 _remove_identity_from_idle(out_circuit, idle_qubits)
                 if circuit.cregs and not out_circuit.cregs:
                     out_circuit.add_register(*circuit.cregs)

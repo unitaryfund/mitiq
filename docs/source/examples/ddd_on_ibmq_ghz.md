@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.16.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -37,6 +37,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import qiskit
+from qiskit_aer import AerSimulator
 from qiskit_ibm_provider import IBMProvider
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
@@ -102,8 +103,8 @@ def get_circuit(depth: int):
     circuit.h(0)
     circuit.cx(0, 1)
     for _ in range(depth):
-        circuit.i(0)
-        circuit.i(1)
+        circuit.id(0)
+        circuit.id(1)
     circuit.cx(0, 1)
     circuit.h(0)
     circuit.measure(0, 0)
@@ -146,9 +147,9 @@ correct_bitstring=[0, 0]
 ```{code-cell} ipython3
 if USE_REAL_HARDWARE:
     provider = IBMProvider()
-    backend = provider.get_backend("ibmq_lima")
+    backend = provider.get_backend("ibm_brisbane")
 else:
-    from qiskit.providers.fake_provider import FakeLima as FakeLima
+    from qiskit_ibm_runtime.fake_provider import FakeLimaV2 as FakeLima
     backend = FakeLima()
 
 
@@ -172,8 +173,8 @@ def ibm_executor(
         transpiled = qiskit.transpile(circuit, backend=backend, optimization_level=0)
         job = backend.run(transpiled, optimization_level=0, shots=shots)
     else:
-        ideal_backand = qiskit.Aer.get_backend("qasm_simulator")
-        job = ideal_backand.run(circuit, optimization_level=0, shots=shots)
+        ideal_backend = AerSimulator()
+        job = ideal_backend.run(circuit, optimization_level=0, shots=shots)
 
     # Convert from raw measurement counts to the expectation value
     all_counts = job.result().get_counts()

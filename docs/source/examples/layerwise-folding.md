@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -59,11 +59,12 @@ from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 from mitiq.interface.mitiq_cirq.cirq_utils import sample_bitstrings
 
 from cirq.contrib.svg import SVGCircuit
+from qiskit_aer import QasmSimulator
 from qiskit_ibm_provider import IBMProvider
 
 # Default to a simulator.
-backend = qiskit.Aer.get_backend("qasm_simulator")
 noise_model = initialized_depolarizing_noise(noise_level=0.02)
+backend = QasmSimulator(noise_model=noise_model)
 
 shots = 10_000
 ```
@@ -116,7 +117,6 @@ folded.
 ```{code-cell} ipython3
 print(folded_circuits[1])
 ```
-
 
 ## Define circuit to analyze
 
@@ -231,15 +231,17 @@ def executor(circuit: cirq.Circuit, shots: int = 10_000) -> float:
         circuit: Circuit to run.
         shots: Number of times to execute the circuit to compute the expectation value.
     """
-    qiskit_circuit = to_qiskit(circuit) 
-    job = qiskit.execute(
-        experiments=qiskit_circuit,
+    qiskit_circuit = to_qiskit(circuit)
+
+    # Transpile the circuit so it can be properly run
+    exec_circuit = qiskit.transpile(
+        qiskit_circuit,
         backend=backend,
-        noise_model=noise_model,
-        basis_gates=noise_model.basis_gates if noise_model is not None else None,
-        optimization_level=0,  # Important to preserve folded gates.
-        shots=shots,
+        basis_gates=noise_model.basis_gates if noise_model else None,
+        optimization_level=0, # Important to preserve folded gates.
     )
+    # Run the circuit
+    job = backend.run(exec_circuit, shots=shots)
 
     # Convert from raw measurement counts to the expectation value
     counts = job.result().get_counts()
@@ -253,7 +255,6 @@ def executor(circuit: cirq.Circuit, shots: int = 10_000) -> float:
 First, for comparison, we apply ZNE with global folding on the entire circuit.
 We then compare the mitigated result of applying ZNE with linear extrapolation
 against the unmitigated value.
-
 
 ```{code-cell} ipython3
 unmitigated = executor(circuit)

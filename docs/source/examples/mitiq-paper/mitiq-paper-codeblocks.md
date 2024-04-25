@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -468,19 +468,21 @@ print("ZNE then PEC value:", zne_then_pec_value)  # Note this is not accurate (b
 :id: dyk7Hj1nPB48
 
 import qiskit
+from qiskit_aer import QasmSimulator
+from qiskit_ibm_provider import IBMProvider
 
-
-provider = qiskit.BasicAer  # Use of a simulator as backend.
-# provider = qiskit.IBMQ.load_account()  # Alternative way to run the blocks, with saved credentials.
 
 def execute(
     circuit: qiskit.QuantumCircuit,
     backend_name: str = "qasm_simulator",
     shots: int = 1024
 ) -> float:
-    job = qiskit.execute(
-        experiments=circuit,
-        backend=provider.get_backend(backend_name),
+    backend = QasmSimulator()  # Use of a simulator as backend.
+    # backend = IBMProvider().get_backend("backend_name")  # Alternative way to run the blocks, with saved credentials.
+    
+    job = backend.run(
+        circuit,
+        backend=backend,
         optimization_level=0,
         shots=shots,
     )

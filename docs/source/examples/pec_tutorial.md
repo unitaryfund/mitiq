@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.12.0
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -156,7 +156,7 @@ def get_representations(computer: nx.Graph) -> List[pec.OperationRepresentation]
 It will be useful later to us to have a number of utility functions for counting
 CNOT gates and operations.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 def get_num_cnot_count(circuit: Union[cirq.Circuit, qiskit.QuantumCircuit]) -> int:
     """Determine number of cnot gates in a given `Circuit` object."""    
     # Count CNOT gates for `cirq`-type circuit objects:
@@ -169,7 +169,6 @@ def get_num_cnot_count(circuit: Union[cirq.Circuit, qiskit.QuantumCircuit]) -> i
 def get_oneq_count(circuit: Union[cirq.Circuit, qiskit.QuantumCircuit]) -> int:
     return len(circuit.instructions) - get_num_cnot_count(circuit)
 ```
-
 
 ## Define the executor
 
@@ -285,7 +284,6 @@ for depth in depths:
     
     pec_values.append(pec_depth_values)
 ```
-
 
 Now we can visualize the results.
 
