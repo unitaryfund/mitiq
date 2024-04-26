@@ -6,8 +6,6 @@
 """Methods for scaling noise in circuits by adding or modifying gates."""
 from mitiq.zne.scaling.folding import (
     fold_all,
-    fold_gates_from_left,
-    fold_gates_from_right,
     fold_gates_at_random,
     fold_global,
 )
