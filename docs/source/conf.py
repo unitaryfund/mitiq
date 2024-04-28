@@ -155,9 +155,9 @@ bibtex_bibfiles = ["refs.bib"]
 # Links matching with the following regular expressions will be ignored
 linkcheck_ignore = [
     r"https://arxiv\.org/.*",
-    r"https://doi\.org/.+",
-    r"https://link\.aps\.org/doi/.+",
-    r"https://www\.sciencedirect\.com/science/article/.+",
+    r"https://doi\.org/.*",
+    r"https://link\.aps\.org/doi/.*",
+    r"https://www\.sciencedirect\.com/science/article/.*",
 ]
 
 linkcheck_retries = 3
