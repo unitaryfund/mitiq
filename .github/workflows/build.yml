@@ -39,6 +39,7 @@ jobs:
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -71,6 +72,14 @@ jobs:
           export BQSKIT_DOC_CHECK_OVERRIDE=1
           export PYDEVD_DISABLE_FILE_VALIDATION=1
           make docs
+
+      - name: Run linkcheck on 'release' PRs
+        if: github.event_name == 'pull_request'
+        run: |
+          pr_title_lower=$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')
+          if [[ "$pr_title_lower" == *"release"* ]]; then
+            make linkcheck
+          fi
 
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
   # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.

@@ -30,7 +30,7 @@ To instantiate an `Executor`, provide a function which either:
 1. Inputs a `mitiq.QPROGRAM` and outputs a `mitiq.QuantumResult`.
 2. Inputs a sequence of `mitiq.QPROGRAM`s and outputs a sequence of `mitiq.QuantumResult`s.
 
-**The function must be [annotated](https://www.python.org/dev/peps/pep-3107/) to tell Mitiq which type of `QuantumResult` it returns. Functions with no annotations are assumed to return `float`s.**
+**The function must be [annotated](https://peps.python.org/pep-3107/) to tell Mitiq which type of `QuantumResult` it returns. Functions with no annotations are assumed to return `float`s.**
 
 A `QPROGRAM` is "something which a quantum computer inputs" and a `QuantumResult` is "something which a quantum computer outputs." The latter is canonically a bitstring for real quantum hardware, but can be other objects for testing, e.g. a density matrix.
 
