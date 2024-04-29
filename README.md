@@ -1,4 +1,4 @@
-# <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/main/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
+# <a href="https://github.com/unitaryfund/mitiq"><img src="https://raw.githubusercontent.com/unitaryfund/mitiq/main/docs/source/img/mitiq-logo.png" alt="Mitiq logo" width="350"/></a>
 
 [![build](https://github.com/unitaryfund/mitiq/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
