@@ -55,8 +55,8 @@ install-hooks:
 	@echo "Git hooks installed."
 
 .PHONY: requirements
-requirements: requirements.txt
-	pip install -r requirements.txt
+requirements: requirements/requirements.txt
+	pip install -r requirements/requirements.txt
 
 .PHONY: test
 test:

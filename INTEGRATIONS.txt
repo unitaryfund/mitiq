@@ -1,0 +1,6 @@
+braket
+cirq
+pennylane
+pyquil
+qibo
+qiskit

@@ -5,14 +5,17 @@
 
 from setuptools import find_packages, setup
 
+
+def load_requirements(filename):
+    with open(f"requirements/{filename}", "r") as file:
+        return file.read().splitlines()
+
+
+with open("INTEGRATIONS.txt", "r") as f:
+    integrations = f.read().splitlines()
+
 with open("VERSION.txt", "r") as f:
     __version__ = f.read().strip()
-
-with open("requirements.txt") as f:
-    requirements = f.read().splitlines()
-
-with open("dev_requirements.txt") as f:
-    dev_requirements = f.read().splitlines()
 
 # save the source code in _version.py
 with open("mitiq/_version.py", "r") as f:
@@ -22,13 +25,21 @@ with open("mitiq/_version.py", "r") as f:
 with open("mitiq/_version.py", "w") as f:
     f.write(f"__version__ = '{__version__}'\n")
 
+third_party_integration_requirements = {
+    k: load_requirements(f"requirements-{k}.txt") for k in integrations
+}
+
 setup(
     name="mitiq",
     version=__version__,
-    install_requires=requirements,
+    install_requires=load_requirements("requirements.txt"),
     extras_require={
-        "development": set(dev_requirements),
-    },
+        "development": set().union(
+            *third_party_integration_requirements.values(),
+            load_requirements("requirements-dev.txt"),
+        )
+    }
+    | third_party_integration_requirements,
     packages=find_packages(),
     include_package_data=True,
     description="Mitiq is an open source toolkit for implementing error "

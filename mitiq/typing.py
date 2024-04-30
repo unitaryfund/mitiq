@@ -34,12 +34,12 @@ class EnhancedEnum(Enum):
 
 # Supported quantum programs.
 class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
-    CIRQ = "cirq"
-    PYQUIL = "pyquil"
-    QISKIT = "qiskit"
     BRAKET = "braket"
+    CIRQ = "cirq"
     PENNYLANE = "pennylane"
+    PYQUIL = "pyquil"
     QIBO = "qibo"
+    QISKIT = "qiskit"
 
 
 try:

@@ -5,13 +5,10 @@ the Python toolkit for implementing error mitigation on quantum computers.
 ## Requirements
 Our documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
-The necessary packages can be installed, from the root Mitiq directory
+The necessary packages can be installed, from the root Mitiq directory with the command
 ```bash
-pip install -e .
-pip install -r dev_requirements.txt
+make install
 ```
-as they are included in the `dev_requirements.txt` file.
-Alternately, you can use the docker image provided in the repo and all requirements for working with the docs are already installed there.
 
 ### Sphinx extensions used to build the docs
 - [`myst-nb`](https://myst-nb.readthedocs.io/en/latest/) and [`myst-parser`](https://myst-parser.readthedocs.io/en/latest/) allow both markdown and jupyter notebooks to be included and run by the Sphinx build. Also adds support for [MyST markdown](https://myst-parser.readthedocs.io/en/latest/using/syntax.html) spec.

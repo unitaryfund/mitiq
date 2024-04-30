@@ -22,12 +22,14 @@ def about() -> None:
         from pyquil import __version__ as pyquil_version
     except ImportError:
         pyquil_version = "Not installed"
+
     try:
         from qiskit import __qiskit_version__  # pragma: no cover
 
         qiskit_version = __qiskit_version__["qiskit"]  # pragma: no cover
     except ImportError:
         qiskit_version = "Not installed"
+
     try:
         from braket._sdk import __version__ as braket_version
     except ImportError:
