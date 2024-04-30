@@ -1,5 +1,5 @@
 qiskit~=1.0.2
 qiskit-aer~=0.14.0.1
-qiskit-ibm-provider~=0.10.0
+qiskit-ibm-provider~=0.11.0
 qiskit-ibm-runtime~=0.20.0
 ply==3.11
