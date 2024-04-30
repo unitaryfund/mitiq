@@ -2,6 +2,8 @@
 
 ## Version 0.36.0
 
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.35.0...v0.36.0))
+
 This milestone contains many PRs, some bigger than others.
 Among the bigger PRs, in this milestone we provide support for Qiskit 1.0.2 (thanks Andre!).
 We also have some PRs that improve the user experience, for example having a method to get all available QEM methods and removing some unused folding functions.
@@ -13,46 +15,28 @@ There are many more smaller PRs in this milestone, all very important in the gra
 
 Thanks to @andre-a-alves, @cosenal, @jordandsulliva, @mistywahl, @purva-thakre for the PRs in this milestone.
 
-### Commits
+### Enhancements
 
+- Run linkcheck on 'release' PR workflow (#2332) [@cosenal]
 - Created method to get available QEM methods in mitiq (#2298) [@jordandsullivan]
-- Add a scheduled linkcheck workflow (#2283) [@cosenal]
-- New technique: Tensor-network error mitigation (#2197) [@mistywahl, @FarLab]
-- Updated link to mitiq logo (#2336) [@jordandsullivan]
-- Run linkcheck on 'release' PR workflow (#2332) [@cosenal]
-- Fix global tqdm module patch in test (#2319) [@cosenal]
-- Clarify wording in quickstart example (#2323) [@jordandsullivan]
-- 2189 remove unused folding functions (#2289) [@jordandsullivan]
-- Pin myst-parser (#2317) [@cosenal]
-- Remove duplicate import and rename test folder (#2312) [@cosenal]
-- Fix PennyLane logo in readme (#2315) [@cosenal]
-- Upgrade Qiskit to 1.0.2 (#2269) [@andre-a-alves]
-- Updated link to mitiq logo (#2336) [@jordandsullivan]
-- Run linkcheck on 'release' PR workflow (#2332) [@cosenal]
-- Fix global tqdm module patch in test (#2319) [@cosenal]
-- Clarify wording in quickstart example (#2323) [@jordandsullivan]
-- 2189 remove unused folding functions (#2289) [@jordandsullivan]
-- Pin myst-parser (#2317) [@cosenal]
-- Remove duplicate import and rename test folder (#2312) [@cosenal]
-- Fix PennyLane logo in readme (#2315) [@cosenal]
-- remove qibo snippet from changelog (#2309) [@mistywahl]
-- Remove unused devcontainer (#2302) [@cosenal]
-- Add link to public agenda for community call to README (#2301) [@jordandsullivan]
-- Fix cache key in gh workflow docs job (#2300) [@cosenal]
-- remove linkcheck (#2287) [@purva-thakre]
-- Use Jupyter cache in gh workflow docs build (#2279) [@cosenal]
 - Define type for frontend supported programs (#2276) [@cosenal]
-- Fix typo 'ipynp' to 'ipynb' in .gitignore (#2282) [@jordandsullivan]
-- Retry linkcheck when building docs (#2277) [@cosenal]
-- Make test for 3rd party imports meaningful again (#2270) [@cosenal]
+- Introduce requirement setup for integrations (#2303) [@cosenal]
+
+### Maintenance and upkeep improvements
+
+- Upgrade Qiskit to 1.0.2 (#2269) [@andre-a-alves]
+- Remove unused folding functions (#2289) [@jordandsullivan]
+- Use Jupyter cache in gh workflow docs build (#2279) [@cosenal]
+
+### Dev environment improvements
+
+- Rename master branch to main (#2263) [@jordandsullivan]
 - Pre-commit hook with style checks (#2264) [@cosenal]
-- 2259 rename master branch to main (#2263) [@jordandsullivan]
-- Remove redundant word in release title (#2260) [@cosenal]
 - Indicate master is under development (#2258) [@natestemen]
+- Remove unused devcontainer (#2302) [@cosenal]
 
 #### 📦 Dependency updates
 
-- Bump myst-parser from 2.0.0 to 3.0.1 (#2333) [dependabot[bot]]
 - Bump myst-parser from 2.0.0 to 3.0.1 (#2333) [dependabot[bot]]
 - Bump bqskit and scipy (#2262) [dependabot[bot]]
 - Bump qibo from 0.2.4 to 0.2.7 (#2268) [dependabot[bot]]
