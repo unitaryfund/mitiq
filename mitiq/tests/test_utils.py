@@ -41,6 +41,7 @@ from mitiq.utils import (
     matrix_kronecker_product,
     matrix_to_vector,
     operator_ptm_vector_rep,
+    qem_methods,
     vector_to_matrix,
 )
 
@@ -436,3 +437,10 @@ def test_operator_ptm_vector_rep_raised_error():
         assert np.allclose(
             operator_ptm_vector_rep(np.array([1.0, 0.0, 0.0, 0.0]))
         )
+
+
+def test_qem_methods_basic():
+    for module, name in qem_methods().items():
+        prefix, suffix = module.split(".")
+        assert prefix == "mitiq"
+        assert len(suffix) <= 3
