@@ -1,11 +1,11 @@
-# <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/main/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
+# <a href="https://github.com/unitaryfund/mitiq"><img src="https://raw.githubusercontent.com/unitaryfund/mitiq/main/docs/source/img/mitiq-logo.png" alt="Mitiq logo" width="350"/></a>
 
 [![build](https://github.com/unitaryfund/mitiq/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/main/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
-[![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
+[![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://www.pepy.tech/projects/mitiq)
 [![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-Unitary%20Fund-FFFF00.svg)](https://unitary.fund)
 [![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
@@ -31,7 +31,7 @@ pip install mitiq
 
 ### Example
 
-Define a function which inputs a circuit and returns an expectation value you want to compute, then use Mitiq to mitigate errors.
+Define a function which takes a circuit as input and returns an expectation value you want to compute, then use Mitiq to mitigate errors.
 
 ```python
 import cirq
@@ -79,6 +79,10 @@ See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [e
 ## Quick Tour
 
 ### Error mitigation techniques
+You can check out currently available quantum error mitigation techniques by calling 
+```python
+mitiq.qem_methods()
+```
 
 | Technique                                 | Documentation                                                | Mitiq module                                                              | Paper Reference(s)                                                                                                                                 |
 | ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -96,8 +100,9 @@ We refer to any programming language you can write quantum circuits in as a _fro
 
 #### Supported frontends
 
-| [Cirq](https://quantumai.google/cirq)                                                                                                                                         | [Qiskit](https://qiskit.org/)                                                                                         | [pyQuil](https://github.com/rigetti/pyquil)                                                                                                             | [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                                                                                         | [PennyLane](https://pennylane.ai/)                                                                                                  |[Qibo](https://qibo.science/)                                                                                                  |
-|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+
+|                                                                   [Cirq](https://quantumai.google/cirq)                                                                    |                                     [Qiskit](https://www.ibm.com/quantum/qiskit)                                      |                                                      [pyQuil](https://github.com/rigetti/pyquil)                                                       |                                                            [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                             |                                                                                  [PennyLane](https://pennylane.ai/)                                                                                     |                                          [Qibo](https://qibo.science/)                                                                                                   |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/main/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="65"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="40"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="75"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="75"/></a> | <a href="https://pennylane.ai/"><img src="https://raw.githubusercontent.com/PennyLaneAI/pennylane/c2f96705efd4570e8755e829b11cc869b4c2287d/doc/_static/logo.png" alt="PennyLane logo"  width="30"/></a> | <a href="https://qibo.science/"><img src="https://raw.githubusercontent.com/qiboteam/qibo/master/doc/source/_static/qibo_logo_dark.svg" alt="Qibo logo" width="60"/></a> |
 
 You can install Mitiq support for these frontends by specifying them during installation, 

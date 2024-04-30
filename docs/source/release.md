@@ -39,8 +39,17 @@ This task has two parts:
 
 When releasing a new version, one must update the `VERSION.txt` file
 which is the single source of truth for version information. We follow
-SemVer, so typically a release will involve changing the version from
+[SemVer](https://semver.org/), so typically a release will involve changing the version from
 `vX.Y.Zdev` (development) to `vX.Y.Z` (released).
+
+### Create a release pull request
+
+A pull request with the changes mentioned above should be created against the _main_ branch as part of the release preparation. 
+The pull request must be reviewed by at least one Mitiq maintainer in addition to the milestone manager, 
+and its title should be "X.Y.Z Release", where `X.Y.Z` represents the version number to be released.
+
+Note: This pull request triggers a specialized build workflow due to the keyword 'release' in its title. 
+This includes additional steps, such as running a link checker to verify all links within the documentation pages.
 
 ## Do the release
 

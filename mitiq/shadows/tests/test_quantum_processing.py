@@ -45,6 +45,10 @@ def test_tqdm_import_not_available():
         )  # Reload the module to trigger the import
         assert mitiq.shadows.quantum_processing.tqdm is None
 
+    # Reload the module again to restore the original tqdm import.
+    # Otherwise, the rest of the tests are affected by the patch (issue #2318)
+    importlib.reload(mitiq.shadows.quantum_processing)
+
 
 def test_generate_random_pauli_strings():
     """Tests that the function generates random Pauli strings."""

@@ -5,14 +5,15 @@
 
 # Quantum computer input/output.
 from mitiq.typing import (
-    SUPPORTED_PROGRAM_TYPES,
-    QPROGRAM,
-    MeasurementResult,
-    QuantumResult,
     Bitstring,
+    MeasurementResult,
+    QPROGRAM,
     QuantumResult,
+    SUPPORTED_PROGRAM_TYPES,
 )
 
+# Utils
+from mitiq.utils import qem_methods
 
 # Executors and observables.
 from mitiq.executor import Executor
