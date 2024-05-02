@@ -1,5 +1,59 @@
 # Changelog
 
+## Version 0.36.0
+
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.35.0...v0.36.0))
+
+### Highlights
+
+**Support for Qiskit 1.0**: Mitiq now fully supports programs written in Qiskit 1.0, thanks to the contributions of André Alves!
+
+**Enhanced Package Requirements**: We've clarified the requirements for frontend packages. Each frontend is now available as an "extra" within the Mitiq package. For instance, to use Mitiq with Qiskit, simply run:
+
+```bash
+pip install mitiq[qiskit]
+```
+and similarly for all other [supported integrations](https://github.com/unitaryfund/mitiq/blob/main/INTEGRATIONS.txt).
+This ensures compatibility between all dependency packages required by Mitiq for frontend integration and those in the user's environment.
+
+**Quantum Error Mitigation methods**: Users can now discover the available quantum error mitigation techniques by executing:
+```python3
+mitiq.qem_methods()
+```
+This function provides an accessible way to understand the module naming of each technique supported by Mitiq.
+
+Thanks to @andre-a-alves, @cosenal, @jordandsulliva, @mistywahl, @purva-thakre for the PRs in this milestone.
+
+### Enhancements
+
+- Created method to get available QEM methods in mitiq (#2298) [@jordandsullivan]
+- Define type for frontend supported programs (#2276) [@cosenal]
+- Introduce requirement setup for integrations (#2303) [@cosenal]
+
+### Maintenance and upkeep improvements
+
+- Upgrade Qiskit to 1.0.2 (#2269) [@andre-a-alves]
+- Remove unused folding functions (#2289) [@jordandsullivan]
+- Use Jupyter cache in gh workflow docs build (#2279) [@cosenal]
+- Run linkcheck on 'release' PR workflow (#2332) [@cosenal]
+
+### Dev environment improvements
+
+- Rename master branch to main (#2263) [@jordandsullivan]
+- Pre-commit hook with style checks (#2264) [@cosenal]
+- Indicate master is under development (#2258) [@natestemen]
+- Remove unused devcontainer (#2302) [@cosenal]
+
+#### 📦 Dependency updates
+
+- Bump myst-parser from 2.0.0 to 3.0.1 (#2333) [dependabot[bot]]
+- Bump bqskit and scipy (#2262) [dependabot[bot]]
+- Bump qibo from 0.2.4 to 0.2.7 (#2268) [dependabot[bot]]
+
+#### 🧑‍💻 Dev Dependency updates
+
+- Update to codecov-action v4 and use token (#2271) [@cosenal]
+
 ## Version 0.35.0
 
 In this milestone, we've continued our work to support Qibo by providing a new tutorial, adding related Qibo-conversion functionality to the API-doc, and added Qibo to our main list of supported frontends.
@@ -44,6 +98,7 @@ Well done making your first contribution so quickly 🏎️💨!
 - Bump pytest-cov from 4.0.0 to 5.0.0 (#2240) [@dependabot]
 
 ## Version 0.34.0
+
 Announcing support for [Qibo](https://qibo.science/), a newly integrated frontend in Mitiq! 📣
 Qibo is an "end-to-end open source platform for quantum simulation, self-hosted quantum hardware control, calibration and characterization".
 
@@ -53,11 +108,14 @@ Thanks also to new contibutor Sam Burdick for fixing our readme.
 This release also includes a refactoring of part of the Mitiq shadows module, `mitiq.shadows.classical_postprocessing`, for speed of execution and code readability.
 
 ### 📓 Documentation
+
 We've continued to enhance our (legendary!) documentation with:
+
 1. Addition of a security policy document
 2. Faster execution of the learning-based PEC tutorial in CI
 
 ### Commits
+
 - Add support for qibo circuits (#2102) [@francescsabater]
 - Reduce doc build time for learning representations (#2165) [@Misty-W]
 - Create SECURITY.md (#2162) [@nathanshammah]
@@ -66,6 +124,7 @@ We've continued to enhance our (legendary!) documentation with:
 - Fix broken link in `combine_rem_zne.md` (#2156) [@Misty-W]
 
 #### 📦 Dependency updates
+
 - Bump openfermion from 1.6.0 to 1.6.1 (#2182) [@dependabot]
 - Update amazon-braket-sdk requirement from ~=1.68.3 to ~=1.69.0 (#2177) [@dependabot]
 - Bump pyscf from 2.4.0 to 2.5.0 (#2176) [@dependabot]
@@ -216,13 +275,13 @@ Released November 2, 2023
 
 ### Summary
 
-This release contains several documentation improvements and some new additions. Quantum subspace expansion (QSE) is added to the user guide (thanks @bubakazouba). Thanks to our first time contributors @dubeyPraY for a new tutorial on using PennyLane and Mitiq in calculating the energy landscape of a simple variational circuit and @kozhukalov for adding the PEC noise level and calculated error to the calibration logs. **We also removed support for python 3.8**. 
+This release contains several documentation improvements and some new additions. Quantum subspace expansion (QSE) is added to the user guide (thanks @bubakazouba). Thanks to our first time contributors @dubeyPraY for a new tutorial on using PennyLane and Mitiq in calculating the energy landscape of a simple variational circuit and @kozhukalov for adding the PEC noise level and calculated error to the calibration logs. **We also removed support for python 3.8**.
 
 ### All changes
 
 - Second incremental speed up of Mitiq tests [@Misty-W]
 - More general conversion decorator and fix conversion bug in PEC (#2064) [@andreamari]
-- Added Example for Mitiq in simple landscape for Pennylane  (#2048) [@dubeyPraY]
+- Added Example for Mitiq in simple landscape for Pennylane (#2048) [@dubeyPraY]
 - Indicate under active development on master (#2054) [@Misty-W]
 - 2029 update contributing docs.md for references thumbnails viewing rtd build (#2053) [@bdg221]
 - Add noise level to the PEC calibration log (#2045) [@kozhukalov]
@@ -255,6 +314,7 @@ This release contains several documentation improvements and some new additions.
 Released October 13, 2023
 
 ### Summary
+
 This release contains several documentation improvements and some new additions.
 The classical shadows documentation has been improved (including a tutorial!) by @Min-Li. The Pauli Twirling method is added to the user guide (thanks @Aaron-Robertson and @purva-thakre). There is a new tutorial applying both zero-noise extrapolation (ZNE) and Clifford Data Regression (CDR) to quantum simulation, for the 1D Ising chain, in Cirq, by @farzadkianvash, a new contributor! The documentation has been further improved and unified by @Misty-W and @natestemen.
 
@@ -272,8 +332,8 @@ circuits = generate_rotated_rb_circuits(
 )
 ```
 
-
 ### All changes
+
 - Add a tutorial for simulating Ising 1-D chain with Cirq with ZNE and CDR [@farzadkianvash]
 - Add section on quantum noise to user guide (#2036) [@Misty-W]
 - New QEM benchmarking method: "rotated" RB circuits (#2028) [@Misty-W]
@@ -284,6 +344,7 @@ circuits = generate_rotated_rb_circuits(
 - Classical Shadows: Add tutorial (#1945) [@Min-Li]
 
 #### Dependency updates
+
 - Update amazon-braket-sdk requirement from ~=1.54.1 to ~=1.55.1 (#2016) [@dependabot]
 - Bump matplotlib from 3.7.2 to 3.7.3 (#2011) [@dependabot]
 
@@ -292,6 +353,7 @@ circuits = generate_rotated_rb_circuits(
 ### Summary
 
 #### Update Pauli Twirling
+
 Thanks to @purva-thakre for updating Mitiq's PT functions, clarifying that PT is a noise tailoring technique and for consolidating utilities to be shared between PT and other techniques.
 This release replaces the `execute_with_pt` function with `pauli_twirl_circuit`.
 
@@ -342,6 +404,7 @@ Also, congrats to our new contributor @bdg221 for closing their first Mitiq PR! 
 - Ensure BQSKit example runs (#1962) [@natestemen]
 
 #### Dependency updates
+
 - Bump stimcirq from 1.11.0 to 1.12.0 (#2000) [@dependabot]
 - Bump stim from 1.11.0 to 1.12.0 (#2001) [@dependabot]
 - Bump actions/checkout from 3 to 4 (#1994) [@dependabot]
@@ -360,6 +423,7 @@ Also, congrats to our new contributor @bdg221 for closing their first Mitiq PR! 
 
 With the main functionaly implemented, quantum subspace expansion is now available in Mitiq!
 The technique requires a sequence of check operators, a Hamiltonian, and an observable in addition to the typical circuit and executor that Mitiq needs to operate.
+
 ```py
 from mitiq.qse import execute_with_qse
 
@@ -425,9 +489,10 @@ The `shadows` module is not quite ready for use, but you can get a sneak peak of
 
 ### Summary
 
-Highlights from this release include adding new benchmark quantum circuits: Mirror Quantum Volume Circuits (@purva-thakre) and adding PEC as technique supported by calibration (@Misty-W). After approval of the related RFC on quantum subspace expansion technique, the first utils have been added (@bubakazouba). Other improvements include  a new tutorial on quantum many body scars (@DHuybrechts); issues solved during unitaryHACK such as improvement to the cost estimation for Calibrator (@YuNariai), Qiskit Upgrade and Deprecation Warnings (@andre-a-alves), and a new function to register user defined Mitiq converters (@Aaron-Robertson).
+Highlights from this release include adding new benchmark quantum circuits: Mirror Quantum Volume Circuits (@purva-thakre) and adding PEC as technique supported by calibration (@Misty-W). After approval of the related RFC on quantum subspace expansion technique, the first utils have been added (@bubakazouba). Other improvements include a new tutorial on quantum many body scars (@DHuybrechts); issues solved during unitaryHACK such as improvement to the cost estimation for Calibrator (@YuNariai), Qiskit Upgrade and Deprecation Warnings (@andre-a-alves), and a new function to register user defined Mitiq converters (@Aaron-Robertson).
 
 ### All changes
+
 - Draft workflow to run change specific tests (#1809) @Aaron-Robertson
 - Improve twirling test (#1831) @andreamari
 - Add banner to docs (#1834) @natestemen
@@ -471,8 +536,6 @@ Highlights from this release include adding new benchmark quantum circuits: Mirr
 - Update amazon-braket-sdk requirement from ~=1.38.1 to ~=1.40.0 (#1849) @dependabot
 - Update pyquil requirement from ~=3.5.1 to ~=3.5.2 (#1856) @dependabot
 
-
-
 ## Version 0.26.0
 
 ### Summary
@@ -480,14 +543,14 @@ Highlights from this release include adding new benchmark quantum circuits: Mirr
 Highlights from this release include functions for applying Pauli Twirling of CNOT and CZ gates, support for noise scaling by circuit layer in ZNE, functions to generate Quantum Phase Estimation benchmarking circuits, and a new example composing two Mitiq techniques: REM and ZNE.
 Special thanks to UF Ambassadors **Purva Thakre** and **Aaron Robertson** for their contributions to this release!
 
-The use of the Pauli Twirling module is demonstrated in the following code cell<sup>*</sup>.
+The use of the Pauli Twirling module is demonstrated in the following code cell<sup>\*</sup>.
 
 ```py
 from mitiq import pt
 twirled_value = pt.execute_with_pauli_twirling(circuit, expval_executor)
 ```
 
-<sup>*</sup>Thorough testing and documentation of Pauli Twirling to follow in future releases.
+<sup>\*</sup>Thorough testing and documentation of Pauli Twirling to follow in future releases.
 If any bugs or inconsistencies are encountered, please [open an issue](https://github.com/unitaryfund/mitiq/issues/new).
 
 ### All changes
@@ -548,6 +611,7 @@ completion of the REM section of the user guide, and the publishing of a Mitiq t
 Special thanks to UF Ambassadors **Amir Ebrahimi** and **Purva Thakre** for their contributions to this release!
 
 **Breaking changes:** The class `NoisyOperation` is deprecated and removed from Mitiq. Moreover the initialization arguments of the `OperationRepresentation` class changed. Please check the associated API-docs and the [PEC section](https://mitiq.readthedocs.io/en/stable/guide/pec.html) of the docs for more details.
+
 - Update pennylane-qiskit requirement from ~=0.28.0 to ~=0.29.0 (#1733) [@dependabot[bot]]
 - Update pennylane requirement from ~=0.28.0 to ~=0.29.0 (#1732) [@dependabot[bot]]
 - Refactoring of NoisyOperation, NoisyBasis, OperationRepresentation (#1712) [@andreamari]
@@ -580,9 +644,9 @@ Special thanks to UF Ambassadors **Amir Ebrahimi** and **Purva Thakre** for thei
 The main improvements introduced in this release are:
 
 - A significant refactoring of the Mitiq [calibration module](https://mitiq.readthedocs.io/en/latest/guide/calibrators.html). We generalized the `Settings`
-object, which is now able to generate a more general list of `BenchmarkProblem` objects (wrapping circuits and ideal results) and a list of `Strategy` objects
-representing the error mitigation strategies to compare. We also improved how the optimal `Strategy` is determined. Specifically, we now average over `BenchmarkProblems` to reduce fluctuations and spurious results.
-We remark that the `mitiq.calibration` module is very new and quickly evolving. Therefore further significant breaking changes are likely to happen in future releases.
+  object, which is now able to generate a more general list of `BenchmarkProblem` objects (wrapping circuits and ideal results) and a list of `Strategy` objects
+  representing the error mitigation strategies to compare. We also improved how the optimal `Strategy` is determined. Specifically, we now average over `BenchmarkProblems` to reduce fluctuations and spurious results.
+  We remark that the `mitiq.calibration` module is very new and quickly evolving. Therefore further significant breaking changes are likely to happen in future releases.
 
 - A non-trivial refactoring of the REM module. We changed the underlying workflow of the technique which is now applied directly to executors, instead of applying REM during the evaluation of expectation values. Expectation values can still be mitigated as usual with `execute_with_rem` but mitigated executors can now return raw `MeasurementResult` objects (bitstrings).
 
@@ -626,6 +690,7 @@ We remark that the `mitiq.calibration` module is very new and quickly evolving. 
 ## Version 0.22.0
 
 ### Summary
+
 In this release we focused on improving our documentation with three new examples, new REM docs, and navigation improvements, along with some bug fixes.
 This release also adds a new module `calibration` which allows one to run a series of experiments to see what error mitigation parameters will work best for their particular setup.
 This feature is still under active development.
@@ -637,6 +702,7 @@ It's been a great time for error mitigation, and we look forward to continuing t
 Happy holidays! 🎄🎉🎊
 
 ### All changes
+
 - Digital Dynamical Decoupling Tutorial on Mirror Circuits (#1645) [@Misty-W]
 - Fix bug for Qiskit circuits with idle qubits (#1646) [@andreamari]
 - Calibration core concepts docs (#1648) [@natestemen]
@@ -651,7 +717,7 @@ Happy holidays! 🎄🎉🎊
 - Update mitiq build badge display name (#1636) [@Misty-W]
 - Fix build badge (#1635) [@andreamari]
 - Contributing/dev tasks docs improvements (#1615) [@natestemen]
-- Fix extrapolations for ExpFactory in special cases  (#1631) [@Misty-W]
+- Fix extrapolations for ExpFactory in special cases (#1631) [@Misty-W]
 - docs: add Misty-W as a contributor for ideas, test, and 2 more (#1632) [@allcontributors]
 - Update learning depolarizing noise tutorial to avoid long execution time (#1628) [@Misty-W]
 - Format examples' titles and list (#1622) [@nathanshammah]
@@ -664,6 +730,7 @@ Happy holidays! 🎄🎉🎊
 ## Version 0.21.0
 
 ### Summary
+
 This release officially adds support for the learning-based PEC sub-technique which is now
 [fully documented](https://mitiq.readthedocs.io/en/latest/guide/pec-3-options.html#applying-learning-based-pec) and ready to be applied by
 Mitiq users.
@@ -683,11 +750,12 @@ We also completed a prototype of this approach, which will be released in a futu
 In addition, this release adds support for qubit-independent representations for PEC, along with bug fixes and minor dependency upgrades.
 
 ### All changes
+
 - Cleanup (some) Deprecation Warnings (#1556) [@purva-thakre]
 - Update qiskit requirement from ~=0.39.2 to ~=0.39.3 (#1611) [@dependabot]
 - Documentation for Identity Scaling (#1573) [@purva-thakre]
 - Bump flake8 from 5.0.4 to 6.0.0 (#1609) [@dependabot]
-- Techniques intro  documentation (#1603) [@nathanshammah]
+- Techniques intro documentation (#1603) [@nathanshammah]
 - Update pennylane requirement from ~=0.26.0 to ~=0.27.0 (#1590) [@dependabot]
 - Enable user to define qubit-independent representations (#1565) [@Misty-W]
 - Refactor generate_inverse_confusion_matrix (#1607) [@amirebrahimi]
@@ -697,7 +765,7 @@ In addition, this release adds support for qubit-independent representations for
 - remove skipped test (#1598) [@natestemen]
 - Write user guide section for learning-based PEC (#1395) [@Misty-W]
 - Raise error when inserting DDD sequence with midcircuit measurement (#1586) [@natestemen]
-- use \prod instead of \Pi  documentationImprovements or additions to documentation (#1592) [@natestemen]
+- use \prod instead of \Pi documentationImprovements or additions to documentation (#1592) [@natestemen]
 - Update amazon-braket-sdk requirement from ~=1.34.0 to ~=1.34.1 (#1595) [@dependabot]
 - Learn biased noise parameters (#1510) [@Misty-W]
 - Update qiskit requirement from ~=0.39.0 to ~=0.39.1 (#1579) [@dependabot]
@@ -722,6 +790,7 @@ Big thanks to @purva-thakre for getting this in Mitiq!
 There are also some minor bug fixes, documentation updates, and a new example contributed by @nickdgardner as well!
 
 ### All changes
+
 - Port BQSKit example to 1.0 release (#1557) [@natestemen]
 - Add Qiskit example on mitigating the energy landscape of a variational circuit (#1551) [@nickdgardner]
 - Bump pytest-xdist[psutil] from 2.5.0 to 3.0.2 (#1569) [@dependabot]
@@ -762,8 +831,8 @@ Read more in our updated [API-doc](https://mitiq.readthedocs.io/en/latest/apidoc
 
 Special thanks to the external contributors @yitchen-tim, @amirebrahimi and @isaac-gs!
 
-
 ### All Changes
+
 - Implement conversions of IonQ native gates for Braket (#1525) [@yitchen-tim]
 - [temporary] ignore errors from first-interaction (#1532) [@natestemen]
 - Update sphinx-autodoc-typehints requirement from ~=1.12.0 to ~=1.19.4 (#1515) [@dependabot[bot]]
@@ -794,7 +863,7 @@ Special thanks to the external contributors @yitchen-tim, @amirebrahimi and @isa
 - [MCMC 1/3] Moving clifford utils for cdr to own files (#1480) [@isaac-gs]
 - Update qiskit requirement from ~=0.37.2 to ~=0.38.0 (#1490) [@dependabot[bot]]
 - docs: add amirebrahimi as a contributor for code, test, doc (#1487) [@allcontributors[bot]]
-- Move MeasurementResult into _typing to fix circular dependency in #1449 (#1484) [@amirebrahimi]
+- Move MeasurementResult into \_typing to fix circular dependency in #1449 (#1484) [@amirebrahimi]
 - Update amazon-braket-sdk requirement from ~=1.29.3 to ~=1.29.4 (#1483) [@dependabot[bot]]
 
 ## Version 0.18.0
@@ -813,8 +882,8 @@ This release cycle focused on review and approval of two RFCs, one for Readout E
 - Update qiskit requirement from ~=0.37.1 to ~=0.37.2 (#1458) [@dependabot]
 - Update sphinxcontrib-bibtex requirement from ~=2.4.2 to ~=2.5.0 (#1457) [@dependabot]
 - Mid circuit measurement fixed for ddd (#1446) [@Aaron-Robertson]
-- Update pennylane requirement from ~=0.24.0 to ~=0.25.1  (#1444) [@dependabot]
-- Update amazon-braket-sdk requirement from ~=1.28.1 to ~=1.29.0  (#1437) [@dependabot]
+- Update pennylane requirement from ~=0.24.0 to ~=0.25.1 (#1444) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.28.1 to ~=1.29.0 (#1437) [@dependabot]
 - Update pyquil requirement from ~=3.2.1 to ~=3.3.0 (#1436) [@dependabot]
 - remove patch release docs (#1435) [@natestemen]
 - 0.18.0 in dev (#1433) [@natestemen]
@@ -855,7 +924,6 @@ This release includes contributions from UnitaryHACK 2022! 🎉
 We had 3 merged pull requests, and a fourth is looking to be merged in the next milestone.
 Along with the great contributions from hackers, this release focused on expanding our ZNE examples to other frontends (Cirq, Braket, and Pennylane), building out learning-based PEC, and improving our benchmarking infrastructure.
 
-
 ### All Changes
 
 - Support the latest Cirq version (0.15.0) (@andreamari, gh-1379)
@@ -886,8 +954,8 @@ Along with the great contributions from hackers, this release focused on expandi
 - Update mypy requirement from ~=0.960 to ~=0.961 (@dependabot, gh-1342)
 - Merge pull request #1320 from unitaryfund/nts-contrib-docs (@natestemen)
 
-
 ## Version 0.16.0 (June 3rd, 2022)
+
 ### Summary
 
 This release officially adds support for the digital dynamical decoupling (DDD) technique which is now [fully documented](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) and so ready to be applied by Mitiq users. This is still very new technique and so, if you notice any bugs, please let us know by
@@ -924,10 +992,10 @@ Congratulations to the new member of the Mitiq team @natestemen and special than
 - Fixed typo in documentation formula (@ZhaoyiLi-HekJukZaaiZyuJan, gh-1246)
 - Update version to 0.16dev (@nathanshammah, gh-1268)
 
-
 ## Version 0.15.0 (April 29th, 2022)
 
 ### Summary
+
 This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based PEC. For dynamical decoupling, high-level functions and rules were added. For learning-based PEC, a function calculating representations with a biased (combination of depolarizing and dephasing) noise model was added. Several high priority bugs and issues were also fixed.
 
 Special thanks to new contributors @RubidgeCarrie and @nickdgardner for their contributions to this release!
@@ -958,7 +1026,7 @@ Special thanks to new contributors @RubidgeCarrie and @nickdgardner for their co
 - Add mitigate_executor and cdr_decorator to mitiq.cdr (@Aaron-Robertson, gh-1204)
 - Update qiskit requirement from ~=0.35.0 to ~=0.36.0 (@dependabot, gh-1213)
 
-## Version 0.14.0  (April 6th, 2022)
+## Version 0.14.0 (April 6th, 2022)
 
 ### Summary
 
@@ -978,25 +1046,25 @@ This milestone focused on updating dependencies and making progress on two new f
 - Merge pull request #1195 from unitaryfund/update-qiskit (@Misty-W)
 - Update docs/source/guide/pec-3-options.myst @crazy4pi314 (@Misty-W)
 - Merge branch 'master' into update-qiskit (@crazy4pi314)
-- Update Cirq to 0.14  (@andreamari, gh-1193)
+- Update Cirq to 0.14 (@andreamari, gh-1193)
 - fix pec-3-options notebook problem (@andreamari)
-- Remove option to squash moments in global folding  (@purva-thakre @andreamari, gh-1113)
+- Remove option to squash moments in global folding (@purva-thakre @andreamari, gh-1113)
 - update qiskit and fix conversions (@andreamari)
-- Idle qubits in conversion  (@Aaron-Robertson, gh-1185)
-- Add get_circuit_mask() for dynamical decoupling  (@Aaron-Robertson, gh-1178)
-- Update pydata-sphinx-theme requirement from ~=0.8.0 to ~=0.8.1  (@dependabot, gh-1188)
+- Idle qubits in conversion (@Aaron-Robertson, gh-1185)
+- Add get_circuit_mask() for dynamical decoupling (@Aaron-Robertson, gh-1178)
+- Update pydata-sphinx-theme requirement from ~=0.8.0 to ~=0.8.1 (@dependabot, gh-1188)
 - Add get_slack_matrix_from_circuit_matrix() function for dynamical decoupling (@andreamari @Aaron-Robertson,gh-1178)
-- Fix sphinx dependency problem  (@andreamari , gh-1181)
-- Create file structure for digital dynamical decoupling  (@andreamari, gh-1175)
+- Fix sphinx dependency problem (@andreamari , gh-1181)
+- Create file structure for digital dynamical decoupling (@andreamari, gh-1175)
 - adding pages publish step (@crazy4pi314,gh-1135)
 - cast gate exponents to float (@andreamari,gh-1174)
 - Update release.rst (@andreamari,gh-1145)
-- Bump actions/setup-python from 2 to 3  (@dependabot, gh-1149)
-- Bump actions/checkout from 2 to 3  (@dependabot, gh-1151)
-- Update amazon-braket-sdk requirement from ~=1.15.0 to ~=1.17.0  (@dependabot, gh-1153)
+- Bump actions/setup-python from 2 to 3 (@dependabot, gh-1149)
+- Bump actions/checkout from 2 to 3 (@dependabot, gh-1151)
+- Update amazon-braket-sdk requirement from ~=1.15.0 to ~=1.17.0 (@dependabot, gh-1153)
 - fixing install permissions, container user is root (@crazy4pi314 , gh-1147)
 
-## Version 0.13.0  (February 25th, 2022)
+## Version 0.13.0 (February 25th, 2022)
 
 ### Summary
 
@@ -1004,8 +1072,6 @@ Mitiq is now compatible with the latest version (0.13.1) of Cirq! This update wa
 This should solve several dependency conflicts or warnings that you may have got when running `pip install mitiq` or `pip install -U mitiq`.
 
 The HTML rendering of all PyQuil examples in our documentation is now fixed. Thanks @astrojuanlu for useful suggestions about readthedocs!
-
-
 
 We also thank @Rahul-Mistri for adding GHZ circuits to our benchmarking module and for making Clifford circuits compatible with the Mitiq CDR technique (instead of raising an error as it happened before this release).
 
@@ -1029,10 +1095,7 @@ We discussed and approved the design documents (RFC) for two new error-mitigatio
 - Can use Clifford Circuits with `execute_with_cdr` (@Rahul-Mistri, gh-1104)
 - Docstring for GHZ-circuits reformatted (@Rahul-Mistri, gh-1101)
 
-
-
-
-## Version 0.12.0  (January 21st, 2022)
+## Version 0.12.0 (January 21st, 2022)
 
 ### Summary
 
@@ -1042,6 +1105,7 @@ This release contains a considerable overhaul of the documentation organization 
 - An example on how to use ZNE to improve the calculations of the energy potential landscape of molecular Hydrogen using VQE was added by @andreamari.
 
 **New features**
+
 - GHZ circuits were added to the benchmark subpackage by @Rahul-Mistri.
 - Airspeed-velocity (asv) has been added to the CI by @rmlarose.
 
@@ -1055,7 +1119,7 @@ This release contains a considerable overhaul of the documentation organization 
 - Use raw.execute in asv benchmarks and remove GHZ circuits from asv (@rmlarose)
 - Added GHZ circuits to benchmark (@Rahul-Mistri, gh-1089)
 - Update scipy requirement from ~=1.7.2 to ~=1.7.3 (@dependabot
-, gh-1084)
+  , gh-1084)
 - PR to trigger CI and fix a broken link (@andreamari, gh-1082)
 - Fix readthedocs by changing a LaTex equation (@andreamari, @nathanshammah, gh-1077)
 - Add asv benchmarking framework (@rmlarose, gh-1047)
@@ -1077,17 +1141,16 @@ This release contains a considerable overhaul of the documentation organization 
 - Update pennylane requirement from ~=0.19.0 to ~=0.19.1 (@dependabot, gh-1029)
 - Update amazon-braket-sdk requirement from ~=1.9.5 to ~=1.11.0 (@dependabot, gh-1038)
 
-
-## Version 0.11.1  (November 29th, 2021)
+## Version 0.11.1 (November 29th, 2021)
 
 ### Summary
 
 This patch release fixes two bugs:
 
 - Bug: PEC could only be used with `cirq.Circuit`s, not `mitiq.QPROGRAM`, due to a missing conversion.
-    - Fix: PEC can now be used with any `mitiq.QPROGRAM` (gh-1018).
+  - Fix: PEC can now be used with any `mitiq.QPROGRAM` (gh-1018).
 - Bug: CDR classically simulated the wrong circuits when doing regression.
-    - Fix: The correct circuits are now classically simulated (gh-1026).
+  - Fix: The correct circuits are now classically simulated (gh-1026).
 
 Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modified `qiskit.QuantumCircuit`s when they shouldn't.
 
@@ -1106,7 +1169,7 @@ Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modi
 - Add workflow figures and technique descriptions (@nathanshammah, gh-953)
 - Prepare to release 0.11.0 (@rmlarose, gh-1010)
 
-## Version 0.11.0  (November 3rd, 2021)
+## Version 0.11.0 (November 3rd, 2021)
 
 ### Summary
 
@@ -1116,6 +1179,7 @@ for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGR
 **New features**
 
 - Specify and use a `mitiq.Observable` in any error-mitigation technique.
+
   - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather
     can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided
     an observable.
@@ -1127,6 +1191,7 @@ for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGR
 - PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has
   two gates, `H` and `CNOT`, you can run `execute_with_pec` by only providing an `OperationRepresentation` for, e.g.,
   the `CNOT`.
+
   - Before, you had to provide all representations or an error would be raised.
   - Performance of PEC may be better by providing all `OperationRepresentation`s. This change is only with respect to
     usability and not performance.
@@ -1136,8 +1201,8 @@ for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGR
 **Breaking changes**
 
 - Signatures of `execute_with_xxx` error-mitigation techniques have changed to include `Observable`s. The default value
-is `None`, meaning that the `executor` should return a `float` as in the old usage, but the additional argument and
-change to keyword-only arguments (see below) may require you to make updates.
+  is `None`, meaning that the `executor` should return a `float` as in the old usage, but the additional argument and
+  change to keyword-only arguments (see below) may require you to make updates.
 
 - You must now use provide keywords for technique-specific arguments in error mitigation techniques. Example:
 
@@ -1156,7 +1221,7 @@ execute_with_pec(circuit, executor, observable, representations)
 The latter will raise `# TypeError: execute_with_pec() missing 1 required keyword-only argument: 'representations'`.
 
 - The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other
-`execute_with_xxx` functions.
+  `execute_with_xxx` functions.
 
 ### All Changes
 
@@ -1201,7 +1266,7 @@ The latter will raise `# TypeError: execute_with_pec() missing 1 required keywor
 Huge thanks to all contributors on this release! @Misty-W, @AkashNarayanan, @purva-thakre, @trbromley, @nathanshammah,
 @crazy4pi314, @andreamari, and @rmlarose.
 
-## Version 0.10.0  (September 17, 2021)
+## Version 0.10.0 (September 17, 2021)
 
 ### Summary
 
@@ -1276,7 +1341,7 @@ Thanks to @Misty-W and @DSamuel1 for their great contributions this release! �
 - Better error message for `CircuitConversionError`s (@rmlarose, gh-809)
 - Fix some documentation not being tested & remove global imports in docs config (@rmlarose, gh-804)
 
-## Version 0.9.3  (July 7th, 2021)
+## Version 0.9.3 (July 7th, 2021)
 
 ### Summary
 
@@ -1288,7 +1353,7 @@ This primary reason for this patch release is to fix a bug interfacing with Qisk
 - Rename parameter calibration function and make it visible (@rmlarose, gh-780).
 - Allow adding qubits when transforming registers in a Qiskit circuit (@rmlarose, gh-803).
 
-## Version 0.9.2  (June 30th, 2021)
+## Version 0.9.2 (June 30th, 2021)
 
 ### Summary
 
@@ -1300,7 +1365,7 @@ It also adds an example about Clifford data regression in the documentation.
 - Ensure short circuit warning is multi-platform (@andreamari gh-769).
 - Add CDR example to docs + small change to `cdr.calculate_observable` (@rmlarose, gh-750).
 
-## Version 0.9.1  (June 24th, 2021)
+## Version 0.9.1 (June 24th, 2021)
 
 ### Summary
 
@@ -1340,7 +1405,7 @@ Thanks to all contributors (@L-P-B, @Aaron-Robertson, @francespoblete, @LaurentA
 - Update feature request template (@rmlarose, gh-713).
 - CDR part two - Clifford data regression functions to fit training data (@L-P-B gh-677).
 - Consolidate images, update README. (@rmlarose, gh-709).
-- New logo for readme (@crazy4pi314, @francespoblete,  gh-709).
+- New logo for readme (@crazy4pi314, @francespoblete, gh-709).
 - Update Guidelines for Release (@nathanshammah, gh-707).
 - Add action to close stale issues/pr #698 (@crazy4pi314, gh-699).
 - Optimal quasi-probability representations (@andreamari, gh-701).
@@ -1358,7 +1423,6 @@ Thanks to all contributors (@L-P-B, @Aaron-Robertson, @francespoblete, @LaurentA
 - Depend only on cirq-core (@rmlarose, gh-673). This was reverted in gh-717.
 - Fix docs build (@rmlarose, gh-671).
 - Fix is_clifford logic for Clifford Data Regression (@L-P-B gh-669).
-
 
 ## Version 0.8.0 (May 6th, 2021)
 
@@ -1400,7 +1464,6 @@ Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-a
 - Update PR template (@rmlarose, gh-634).
 - Add blurb about unitaryHACK (@nathanshammah).
 
-
 ## Version 0.7.0 (April 7th, 2021)
 
 ### Summary
@@ -1408,7 +1471,6 @@ Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-a
 This release focuses on contributions from the community.
 Many thanks @yhindi for adding a method to parametrically scale noise in circuit, to @aaron-robertson and @pchung39 for adding Qiskit executors with depolarizing noise to the utils,
 to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMathew and @marwahaha for typo corrections.
-
 
 ### All Changes
 
@@ -1420,7 +1482,7 @@ to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMa
 - Fix spelling typo (@marwahaha, gh-616)
 - Add link for MEP (@purva-thakre, gh-610)
 - Correct a typo in the readme (@BobinMathew, gh-609)
-- Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
+- Add `represent_operations_in_circuit_...` functions for PEC (@andreamari, gh-515)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
 - Move Cirq executors in docs to cirq_utils (@purva-thakre, gh-603)
 - Add parametrized scaling (@yhindyYousef, gh-411)
@@ -1442,6 +1504,7 @@ The automated workflows for builds and releases are improved and PyPI releases a
 We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as well as some miscellaneous bug fixes.
 
 ### All Changes
+
 - Add minimal section on PEC to documentation (@nathanshammah, gh-564)
 
 - Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
@@ -1460,10 +1523,10 @@ We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as
 ### Summary
 
 The implementation of Probabilistic Error Cancellation is now multi-platform and
-documented in the docs (for the moment only in the *Getting Started* section).
+documented in the docs (for the moment only in the _Getting Started_ section).
 A new infrastructure based on [MyST](https://myst-parser.readthedocs.io/en/stable/)
 can now be used for writing the documentation and, in particular, for adding new examples
-in the *Mitiq Examples* section.
+in the _Mitiq Examples_ section.
 
 ### All Changes
 
@@ -1550,7 +1613,6 @@ release plan to demonstrate the full end-to-end operation of the new technique.
 
 Thanks to @erkska and @k-m-schultz for their contributions to this release!
 
-
 ## Version 0.2.0 (October 4th, 2020)
 
 ### Announcements
@@ -1589,7 +1651,7 @@ This marks the first public release of Mitiq on a stable version.
 ### All Changes
 
 - Add static extrapolate method to all factories (@andreamari, gh-352).
-- Add the ``angle`` module for parameter noise scaling (@yhindy, gh-288).
+- Add the `angle` module for parameter noise scaling (@yhindy, gh-288).
 - Add to the documentation instructions for maintainers to make a new release (@nathanshammah, gh-332).
 - Add basic compilation facilities, don't relabel qubits (@karalekas, gh-324).
 - Update readme (@rmlarose, gh-330).
@@ -1598,7 +1660,7 @@ This marks the first public release of Mitiq on a stable version.
 - Add change log as markdown file (@nathanshammah, gh-328).
 - Add documentation on mitigating the energy landscape for QAOA MaxCut on two qubits (@rmlarose, gh-241).
 - Simplify inverse gates before conversion to QASM (@andreamari, gh-283).
-- Restructure library with ``zne/`` subpackage, modules renaming (@nathanshammah, gh-298).
+- Restructure library with `zne/` subpackage, modules renaming (@nathanshammah, gh-298).
 - [Bug Fix] Fix minor problems in executors documentation (@andreamari, gh-292).
 - Add better link to docs and more detailed features (@andreamari, gh-306).
 - [Bug Fix] Fix links and author list in README (@willzeng, gh-302).
@@ -1609,7 +1671,6 @@ This marks the first public release of Mitiq on a stable version.
 - Add circuit conversion error + tests (@rmlarose, gh-321).
 - Make test file names unique (@rmlarose, gh-319).
 - Update package version from v. 0.1a2, released, to 0.10dev (@nathanshammah, gh-314).
-
 
 ## Version 0.1a2 (August 17th, 2020)
 
