@@ -4,14 +4,23 @@
 
 ([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.35.0...v0.36.0))
 
-This milestone contains many PRs, some bigger than others.
-Among the bigger PRs, in this milestone we provide support for Qiskit 1.0.2 (thanks Andre!).
-We also have some PRs that improve the user experience, for example having a method to get all available QEM methods and removing some unused folding functions.
-Exploration of new techniques was also among the goals in this milestone.
-Tensor network error mitigation looks to be a complicated algorithm that has been patented, so we need more information regarding the legal side.
-Great work has been done by Purva on the RFC for Layerwise Richardson Extrapolation which is up for review right now.
-We decided to not merge the PR before extensive reviews have been done, so unfortunately it will not be in time for this milestone.
-There are many more smaller PRs in this milestone, all very important in the gradual and continuous improvement of mitiq.
+### Highlights
+
+**Support for Qiskit 1.0**: Mitiq now fully supports programs written in Qiskit 1.0, thanks to the contributions of André Alves!
+
+**Enhanced Package Requirements**: We've clarified the requirements for frontend packages. Each frontend is now available as an "extra" within the Mitiq package. For instance, to use Mitiq with Qiskit, simply run:
+
+`
+pip install mitiq[qiskit]
+`
+and similarly for all other [supported integrations](https://github.com/unitaryfund/mitiq/blob/main/INTEGRATIONS.txt).
+This ensures compatibility between all dependency packages required by Mitiq for frontend integration and those in the user's environment.
+
+**Quantum Error Mitigation methods**: Users can now discover the available quantum error mitigation techniques by executing:
+`
+mitiq.qem_methods()
+`
+This function provides an accessible way to understand the module naming of each technique supported by Mitiq.
 
 Thanks to @andre-a-alves, @cosenal, @jordandsulliva, @mistywahl, @purva-thakre for the PRs in this milestone.
 
