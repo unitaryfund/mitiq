@@ -10,12 +10,16 @@
 
 **Enhanced Package Requirements**: We've clarified the requirements for frontend packages. Each frontend is now available as an "extra" within the Mitiq package. For instance, to use Mitiq with Qiskit, simply run:
 
-`pip install mitiq[qiskit]`
+```bash
+pip install mitiq[qiskit]
+```
 and similarly for all other [supported integrations](https://github.com/unitaryfund/mitiq/blob/main/INTEGRATIONS.txt).
 This ensures compatibility between all dependency packages required by Mitiq for frontend integration and those in the user's environment.
 
 **Quantum Error Mitigation methods**: Users can now discover the available quantum error mitigation techniques by executing:
-`mitiq.qem_methods()`
+```python3
+mitiq.qem_methods()
+```
 This function provides an accessible way to understand the module naming of each technique supported by Mitiq.
 
 Thanks to @andre-a-alves, @cosenal, @jordandsulliva, @mistywahl, @purva-thakre for the PRs in this milestone.
