@@ -60,7 +60,6 @@ from mitiq.interface.mitiq_cirq.cirq_utils import sample_bitstrings
 
 from cirq.contrib.svg import SVGCircuit
 from qiskit_aer import QasmSimulator
-from qiskit_ibm_provider import IBMProvider
 
 # Default to a simulator.
 noise_model = initialized_depolarizing_noise(noise_level=0.02)

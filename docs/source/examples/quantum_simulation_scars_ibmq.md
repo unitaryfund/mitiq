@@ -155,10 +155,10 @@ USE_REAL_HARDWARE = False
 
 ```{code-cell} ipython3
 if USE_REAL_HARDWARE:
-    from qiskit_ibm_provider import IBMProvider
+    from qiskit_ibm_runtime import QiskitRuntimeService
     
-    provider = IBMProvider(token="MY_IBM_QUANTUM_TOKEN")   # Get the API token in https://quantum-computing.ibm.com/account
-    backend = provider.get_backend("ibm_brisbane")  # Set quantum computer here!
+    service = QiskitRuntimeService(channel="ibm_quantum", token="MY_IBM_QUANTUM_TOKEN")   # Get the API token in https://quantum-computing.ibm.com/account
+    backend = service.least_busy(operational=True, simulator=False)
 else:
     from qiskit_aer import QasmSimulator
 

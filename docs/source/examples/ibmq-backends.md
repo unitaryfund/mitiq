@@ -21,7 +21,7 @@ This tutorial shows an example of how to mitigate noise on IBMQ backends.
 ```{code-cell} ipython3
 import qiskit
 from qiskit_aer import QasmSimulator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
@@ -70,9 +70,10 @@ We define this function in the following code block. Because we are using IBMQ b
 for instructions to create an account, save credentials, and see online quantum computers.
 
 ```{code-cell} ipython3
-if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
-    provider = IBMProvider()
-    backend = provider.get_backend("ibm_brisbane")  # Set quantum computer here!
+if QiskitRuntimeService.saved_accounts() and USE_REAL_HARDWARE:
+    service = QiskitRuntimeService()
+    backend = service.least_busy(operational=True, simulator=False)
+    noise_model = False
 else:
     # Simulate the circuit with noise
     noise_model = initialized_depolarizing_noise(noise_level=0.02)
