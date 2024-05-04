@@ -1,2 +1,4 @@
 pennylane-qiskit~=0.35.1
 pennylane~=0.35.1
+# TODO: Remove qiskit-ibm-provider
+qiskit-ibm-provider~=0.10.0 # Needed for Python 3.9 with pennylane-qiskit~=0.35.1
