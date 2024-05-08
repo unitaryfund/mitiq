@@ -60,7 +60,7 @@ between the qubits and the environment, mitigating the effects of noise.
 : Ideal operations are represented as quasi-probability distributions over noisy implementable operations, and unbiased estimates of expectation values are obtained by averaging over circuits sampled according to this representation.
 
 [Quantum Subspace Expansion](qse.md)
-: The error-mitigated expectation value of some observable is estimated by searching the subspace of an output quantum state for a variation of the state with the lowest error rate. This is realized without utilizing syndrome measurements often required by quantum error-correcting schemes.  
+: The error-mitigated expectation value of some observable is estimated by searching the subspace of an output quantum state for a variation of the state with the lowest error rate. This is realized without utilizing intricate syndrome measurements often required by quantum error-correcting schemes.  
 
 [Readout Error Mitigation (REM)](rem.md)
 : Inverted transition/confusion matrices are applied to noisy measurement results to mitigate errors in the estimation of expectation values.
