@@ -361,3 +361,27 @@ def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
             np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
         )
     return np.array(opt_vec)
+
+
+def qem_methods() -> Dict[str, str]:
+    """
+    Returns a dictionary of Quantum Error Mitigation techniques
+    currently available in Mitiq. Updated v0.36.0
+
+    Returns:
+        dict: Dictionary whose keys are the names of available QEM
+        technique modules in Mitiq and whose values are the full names
+        of these techniques
+
+    """
+    techniques = {
+        "mitiq.cdr": "Clifford Data Regression",
+        "mitiq.ddd": "Digital Dynamical Decoupling",
+        "mitiq.pec": "Probabilistic Error Cancellation",
+        "mitiq.pt": "Pauli Twirling",
+        "mitiq.qse": "Quantum Subspace Expansion",
+        "mitiq.rem": "Readout Error Mitigation (confusion inversion)",
+        "mitiq.zne": "Zero Noise Extrapolation",
+    }
+
+    return techniques

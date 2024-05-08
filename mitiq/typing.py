@@ -16,15 +16,31 @@
 
 from collections import Counter
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from enum import Enum, EnumMeta
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 import numpy as np
 import numpy.typing as npt
 from cirq import Circuit as _Circuit
 
 
-class EnhancedEnum(Enum):
+class EnhancedEnumMeta(EnumMeta):
+    def __str__(cls) -> str:
+        return ", ".join([member.value for member in cast(Type[Enum], cls)])
+
+
+class EnhancedEnum(Enum, metaclass=EnhancedEnumMeta):
     # This is for backwards compatibility with the old representation
     # of SUPPORTED_PROGRAM_TYPES, which was a dictionary
     @classmethod
@@ -34,12 +50,12 @@ class EnhancedEnum(Enum):
 
 # Supported quantum programs.
 class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
-    CIRQ = "cirq"
-    PYQUIL = "pyquil"
-    QISKIT = "qiskit"
     BRAKET = "braket"
+    CIRQ = "cirq"
     PENNYLANE = "pennylane"
+    PYQUIL = "pyquil"
     QIBO = "qibo"
+    QISKIT = "qiskit"
 
 
 try:

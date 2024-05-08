@@ -13,7 +13,7 @@ The rest of this document describes the technical details of getting set up to d
 ## Development environment
 
 1. Ensure you have python 3.9 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/).
-2. Set up a virtual environment to isolate dependencies. This can be done with many different tools including [Virtualenv](https://virtualenv.pypa.io/en/latest/), [Pipenv](https://pypi.org/project/pipenv/), [Poetry](https://python-poetry.org/), and [Anaconda](https://www.anaconda.com/products/distribution). In what follows we will use Anaconda, but if you're familiar with other tools feel free to use those.
+2. Set up a virtual environment to isolate dependencies. This can be done with many different tools including [Virtualenv](https://virtualenv.pypa.io/en/latest/), [Pipenv](https://pypi.org/project/pipenv/), [Poetry](https://python-poetry.org/), and [Anaconda](https://www.anaconda.com/download). In what follows we will use Anaconda, but if you're familiar with other tools feel free to use those.
 3. Set up a local version of the [Mitiq repository](https://github.com/unitaryfund/mitiq). To do this you will need to use `git` which is a version control system. If you're unfamiliar, check out the [docs](https://git-scm.com/), and learn about what the typical [`git` workflow](https://www.asmeurer.com/git-workflow/) looks like.
 4. Inside the Mitiq repository (`cd mitiq`), activate a virtual environment. With conda this is done using the following command.
 ```
@@ -22,7 +22,7 @@ conda activate myenv
 ```
 5. Install the dependencies. First, to get an updated version of [`pip`](https://pypi.org/project/pip/) inside the virtual environment run `conda install pip` followed by
 ```
-pip install -e ".[development]"
+make install
 ```
 6. You should now have a development environment set up to work on Mitiq! 🎉 To go forward with making the desired changes, please consult the ["Making changes" section](https://www.asmeurer.com/git-workflow/#making-changes) of the `git` workflow article. If you've encountered any problems thus far, please let us know by opening an issue! More information about workflow can be found below in the [lifecycle](#lifecycle) section.
 
@@ -73,7 +73,7 @@ Follow these [instructions for contributing to the documentation](https://mitiq.
 ### Style guidelines
 
 Mitiq code is developed according the best practices of Python development.
-- Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code) and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
+- Please get familiar with [PEP 8](https://peps.python.org/pep-0008/) (code) and [PEP 257](https://peps.python.org/pep-0257/) (docstrings) guidelines.
 - Use annotations for type hints in the objects' signature.
 - Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods).
 
