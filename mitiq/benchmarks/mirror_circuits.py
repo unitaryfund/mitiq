@@ -149,7 +149,7 @@ def generate_mirror_circuit(
             ``cirq.Circuit``.
 
     Returns:
-        A randomized mirror circuit.
+        A randomized mirror circuit and correct bitstring.
     """
     if not 0 <= two_qubit_gate_prob <= 1:
         raise ValueError("two_qubit_gate_prob must be between 0 and 1")
