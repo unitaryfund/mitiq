@@ -14,7 +14,7 @@ jupyter:
 
 # Composing techniques: Digital Dynamical Decoupling and Zero Noise Extrapolation
 
-Noise in quantum computers can arise from a variety of sources, and sometimes applying multiple error mitigation techniques can be more beneficial than applying a single technique alone. 
+Noise in quantum computers can arise from a variety of sources, and sometimes applying multiple error mitigation techniques can be more beneficial than applying a single technique alone.
 
 Here we apply a combination of Digital Dynamical Decoupling (DDD) and Zero Noise Extrapolation (ZNE) on a GHZ state.
 
@@ -34,9 +34,25 @@ import numpy as np
 from mitiq import MeasurementResult, Observable, PauliString
 ```
 
+<!-- #region -->
 ## Task
 
-We will demonstrate quantum error mitigation on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger%E2%80%93Horne%E2%80%93Zeilinger_state), entangling multiple qubits together. We can create a short function to do this for convenience, including an optional argument `idle_steps` which will give us a way to insert additional time steps in which to let our qubits idle. This is to more clearly simulate the effect of time correlated noise.
+We will demonstrate quantum error mitigation on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger%E2%80%93Horne%E2%80%93Zeilinger_state), entangling multiple qubits together. We can create a short function to do this for convenience. We will also define a utility function `idle_qubits`, which will give us a way to insert additional time steps in which to let our qubits idle. 
+
+
+We will explain this further in the noise model section, but suffice it to say that these are intended to amplify the effect of time correlated noise. 
+<!-- #endregion -->
+
+```python
+def idle_qubits(circuit, qubits, idle_steps):
+    """Set qubits to idle for specfied number of steps 
+    in by inserting Identity gates in each `moment`
+    """
+    for step in range(idle_steps):
+        circuit.append(cirq.I(q) for q in qubits)
+
+    return circuit
+```
 
 ```python
 def ghz(num_qubits, idle_steps=0):
@@ -45,29 +61,43 @@ def ghz(num_qubits, idle_steps=0):
 
     # Create a quantum circuit
     circuit = cirq.Circuit()
-    # Add a Hadamard gate to the first qubit
-    circuit.append(cirq.H(qubits[0]))
-
+    
     # Add CNOT gates to entangle the first qubit with each of the other qubits
-    for i in range(1, num_qubits):
-        circuit.append(cirq.CNOT(qubits[0], qubits[i]))
-        # Set qubits to idle for specfied number of steps
-        # in the form of Identity gates
-        for step in range(idle_steps):
-            circuit.append(cirq.I(q) for q in qubits)
-
+    for i in range(num_qubits):
+        if i == 0: 
+            # Add a Hadamard gate to the first qubit
+            circuit.append(cirq.H(qubits[0]))
+        else:
+            circuit.append(cirq.CNOT(qubits[0], qubits[i]))
+            # Set qubits to idle for specfied number of steps
+            # in the form of Identity gates
+            other_qubits = qubits[1:i] + qubits[i+1:]
+            circuit = idle_qubits(circuit, other_qubits, idle_steps)
+    
     return circuit
 ```
 
+### Defining the circuit
+
+For this example we will create a 6 qubit GHZ state with two idle steps after each moment:
+
 ```python
 num_qubits = 6
-circuit = ghz(num_qubits, 2)
+circuit = ghz(num_qubits, idle_steps=3)
+
 print(circuit)
 ```
 
+In the diagram above, the horizontal brakets above and below specific gates represent the [cirq](https://quantumai.google/cirq) notion of [moments](https://quantumai.google/reference/python/cirq/Moment), which are time-slices intended to help with qubit scheduling (e.g. making sure qubits arrive at a gate at the same time). 
+
+In the our noise model, we will apply errors after each moment. Adding the additional identity gates within each "moment" should amplify the effect of these time-correlated errors.
+
+**Note:** Due to cirq's definition of moments, the first two gates of the circuit (`cirq.H(qubits[0])` and `cirq.CNOT(qubits[0], qubits[i])`) are in the same moment. This means the idle steps cannot be added between these gates, and therefore the time correlated noise will have less of an effect for the start of the circuit. 
+
+
 ## Noise model and executor
 
-**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate systematic $R_z$ rotations and depolarising noise applied to each qubit after each time step. This corresponds to noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
+**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate systematic $R_z$ rotations and depolarising noise applied to each qubit after each time step. This corresponds to noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD. We 
 
 We use an [executor function](../guide/executors.md) to run the quantum circuit with the noise model applied.
 
@@ -112,7 +142,7 @@ The `'counts'` key represents the number of times a particular measurement bitst
 
 Since the default execute function includes noise in this case, we see that most of the results are all ones or all zeros, corresponding to perfect entanglement between all qubits.
 
-A few others however are one or more bitflips away from either of these states. It is these types of errors we want to mitigate. 
+A few others, like `'110111'` however are one or more bitflips away from either of these states. It is these types of errors we want to mitigate. 
 
 
 ## Observable
@@ -126,7 +156,7 @@ obs = Observable(PauliString("X" * num_qubits))
 print(obs)
 ```
 
-For the circuit defined above, the ideal (noiseless) expectation value of the observable is 1, as we will see though, the unmitigated (noisy) result is impacted by depolarizing and readout errors.
+For the circuit defined above, the ideal (noiseless) expectation value of the observable is 1:
 
 ```python
 from functools import partial
@@ -137,11 +167,15 @@ ideal = obs.expectation(circuit, ideal_exec)
 print("Ideal value:", "{:.5f}".format(ideal.real))
 ```
 
+The unmitigated (noisy) result however, is impacted by the `Rz` and depolarizing errors:
+
 ```python
-noisy_exec = partial(execute, rz_noise = 0.01, depolar_noise = 0.001)
+noisy_exec = partial(execute, rz_noise = 0.03, depolar_noise = 0.002)
 noisy = obs.expectation(circuit, noisy_exec) 
 print("Unmitigated noisy value:", "{:.5f}".format(noisy.real))
 ```
+
+### Applying Digital Dynamical Decoupling
 
 Next we choose our gate sequences to be used in the digital dynamical decoupling routine (DDD). 
 More information on choosing appropriate sequences can be found in the [DDD theory](../guide/ddd-5-theory.md#common-examples-of-ddd-sequences) section of the user guide.
@@ -149,7 +183,7 @@ More information on choosing appropriate sequences can be found in the [DDD theo
 To do this, we will insert DDD sequences into our circuit itself and then compare the original circuit with the modified one.
 
 ```python
-from mitiq.ddd import rules, insert_ddd_sequences
+from mitiq.ddd import insert_ddd_sequences, rules
 
 print("Original circuit \n", circuit)
 
@@ -169,6 +203,9 @@ print("Unmitigated expectation value:", "{:.5f}".format(noisy.real))
 print("Expectation value with DDD:", "{:.5f}".format(ddd_noisy.real))
 ```
 
+### Zero Noise Extrapolation alone
+
+
 For comparison, we then apply ZNE one our original circuit (without DDD sequences inserted).
 
 ```python
@@ -178,6 +215,12 @@ zne_executor = zne.mitigate_executor(noisy_exec, observable=obs, scale_noise=zne
 zne_result = zne_executor(circuit)
 print("Mitigated value obtained with ZNE:", "{:.5f}".format(zne_result.real))
 ```
+
+In this case, we see that ZNE by itself actually _makes things worse_ than the unmitigated expectation value!
+
+
+### Digital Dynamical Decoupling + Zero noise extrapolation
+
 
 Finally, we apply a combination of DDD and ZNE.
 DDD is applied first to apply the control pulses to each circuit which ZNE runs to do its extrapolation.
@@ -190,3 +233,5 @@ print("Mitigated value obtained with DDD + ZNE:", "{:.5f}".format(combined_resul
 ```
 
 From this example we can see that each technique affords some improvement, and for this specific noise model, the combination of DDD and ZNE is more effective in mitigating errors than either technique alone.
+
+We encourage users to experiment with different circuits and noise models to see where they can find the best advantage to using these techniques in conjunction! 
