@@ -39,7 +39,14 @@ the naive (i.e. unmitigated) method of running the same noisy input circuit $N$ 
 sample mean of the measurement outcomes. Also called sampling cost, it is usually reported as a multiplicative factor $C$, defined as the ratio of the QEM estimator's variance to the sample-mean estimator's variance, and meaning that
 the method needs $C \cdot N$ circuit shots to obtain the same precision as the sample-mean estimator would with only $N$ shots.
 
+[Pauli Twirling (PT)](pt.md)
+: A technique utilizing Pauli gates is used to tailor the noise in an input circuit to be more manageable. Coherent errors contribute heavily to the quadratically worst-case gate infidelities scenario compared to incoherent errors. This could indirectly affect the performance of a large noisy quantum circuit if the circuit noise is not tailored to be a Pauli noise channel i.e. incoherent. 
+
+
 ## QEM Methods
+
+[Classical Shadows](shadows.md)
+: A quantum state is classically approximated through a small number of noisy measurements such that the error-mitigated expectation value is predicted through the classical representation.  
 
 [Clifford Data Regression (CDR)](cdr.md)
 : An error mitigation model is
@@ -51,6 +58,9 @@ between the qubits and the environment, mitigating the effects of noise.
 
 [Probabilistic Error Cancellation (PEC)](pec.md)
 : Ideal operations are represented as quasi-probability distributions over noisy implementable operations, and unbiased estimates of expectation values are obtained by averaging over circuits sampled according to this representation.
+
+[Quantum Subspace Expansion (QSE)](qse.md)
+: The error-mitigated expectation value of some observable is estimated by searching the subspace of an output quantum state for a variation of the state with the lowest error rate. This is realized without utilizing intricate syndrome measurements often required by quantum error-correcting schemes.  
 
 [Readout Error Mitigation (REM)](rem.md)
 : Inverted transition/confusion matrices are applied to noisy measurement results to mitigate errors in the estimation of expectation values.
