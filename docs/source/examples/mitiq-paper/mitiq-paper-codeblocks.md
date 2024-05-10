@@ -17,7 +17,7 @@ Codeblocks from the main text of the [Mitiq whitepaper](https://quantum-journal.
 
 **Codeblock 1**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -29,7 +29,7 @@ outputId: 38c2ce43-463f-4ab8-e402-fbc1d5877ce3
 
 **Codeblock 2**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -45,7 +45,7 @@ mitiq.about()
 
 > Note: The paper just shows the signature of an executor function, but here we explicitly define one to use in examples.
 
-```{code-cell}
+```{code-cell} ipython3
 :id: PyPWG95HhYfj
 
 import cirq
@@ -61,7 +61,7 @@ def executor(circuit: mitiq.QPROGRAM) -> float:
 
 **Codeblock 5**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -82,7 +82,7 @@ print("ZNE value:", zne_value)
 
 > Note: The paper shows pseudocode; here we show an example.
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -102,7 +102,7 @@ print("ZNE value:", zne_value)
 
 > Note: The paper shows pseudocode; here we show an example.
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -127,7 +127,7 @@ print("\n\nPEC value:", pec_value)
 
 **Codeblock 8**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -171,7 +171,7 @@ print("Folded circuit:", folded, sep="\n")
 
 **Codeblock 11**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -187,7 +187,7 @@ print("Folded circuit:", folded, sep="\n")
 
 > Note: The paper shows pseudocode; here we show an example.
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -207,7 +207,7 @@ print("\nScaled circuit:", scaled, sep="\n")
 
 > Note: The paper shows pseudocode; here we show an example.
 
-```{code-cell}
+```{code-cell} ipython3
 from functools import partial
 from mitiq.zne.scaling import compute_parameter_variance, scale_parameters
 
@@ -229,7 +229,7 @@ print("ZNE value via parameter noise scaling:", zne_value)
 
 **Codeblock 14**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -246,7 +246,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 15**
 
-```{code-cell}
+```{code-cell} ipython3
 :id: AhnilvXffoF2
 
 linear_factory = zne.inference.LinearFactory(scale_factors=[1.0, 2.0, 3.0])
@@ -254,7 +254,7 @@ linear_factory = zne.inference.LinearFactory(scale_factors=[1.0, 2.0, 3.0])
 
 **Codeblock 16**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -271,7 +271,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 17**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -290,7 +290,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 18**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -309,7 +309,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 19**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -341,7 +341,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 20**
 
-```{code-cell}
+```{code-cell} ipython3
 :id: qqndfKFIGLy6
 
 from mitiq import pec
@@ -360,7 +360,7 @@ noisy_z = pec.NoisyOperation(
 
 **Codeblock 21 & 22**
 
-```{code-cell}
+```{code-cell} ipython3
 :id: UsxGtCrAGL-h
 
 h_rep = pec.OperationRepresentation(
@@ -372,7 +372,7 @@ h_rep = pec.OperationRepresentation(
 
 **Codeblock 23**
 
-```{code-cell}
+```{code-cell} ipython3
 :id: Civ6U2OSGMQV
 
 noisy_op, sign, coeff = h_rep.sample()
@@ -380,7 +380,7 @@ noisy_op, sign, coeff = h_rep.sample()
 
 **Codeblock 24**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -404,7 +404,7 @@ See https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html.
 
 **Codeblock 27**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -420,7 +420,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 28**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -440,7 +440,7 @@ print("ZNE value:", zne_value)
 
 **Codeblock 29**
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/
@@ -464,12 +464,12 @@ print("ZNE then PEC value:", zne_then_pec_value)  # Note this is not accurate (b
 
 **Codeblock 30**
 
-```{code-cell}
+```{code-cell} ipython3
 :id: dyk7Hj1nPB48
 
 import qiskit
 from qiskit_aer import QasmSimulator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 
 def execute(
@@ -478,12 +478,16 @@ def execute(
     shots: int = 1024
 ) -> float:
     backend = QasmSimulator()  # Use of a simulator as backend.
-    # backend = IBMProvider().get_backend("backend_name")  # Alternative way to run the blocks, with saved credentials.
-    
-    job = backend.run(
+    # backend = QiskitRuntimeService().least_busy(operational=True, simulator=False)  # Alternative way to run the blocks, with saved credentials.
+
+    exec_circuit = qiskit.transpile(
         circuit,
         backend=backend,
-        optimization_level=0,
+        optimization_level=0, # Important to preserve folded gates.
+    )
+    
+    job = backend.run(
+        exec_circuit,
         shots=shots,
     )
 
@@ -491,7 +495,7 @@ def execute(
     return counts.get("00", 0.0) / shots
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 colab:
   base_uri: https://localhost:8080/

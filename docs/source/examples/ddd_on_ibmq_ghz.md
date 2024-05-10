@@ -38,7 +38,7 @@ from matplotlib import pyplot as plt
 
 import qiskit
 from qiskit_aer import AerSimulator
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
 from mitiq import ddd, QPROGRAM
@@ -146,8 +146,8 @@ correct_bitstring=[0, 0]
 
 ```{code-cell} ipython3
 if USE_REAL_HARDWARE:
-    provider = IBMProvider()
-    backend = provider.get_backend("ibm_brisbane")
+    service = QiskitRuntimeService()
+    backend = service.least_busy(operational=True, simulator=False)
 else:
     from qiskit_ibm_runtime.fake_provider import FakeLimaV2 as FakeLima
     backend = FakeLima()
@@ -171,7 +171,7 @@ def ibm_executor(
     """
     if noisy:
         transpiled = qiskit.transpile(circuit, backend=backend, optimization_level=0)
-        job = backend.run(transpiled, optimization_level=0, shots=shots)
+        job = backend.run(transpiled, shots=shots)
     else:
         ideal_backend = AerSimulator()
         job = ideal_backend.run(circuit, optimization_level=0, shots=shots)

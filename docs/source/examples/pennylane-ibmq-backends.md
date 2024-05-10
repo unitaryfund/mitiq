@@ -57,20 +57,20 @@ First, we get our devices set up depending on whether we would like to use real 
 
 ```{code-cell} ipython3
 import qiskit
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 USE_REAL_HARDWARE = False
 
 # TODO: Remove the below comment when PennyLane supports Qiskit 1.0
-# As of 14 April 2024, PennyLane is not compatible with Qiskit 1.0,
+# As of 03 May 2024, PennyLane is not compatible with Qiskit 1.0,
 # but PennyLane plans to support the upgrade, soon
-if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
-    provider = IBMProvider()
+if QiskitRuntimeService.saved_accounts() and USE_REAL_HARDWARE:
+    service = QiskitRuntimeService()
+    backend = service.least_busy(operational=True, simulator=False)
     dev = qml.device(
         "qiskit.ibmq",
         wires=1,
-        backend="ibm_brisbane",
-        provider=provider
+        backend=backend,
     )
 else:
     noise_strength = 0.05
@@ -78,7 +78,7 @@ else:
     dev = qml.transforms.insert(
         dev_noise_free,
         qml.AmplitudeDamping,
-        noise_strength
+        noise_strength,
     )
 ```
 

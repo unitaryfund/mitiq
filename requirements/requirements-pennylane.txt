@@ -1,2 +1,4 @@
 pennylane-qiskit~=0.36.0
 pennylane~=0.36.0
+# TODO: Remove qiskit-ibm-provider when upgrading qiskit-ibm-runtime in requirements-qiskit
+qiskit-ibm-provider~=0.11.0; python_version == '3.9'
