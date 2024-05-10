@@ -13,7 +13,7 @@ kernelspec:
 
 # What happens when I use QSE?
 A figure for the typical workflow for QSE is shown below:
-```{figure} ../img/qse-data-flow-diagram.png
+```{figure} ../img/qse-data-flow-diagram-v2.png
 ---
 width: 700px
 name: qse_workflow_overview
