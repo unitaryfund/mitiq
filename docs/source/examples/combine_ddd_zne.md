@@ -1,15 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.16.1
-  kernelspec:
-    display_name: Python 3 (ipykernel)
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.16.1
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
 ---
 
 # Composing techniques: Digital Dynamical Decoupling and Zero Noise Extrapolation
@@ -23,27 +22,26 @@ In [DDD](../guide/ddd.md), the input quantum circuit is modified by inserting ga
 In [ZNE](../guide/zne.md), the expectation value of the observable of interest is computed at different noise levels, and subsequently the ideal expectation value is inferred by extrapolating the measured results to the zero-noise
 limit. 
 
++++
 
 ## Setup
 
 We begin by importing the relevant modules and libraries required for the rest of this tutorial.
 
-```python
+```{code-cell}
 import cirq
 import numpy as np
 from mitiq import MeasurementResult, Observable, PauliString
 ```
 
-<!-- #region -->
 ## Task
 
 We will demonstrate quantum error mitigation on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger%E2%80%93Horne%E2%80%93Zeilinger_state), entangling multiple qubits together. We can create a short function to do this for convenience. We will also define a utility function `idle_qubits`, which will give us a way to insert additional time steps in which to let our qubits idle. 
 
 
 We will explain this further in the noise model section, but suffice it to say that these are intended to amplify the effect of time correlated noise. 
-<!-- #endregion -->
 
-```python
+```{code-cell}
 def idle_qubits(circuit, qubits, idle_steps):
     """Set qubits to idle for specfied number of steps 
     in by inserting Identity gates in each `moment`
@@ -54,7 +52,7 @@ def idle_qubits(circuit, qubits, idle_steps):
     return circuit
 ```
 
-```python
+```{code-cell}
 def ghz(num_qubits, idle_steps=0):
     # Create  qubit registers
     qubits = cirq.LineQubit.range(num_qubits)
@@ -81,7 +79,7 @@ def ghz(num_qubits, idle_steps=0):
 
 For this example we will create a 6 qubit GHZ state with two idle steps after each moment:
 
-```python
+```{code-cell}
 num_qubits = 6
 circuit = ghz(num_qubits, idle_steps=3)
 
@@ -94,6 +92,7 @@ In the our noise model, we will apply errors after each moment. Adding the addit
 
 **Note:** Due to cirq's definition of moments, the first two gates of the circuit (`cirq.H(qubits[0])` and `cirq.CNOT(qubits[0], qubits[i])`) are in the same moment. This means the idle steps cannot be added between these gates, and therefore the time correlated noise will have less of an effect for the start of the circuit. 
 
++++
 
 ## Noise model and executor
 
@@ -101,7 +100,7 @@ In the our noise model, we will apply errors after each moment. Adding the addit
 
 We use an [executor function](../guide/executors.md) to run the quantum circuit with the noise model applied.
 
-```python
+```{code-cell}
 def execute(
     circuit: cirq.Circuit, 
     rz_noise: float = 0.01,
@@ -133,7 +132,7 @@ def execute(
 
 Let's see what the execute function returns when we call it on our GHZ circuit, just leaving the default noise levels:
 
-```python
+```{code-cell}
 res = execute(circuit)
 res.to_dict() # Dictionary for more convenient visualization
 ```
@@ -144,6 +143,7 @@ Since the default execute function includes noise in this case, we see that most
 
 A few others, like `'110111'` however are one or more bitflips away from either of these states. It is these types of errors we want to mitigate. 
 
++++
 
 ## Observable
 
@@ -151,14 +151,14 @@ In this example, we just want to check if we have achieved entanglement across a
 
 This corresponds to projecting the state onto either the $∣+⟩^{⊗n}$ or $∣−⟩^{⊗n}$ basis. For a perfect GHZ state, this observable will have an expectation value of 1, which corresponds to all qubits being in the same state.
 
-```python
+```{code-cell}
 obs = Observable(PauliString("X" * num_qubits))
 print(obs)
 ```
 
 For the circuit defined above, the ideal (noiseless) expectation value of the observable is 1:
 
-```python
+```{code-cell}
 from functools import partial
 
 ideal_exec = partial(execute, rz_noise = 0.0, depolar_noise = 0.0)
@@ -167,10 +167,10 @@ ideal = obs.expectation(circuit, ideal_exec)
 print("Ideal value:", "{:.5f}".format(ideal.real))
 ```
 
-The unmitigated (noisy) result however, is impacted by the `Rz` and depolarizing errors:
+The unmitigated (noisy) result however, is impacted by the `Rz` and depolarizing errors. In fact, we are not even halfway to the correct expectation value:
 
-```python
-noisy_exec = partial(execute, rz_noise = 0.03, depolar_noise = 0.002)
+```{code-cell}
+noisy_exec = partial(execute, rz_noise = 0.02, depolar_noise = 0.005)
 noisy = obs.expectation(circuit, noisy_exec) 
 print("Unmitigated noisy value:", "{:.5f}".format(noisy.real))
 ```
@@ -182,7 +182,7 @@ More information on choosing appropriate sequences can be found in the [DDD theo
 
 To do this, we will insert DDD sequences into our circuit itself and then compare the original circuit with the modified one.
 
-```python
+```{code-cell}
 from mitiq.ddd import insert_ddd_sequences, rules
 
 print("Original circuit \n", circuit)
@@ -195,7 +195,7 @@ print("DDD modified circuit \n", ddd_circuit)
 
 Now we execute our function on the `ddd_circuit`:
 
-```python
+```{code-cell}
 ddd_noisy = obs.expectation(ddd_circuit, noisy_exec)
 
 print("Unmitigated expectation value:", "{:.5f}".format(noisy.real))
@@ -205,10 +205,11 @@ print("Expectation value with DDD:", "{:.5f}".format(ddd_noisy.real))
 
 ### Zero Noise Extrapolation alone
 
++++
 
 For comparison, we then apply ZNE one our original circuit (without DDD sequences inserted).
 
-```python
+```{code-cell}
 from mitiq import zne
 
 zne_executor = zne.mitigate_executor(noisy_exec, observable=obs, scale_noise=zne.scaling.folding.fold_global)
@@ -218,14 +219,16 @@ print("Mitigated value obtained with ZNE:", "{:.5f}".format(zne_result.real))
 
 In this case, we see that ZNE by itself actually _makes things worse_ than the unmitigated expectation value!
 
++++
 
 ### Digital Dynamical Decoupling + Zero noise extrapolation
 
++++
 
 Finally, we apply a combination of DDD and ZNE.
 DDD is applied first to apply the control pulses to each circuit which ZNE runs to do its extrapolation.
 
-```python
+```{code-cell}
 combined_executor = zne.mitigate_executor(execute, observable=obs, scale_noise=zne.scaling.folding.fold_global)
 
 combined_result = combined_executor(ddd_circuit)
@@ -234,4 +237,4 @@ print("Mitigated value obtained with DDD + ZNE:", "{:.5f}".format(combined_resul
 
 From this example we can see that each technique affords some improvement, and for this specific noise model, the combination of DDD and ZNE is more effective in mitigating errors than either technique alone.
 
-We encourage users to experiment with different circuits and noise models to see where they can find the best advantage to using these techniques in conjunction! 
+We encourage users to experiment with different circuits and noise models to see where they can find the best advantage to using these techniques in conjunction!
