@@ -236,6 +236,6 @@ combined_result = combined_executor(ddd_circuit)
 print("Mitigated value obtained with DDD + ZNE:", "{:.5f}".format(combined_result.real))
 ```
 
-From this example we can see that each technique affords some improvement, and for this specific noise model, the combination of DDD and ZNE is more effective in mitigating errors than either technique alone.
+From this example we can see that for this specific noise model, DDD improved things somewhat on its own, while ZNE was ineffectual on the original unmitigated circuit. It was only by using DDD and ZNE in conjunction that we were able to achieve significant gains in performance.
 
 We encourage users to experiment with different circuits and noise models to see where they can find the best advantage to using these techniques in conjunction!
