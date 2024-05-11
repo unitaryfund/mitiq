@@ -5,7 +5,6 @@ maxdepth: 2
 caption: Contents
 hidden: true
 ---
-readme.md
 guide/guide.md
 examples/examples.md
 apidoc.md
