@@ -362,7 +362,6 @@ html_theme_options = {
     "secondary_sidebar_items": ["page-toc", "sourcelink", "notebook-download"],
 }
 
-
 myst_update_mathjax = False
 
 nbsphinx_custom_formats = {
