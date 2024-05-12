@@ -38,7 +38,7 @@ with open(f"{directory_of_this_file}/../../VERSION.txt", "r") as f:
 sys.path.append(os.path.abspath("sphinxext"))
 
 
-def add_notebook_link_to_context_if_exist(app, pagename, context):
+def add_notebook_link_to_context_if_exists(app, pagename, context):
     nb_filename = pagename + ".ipynb"
     nb_exists = os.path.exists(
         os.path.join(app.outdir, "../jupyter_execute", nb_filename)
@@ -50,24 +50,28 @@ def add_notebook_link_to_context_if_exist(app, pagename, context):
 
 
 def handle_page_context(app, pagename, templatename, context, doctree):
-    add_notebook_link_to_context_if_exist(app, pagename, context)
+    add_notebook_link_to_context_if_exists(app, pagename, context)
 
 
-def move_notebook_dir(app, exception):
+def move_notebook_dir(app):
+    source_dir = os.path.join(app.outdir, "../jupyter_execute")
+    target_dir = os.path.join(app.outdir, ".")
+
+    if os.path.exists(source_dir):
+        shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+        print(f"Copied Jupyter execution files to {target_dir}")
+    else:
+        print("No Jupyter execution files found to copy.")
+
+
+def handle_build_finished(app, exception):
     if exception is None:  # Only proceed if the build completed successfully
-        source_dir = os.path.join(app.outdir, "../jupyter_execute")
-        target_dir = os.path.join(app.outdir, ".")
-
-        if os.path.exists(source_dir):
-            shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
-            print(f"Copied Jupyter execution files to {target_dir}")
-        else:
-            print("No Jupyter execution files found to copy.")
+        move_notebook_dir(app)
 
 
 def setup(app):
     app.connect("html-page-context", handle_page_context)
-    app.connect("build-finished", move_notebook_dir)
+    app.connect("build-finished", handle_build_finished)
 
 
 # -- General configuration ---------------------------------------------------
@@ -355,7 +359,7 @@ html_theme_options = {
             "type": "fontawesome",
         }
     ],
-    "secondary_sidebar_items": ["page-toc", "sourcelink", "jupyter-download"],
+    "secondary_sidebar_items": ["page-toc", "sourcelink", "notebook-download"],
 }
 
 
