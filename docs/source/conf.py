@@ -12,6 +12,7 @@
 #
 import datetime
 import os
+import shutil
 import sys
 
 import pybtex.style.formatting
@@ -35,6 +36,41 @@ with open(f"{directory_of_this_file}/../../VERSION.txt", "r") as f:
     release = f.read().strip()
 
 sys.path.append(os.path.abspath("sphinxext"))
+
+
+def add_notebook_link_to_context_if_exist(pagename, context):
+    nb_filename = pagename + ".ipynb"
+    nb_exists = os.path.exists(
+        os.path.join(
+            os.path.abspath(os.curdir), "./build/jupyter_execute", nb_filename
+        )
+    )
+    if nb_exists:
+        context["notebook_link"] = nb_filename
+    else:
+        context["notebook_link"] = None
+
+
+def handle_page_context(app, pagename, templatename, context, doctree):
+    add_notebook_link_to_context_if_exist(pagename, context)
+
+
+def move_notebook_dir(app, exception):
+    if exception is None:  # Only proceed if the build completed successfully
+        source_dir = os.path.join(app.outdir, "../jupyter_execute")
+        target_dir = os.path.join(app.outdir, ".")
+
+        if os.path.exists(source_dir):
+            shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+            print(f"Copied Jupyter execution files to {target_dir}")
+        else:
+            print("No Jupyter execution files found to copy.")
+
+
+def setup(app):
+    app.connect("html-page-context", handle_page_context)
+    app.connect("build-finished", move_notebook_dir)
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -321,7 +357,9 @@ html_theme_options = {
             "type": "fontawesome",
         }
     ],
+    "secondary_sidebar_items": ["page-toc", "sourcelink", "jupyter-download"],
 }
+
 
 myst_update_mathjax = False
 
