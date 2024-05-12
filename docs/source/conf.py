@@ -38,15 +38,15 @@ with open(f"{directory_of_this_file}/../../VERSION.txt", "r") as f:
 sys.path.append(os.path.abspath("sphinxext"))
 
 
+JUPYTER_EXECUTE_PATH = "../jupyter_execute"
+
+
 def add_notebook_link_to_context_if_exists(app, pagename, context):
     nb_filename = pagename + ".ipynb"
     nb_exists = os.path.exists(
-        os.path.join(app.outdir, "../jupyter_execute", nb_filename)
+        os.path.join(app.outdir, JUPYTER_EXECUTE_PATH, nb_filename)
     )
-    if nb_exists:
-        context["notebook_link"] = nb_filename
-    else:
-        context["notebook_link"] = None
+    context["notebook_link"] = nb_filename if nb_exists else None
 
 
 def handle_page_context(app, pagename, templatename, context, doctree):
@@ -54,7 +54,7 @@ def handle_page_context(app, pagename, templatename, context, doctree):
 
 
 def move_notebook_dir(app):
-    source_dir = os.path.join(app.outdir, "../jupyter_execute")
+    source_dir = os.path.join(app.outdir, JUPYTER_EXECUTE_PATH)
     target_dir = os.path.join(app.outdir, ".")
 
     if os.path.exists(source_dir):
