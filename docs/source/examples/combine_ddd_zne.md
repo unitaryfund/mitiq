@@ -16,7 +16,7 @@ kernelspec:
 
 Noise in quantum computers can arise from a variety of sources, and sometimes applying multiple error mitigation techniques can be more beneficial than applying a single technique alone.
 
-Here we apply a combination of Digital Dynamical Decoupling (DDD) and Zero Noise Extrapolation (ZNE) on a GHZ state.
+Here we apply a combination of Digital Dynamical Decoupling (DDD) and Zero Noise Extrapolation (ZNE) on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger-Horne-Zeilinger_state). We choose this particular use case because it is a common subroutine in many circuits, and we know its expectation value beforehand, making it easy to compare fidelities with and without error mitigation. 
 
 In [DDD](../guide/ddd.md), the input quantum circuit is modified by inserting gate sequences at regular intervals designed to reduce interaction between (i.e., decouple) the qubits from their environment. 
 
@@ -97,15 +97,15 @@ In the our noise model, we will apply errors after each moment. Adding the addit
 
 ## Noise model and executor
 
-**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate systematic $R_z$ rotations and depolarising noise applied to each qubit after each time step. This corresponds to noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD. We 
+**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate systematic $R_z$ rotations and depolarising noise applied to each qubit after each time step. This corresponds to noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD. 
 
-We use an [executor function](../guide/executors.md) to run the quantum circuit with the noise model applied.
+We use an [executor function](../guide/executors.md) to run the quantum circuit with the noise model applied. The default noise values have been chosen empirically to demonstrate an error model which strongly impacts our chosen circuit (creating a GHZ state), but which can still be mitigated by our chosen QEM techniques.  
 
 ```{code-cell}
 def execute(
     circuit: cirq.Circuit, 
-    rz_noise: float = 0.01,
-    depolar_noise: float = 0.0005
+    rz_noise: float = 0.02,
+    depolar_noise: float = 0.005
     ) -> MeasurementResult:
     """
     Execute a circuit with R_z dephasing noise of strength ``rz_noise`` and depolarizing noise ``depolar_noise``
@@ -230,7 +230,7 @@ Finally, we apply a combination of DDD and ZNE.
 DDD is applied first to apply the control pulses to each circuit which ZNE runs to do its extrapolation.
 
 ```{code-cell}
-combined_executor = zne.mitigate_executor(execute, observable=obs, scale_noise=zne.scaling.folding.fold_global)
+combined_executor = zne.mitigate_executor(noisy_exec, observable=obs, scale_noise=zne.scaling.folding.fold_global)
 
 combined_result = combined_executor(ddd_circuit)
 print("Mitigated value obtained with DDD + ZNE:", "{:.5f}".format(combined_result.real))
