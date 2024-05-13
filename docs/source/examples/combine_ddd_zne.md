@@ -208,7 +208,7 @@ print("Expectation value with DDD:", "{:.5f}".format(ddd_noisy.real))
 
 +++
 
-For comparison, we then apply ZNE one our original circuit (without DDD sequences inserted).
+For comparison, we then apply ZNE on our original circuit (without DDD sequences inserted).
 
 ```{code-cell}
 from mitiq import zne
