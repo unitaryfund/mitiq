@@ -34,5 +34,6 @@ DDD with Cirq: Mirror circuits <ddd_tutorial.md>
 DDD with Qiskit: GHZ circuits <ddd_on_ibmq_ghz.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>
 Composing techniques: REM + ZNE <combine_rem_zne.md>
+Composing techniques: DDD + ZNE <combine_ddd_zne.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
 ```
