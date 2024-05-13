@@ -40,8 +40,48 @@ def _get_num_layers_without_measurements(input_circuit: cirq.Circuit) -> int:
     return num_layers
 
 
+def _get_chunks(
+    input_circuit: cirq.Circuit, num_chunks: int
+) -> list[cirq.Circuit]:
+    """Splits a circuit into approximately equal chunks.
+
+    Adapted from:
+    https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length
+
+        Args:
+            input_circuit: Circuit of interest.
+            num_chunks: Number of desired approximately equal chunks
+            * when num_chunks == num_layers, the circuit gets split into each
+                layer in the input circuit
+            * when num_chunks == 1, the entire circuit is chunked into 1 layer
+
+
+        Returns:
+            split_circuit: Circuit of interest split into approximately equal
+            chunks
+    """
+    num_layers = _get_num_layers_without_measurements(input_circuit)
+    if num_chunks == 0:
+        raise ValueError("The number of chunks should be >= to 1.")
+
+    if num_chunks > num_layers:
+        raise ValueError(
+            "Number of chunks > the number of layers in the circuit."
+        )
+
+    k, m = divmod(num_layers, num_chunks)
+    split_circuit = (
+        input_circuit[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)]
+        for i in range(num_chunks)
+    )
+    return list(split_circuit)
+
+
 def _get_scale_factor_vectors(
-    input_circuit: cirq.Circuit, degree: int, fold_multiplier: int
+    input_circuit: cirq.Circuit,
+    degree: int,
+    fold_multiplier: int,
+    num_chunks: int = 1,
 ) -> list[tuple[int]]:
     """Returns the patterned scale factor vectors required for multivariate
     extrapolation.
@@ -55,7 +95,11 @@ def _get_scale_factor_vectors(
             scale_factor_vectors: Multiple variations of scale factors for each
             layer in the input circuit
     """
-    num_layers = _get_num_layers_without_measurements(input_circuit)
+    if num_chunks == 1:
+        num_layers = _get_num_layers_without_measurements(input_circuit)
+    else:
+        circuit_chunks = _get_chunks(input_circuit, num_chunks)
+        num_layers = len(circuit_chunks)
 
     # find the exponents of all the monomial terms required for the folding
     # pattern

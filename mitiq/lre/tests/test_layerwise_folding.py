@@ -100,7 +100,8 @@ def test_get_num_layers(test_input, expected):
             1,
             0,
             [(1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1)],
-        ),(
+        ),
+        (
             test_circuit1_with_measurements,
             1,
             1,
@@ -159,7 +160,7 @@ def test_get_num_layers(test_input, expected):
         ),
     ],
 )
-def test_get_scale_factor_vectors(
+def test_get_scale_factor_vectors_no_chunking(
     test_input, degree, test_fold_multiplier, expected_scale_factor_vectors
 ):
     """Verifies vectors of scale factors are calculated accurately."""
@@ -168,3 +169,41 @@ def test_get_scale_factor_vectors(
     )
 
     assert calculated_scale_factor_vectors == expected_scale_factor_vectors
+
+
+@pytest.mark.parametrize(
+    "test_input, degree, test_fold_multiplier, test_chunks, expected_size",
+    [
+        (test_circuit1, 1, 0, 1, 4),
+        (test_circuit1, 1, 1, 2, 3),
+        (test_circuit1, 2, 1, 3, 10),
+        (test_circuit1, 2, 3, 2, 6),
+    ],
+)
+def test_get_scale_factor_vectors_with_chunking(
+    test_input, degree, test_fold_multiplier, test_chunks, expected_size
+):
+    """Verifies vectors of scale factors are calculated accurately."""
+    calculated_scale_factor_vectors = _get_scale_factor_vectors(
+        test_input, degree, test_fold_multiplier, test_chunks
+    )
+
+    assert len(calculated_scale_factor_vectors) == expected_size
+
+
+@pytest.mark.parametrize(
+    "test_input, num_chunks, error_msg",
+    [
+        (test_circuit1, 0, "The number of chunks should be >= to 1."),
+        (
+            test_circuit1,
+            5,
+            "Number of chunks > the number of layers in the circuit.",
+        ),
+    ],
+)
+def test_invalid_num_chunks(test_input, num_chunks, error_msg):
+    """Ensures that the number of intended chunks in the input circuit raises
+    an error for an invalid value."""
+    with pytest.raises(ValueError, match=error_msg):
+        _get_scale_factor_vectors(test_input, 2, 2, num_chunks)
