@@ -230,9 +230,7 @@ Finally, we apply a combination of DDD and ZNE.
 DDD is applied first to apply the control pulses to each circuit which ZNE runs to do its extrapolation.
 
 ```{code-cell}
-combined_executor = zne.mitigate_executor(noisy_exec, observable=obs, scale_noise=zne.scaling.folding.fold_global)
-
-combined_result = combined_executor(ddd_circuit)
+combined_result = zne_executor(ddd_circuit)
 print("Mitigated value obtained with DDD + ZNE:", "{:.5f}".format(combined_result.real))
 ```
 
