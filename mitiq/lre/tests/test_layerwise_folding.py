@@ -14,6 +14,7 @@ import pytest
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_num_layers_without_measurements,
     _get_scale_factor_vectors,
+    multivariate_layer_scaling,
 )
 
 qreg1 = cirq.LineQubit.range(3)
@@ -26,6 +27,40 @@ test_circuit1 = cirq.Circuit(
 
 test_circuit1_with_measurements = deepcopy(test_circuit1)
 test_circuit1_with_measurements.append(cirq.ops.measure_each(*qreg1))
+
+
+def test_multivariate_layerwise_scaling():
+    """Checks if multiple scaled circuits are returned to fit the required
+    folding pattern for multivariate extrapolation."""
+    multiple_scaled_circuits = multivariate_layer_scaling(
+        test_circuit1, 2, 2, 3
+    )
+
+    assert len(multiple_scaled_circuits) == 10
+    folding_pattern = [
+        (1, 1, 1),
+        (5, 1, 1),
+        (1, 5, 1),
+        (1, 1, 5),
+        (9, 1, 1),
+        (5, 5, 1),
+        (5, 1, 5),
+        (1, 9, 1),
+        (1, 5, 5),
+        (1, 1, 9),
+    ]
+
+    i = 0
+    for scale_factor_vector in folding_pattern:
+        scale_layer1, scale_layer2, scale_layer3 = scale_factor_vector
+        expected_circuit = cirq.Circuit(
+            [cirq.ops.H.on_each(*qreg1)] * scale_layer1,
+            [cirq.ops.CNOT.on(qreg1[0], qreg1[1]), cirq.ops.X.on(qreg1[2])]
+            * scale_layer2,
+            [cirq.ops.TOFFOLI.on(*qreg1)] * scale_layer3,
+        )
+        assert expected_circuit == multiple_scaled_circuits[i]
+        i += 1
 
 
 @pytest.mark.parametrize(
