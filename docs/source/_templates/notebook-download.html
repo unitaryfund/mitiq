@@ -1,0 +1,8 @@
+{# Displays a link to download the Jupyter Notebook #}
+{% if notebook_link %}
+  <div class="tocsection sourcelink">
+    <a href="{{ pathto(notebook_link, true) }}" title="Download Notebook" download>
+      <i class="fa-solid fa-book"></i> {{ _("Download Notebook") }}
+    </a>
+  </div>
+{% endif %}
