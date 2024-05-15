@@ -45,8 +45,7 @@ def test_rb_conversion(n_qubits, return_type):
 
 def test_bad_n_qubits():
     with pytest.raises(
-        ValueError, match="Only generates RB circuits on one or two "):
+        ValueError, match="Only generates RB circuits on one or two "
+    ):
         for trials in [2, 3]:
-            generate_rb_circuits(
-                n_qubits=4, num_cliffords=10, trials=trials
-            )
+            generate_rb_circuits(n_qubits=4, num_cliffords=10, trials=trials)
