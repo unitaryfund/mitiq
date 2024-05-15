@@ -51,3 +51,21 @@ def test_conversion(return_type):
         return_type=return_type,
     )
     assert return_type in circuit.__module__
+
+
+@pytest.mark.parametrize(
+    "test_num_qubits, test_num_twoq_cliffords, error_msg",
+    [
+        (0, 2, "Cannot prepare a circuit with"),
+        (1, 2, "Need more than 2 qubits for two-qubit Clifford gates."),
+    ],
+)
+def test_invalid_input(test_num_qubits, test_num_twoq_cliffords, error_msg):
+    """Ensures error raised as expected."""
+    with pytest.raises(ValueError, match=error_msg):
+        generate_random_clifford_t_circuit(
+            num_qubits=test_num_qubits,
+            num_oneq_cliffords=2,
+            num_twoq_cliffords=test_num_twoq_cliffords,
+            num_t_gates=2,
+        )

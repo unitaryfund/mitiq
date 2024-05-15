@@ -195,6 +195,13 @@ def test_two_qubit_gate_unsupported():
         )
 
 
+def test_two_qubit_gate_bad_probability():
+    with pytest.raises(
+        ValueError, match="two_qubit_gate_prob must be between 0 and 1"
+    ):
+        mirror_circuits.generate_mirror_circuit(1, 2.0, nx.complete_graph(2))
+
+
 def test_deterministic_correct_bitstrings():
     """For a fixed seed, correct bitstrings should be deterministic."""
     expected_correct_bitstrings = (
