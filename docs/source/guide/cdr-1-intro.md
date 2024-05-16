@@ -97,7 +97,8 @@ The CDR method creates a set of "training circuits" which are related to the inp
 These circuits are simulated on a classical (noiseless) simulator to collect data for regression.
 The simulator should also return a `QuantumResult`.
 
-To use CDR at scale, an efficient near-Clifford circuit simulator must be specified.
+To use CDR at scale, an efficient near-Clifford circuit simulator must be specified. Two examples of efficient near-Clifford circuit simulators are [Qrack with the stabilizer hybrid (Clifford+Rz)](https://github.com/vm6502q/pyqrack-jupyter/blob/main/Clifford_RZ.ipynb)  and [IBM's extended stabilizer simulator](https://qiskit.github.io/qiskit-aer/tutorials/6_extended_stabilizer_tutorial.html).
+
 In this example, the circuit is small enough to use any classical simulator, and we use the same density matrix simulator as above but without noise.
 
 ```{code-cell} ipython3
