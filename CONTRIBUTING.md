@@ -115,11 +115,26 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 - [Error Mitigation by Subspace Expansion](https://docs.google.com/document/d/1JyQAwiw8BRT_oucZ6tQv0id6UhSdd3df1mNSPpOvu1I) by Ammar Jahin, Dariel Mok , Preksha Naik, Abdulrahman Sahmoud (@bubakazouba) Apr 28, 2023
 - [Implementation RFC for Mitiq calibration](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
 - [Calibration tools for error mitigation RFC (abstract general solutions)](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
-- [Identity insersion scaling RFC](https://docs.google.com/document/d/1hbd9frjYiSy0WujA0iCccc-oMO4Q-kZc2G4b3lkJHdk/edit) by Purva Thakre (@purva-thakre) Jun 29, 2022
+- [Identity insertion scaling RFC](https://docs.google.com/document/d/1hbd9frjYiSy0WujA0iCccc-oMO4Q-kZc2G4b3lkJHdk/edit) by Purva Thakre (@purva-thakre) Jun 29, 2022
 - [Readout Confusion Inversion RFC](https://docs.google.com/document/d/1buO5PrO5sS02VXjcaYf37RuR0rF6xpyr4J9H1tI4vN4/edit) by Amir Ebrahimi (@amirebrahimi) Jun 16, 2022
 - [Documentation reorganization RFC](https://docs.google.com/document/d/13un5TZPknSOhmOBkrL2rsofjGfdp2jDnd-DywLpGFPc/edit) by Ryan LaRose (@rmlarose) Dec 1, 2021
 - [Learning-based PEC RFC](https://docs.google.com/document/d/1VItesy6R5SlUa_YXW1km7IjFZ8kzyFeHUepHak1fEh4/edit) by Misty Wahl (@Misty-W) Oct 25, 2021
 - [Digital dynamical decoupling RFC](https://docs.google.com/document/d/1cRwFCTn6kUjI1P0kNydtevxIYtE4r8Omd_iWK0Pe8qo/edit) by Aaron Robertson (@Aaron-Robertson) Jan 28, 2021
+
+### Checklist for adding an approved feature
+
+After your RFC is accepted, the proposed feature (for example, a new QEM Method) will require the following:
+
+- Add the new QEM method to `mitiq/abbreviated_name_of_qem_method` such that the corresponding units tests are in `mitiq/abbreviated_name_of_qem_method/tests`
+- The code must follow the formatting and style guidelines discussed previously.
+- The new module has to be added to the [API-doc](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#automatically-add-information-from-the-api-docs)
+- If you are adding a new QEM method, see the [instructions for User's Guide](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#adding-files-to-the-user-guide)
+- In addition, update the [Glossary](https://mitiq.readthedocs.io/en/latest/guide/glossary.html) with a one-line summary of what your new feature accomplishes. 
+
+If you are adding a new tutorial to the [documentation examples](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#updating-the-documentation),
+- add the file as a `.md` file in `docs/source/examples`. A template is available at `docs/source/examples/template.md`
+- add your tutorial in `docs/source/examples/examples.md` such that it shows up in a docs build 
+- add a thumbnail image as `docs/source/_thumbnails/your_image.png` and list it in the `nbsphinx_thumbnails` block of `docs/source/conf.py`
 
 ## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).

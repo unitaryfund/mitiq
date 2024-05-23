@@ -81,6 +81,46 @@ where `file.md` is the one to be added. For more information on including files 
 To add information in the guide, please add markdown (`.md`) files to the `docs/guide` directory.
 Remember to add new files to the guide's TOC file `docs/source/guide/guide.md`.
 
+The different sections of a User's guide comprises of:
+
+- How do I use `new_QEM_method` labeled as `new_QEM_method-1-intro.md`?
+- When should I use `new_QEM_method` labeled as `new_QEM_method-2-use-case.md`?
+- What additional options are available in `new_QEM_method` labeled as `new_QEM_method-3-options.md`?
+- What happens when I use `new_QEM_method` labeled as `new_QEM_method-4-low-level.md`?
+- What is the theory behind `new_QEM_method` labeled as `new_QEM_method-5-theory.md`?
+
+The main landing page will link all the sections of the User's Guide such that there is a [workflow diagram](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#adding-workflow-images-to-the-user-guide) for the `new_QEM_method` on this page alongside
+links to any tutorials utilizing `new_QEM_method` in `docs/source/examples`. 
+
+```{code-block}
+   # Full Name of New QEM Method
+
+   One line summary of what the technique does
+
+   <start_backticks_code_block>{figure} ../img/new_qem_method_workflow.png
+   ---
+   width: 700px
+   name: new_qem_method_workflow_overview
+   ---
+   The new_QEM workflow in Mitiq is fully explained in the {doc}`new_QEM_method-4-low-level.md` section.
+   <end_backticks_code_block>
+
+   Below you can find sections of the documentation that address the following questions:
+
+   <start_backticks_code_block>{toctree}
+   ---
+   maxdepth: 1
+   ---
+   new_QEM_method-1-intro.md
+   new_QEM_method-2-use-case.md
+   new_QEM_method-3-options.md
+   new_QEM_method-4-low-level.md
+   new_QEM_method-theory.md
+   <end_backticks_code_block>
+
+   A simple tutorial using  `new_QEM_method` can be found <insert_link>
+```
+
 ### Adding workflow images to the user guide
 
 To insert a workflow to the user's guide of some new technique, a template is available (shown below as a `png`). This template is also available in `svg` format at [mitiq_template.svg](../source/img/general_template.svg).
