@@ -129,7 +129,8 @@ After your RFC is accepted, the proposed feature (for example, a new QEM Method)
 - The code must follow the formatting and style guidelines discussed previously.
 - The new module has to be added to the [API-doc](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#automatically-add-information-from-the-api-docs)
 - If you are adding a new QEM method, see the [instructions for User's Guide](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#adding-files-to-the-user-guide)
-- In addition, update the [Glossary](https://mitiq.readthedocs.io/en/latest/guide/glossary.html) with a one-line summary of what your new feature accomplishes. 
+- In addition, update the [Glossary](https://mitiq.readthedocs.io/en/latest/guide/glossary.html) with a one-line summary of what your new feature accomplishes.
+- Update `README.md` with information related to your new feature. 
 
 If you are adding a new tutorial to the [documentation examples](https://mitiq.readthedocs.io/en/latest/contributing_docs.html#updating-the-documentation),
 - add the file as a `.md` file in `docs/source/examples`. A template is available at `docs/source/examples/template.md`
