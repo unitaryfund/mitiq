@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import random
-from typing import List
+from typing import List, Optional
 
 import cirq
 
@@ -53,6 +53,7 @@ CZ_twirling_gates = [
 def pauli_twirl_circuit(
     circuit: QPROGRAM,
     num_circuits: int = 10,
+    noise_op: Optional[cirq.Gate] = None,
 ) -> List[QPROGRAM]:
     r"""Return the Pauli twirled versions of the input circuit.
 
@@ -63,6 +64,13 @@ def pauli_twirl_circuit(
     Args:
         circuit: The input circuit to execute with twirling.
         num_circuits: Number of circuits to be twirled, and averaged.
+        noise_op: Noisy operator acting on CNOT and CZ gates. See warning.
+
+    Warning:
+        If this function is executed with a simulator backend, it is
+        necessary to use the `noise_op` argument to apply noise on CNOT
+        and CZ gates. Otherwise, the twirled circuits will not include the
+        noise on these gates.
 
     Returns:
         The expectation value estimated with Pauli twirling.
@@ -72,7 +80,32 @@ def pauli_twirl_circuit(
         twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
     ]
 
+    if noise_op is not None:
+        twirled_circuits = [
+            add_noise_to_two_qubit_gates(circuit, noise_op)
+            for circuit in twirled_circuits
+        ]
+
     return twirled_circuits
+
+
+@accept_qprogram_and_validate
+def add_noise_to_two_qubit_gates(
+    circuit: cirq.Circuit, noise_op: cirq.Gate
+) -> cirq.Circuit:
+    """Add noise to CNOT and CZ gates."""
+
+    noisy_gates = [cirq.ops.CNOT, cirq.ops.CZ]
+
+    noisy_circuit = cirq.Circuit()
+    for moment in circuit:
+        layer = cirq.Circuit()
+        for op in moment:
+            layer.append(op)
+            if op.gate in noisy_gates:
+                layer.append(noise_op.on_each(op.qubits))
+        noisy_circuit += layer
+    return noisy_circuit
 
 
 def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
