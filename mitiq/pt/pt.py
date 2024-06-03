@@ -93,7 +93,12 @@ def pauli_twirl_circuit(
 def add_noise_to_two_qubit_gates(
     circuit: cirq.Circuit, noise_op: cirq.Gate
 ) -> cirq.Circuit:
-    """Add noise to CNOT and CZ gates."""
+    """Add noise to CNOT and CZ gates on pre-twirled circuits.
+
+    Args:
+        circuit: Pre-twirled circuit
+        noise_op: noise operator to apply after CNOT and CZ gates
+    """
 
     noisy_gates = [cirq.ops.CNOT, cirq.ops.CZ]
 
