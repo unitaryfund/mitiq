@@ -39,16 +39,14 @@ extensions = ['sphinx.ext.autodoc']
 
 Documentation is found in `docs/source`, and is divided into the following sections:
 
--  a **guide**, whose content needs to be
-written from scratch, 
-- **examples** which can be either jupyter notebooks or MyST formatted notebooks, and
-- an **API-doc** part, which is (mostly)
-automatically generated.
+-  a **guide**, whose content needs to be written from scratch for new features. For more details, go to [](contributing.md#proposing-a-new-feature-to-mitiq) and [](contributing_docs.md#adding-files-to-the-user-guide)
+- **examples** which can be either jupyter notebooks or MyST formatted notebook. A checklist is available in [](contributing_docs.md#adding-example-files)
+- an **API-doc** part, which is (mostly) automatically generated. See [](contributing_docs.md#automatically-add-information-from-the-api-docs) for additional information.
 
 Information in the docs should be added as markdown files using the MyST markdown syntax.
 If you are adding a new file (as opposed to editing an existing one), ensure to add it to an associated TOC so that it is discoverable.
 
-The main table of contents (TOC) file for the docs is `index.md`. It includes `guide\guide.md` and `apidoc.md`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
+The main table of contents (TOC) file for the docs is `index.md`. It includes `guide/guide.md` and `apidoc.md`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
 ````
 ```{toctree}
 ---
@@ -76,10 +74,14 @@ To include `.md` files outside of the documentation `source` directory, you can 
 
 where `file.md` is the one to be added. For more information on including files external to the docs, see the [MyST docs](https://myst-parser.readthedocs.io/en/latest/).
 
+
+
 ### Adding files to the user guide
 
 To add information in the guide, please add markdown (`.md`) files to the `docs/guide` directory.
 Remember to add new files to the guide's TOC file `docs/source/guide/guide.md`.
+
+#### User Guide Outline
 
 The different sections of a User's guide comprises of:
 
@@ -121,7 +123,7 @@ links to any tutorials utilizing `new_QEM_method` in `docs/source/examples`.
    A simple tutorial using  `new_QEM_method` can be found <insert_link>
 ```
 
-### Adding workflow images to the user guide
+#### Adding workflow images to the user guide
 
 To insert a workflow to the user's guide of some new technique, a template is available (shown below as a `png`). This template is also available in `svg` format at [mitiq_template.svg](../source/img/general_template.svg).
 
@@ -148,13 +150,22 @@ Jupyter notebooks (`.ipynb`) or MyST markdown notebooks, but MyST formatting wil
 If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to `.md`, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
 To convert from an IPython notebook to markdown file, run `jupytext your_filename.ipynb --to myst` and find the converted file at `your_filename.md`.
 
-Futher, not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
+Futher, not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks)).
+
 Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
 ```{tip}
 There is a [sample markdown formatted notebook in the `examples` directory](./examples/template.md) for you to take a look at as you write your own!
 ```
+
+### Adding example files
+
+If you are adding a new tutorial to the [documentation examples](https://github.com/unitaryfund/mitiq/blob/837ea83546f16e39867e3ee74cd27996b1d7509d/docs/source/examples/examples.md),
+
+- add the file as a `.md` file in `docs/source/examples`. A template is available at [this link](https://github.com/unitaryfund/mitiq/blob/837ea83546f16e39867e3ee74cd27996b1d7509d/docs/source/examples/template.md).
+- add your tutorial in `docs/source/examples/examples.md` such that it shows up in a docs build 
+- add a thumbnail image as `docs/source/_thumbnails/your_image.png` and list it in the `nbsphinx_thumbnails` block of `docs/source/conf.py`
 
 ### Automatically add information from the API docs
 
