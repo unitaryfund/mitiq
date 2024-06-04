@@ -1,8 +1,11 @@
 # Changelog
 
+## Version 0.38.0
+_In development_
+
 ## Version 0.37.0
 
-<!-- ([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.36.0...v0.37.0)) -->
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.36.0...v0.37.0))
 
 ### Highlights
 
