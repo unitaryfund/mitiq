@@ -35,7 +35,7 @@ This task has two parts:
     Alternatively, the list of released changes can be generated via [GitHub CLI](https://cli.github.com/) with the following commands:
         
         LATEST_TAG=$(gh release list --repo unitaryfund/mitiq --limit 1 --json tagName --jq '.[0].tagName')
-        gh api repos/unitaryfund/mitiq/compare/$LATEST_TAG...main --paginate --jq '.commits | reverse | .[] | (.commit.message | split("\n")[0]) + " [@" + .author.login + "]"'
+        gh api repos/unitaryfund/mitiq/compare/$LATEST_TAG...main --paginate --jq '.commits | reverse | .[] | "- " + (.commit.message | split("\n")[0]) + " [@" + .author.login + "]"'
     This method requires installing (and authenticating on) the Github CLI, but has the advantage that the output list comes already with Github handles, hence removing a tedious step for the release manager.    
     ``` 
 2.  The release manager should add a "Summary" section with a couple
