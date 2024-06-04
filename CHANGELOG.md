@@ -8,7 +8,7 @@
 
 ✨ Stacking quantum error mitigation techniques is a primary area of focus in Mitiq. In this release, @jordandsullivan introduced a **Tutorial on composing Digital Dynamical Decoupling (DDD) and Zero Noise Extrapolation (ZNE)**.
 
-🗒️ **»Download Notebook«**: Users have now the option to download tutorials in Jupyter `.ipynb` format. We hope this will encourage experimentation with existing tutorials.
+🗒️ **»Download Notebook«**: Users have now the option to download tutorials in Jupyter `.ipynb` format directly from our documentation. We hope this will encourage experimentation with existing tutorials.
 
 🤐 Lastly, a spoiler on what's upcoming: a Request for Comments document by @purva-thakre on adding **Layerwise Noise-Scaling and Multivariate Richardson Extrapolation** has been reviewed and approved. These techniques will soon make their way into Mitiq, stay tuned!
 
