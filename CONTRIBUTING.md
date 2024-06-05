@@ -5,7 +5,7 @@ The most common ways to contribute here are
 
 1. opening an [issue](https://github.com/unitaryfund/mitiq/issues/new) to report a bug or propose a new feature, or ask a question, and
 2. opening a [pull request](https://github.com/unitaryfund/mitiq/pulls) to fix a bug, or implement a desired feature.
-3. opening a [discussion post](https://github.com/unitaryfund/mitiq/discussions) to ask a question (no stupid questions!), provide feedback, or show something off!
+3. opening a [discussion post](https://github.com/unitaryfund/mitiq/discussions) to ask a question (all questions welcome!), provide feedback, or show something off!
 
 The rest of this document describes the technical details of getting set up to develop, and make your first contribution to Mitiq.
 
@@ -47,7 +47,7 @@ Once they pass, you can run the entire test suite (excluding those that require 
 make test
 ```
 
-This can often be slow, however, so testing your changes iteratively using `pytest` is often faster when doing development.
+This can often be slow, however, so testing your changes [iteratively](https://docs.pytest.org/en/7.1.x/how-to/usage.html#specifying-which-tests-to-run) using `pytest` is often faster when doing development. 
 
 To run the tests for the pyQuil plugins, run
 ```bash
@@ -68,7 +68,7 @@ docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
 
 ### Updating the documentation
-Follow these [instructions for contributing to the documentation](contributing_docs.md) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
+Follow these [instructions for contributing to the documentation](contributing_docs.md) which include guidelines about updating the API-doc list of modules and adding tutorial examples and updating the user guide.
 
 ### Style guidelines
 
@@ -126,11 +126,11 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 After your RFC is accepted, the proposed feature (for example, a new QEM Method) will require the following:
 
 - Add the new QEM method to `mitiq/abbreviated_name_of_qem_method` such that the corresponding units tests are in `mitiq/abbreviated_name_of_qem_method/tests`
-- The code must follow the formatting and style guidelines discussed previously,
+- The code must follow the formatting and style guidelines discussed [ppreviously](#style-guidelines),
 - The new module has to be added to the [](apidoc.md). For more information, see [](contributing_docs.md#automatically-add-information-from-the-api-docs),
 - Add documentation for the new QEM method, additional details are available in [](contributing_docs.md#adding-files-to-the-user-guide),
 - In addition, update `docs/source/guide/glossary.md` with a one-line summary of what your new feature accomplishes, and
-- Update [](./readme.md#quick-tour) of `README.md` with information related to your new feature
+- Update [](./readme.md#quick-tour) section of `README.md` with information related to your new feature.
 
 
 ## Code of conduct

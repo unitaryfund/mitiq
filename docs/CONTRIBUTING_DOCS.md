@@ -40,11 +40,11 @@ extensions = ['sphinx.ext.autodoc']
 Documentation is found in `docs/source`, and is divided into the following sections:
 
 -  a **guide**, whose content needs to be written from scratch for new features. For more details, go to [](contributing.md#proposing-a-new-feature-to-mitiq) and [](contributing_docs.md#adding-files-to-the-user-guide)
-- **examples** which can be either jupyter notebooks or MyST formatted notebook. A checklist is available in [](contributing_docs.md#adding-example-files)
+- **examples** which can be either a jupyter notebook or a MyST formatted notebook. A checklist is available in [](contributing_docs.md#adding-example-files)
 - an **API-doc** part, which is (mostly) automatically generated. See [](contributing_docs.md#automatically-add-information-from-the-api-docs) for additional information.
 
 Information in the docs should be added as markdown files using the MyST markdown syntax.
-If you are adding a new file (as opposed to editing an existing one), ensure to add it to an associated TOC so that it is discoverable.
+If you are adding a new file (as opposed to editing an existing one), ensure to add it to an associated TOC so that it is discoverable. 
 
 The main table of contents (TOC) file for the docs is `index.md`. It includes `guide/guide.md` and `apidoc.md`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
 ````
@@ -156,14 +156,14 @@ Using the paired notebooks you can continue your development in the notebooks as
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
 ```{tip}
-There is a [sample markdown formatted notebook in the `examples` directory](./examples/template.md) for you to take a look at as you write your own!
+There is a [sample markdown formatted notebook in the `examples` directory](../source/examples/template.md) for you to take a look at as you write your own!
 ```
 
 ### Adding example files
 
-If you are adding a new tutorial to the [documentation examples](https://github.com/unitaryfund/mitiq/blob/837ea83546f16e39867e3ee74cd27996b1d7509d/docs/source/examples/examples.md),
+If you are adding a new tutorial to the [documentation examples](../source/examples/examples.md),
 
-- add the file as a `.md` file in `docs/source/examples`. A template is available at [this link](https://github.com/unitaryfund/mitiq/blob/837ea83546f16e39867e3ee74cd27996b1d7509d/docs/source/examples/template.md).
+- add the file as a `.md` file in `docs/source/examples`. A template is available at [this link](../source/examples/template.md).
 - add your tutorial in `docs/source/examples/examples.md` such that it shows up in a docs build 
 - add a thumbnail image as `docs/source/_thumbnails/your_image.png` and list it in the `nbsphinx_thumbnails` block of `docs/source/conf.py`
 
@@ -193,7 +193,7 @@ source code, and to the API page `apidoc.md`.
 
 ### Adding references 
 
-To add references to the [Mitiq bibliography](https://mitiq.readthedocs.io/en/stable/bibliography.html), the first step is to add the reference to `docs/source/refs.bib` which is organized alphabetically. For formatting, please see BibTeX documentation for [articles](https://www.bibtex.com/e/article-entry/), [books](https://www.bibtex.com/e/book-entry/), and [others](https://www.bibtex.com/e/entry-types/).
+To add references to the [Mitiq bibliography](bibliography.md), the first step is to add the reference to `docs/source/refs.bib` which is organized alphabetically. For formatting, please see BibTeX documentation for [articles](https://www.bibtex.com/e/article-entry/), [books](https://www.bibtex.com/e/book-entry/), and [others](https://www.bibtex.com/e/entry-types/).
 
 Once the reference has been added to the `docs/source/refs.bib` file, cite the reference in the file by using:
 ```md
