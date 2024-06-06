@@ -8,8 +8,8 @@ circuit to allow for multivariate extrapolation."""
 
 from copy import deepcopy
 
-import cirq
 import pytest
+from cirq import Circuit, LineQubit, ops
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_num_layers_without_measurements,
@@ -17,16 +17,16 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
     multivariate_layer_scaling,
 )
 
-qreg1 = cirq.LineQubit.range(3)
-test_circuit1 = cirq.Circuit(
-    [cirq.ops.H.on_each(*qreg1)],
-    [cirq.ops.CNOT.on(qreg1[0], qreg1[1])],
-    [cirq.ops.X.on(qreg1[2])],
-    [cirq.ops.TOFFOLI.on(*qreg1)],
+qreg1 = LineQubit.range(3)
+test_circuit1 = Circuit(
+    [ops.H.on_each(*qreg1)],
+    [ops.CNOT.on(qreg1[0], qreg1[1])],
+    [ops.X.on(qreg1[2])],
+    [ops.TOFFOLI.on(*qreg1)],
 )
 
 test_circuit1_with_measurements = deepcopy(test_circuit1)
-test_circuit1_with_measurements.append(cirq.ops.measure_each(*qreg1))
+test_circuit1_with_measurements.append(ops.measure_each(*qreg1))
 
 
 def test_multivariate_layerwise_scaling():
@@ -53,11 +53,11 @@ def test_multivariate_layerwise_scaling():
     i = 0
     for scale_factor_vector in folding_pattern:
         scale_layer1, scale_layer2, scale_layer3 = scale_factor_vector
-        expected_circuit = cirq.Circuit(
-            [cirq.ops.H.on_each(*qreg1)] * scale_layer1,
-            [cirq.ops.CNOT.on(qreg1[0], qreg1[1]), cirq.ops.X.on(qreg1[2])]
+        expected_circuit = Circuit(
+            [ops.H.on_each(*qreg1)] * scale_layer1,
+            [ops.CNOT.on(qreg1[0], qreg1[1]), ops.X.on(qreg1[2])]
             * scale_layer2,
-            [cirq.ops.TOFFOLI.on(*qreg1)] * scale_layer3,
+            [ops.TOFFOLI.on(*qreg1)] * scale_layer3,
         )
         assert expected_circuit == multiple_scaled_circuits[i]
         i += 1

@@ -10,8 +10,8 @@ import itertools
 from copy import deepcopy
 from typing import Any, Callable, List, Tuple
 
-import cirq
 import numpy as np
+from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.utils import _append_measurements, _pop_measurements
@@ -19,7 +19,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.zne.scaling.folding import _check_foldable
 
 
-def _get_num_layers_without_measurements(input_circuit: cirq.Circuit) -> int:
+def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
     """Checks if the circuit has non-terminal measurements and returns the
     number of layers in the input circuit without the terminal measurements.
 
@@ -43,9 +43,7 @@ def _get_num_layers_without_measurements(input_circuit: cirq.Circuit) -> int:
     return num_layers
 
 
-def _get_chunks(
-    input_circuit: cirq.Circuit, num_chunks: int
-) -> List[cirq.Circuit]:
+def _get_chunks(input_circuit: Circuit, num_chunks: int) -> List[Circuit]:
     """Splits a circuit into approximately equal chunks.
 
     Adapted from:
@@ -81,7 +79,7 @@ def _get_chunks(
 
 
 def _get_scale_factor_vectors(
-    input_circuit: cirq.Circuit,
+    input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
     num_chunks: int = 1,
@@ -126,14 +124,14 @@ def _get_scale_factor_vectors(
 
 
 def multivariate_layer_scaling(
-    input_circuit: cirq.Circuit,
+    input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
     num_chunks: int = 1,
     folding_method: Callable[
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,
-) -> List[cirq.Circuit]:
+) -> List[Circuit]:
     """Defines the noise scaling function required for Layerwise Richardson
     Extrapolation."""
     circuit_copy = deepcopy(input_circuit)
@@ -147,12 +145,12 @@ def multivariate_layer_scaling(
 
     multiple_folded_circuits = []
     for scale_factor_vector in scaling_pattern:
-        folded_circuit = cirq.Circuit()
+        folded_circuit = Circuit()
         for chunk, scale_factor in zip(chunks, scale_factor_vector):
             if scale_factor == 1:
                 folded_circuit += chunk
             else:
-                chunks_circ = cirq.Circuit(chunk)
+                chunks_circ = Circuit(chunk)
                 folded_chunk_circ = folding_method(chunks_circ, scale_factor)
                 folded_circuit += folded_chunk_circ
             _append_measurements(folded_circuit, terminal_measurements)
