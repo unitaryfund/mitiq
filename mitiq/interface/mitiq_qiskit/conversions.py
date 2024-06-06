@@ -14,7 +14,7 @@ import cirq
 import numpy as np
 import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
-from qiskit import qasm2
+from qiskit import compiler, qasm2
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
 from qiskit.transpiler.passes import SetLayout
@@ -248,7 +248,17 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    return from_qasm(qasm2.dumps(circuit))
+    try:
+        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+    except Exception:
+        # If the conversion fails, try to decompose and transpile the
+        # circuit to native gates
+        circuit = compiler.transpile(
+            circuit, basis_gates=["u1", "u2", "u3", "cx"]
+        )
+        circuit = circuit.decompose()
+        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+    return mitiq_circuit
 
 
 def from_qasm(qasm: QASMType) -> cirq.Circuit:
