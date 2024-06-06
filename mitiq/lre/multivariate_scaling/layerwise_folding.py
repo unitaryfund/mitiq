@@ -8,7 +8,7 @@ extrapolation."""
 
 import itertools
 from copy import deepcopy
-from typing import Callable
+from typing import Any, Callable, List, Tuple
 
 import cirq
 import numpy as np
@@ -45,7 +45,7 @@ def _get_num_layers_without_measurements(input_circuit: cirq.Circuit) -> int:
 
 def _get_chunks(
     input_circuit: cirq.Circuit, num_chunks: int
-) -> list[cirq.Circuit]:
+) -> List[cirq.Circuit]:
     """Splits a circuit into approximately equal chunks.
 
     Adapted from:
@@ -85,7 +85,7 @@ def _get_scale_factor_vectors(
     degree: int,
     fold_multiplier: int,
     num_chunks: int = 1,
-) -> list[tuple[int]]:
+) -> List[Tuple[Any, ...]]:
     """Returns the patterned scale factor vectors required for multivariate
     extrapolation.
 
@@ -133,7 +133,7 @@ def multivariate_layer_scaling(
     folding_method: Callable[
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,
-):
+) -> List[cirq.Circuit]:
     """Defines the noise scaling function required for Layerwise Richardson
     Extrapolation."""
     circuit_copy = deepcopy(input_circuit)
