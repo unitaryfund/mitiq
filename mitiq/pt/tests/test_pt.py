@@ -14,6 +14,7 @@ import qiskit
 from mitiq.benchmarks import generate_mirror_circuit
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.pt.pt import (
+    CIRQ_NOISE_OP,
     CNOT_twirling_gates,
     CZ_twirling_gates,
     pauli_twirl_circuit,
@@ -146,18 +147,17 @@ def test_no_CNOT_CZ_circuit(twirl_func):
         assert _equal(circuit, twirled_output[i])
 
 
-@pytest.mark.parametrize(
-    "noise_op", [cirq.bit_flip(p=0.1), cirq.depolarize(p=0.01)]
-)
-def test_noisy_CNOT_CZ_circuit(noise_op):
+@pytest.mark.parametrize("noise_name", ["bit-flip", "depolarize"])
+def test_noisy_CNOT_CZ_circuit(noise_name):
+    p = 0.01
     a, b = cirq.LineQubit.range(2)
     circuit = cirq.Circuit(cirq.H.on(a), cirq.CNOT.on(a, b), cirq.CZ.on(a, b))
     twirled_circuit = pauli_twirl_circuit(
-        circuit, num_circuits=1, noise_op=noise_op
+        circuit, num_circuits=1, noise_name=noise_name, p=p
     )[0]
 
     for i, current_moment in enumerate(twirled_circuit):
         for op in current_moment:
             if op.gate in [cirq.CNOT, cirq.CZ]:
                 for next_op in twirled_circuit[i + 1]:
-                    assert next_op.gate == noise_op
+                    assert next_op.gate == CIRQ_NOISE_OP[noise_name](p=p)
