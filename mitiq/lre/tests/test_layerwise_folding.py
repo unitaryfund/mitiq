@@ -209,7 +209,7 @@ def test_get_scale_factor_vectors_no_chunking(
 @pytest.mark.parametrize(
     "test_input, degree, test_fold_multiplier, test_chunks, expected_size",
     [
-        (test_circuit1, 1, 0, 1, 4),
+        (test_circuit1, 1, 0, 1, 2),
         (test_circuit1, 1, 1, 2, 3),
         (test_circuit1, 2, 1, 3, 10),
         (test_circuit1, 2, 3, 2, 6),

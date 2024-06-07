@@ -8,7 +8,7 @@ extrapolation."""
 
 import itertools
 from copy import deepcopy
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import numpy as np
 from cirq import Circuit
@@ -43,7 +43,9 @@ def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
     return num_layers
 
 
-def _get_chunks(input_circuit: Circuit, num_chunks: int) -> List[Circuit]:
+def _get_chunks(
+    input_circuit: Circuit, num_chunks: Optional[int] = None
+) -> List[Circuit]:
     """Splits a circuit into approximately equal chunks.
 
     Adapted from:
@@ -52,8 +54,7 @@ def _get_chunks(input_circuit: Circuit, num_chunks: int) -> List[Circuit]:
         Args:
             input_circuit: Circuit of interest.
             num_chunks: Number of desired approximately equal chunks
-            * when num_chunks == num_layers, the circuit gets split into each
-                layer in the input circuit
+            * when num_chunks == num_layers, the original circuit is returned
             * when num_chunks == 1, the entire circuit is chunked into 1 layer
 
 
@@ -62,6 +63,9 @@ def _get_chunks(input_circuit: Circuit, num_chunks: int) -> List[Circuit]:
             chunks
     """
     num_layers = _get_num_layers_without_measurements(input_circuit)
+    if num_chunks is None:
+        num_chunks = num_layers
+
     if num_chunks == 0:
         raise ValueError("The number of chunks should be >= to 1.")
 
@@ -82,7 +86,7 @@ def _get_scale_factor_vectors(
     input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
-    num_chunks: int = 1,
+    num_chunks: Optional[int] = None,
 ) -> List[Tuple[Any, ...]]:
     """Returns the patterned scale factor vectors required for multivariate
     extrapolation.
@@ -96,11 +100,9 @@ def _get_scale_factor_vectors(
             scale_factor_vectors: Multiple variations of scale factors for each
             layer in the input circuit
     """
-    if num_chunks == 1:
-        num_layers = _get_num_layers_without_measurements(input_circuit)
-    else:
-        circuit_chunks = _get_chunks(input_circuit, num_chunks)
-        num_layers = len(circuit_chunks)
+
+    circuit_chunks = _get_chunks(input_circuit, num_chunks)
+    num_layers = len(circuit_chunks)
 
     # find the exponents of all the monomial terms required for the folding
     # pattern
@@ -127,7 +129,7 @@ def multivariate_layer_scaling(
     input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
-    num_chunks: int = 1,
+    num_chunks: Optional[int] = None,
     folding_method: Callable[
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,
@@ -153,7 +155,7 @@ def multivariate_layer_scaling(
                 chunks_circ = Circuit(chunk)
                 folded_chunk_circ = folding_method(chunks_circ, scale_factor)
                 folded_circuit += folded_chunk_circ
-            _append_measurements(folded_circuit, terminal_measurements)
+        _append_measurements(folded_circuit, terminal_measurements)
         multiple_folded_circuits.append((folded_circuit))
 
     return multiple_folded_circuits
