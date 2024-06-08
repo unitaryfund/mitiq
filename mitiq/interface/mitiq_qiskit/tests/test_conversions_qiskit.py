@@ -203,6 +203,27 @@ def test_random_circuit_to_from_qasm():
     )
 
 
+def test_qft_circuit_from_qasm():
+    """Tests QASM string --> cirq.Circuit
+    with a qft of 1 qubit.
+    """
+    qft_string = """
+OPENQASM 2.0;
+include "qelib1.inc";
+gate gate_QFT q0 { h q0; }
+qreg q[1];
+creg meas[1];
+gate_QFT q[0];
+measure q[0] -> meas[0];
+"""
+    qft_cirq = from_qasm(qft_string)
+    qreg = cirq.LineQubit.range(1)
+    cirq_circuit = cirq.Circuit(
+        [cirq.ops.H.on(qreg[0]), cirq.ops.measure(qreg[0], key="meas")]
+    )
+    assert _equal(cirq_circuit, qft_cirq)
+
+
 @pytest.mark.parametrize("as_qasm", (True, False))
 def test_convert_with_barrier(as_qasm):
     """Tests converting a Qiskit circuit with a barrier to a Cirq circuit."""
