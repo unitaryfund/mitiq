@@ -77,7 +77,6 @@ def test_get_num_layers(test_input, expected):
 @pytest.mark.parametrize(
     "test_input, degree, test_fold_multiplier, expected_scale_factor_vectors",
     [
-        (test_circuit1, 1, 0, [(1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1)]),
         (test_circuit1, 1, 1, [(1, 1, 1), (3, 1, 1), (1, 3, 1), (1, 1, 3)]),
         (
             test_circuit1,
@@ -129,12 +128,6 @@ def test_get_num_layers(test_input, expected):
                 (1, 7, 7),
                 (1, 1, 13),
             ],
-        ),
-        (
-            test_circuit1_with_measurements,
-            1,
-            0,
-            [(1, 1, 1), (1, 1, 1), (1, 1, 1), (1, 1, 1)],
         ),
         (
             test_circuit1_with_measurements,
@@ -209,7 +202,6 @@ def test_get_scale_factor_vectors_no_chunking(
 @pytest.mark.parametrize(
     "test_input, degree, test_fold_multiplier, test_chunks, expected_size",
     [
-        (test_circuit1, 1, 0, 1, 2),
         (test_circuit1, 1, 1, 2, 3),
         (test_circuit1, 2, 1, 3, 10),
         (test_circuit1, 2, 3, 2, 6),
@@ -242,3 +234,26 @@ def test_invalid_num_chunks(test_input, num_chunks, error_msg):
     an error for an invalid value."""
     with pytest.raises(ValueError, match=error_msg):
         _get_scale_factor_vectors(test_input, 2, 2, num_chunks)
+
+
+@pytest.mark.parametrize(
+    "test_input, test_degree, test_fold_multiplier, error_msg",
+    [
+        (test_circuit1, 0, 1, "Multinomial degree not >= to 1."),
+        (
+            test_circuit1,
+            1,
+            0,
+            "Fold multiplier not >= to 1.",
+        ),
+    ],
+)
+def test_invalid_degree_fold_multiplier(
+    test_input, test_degree, test_fold_multiplier, error_msg
+):
+    """Ensures that the number of intended chunks in the input circuit raises
+    an error for an invalid value."""
+    with pytest.raises(ValueError, match=error_msg):
+        multivariate_layer_scaling(
+            test_input, test_degree, test_fold_multiplier
+        )

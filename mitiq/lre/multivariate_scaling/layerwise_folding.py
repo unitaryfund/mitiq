@@ -136,6 +136,10 @@ def multivariate_layer_scaling(
 ) -> List[Circuit]:
     """Defines the noise scaling function required for Layerwise Richardson
     Extrapolation."""
+    if degree < 1:
+        raise ValueError("Multinomial degree not >= to 1.")
+    if fold_multiplier < 1:
+        raise ValueError("Fold multiplier not >= to 1.")
     circuit_copy = deepcopy(input_circuit)
     terminal_measurements = _pop_measurements(circuit_copy)
 
