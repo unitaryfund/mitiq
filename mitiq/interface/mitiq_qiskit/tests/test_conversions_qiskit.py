@@ -203,20 +203,12 @@ def test_random_circuit_to_from_qasm():
     )
 
 
-def test_qft_circuit_from_qasm():
-    """Tests QASM string --> cirq.Circuit
-    with a qft of 1 qubit.
-    """
-    qft_string = """
-OPENQASM 2.0;
-include "qelib1.inc";
-gate gate_QFT q0 { h q0; }
-qreg q[1];
-creg meas[1];
-gate_QFT q[0];
-measure q[0] -> meas[0];
-"""
-    qft_cirq = from_qasm(qft_string)
+def test_convert_with_qft():
+    """Tests converting a Qiskit circuit with a QFT to a Cirq circuit."""
+    circuit = qiskit.QuantumCircuit(1)
+    circuit &= qiskit.circuit.library.QFT(1)
+    circuit.measure_all()
+    qft_cirq = from_qiskit(circuit)
     qreg = cirq.LineQubit.range(1)
     cirq_circuit = cirq.Circuit(
         [cirq.ops.H.on(qreg[0]), cirq.ops.measure(qreg[0], key="meas")]

@@ -15,7 +15,7 @@ import numpy as np
 import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
 from cirq.contrib.qasm_import.exception import QasmException
-from qiskit import compiler, qasm2
+from qiskit import qasm2
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
 from qiskit.transpiler.passes import SetLayout
@@ -249,7 +249,13 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    return from_qasm(qasm2.dumps(circuit))
+    try:
+        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+    except QasmException:
+        # Try to decompose circuit before running
+        circuit = circuit.decompose()
+        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+    return mitiq_circuit
 
 
 def from_qasm(qasm: QASMType) -> cirq.Circuit:
@@ -261,15 +267,5 @@ def from_qasm(qasm: QASMType) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input QASM string.
     """
-    try:
-        qasm = _remove_qasm_barriers(qasm)
-        mitiq_circuit = circuit_from_qasm(qasm)
-    except QasmException:
-        # Try to decompose and transpile the qiskit
-        # circuit before running
-        circuit = qiskit.QuantumCircuit.from_qasm_str(qasm)
-        circuit = compiler.transpile(circuit)
-        circuit = circuit.decompose()
-        qasm = _remove_qasm_barriers(qasm2.dumps(circuit))
-        mitiq_circuit = circuit_from_qasm(qasm)
-    return mitiq_circuit
+    qasm = _remove_qasm_barriers(qasm)
+    return circuit_from_qasm(qasm)
