@@ -4,7 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for layerwise folding of input circuits to allow for multivariate
-extrapolation."""
+extrapolation as defined in :cite:`Russo_2024_LRE`.
+"""
 
 import itertools
 from copy import deepcopy
@@ -30,11 +31,11 @@ def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
             UnfoldableCircuitError:
                 * If the circuit has intermediate measurements.
                 * If the circuit has non-unitary channels which are not
-                terminal measurements.
+                    terminal measurements.
 
         Returns:
             num_layers: the number of layers in the input circuit without the
-            terminal measurements.
+                terminal measurements.
     """
     circuit = deepcopy(input_circuit)
     _check_foldable(circuit)
@@ -54,13 +55,15 @@ def _get_chunks(
         Args:
             input_circuit: Circuit of interest.
             num_chunks: Number of desired approximately equal chunks
-            * when num_chunks == num_layers, the original circuit is returned
-            * when num_chunks == 1, the entire circuit is chunked into 1 layer
+                * when num_chunks == num_layers, the original circuit is
+                    returned
+                * when num_chunks == 1, the entire circuit is chunked into 1
+                    layer
 
 
         Returns:
             split_circuit: Circuit of interest split into approximately equal
-            chunks
+                chunks
     """
     num_layers = _get_num_layers_without_measurements(input_circuit)
     if num_chunks is None:
@@ -98,7 +101,7 @@ def _get_scale_factor_vectors(
 
         Returns:
             scale_factor_vectors: Multiple variations of scale factors for each
-            layer in the input circuit
+                layer in the input circuit
     """
 
     circuit_chunks = _get_chunks(input_circuit, num_chunks)
@@ -134,8 +137,35 @@ def multivariate_layer_scaling(
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,
 ) -> List[Circuit]:
-    """Defines the noise scaling function required for Layerwise Richardson
-    Extrapolation."""
+    r"""
+    Defines the noise scaling function required for Layerwise Richardson
+    Extrapolation as defined in :cite:`Russo_2024_LRE`.
+
+    Args:
+        input_circuit: Circuit to be scaled
+        degree: Degree of the multivariate polynomial
+        fold_multiplier: Scaling gap required by unitary folding
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+        folding_method: Unitary folding method. Default is
+            :func:`fold_gates_at_random`
+
+    Returns:
+        Multiple folded variations of the input circuit
+
+    Raises:
+        ValueError:
+            When the degree for the multinomial is not >= to 1.
+        ValueError:
+            When the fold multiplier to scale the circuit is not >= to 1.
+        ValueError:
+            When the number of chunks for a large circuit is 0.
+        ValueError:
+            When the number of chunks in a circuit is greater than the number
+                of layers in the input circuit.
+
+    """
     if degree < 1:
         raise ValueError("Multinomial degree not >= to 1.")
     if fold_multiplier < 1:
