@@ -144,6 +144,16 @@ def multivariate_layer_scaling(
     Defines the noise scaling function required for Layerwise Richardson
     Extrapolation as defined in :cite:`Russo_2024_LRE`.
 
+    Note that this method only works for the multivariate extrapolation
+    methods. It does not allows a user to choose which layers in the input
+    circuit will be scaled.
+
+    .. seealso::
+
+        If you would prefer to choose the layers for unitary
+        folding, use :func:`mitiq.zne.scaling.layer_scaling.get_layer_folding`
+        instead.
+
     Args:
         input_circuit: Circuit to be scaled
         degree: Degree of the multivariate polynomial
