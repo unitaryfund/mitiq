@@ -5,7 +5,7 @@
 
 import random
 from functools import singledispatch
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import cirq
 import pennylane as qml
@@ -53,7 +53,9 @@ CZ_twirling_gates = [
     (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
 ]
 
-CIRQ_NOISE_OP = {
+CIRQ_NOISE_FUNCTION = Callable[[float], cirq.Gate]
+
+CIRQ_NOISE_OP: dict[str, CIRQ_NOISE_FUNCTION] = {
     "bit-flip": cirq.bit_flip,
     "depolarize": cirq.depolarize,
 }
@@ -68,7 +70,7 @@ def pauli_twirl_circuit(
     circuit: QPROGRAM,
     num_circuits: int = 10,
     noise_name: Optional[str] = None,
-    **kwargs,
+    **kwargs: float,
 ) -> List[QPROGRAM]:
     r"""Return the Pauli twirled versions of the input circuit.
 
@@ -106,7 +108,7 @@ def pauli_twirl_circuit(
 
 
 def add_noise_to_two_qubit_gates(
-    circuit: QPROGRAM, noise_name: str, **kwargs
+    circuit: QPROGRAM, noise_name: str, **kwargs: float
 ) -> QPROGRAM:
     """Add noise to CNOT and CZ gates on pre-twirled circuits.
 
@@ -119,16 +121,18 @@ def add_noise_to_two_qubit_gates(
 
 
 @singledispatch
-def _add_noise_to_two_qubit_gates(circuit, noise_name, **kwargs):
+def _add_noise_to_two_qubit_gates(
+    circuit: QPROGRAM, noise_name: str, **kwargs: float
+) -> QPROGRAM:
     raise NotImplementedError(
         f"Cannot add noise to Circuit of type {type(circuit)}."
     )
 
 
 @_add_noise_to_two_qubit_gates.register
-def _cirq(circuit: _Circuit, noise_name: str, **kwargs):
+def _cirq(circuit: _Circuit, noise_name: str, **kwargs: float) -> _Circuit:
     noise_function = CIRQ_NOISE_OP[noise_name]
-    noise_op = noise_function(**kwargs)
+    noise_op = noise_function(**kwargs)  # type: ignore
 
     noisy_gates = [cirq.ops.CNOT, cirq.ops.CZ]
 
@@ -144,7 +148,9 @@ def _cirq(circuit: _Circuit, noise_name: str, **kwargs):
 
 
 @_add_noise_to_two_qubit_gates.register
-def _pennylane(circuit: QuantumTape, noise_name: str, **kwargs):
+def _pennylane(
+    circuit: QuantumTape, noise_name: str, **kwargs: float
+) -> QuantumTape:
     new_ops = []
     noise_function = PENNYLANE_NOISE_OP[noise_name]
 
