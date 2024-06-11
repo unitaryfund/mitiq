@@ -134,7 +134,7 @@ After your RFC is accepted, the proposed feature (for example, a new QEM Method)
 
 
 ## Code of conduct
-Mitiq development abides to the [](./code_of_conduct.md#contributor-covenant-code-of-conduct).
+Mitiq development abides to the [](./code_of_conduct.md).
 
 ## Lifecycle
 The basic development workflow for Mitiq is done in units of milestones which are usually one month periods where we focus our efforts on thrusts decided by the development team, alongside community members.
