@@ -14,6 +14,7 @@ import cirq
 import numpy as np
 import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
+from cirq.contrib.qasm_import.exception import QasmException
 from qiskit import qasm2
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
@@ -248,7 +249,15 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    return from_qasm(qasm2.dumps(circuit))
+    try:
+        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+    except QasmException:
+        # Try to decompose circuit before running
+        # This is necessary for converting qiskit circuits with
+        # custom packaged gates, e.g., QFT gates
+        circuit = circuit.decompose()
+        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+    return mitiq_circuit
 
 
 def from_qasm(qasm: QASMType) -> cirq.Circuit:
