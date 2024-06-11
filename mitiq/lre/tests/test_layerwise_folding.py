@@ -221,11 +221,16 @@ def test_get_scale_factor_vectors_with_chunking(
 @pytest.mark.parametrize(
     "test_input, num_chunks, error_msg",
     [
-        (test_circuit1, 0, "The number of chunks should be >= to 1."),
+        (
+            test_circuit1,
+            0,
+            "Number of chunks should be greater than or equal to 1.",
+        ),
         (
             test_circuit1,
             5,
-            "Number of chunks > the number of layers in the circuit.",
+            "Number of chunks 5 cannot be greater than the number of layers"
+            " 3.",
         ),
     ],
 )
@@ -239,12 +244,17 @@ def test_invalid_num_chunks(test_input, num_chunks, error_msg):
 @pytest.mark.parametrize(
     "test_input, test_degree, test_fold_multiplier, error_msg",
     [
-        (test_circuit1, 0, 1, "Multinomial degree not >= to 1."),
+        (
+            test_circuit1,
+            0,
+            1,
+            "Multinomial degree must be greater than or equal to 1.",
+        ),
         (
             test_circuit1,
             1,
             0,
-            "Fold multiplier not >= to 1.",
+            "Fold multiplier must be greater than or equal to 1.",
         ),
     ],
 )

@@ -25,23 +25,23 @@ def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
     number of layers in the input circuit without the terminal measurements.
 
         Args:
-            input_circuit: Checks whether this circuit is able to be folded.
+            input_circuit: Circuit of interest
 
         Raises:
             UnfoldableCircuitError:
-                * If the circuit has intermediate measurements.
+                * If the circuit has intermediate measurements
                 * If the circuit has non-unitary channels which are not
-                    terminal measurements.
+                    terminal measurements
 
         Returns:
             num_layers: the number of layers in the input circuit without the
-                terminal measurements.
+                terminal measurements
     """
+
+    _check_foldable(input_circuit)
     circuit = deepcopy(input_circuit)
-    _check_foldable(circuit)
     _pop_measurements(circuit)
-    num_layers = len(circuit)
-    return num_layers
+    return len(circuit)
 
 
 def _get_chunks(
@@ -53,7 +53,7 @@ def _get_chunks(
     https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length
 
         Args:
-            input_circuit: Circuit of interest.
+            input_circuit: Circuit of interest
             num_chunks: Number of desired approximately equal chunks
                 * when num_chunks == num_layers, the original circuit is
                     returned
@@ -70,19 +70,21 @@ def _get_chunks(
         num_chunks = num_layers
 
     if num_chunks == 0:
-        raise ValueError("The number of chunks should be >= to 1.")
+        raise ValueError(
+            "Number of chunks should be greater than or equal to 1."
+        )
 
     if num_chunks > num_layers:
         raise ValueError(
-            "Number of chunks > the number of layers in the circuit."
+            f"Number of chunks {num_chunks} cannot be greater than the number"
+            f" of layers {num_layers}."
         )
 
     k, m = divmod(num_layers, num_chunks)
-    split_circuit = (
+    return [
         input_circuit[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)]
         for i in range(num_chunks)
-    )
-    return list(split_circuit)
+    ]
 
 
 def _get_scale_factor_vectors(
@@ -97,6 +99,7 @@ def _get_scale_factor_vectors(
         Args:
             input_circuit: Circuit to be scaled
             degree: Degree of the multivariate polynomial
+            num_chunks: Number of desired approximately equal chunks
             fold_multiplier: Scaling gap required by unitary folding
 
         Returns:
@@ -107,21 +110,21 @@ def _get_scale_factor_vectors(
     circuit_chunks = _get_chunks(input_circuit, num_chunks)
     num_layers = len(circuit_chunks)
 
-    # find the exponents of all the monomial terms required for the folding
+    # Find the exponents of all the monomial terms required for the folding
     # pattern
     pattern_full = []
     for i in range(degree + 1):
         for j in itertools.combinations_with_replacement(range(num_layers), i):
-            pattern = [0] * num_layers
-            # get the monomial terms in graded lexicographic order
+            pattern = np.zeros(num_layers, dtype=int)
+            # Get the monomial terms in graded lexicographic order.
             for index in j:
                 pattern[index] += 1
-            # use fold multiplier on the folding pattern to figure out which
-            # layers will be scaled
-            pattern_full.append(tuple(fold_multiplier * np.array(pattern)))
+            # Use the fold multiplier on the folding pattern to determine which
+            # layers will be scaled.
+            pattern_full.append(tuple(fold_multiplier * pattern))
 
-    # get the scale factor vectors
-    # the layers are scaled as 2n+1 for unitary folding
+    # Get the scale factor vectors.
+    # The layers are scaled as 2n+1 due to unitary folding.
     return [
         tuple(2 * num_folds + 1 for num_folds in pattern)
         for pattern in pattern_full
@@ -156,9 +159,11 @@ def multivariate_layer_scaling(
 
     Raises:
         ValueError:
-            When the degree for the multinomial is not >= to 1.
+            When the degree for the multinomial is not greater than or
+                equal to 1.
         ValueError:
-            When the fold multiplier to scale the circuit is not >= to 1.
+            When the fold multiplier to scale the circuit is greater than or
+                equal to 1.
         ValueError:
             When the number of chunks for a large circuit is 0.
         ValueError:
@@ -167,9 +172,11 @@ def multivariate_layer_scaling(
 
     """
     if degree < 1:
-        raise ValueError("Multinomial degree not >= to 1.")
+        raise ValueError(
+            "Multinomial degree must be greater than or equal to 1."
+        )
     if fold_multiplier < 1:
-        raise ValueError("Fold multiplier not >= to 1.")
+        raise ValueError("Fold multiplier must be greater than or equal to 1.")
     circuit_copy = deepcopy(input_circuit)
     terminal_measurements = _pop_measurements(circuit_copy)
 
