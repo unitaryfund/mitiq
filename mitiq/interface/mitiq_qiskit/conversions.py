@@ -253,6 +253,8 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
     except QasmException:
         # Try to decompose circuit before running
+        # This is necessary for converting qiskit circuits with
+        # custom packaged gates, e.g., QFT gates
         circuit = circuit.decompose()
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
     return mitiq_circuit

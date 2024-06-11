@@ -543,8 +543,8 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     assert abs(zne_value - true_value) < 0.1
 
 
-def test_execute_zne_transpiled_qiskit_circuit_with_noise_and_QFT():
-    """Tests ZNE when transpiling to a Qiskit device with a QFT gate."""
+def test_execute_zne_on_qiskit_circuit_with_QFT():
+    """Tests ZNE of a Qiskit device with a QFT gate."""
 
     def qs_noisy_simulation(
         circuit: qiskit.QuantumCircuit, shots: int = 1
