@@ -150,8 +150,7 @@ Jupyter notebooks (`.ipynb`) or MyST markdown notebooks, but MyST formatting wil
 If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to `.md`, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
 To convert from an IPython notebook to markdown file, run `jupytext your_filename.ipynb --to myst` and find the converted file at `your_filename.md`.
 
-Futher, not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks)).
-
+Further, not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks)).
 Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
@@ -163,7 +162,7 @@ There is a [sample markdown formatted notebook in the `examples` directory](../s
 
 If you are adding a new tutorial to the [documentation examples](../source/examples/examples.md),
 
-- add the file as a `.md` file in `docs/source/examples`. A template is available at [this link](../source/examples/template.md).
+- add the file as a `.md` file in `docs/source/examples`. A template is available at [here](../source/examples/template.md).
 - add your tutorial in `docs/source/examples/examples.md` such that it shows up in a docs build 
 - add a thumbnail image as `docs/source/_thumbnails/your_image.png` and list it in the `nbsphinx_thumbnails` block of `docs/source/conf.py`
 

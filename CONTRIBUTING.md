@@ -68,7 +68,7 @@ docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
 
 ### Updating the documentation
-Follow these [instructions for contributing to the documentation](contributing_docs.md) which include guidelines about updating the API-doc list of modules and adding tutorial examples and updating the user guide.
+Follow these [instructions for contributing to the documentation](contributing_docs.md) which include guidelines about updating the API-doc, adding examples, and updating the user guide.
 
 ### Style guidelines
 
@@ -126,11 +126,11 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 After your RFC is accepted, the proposed feature (for example, a new QEM Method) will require the following:
 
 - Add the new QEM method to `mitiq/abbreviated_name_of_qem_method` such that the corresponding units tests are in `mitiq/abbreviated_name_of_qem_method/tests`
-- The code must follow the formatting and style guidelines discussed [ppreviously](#style-guidelines),
-- The new module has to be added to the [](apidoc.md). For more information, see [](contributing_docs.md#automatically-add-information-from-the-api-docs),
+- The code must follow the formatting and style guidelines discussed [above](#style-guidelines),
+- The new module should be added to the [](apidoc.md) using the instructions found in [](contributing_docs.md#automatically-add-information-from-the-api-docs),
 - Add documentation for the new QEM method, additional details are available in [](contributing_docs.md#adding-files-to-the-user-guide),
-- In addition, update `docs/source/guide/glossary.md` with a one-line summary of what your new feature accomplishes, and
-- Update [](./readme.md#quick-tour) section of `README.md` with information related to your new feature.
+- Update `docs/source/guide/glossary.md` with a one-line summary of what your new feature accomplishes, and
+- Update the [](./readme.md#quick-tour) section of the `README.md` with information related to your new technique.
 
 
 ## Code of conduct
