@@ -66,6 +66,9 @@ jobs:
         with:
           path: ./docs/build/.jupyter_cache
           key: jupyter-cache-${{ steps.gen_hash.outputs.hash }}
+      
+      - name: Lint docs
+        uses: DavidAnson/markdownlint-cli2-action@v16
 
       - name: Build and test Sphinx docs
         run: |
