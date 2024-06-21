@@ -27,12 +27,6 @@ def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
         Args:
             input_circuit: Circuit of interest
 
-        Raises:
-            UnfoldableCircuitError:
-                * If the circuit has intermediate measurements
-                * If the circuit has non-unitary channels which are not
-                    terminal measurements
-
         Returns:
             num_layers: the number of layers in the input circuit without the
                 terminal measurements
@@ -59,8 +53,6 @@ def _get_chunks(
                     returned
                 * when num_chunks == 1, the entire circuit is chunked into 1
                     layer
-
-
         Returns:
             split_circuit: Circuit of interest split into approximately equal
                 chunks
@@ -111,7 +103,7 @@ def _get_scale_factor_vectors(
     num_layers = len(circuit_chunks)
 
     # Find the exponents of all the monomial terms required for the folding
-    # pattern
+    # pattern.
     pattern_full = []
     for i in range(degree + 1):
         for j in itertools.combinations_with_replacement(range(num_layers), i):
@@ -170,15 +162,10 @@ def multivariate_layer_scaling(
     Raises:
         ValueError:
             When the degree for the multinomial is not greater than or
-                equal to 1.
-        ValueError:
-            When the fold multiplier to scale the circuit is greater than or
-                equal to 1.
-        ValueError:
-            When the number of chunks for a large circuit is 0.
-        ValueError:
-            When the number of chunks in a circuit is greater than the number
-                of layers in the input circuit.
+                equal to 1; when the fold multiplier to scale the circuit is
+                greater than/equal to 1; when the number of chunks for a
+                large circuit is 0 or when the number of chunks in a circuit is
+                greater than the number of layers in the input circuit.
 
     """
     if degree < 1:
