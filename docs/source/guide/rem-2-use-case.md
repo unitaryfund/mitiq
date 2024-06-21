@@ -23,7 +23,7 @@ measurement statistics in order to generate more accurate predictions.
 
 ## Disadvantages
 
-Readout-error mitigation requires the preliminary characterization of the 
+Readout-error mitigation requires the preliminary characterization of the
 measurement errors associated to a specific backend. Measurement errors can
 be expressed in the form of a confusion matrix and its estimation involves
 numerous state preparations and measurements in the computational basis.

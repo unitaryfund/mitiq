@@ -204,63 +204,63 @@ quantum circuits.
 A list of research articles academic resources on error mitigation:
 
 - On **zero-noise extrapolation**:
-    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017
+  - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017
     {cite}`Li_2017_PRX` and K. Temme
     *et al.*, *Phys. Rev. Lett.*, 2017
     {cite}`Temme_2017_PRL`
-    - Experiment on superconducting circuit chip, A. Kandala *et
+  - Experiment on superconducting circuit chip, A. Kandala *et
     al.*, *Nature*, 2019 {cite}`Kandala_2019_Nature`
 
 - On **probabilistic error cancellation**:
-    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017
+  - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017
       {cite}`Li_2017_PRX` and K. Temme
       *et al.*, *Phys. Rev. Lett.*, 2017
       {cite}`Temme_2017_PRL`
-    - Resource analysis for probabilistic error cancellation,
+  - Resource analysis for probabilistic error cancellation,
       Ryuji Takagi, arxiv, 2020
       {cite}`Takagi_2020_PRR`
 
 - On **randomization methods**:
-    - Randomized compiling with twirling gates, J. Wallman *et
+  - Randomized compiling with twirling gates, J. Wallman *et
       al.*, *Phys. Rev. A*, 2016
       {cite}`Wallman_2016_PRA`
-    - Probabilistic error correction, K. Temme *et al.*, *Phys.
+  - Probabilistic error correction, K. Temme *et al.*, *Phys.
       Rev. Lett.*, 2017 {cite}`Temme_2017_PRL`
-    - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018
+  - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018
       {cite}`Endo_2018_PRX`
-    - Experiment on trapped ions, S. Zhang *et al.*, *Nature
+  - Experiment on trapped ions, S. Zhang *et al.*, *Nature
       Comm.* 2020 {cite}`Zhang_2020_NatComm`
-    - Experiment with gate set tomography on a supeconducting
+  - Experiment with gate set tomography on a supeconducting
       circuit device, J. Sun *et al.*, 2019 arXiv
       {cite}`Sun_2021_PRAppl`
 
 - On **subspace expansion**:
-    - By hybrid quantum-classical hierarchy introduction, J.
+  - By hybrid quantum-classical hierarchy introduction, J.
       McClean *et al.*, *Phys. Rev. A*, 2017
       {cite}`McClean_2017_PRA`
-    - By symmetry verification, X. Bonet-Monroig *et al.*, *Phys.
+  - By symmetry verification, X. Bonet-Monroig *et al.*, *Phys.
       Rev. A*, 2018 {cite}`Bonet_2018_PRA`
-    - With a stabilizer-like method, S. McArdle *et al.*, *Phys.
+  - With a stabilizer-like method, S. McArdle *et al.*, *Phys.
       Rev. Lett.*, 2019, {cite}`McArdle_2019_PRL`
-    - Exploiting molecular symmetries, J. McClean *et al.*, *Nat.
+  - Exploiting molecular symmetries, J. McClean *et al.*, *Nat.
       Comm.*, 2020 {cite}`McClean_2020_NatComm`
-    - Experiment on a superconducting circuit device, R.
+  - Experiment on a superconducting circuit device, R.
       Sagastizabal *et al.*, *Phys. Rev. A*, 2019
       {cite}`Sagastizabal_2019_PRA`
 
 - On **other error-mitigation techniques** such as:
-    - Approximate error-correcting codes in the generalized
+  - Approximate error-correcting codes in the generalized
       amplitude-damping channels, C. Cafaro *et al.*, *Phys. Rev.
       A*, 2014 {cite}`Cafaro_2014_PRA`
-    - Extending the variational quantum eigensolver (VQE) to
+  - Extending the variational quantum eigensolver (VQE) to
       excited states, R. M. Parrish *et al.*, *Phys. Rev. Lett.*,
       2017 {cite}`Parrish_2019_PRL`
-    - Quantum imaginary time evolution, M. Motta *et al.*, *Nat.
+  - Quantum imaginary time evolution, M. Motta *et al.*, *Nat.
       Phys.*, 2020 {cite}`Motta_2020_NatPhys`
-    - Error mitigation for analog quantum simulation, J. Sun *et
+  - Error mitigation for analog quantum simulation, J. Sun *et
       al.*, 2020, arXiv {cite}`Sun_2021_PRAppl`
 
--   For an extensive introduction: S. Endo, *Hybrid quantum-classical
+- For an extensive introduction: S. Endo, *Hybrid quantum-classical
     algorithms and error mitigation*, PhD Thesis, 2019, Oxford
     University
     ([Link](https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85)),
@@ -315,7 +315,8 @@ Fund](https://unitary.fund/grants.html)\'s list of supported projects.
 ### Resources on noise in quantum computers
 
 From the [2023 IBM Qiskit Global Summer School (QGSS23)](https://qiskit.org/events/summer-school-2023):
+
 - [YouTube lecture (Part 1)](https://www.youtube.com/watch?v=3Ka11boCm1M)
 - Lecture Notes (Part 1): [download from GitHub](https://github.com/qiskit-community/qgss-2023/blob/main/Lecture%20Notes/Lecture%207%20-%20Introduction%20to%20Noise.pdf.zip)
 - Additional Notes Part 1: [download from GitHub](https://github.com/qiskit-community/qgss-2023/blob/main/Lecture%20Notes/Lecture%207%20-%20Bonus%20Content.zip)
-- Lecture notes, lab content, and solutions at the [QGSS23 Hub](https://github.com/qiskit-community/qgss-2023) 
+- Lecture notes, lab content, and solutions at the [QGSS23 Hub](https://github.com/qiskit-community/qgss-2023)

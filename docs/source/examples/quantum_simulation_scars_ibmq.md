@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 
 This tutorial shows how to error mitigate a quantum simulation using ZNE, and is applied to a case where the dynamics show signs of quantum many body scars (QMBS). The example in this tutorial is based on the model studied in *Chen et al. PRR (2022)* {cite}`Chen_2022_PRR`. A QMBS is a physical phenomenon where a systems dynamics gives rise to non-ergodic behaviour depending on the initial state. This is in contrast to the ergodic behaviour which is expected from the eigenstate thermalization hypothesis which predicts that a system would thermalize, i.e. a relaxation of the systems dynamics towards a thermal ensemble. For a more elaborate discussion, the interested reader is referred to *Serbyn et al. NatPhys (2021)* {cite}`Serbyn_2021_NatPhys`.
 
-The Hamiltonian that is studied is the mixed-field Ising model (MFIM). Recently, in an analog quantum simulation of the MFIM the quantum many body scar phenomenon was observed experimentally using Rydberg atoms in optical tweezers (see *Bernien et al. Nat (2017)* {cite}`Bernien_2017_Nat`). 
+The Hamiltonian that is studied is the mixed-field Ising model (MFIM). Recently, in an analog quantum simulation of the MFIM the quantum many body scar phenomenon was observed experimentally using Rydberg atoms in optical tweezers (see *Bernien et al. Nat (2017)* {cite}`Bernien_2017_Nat`).
 
 The MFIM Hamiltonian can be written in terms of Pauli matrices as follows
 \begin{equation}
@@ -47,7 +47,7 @@ The dynamics of this model is governed by the Schrödinger equation
 \begin{equation}
 \frac{d}{dt}\vert\Psi(t)\rangle = -i H\vert\Psi(t)\rangle,
 \end{equation}
-which can formally be solved as 
+which can formally be solved as
 \begin{equation}
 \vert\Psi(t + \Delta t)\rangle = e^{-i H\Delta t}\vert\Psi(t)\rangle = U(\Delta t)\vert\Psi(t)\rangle.
 \end{equation}
@@ -106,7 +106,7 @@ def trotter_evolution_H(L: int, V: float,
 
 By subsequently applying this unitary operator (or its circuit equivalent), one (approximately) time evolves according to the system Hamiltonian.
 
-In this example we will limit ourselves to calculating the behaviour of the staggered magnetization in the $z$-direction. This is defined as 
+In this example we will limit ourselves to calculating the behaviour of the staggered magnetization in the $z$-direction. This is defined as
 \begin{equation}
 Z_\pi = \sum_{i=1}^{L}(-1)^i Z_i.
 \end{equation}
@@ -147,7 +147,7 @@ For this tutorial we will not use real (quantum) hardware. If you do wish to do 
 
 +++
 
-Note: Using an IBM quantum computer requires a valid IBMQ account. See https://quantum-computing.ibm.com/ for instructions to create an account, save credentials, and see online quantum computers.
+Note: Using an IBM quantum computer requires a valid IBMQ account. See <https://quantum-computing.ibm.com/> for instructions to create an account, save credentials, and see online quantum computers.
 
 ```{code-cell} ipython3
 USE_REAL_HARDWARE = False
@@ -225,7 +225,7 @@ def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
     return expectation_value
 ```
 
-We now have all necessary components to perform a time evolution of the Ising Hamiltonian. The Hamiltonian parameters used in the following are those used in the article to create Fig. 3 and 4 of Ref. [1]. However, in the following we will stick to a smaller Ising chain with 6 sites for the sake of simplicity. 
+We now have all necessary components to perform a time evolution of the Ising Hamiltonian. The Hamiltonian parameters used in the following are those used in the article to create Fig. 3 and 4 of Ref. [1]. However, in the following we will stick to a smaller Ising chain with 6 sites for the sake of simplicity.
 
 As an initial test we will time evolve the system over one time step $dt$ (you can change this by enlarging the parameter $n_{dt}$). The system is initialized in the Néel state, that is the $\vert 010101\rangle$ state. We simulate results with noise, and calculate the unmitigated and mitigated result. Additionally, we also calculate the result in case no noise is present in the system, that is, an ideal Trotted decomposed time evolution.
 
@@ -296,7 +296,7 @@ To take this noise into account, and the corresponding uncertainty, we also calc
 
 +++
 
-We start with an arbitrary choice of scaling parameters below, and we chose a large number of them to get a grasp of the scaling behavior. Furthermore, will use the random gate folding function to incorporate the scaling factors into the folded circuit. 
+We start with an arbitrary choice of scaling parameters below, and we chose a large number of them to get a grasp of the scaling behavior. Furthermore, will use the random gate folding function to incorporate the scaling factors into the folded circuit.
 Note that the random gate folding function applies the unitary folding map $G\rightarrow GG^\dagger G$ to a random subset of gates of the input circuit . In our specific case it is good to note that since the RZZ is explicitely given in terms of the CNOT and RZ gate, these individual gates can/ will also be folded.
 
 The folded circuit is more sensitive to gate errors since it has a number of gates approximately equal to scale_factor * n, where n is the number of gates in the input circuit.
@@ -420,7 +420,6 @@ where RSS is the residual sum of squares given by
 \begin{equation}
     RSS = \sum_{i=1}^n \epsilon_i^2.
 \end{equation}
-
 
 Note that $(x_i, y_i)$ are all data points, that is the various predictions of each shot for our expectation values at the different scaling factors. Also note that in the above, strictly speaking one assumes that errors $\epsilon_i$ are uncorrelated with common variance $\sigma^2$. Even if this is not exactly valid, the estimates on the standard error are usually good approximations.
 

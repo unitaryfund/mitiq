@@ -125,6 +125,7 @@ def variational_circuit(gamma):
 
 We can run this circuit many times, varying $\gamma$ each time, and compute ideal and noisy expectation values to compare to the mitigated versions.
 We do this comparison by using an improvement factor (IF) which is defined as
+
 ```{math}
 \left|\frac{\text{ideal} - \text{noisy}}{\text{ideal} - \text{mitigated}}\right|.
 ```
@@ -158,7 +159,6 @@ As we can see, both techniques offer an improvement, but for this problem identi
 This is due to the fact that ZNE assumes one can scale the noise throughout a circuit by doubling, tripling, etc, the noise's strength.
 On the simple noise model used in our example, identity insertion does exactly this, and hence has great performance.
 Noise models with increased complexity and gate-dependent errors would likely see more equal, or perhaps better performance by folding-based techniques.
-
 
 ## Conclusion
 

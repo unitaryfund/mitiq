@@ -40,8 +40,7 @@ sample mean of the measurement outcomes. Also called sampling cost, it is usuall
 the method needs $C \cdot N$ circuit shots to obtain the same precision as the sample-mean estimator would with only $N$ shots.
 
 [Pauli Twirling (PT)](pt.md)
-: A technique utilizing Pauli gates is used to tailor the noise in an input circuit to be more manageable. Coherent errors contribute heavily to the quadratically worst-case gate infidelities scenario compared to incoherent errors. This could indirectly affect the performance of a large noisy quantum circuit if the circuit noise is not tailored to be a Pauli noise channel i.e. incoherent. 
-
+: A technique utilizing Pauli gates is used to tailor the noise in an input circuit to be more manageable. Coherent errors contribute heavily to the quadratically worst-case gate infidelities scenario compared to incoherent errors. This could indirectly affect the performance of a large noisy quantum circuit if the circuit noise is not tailored to be a Pauli noise channel i.e. incoherent.
 
 ## QEM Methods
 

@@ -20,7 +20,6 @@ The main advantage of ZNE is that the technique can be applied without a detaile
 the undelying noise model. Therefore it can be a good option in situations where
 tomography is impractical.
 
-
 ## Disadvantages
 
 In some instances the results of the extrapolation can exhibit a large bias

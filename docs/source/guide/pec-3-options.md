@@ -82,7 +82,7 @@ for c in basis_circuits:
     print(c)
 ```
 
-Each element of `basis_circuits` describes "how to physically implement" a noisy operation 
+Each element of `basis_circuits` describes "how to physically implement" a noisy operation
 $\mathcal O_\alpha$ on a noisy backend. To completely characterize a noisy operation we can also
 specify the actual (non-unitary) quantum channel associated to it.
 In Mitiq, this can be done using the {class}`.NoisyOperation` class.
@@ -150,7 +150,7 @@ it minimizes the one-norm of the quasi-probability distribution.
 Behind the scenes, {func}`.find_optimal_representation` solves the following optimization problem:
 
 $$\gamma^{\rm opt} = \min_{\substack{ \{ \eta_{\alpha} \}  \\ \{ \mathcal O_{ \alpha} \}}}
-\left[ \sum_\alpha |\eta_{\alpha}| \right], \quad \text{ such that} \quad \mathcal G 
+\left[ \sum_\alpha |\eta_{\alpha}| \right], \quad \text{ such that} \quad \mathcal G
 = \sum_\alpha \eta_\alpha \mathcal O_\alpha \, .$$
 
 +++
@@ -235,17 +235,17 @@ print(*sampled_circuits)
 
 +++
 
-The main idea of PEC is to estimate the average with respect to a 
-quasi-probability distribution over noisy circuits with a probabilistic Monte-Carlo 
+The main idea of PEC is to estimate the average with respect to a
+quasi-probability distribution over noisy circuits with a probabilistic Monte-Carlo
 approach.
 This can be obtained rewriting $\mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha \$ as:
 
-$$\mathcal G = \gamma \sum_\alpha p(\alpha) \textrm{sign}(\eta_\alpha) \mathcal O_\alpha 
+$$\mathcal G = \gamma \sum_\alpha p(\alpha) \textrm{sign}(\eta_\alpha) \mathcal O_\alpha
 \quad p(\alpha):= |\eta_\alpha| / \gamma,$$
 
 where $p(\alpha)$ is a (positive) well-defined probability distribution.
 If we take a single sample from $p(\alpha)$, we obtain a noisy operation $\mathcal O_\alpha$ that
-should be multiplied by the sign of the associated coefficient $\eta_\alpha$ and by $\gamma$. 
+should be multiplied by the sign of the associated coefficient $\eta_\alpha$ and by $\gamma$.
 
 The method {meth}`.OperationRepresentation.sample()` can be used for this scope:
 
@@ -306,9 +306,9 @@ representations = [h_rep]
 In general `representations` will contain as many representations as the number of ideal
 gates involved in `circuit`.
 
-**Note:** *If a gate is in `circuit` but its {class}`.OperationRepresentation` is not listed in 
+**Note:** *If a gate is in `circuit` but its {class}`.OperationRepresentation` is not listed in
 `representations`, Mitiq can still apply PEC. However, any errors associated to
-that gate will not be mitigated. In practice, all the gates without {class}`.OperationRepresentation`s 
+that gate will not be mitigated. In practice, all the gates without {class}`.OperationRepresentation`s
 are treated by Mitiq as if they were noiseless.*
 
 The executor must be defined by the user since it depends on the specific frontend and backend
@@ -354,14 +354,13 @@ pec_value, pec_data = pec.execute_with_pec(
 )
 ```
 
-Similar to other error mitigation modules, `observable` is an optional argument of 
+Similar to other error mitigation modules, `observable` is an optional argument of
 {func}`.execute_with_pec`. If `observable` is `None` the executor must return an expectation value,
 otherwise the executor must return a `mitiq.QuantumResult` from which the expectation value of the input
-`observable` can be computed. See the [Executors](executors.md) section for more details. 
-
+`observable` can be computed. See the [Executors](executors.md) section for more details.
 
 Another option that can be used, instead of `num_samples`, is `precision`.
-Its default value is `0.03` and  quantifies the desired estimation accuracy. 
+Its default value is `0.03` and  quantifies the desired estimation accuracy.
 
 For a bounded observable $\|A\|\le 1$, `precision` approximates
 $|\langle  A \rangle_{ \rm ideal} - \langle  A \rangle_{ \rm PEC}|$ (up to constant factors and up to
@@ -385,7 +384,7 @@ pec_value, pec_data = pec.execute_with_pec(
 )
 ```
 
-***Hint:** The value of `precision` used above is very large, in order to reduce the execution 
+***Hint:** The value of `precision` used above is very large, in order to reduce the execution
 time. Try re-executing the previous cell with smaller values of `precision` to improve the result.*
 
 ### Analyzing the executed circuits
@@ -443,10 +442,9 @@ pec_data["pec_error"]
 
 Instead of the error printed above, one could use more advanced statistical techniques to estimate the
 uncertainty of the PEC result. For example, given the raw samples contained in  `pec_data["unbiased_estimators"]`,
-one can apply a [bootstrapping](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) approach. Alternatively, 
+one can apply a [bootstrapping](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) approach. Alternatively,
 a simpler but computationally more expensive approach is to perform multiple PEC estimations of the same expectation
 value and compute the standard deviation of the results.
-
 
 ## Applying learning-based PEC
 
@@ -461,7 +459,7 @@ The learning-based PEC workflow was inspired by the procedure described in *Stri
 +++
 
 The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy executor and on a classical simulator via an ideal executor (for more information on executors, check out the {doc}`executors` portion of the documentation).
-The training circuits are near-Clifford approximations of the input circuit. 
+The training circuits are near-Clifford approximations of the input circuit.
 During training, the noise strength parameter is used to calculate quasiprobability representations of the ideal gate with
 a depolarizing noise model.
 The representations are then input into {func}`.pec.execute_with_pec` to obtain an error-mitigated expecation value from execution of the
@@ -469,15 +467,13 @@ training circuit, for comparison with the ideal expecation value obtained from c
 The optimizer used in the learning function is from {py:func}`scipy.optimize.minimize`.
 The default optimization method in the learning function is `Nelder-Mead`, as that appears to work best for this particular problem setup.
 
-
 In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors, the user should specify the number
 of training circuits, the fraction of non-Clifford gates in the training circuits, an initial guess for noise strength, and in the case of
-biased noise, an initial guess for a noise bias. 
+biased noise, an initial guess for a noise bias.
 The user can also set options for the intermediate executions of {func}`.pec.execute_with_pec()` during the training process as a dictionary in
 `pec_kwargs`, specify the {doc}`observable <observables>` of which the expecation value is to be computed, and
 enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
 for the chosen optimization method.
-
 
 ```{note}
 Using `learn_depolarizing_noise_parameter` and `learn_biased_noise_parameters` may require some tuning.
@@ -551,7 +547,7 @@ operations_to_learn.cx(1, 0)
 ```
 
 Upon completing the optimization loop, {func}`.representations.learning.learn_depolarizing_noise_parameter` returns a flag indicating
-whether the optimizer exited successfully, in addition to the optimized noise strength, which can then be input into 
+whether the optimizer exited successfully, in addition to the optimized noise strength, which can then be input into
 {func}`.representations.depolarizing.represent_operation_with_local_depolarizing_noise` to calculate quasiprobability representations of the
 ideal gate in terms of noisy gates.
 
@@ -567,18 +563,18 @@ representations = represent_operation_with_local_depolarizing_noise(
 
 In cases where the noise of the backend can be approximated by a combined depolarizing and dephasing noise model with a bias factor, also
 referred to as a biased noise model, `pec.representations.learning.learn_biased_noise_parameters` can be used to learn the noise strength
-`epsilon` and noise bias `eta`  associated to a set of input operations. 
-
+`epsilon` and noise bias `eta`  associated to a set of input operations.
 
 The single-qubit biased noise channel is given by:
 
 $$
 \mathcal{D}(\epsilon) = (1 - \epsilon)\mathbb{1}
+
 + \epsilon\Big(\frac{\eta}{\eta + 1} \mathcal{Z}
 + \frac{1}{3}\frac{1}{\eta + 1}(\mathcal{X} + \mathcal{Y}
 + \mathcal{Z})\Big)
-$$ 
 
+$$
 
 For multi-qubit operations, the noise channel used is the tensor product of the local single-qubit channels.
 
@@ -618,7 +614,7 @@ operations_to_learn.cx(1, 0)
 ```
 
 Upon completing the optimization loop, {func}`.representations.learning.learn_biased_noise_parameters` returns a flag indicating whether the
-optimizer exited successfully, in addition to the optimized noise strength and noise bias, which can then be input into 
+optimizer exited successfully, in addition to the optimized noise strength and noise bias, which can then be input into
 {func}`.represent_operation_with_local_biased_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3

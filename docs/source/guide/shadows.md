@@ -24,7 +24,6 @@ This approach not only characterizes and mitigates noise effectively but also re
 sample efficiency and demonstrates noise resilience {cite}`chen2021robust`. For more details, see the section
 [Classical Shadow Protocol and its Robust Estimation](shadows-5-theory.md).
 
- 
 ```{figure} ../img/classicalshadow_workflow.png
 ---
 width: 700px
@@ -54,4 +53,3 @@ Here are some examples on how to use shadows in Mitiq:
 
 - [Classical Shadows Protocol with Cirq](../examples/shadows_tutorial.md)
 - [Robust Shadows Estimation with Cirq](../examples/rshadows_tutorial.md)
-

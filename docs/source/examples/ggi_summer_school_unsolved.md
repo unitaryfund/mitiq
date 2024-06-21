@@ -11,14 +11,14 @@ kernelspec:
   name: python3
 ---
 
-# Hands-on lab on error mitigation with Mitiq.
+# Hands-on lab on error mitigation with Mitiq
 
 +++
 
-This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://sqmscenter.fnal.gov/opportunities/summer-schools/#2022). 
+This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://sqmscenter.fnal.gov/opportunities/summer-schools/#2022).
 
 It is a guided tutorial on error mitigation with Mitiq and is focused on the zero-noise extrapolation (ZNE) technique. As this is
-intended to be a hands-on exercise, the solutions to the examples are linked at the end of the notebook. 
+intended to be a hands-on exercise, the solutions to the examples are linked at the end of the notebook.
 
 Useful links :
 
@@ -284,6 +284,7 @@ print("Noise-scaled expectation values:", noise_scaled_vals)
 ```
 
 ### STEP 2: Inference of the ideal result via zero-noise extrapolation
+
 Given the list of noise scaled expectation values, one can extrapolate the zero-noise limit. This is the final classical post-processing step.
 
 ```{code-cell} ipython3
@@ -328,6 +329,6 @@ The solutions to this notebook are available [here .](ggi_summer_school_solved.m
 
 3. _Error mitigation for short-depth quantum circuits_, K. Temme, S. Bravyi, J. M. Gambetta, [arXiv:1612.02058](https://arxiv.org/abs/1612.02058) (2016).
 
-4. _Digital zero noise extrapolation for quantum error mitigation_, 
+4. _Digital zero noise extrapolation for quantum error mitigation_,
 T. Giurgica-Tiron, Y. Hindy, R. LaRose, A. Mari, W. J. Zeng,
 [arXiv:2005.10921](https://arxiv.org/abs/2005.10921) (2020).

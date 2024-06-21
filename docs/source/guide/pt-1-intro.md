@@ -26,11 +26,11 @@ import mitiq
 mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
 
-
 ## Problem setup
-We first define the circuit of interest. In this example, the circuit has 
+
+We first define the circuit of interest. In this example, the circuit has
 two CNOT gates and a CZ gate. We can see that when we apply Pauli Twirling,
-we will generate 
+we will generate
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, CZ, CNOT
@@ -77,6 +77,7 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
 ```
 
 ## Apply PT
+
 Pauli Twirling can be easily implemented with the function
 {func}`.pauli_twirl_circuit()`.
 
@@ -92,7 +93,7 @@ mitigated_result = pt.pauli_twirl_circuit(
 ```
 
 Here we observe that the application of PT does not reduce the estimation error when compared
-to the unmitigated result. The intended effect was to only tailor the noise. 
+to the unmitigated result. The intended effect was to only tailor the noise.
 
 ```{admonition} Note:
 PT is designed to transform the noise simulated in this example,

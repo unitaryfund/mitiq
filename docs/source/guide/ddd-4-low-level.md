@@ -30,7 +30,7 @@ Workflow of the DDD technique in Mitiq.
 
 With respect to the workflows of other error-mitigation techniques (e.g. [ZNE](zne-4-low-level.md) or [PEC](pec-4-low-level.md)),
 DDD involves the generation and the execution of a _single_ modified circuit.
-For this reason, there is no need to combine the results of multiple circuits and the final inference step which is necessary for other 
+For this reason, there is no need to combine the results of multiple circuits and the final inference step which is necessary for other
 techniques is instead trivial for DDD.
 
 ```{note}
@@ -39,7 +39,7 @@ the associated results are averaged to obtain the final expectation value. This 
 it can be considered as an average of independent single-circuit workflows.
 ```
 
-As shown in [How do I use DDD?](ddd-1-intro.md), the function {func}`.execute_with_ddd()` applies DDD behind the scenes 
+As shown in [How do I use DDD?](ddd-1-intro.md), the function {func}`.execute_with_ddd()` applies DDD behind the scenes
 and directly returns the error-mitigated expectation value.
 In the next sections instead, we show how one can apply DDD at a lower level, i.e., by:
 
@@ -50,14 +50,15 @@ In the next sections instead, we show how one can apply DDD at a lower level, i.
 ## Analysis of idle windows (optional step)
 
 In this section we show how one can determine all the idle windows (often called slack windows) in a circuit and how long they are,
-i.e. how many single-qubit gates can fit each window. 
-This is an optional step, since it is actually not necessary to apply DDD with Mitiq. 
-Nonetheless, it provides additional information on the gate structure of the circuit that can be useful, especially for research purposes. 
+i.e. how many single-qubit gates can fit each window.
+This is an optional step, since it is actually not necessary to apply DDD with Mitiq.
+Nonetheless, it provides additional information on the gate structure of the circuit that can be useful, especially for research purposes.
 
 ### The circuit mask
+
 A quantum circuit can be visualized as a 2D grid where the horizontal axis represents discrete
 time steps (often called moments) and the vertical axis represents the qubits of the circuit. Each gate occupies one or more grid cells,
-depending on the number of qubits it acts on. 
+depending on the number of qubits it acts on.
 
 This 2D grid is essentially what we get each time we print a circuit out.
 
@@ -164,7 +165,7 @@ execute(circuit_with_ddd)
 ```
 
 As a final remark, we stress that the low-level procedure that we have shown is exactly what {func}`.execute_with_ddd()` does behind the scenes.
-Let's verify this fact: 
+Let's verify this fact:
 
 ```{code-cell} ipython3
 np.isclose(

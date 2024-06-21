@@ -23,7 +23,7 @@ Ensure the commit where these changes are made include authorship for all contri
 
 This task has two parts:
 
-1.  Make sure that `CHANGELOG.md` has an entry for each pull request
+1. Make sure that `CHANGELOG.md` has an entry for each pull request
     (PR) since the last release. This can be generated from the commit
     history using `git log vX.Y.Z.. --pretty=format:"- %s [%an]"`
     where `vX.Y.Z` is the last version of Mitiq which was released.
@@ -37,8 +37,9 @@ This task has two parts:
         LATEST_TAG=$(gh release list --repo unitaryfund/mitiq --limit 1 --json tagName --jq '.[0].tagName')
         gh api repos/unitaryfund/mitiq/compare/$LATEST_TAG...main --paginate --jq '.commits | reverse | .[] | "- " + (.commit.message | split("\n")[0]) + " [@" + .author.login + "]"'
     This method requires installing (and authenticating on) the Github CLI, but has the advantage that the output list comes already with Github handles, hence removing a tedious step for the release manager.    
-    ``` 
-2.  The release manager should add a "Summary" section with a couple
+    ```
+
+2. The release manager should add a "Summary" section with a couple
     sentences describing the latest release, and then update the title
     of the release section to include the release date and remove the
     "In Development" designation.
@@ -52,11 +53,11 @@ which is the single source of truth for version information. We follow
 
 ### Create a release pull request
 
-A pull request with the changes mentioned above should be created against the _main_ branch as part of the release preparation. 
-The pull request must be reviewed by at least one Mitiq maintainer in addition to the milestone manager, 
+A pull request with the changes mentioned above should be created against the _main_ branch as part of the release preparation.
+The pull request must be reviewed by at least one Mitiq maintainer in addition to the milestone manager,
 and its title should be "X.Y.Z Release", where `X.Y.Z` represents the version number to be released.
 
-Note: This pull request triggers a specialized build workflow due to the keyword 'release' in its title. 
+Note: This pull request triggers a specialized build workflow due to the keyword 'release' in its title.
 This includes additional steps, such as running a link checker to verify all links within the documentation pages.
 
 ## Do the release

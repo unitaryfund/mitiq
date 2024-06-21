@@ -36,6 +36,7 @@ zne_value = zne.execute_with_zne(
 +++
 
 The three main options are `scale_noise`, `factory` and `num_to_average`.
+
 - The option `scale_noise` can be used to select a noise scaling method.
     More details are explained below.
 - The option `factory` can be used to select an extrapolation method.
@@ -44,7 +45,7 @@ The three main options are `scale_noise`, `factory` and `num_to_average`.
 
 +++
 
-In the next sections we explain in more details how noise scaling and extrapolation methods are represented in Mitiq 
+In the next sections we explain in more details how noise scaling and extrapolation methods are represented in Mitiq
 and how they can be applied in practice.
 
 +++
@@ -58,14 +59,14 @@ Mitiq achieves this task by *digital* noise scaling, i.e., with circuit manipula
 More details on digital ZNE can be found in [What is the theory behind ZNE?](zne-5-theory.md)
 
 In Mitiq a noise scaling method is represented by a *noise scaling function* that takes as input a `circuit` and a real `scale_factor` and
-returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
-`scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`. 
+returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend,
+`scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`.
 
 As discussed previously in [How do I use ZNE?](zne-1-intro.md), the two available methods to scale noise are by inserting
 unitaries or by inserting layers of identity gates. Note that the number of layers inserted are different for the two methods even
-if they have the same scale factor greater than 1. 
+if they have the same scale factor greater than 1.
 
-### Unitary Folding 
+### Unitary Folding
 
 Mitiq provides several noise scaling functions for the repeated application of the *unitary folding* technique. In
 this technique regardless of the *unitary folding* function used, a unitary $G$ is mapped as follows:
@@ -78,12 +79,13 @@ The Mitiq function for global folding is:
 
 - {func}`.fold_global()`.
 
-The Mitiq functions for local folding are: 
+The Mitiq functions for local folding are:
+
 - {func}`.fold_gates_at_random()`;
 - {func}`.fold_all()`.
 
 There are multiple functions for local folding since it can be applied to the gates of a circuit according to different orderings:
-at random, from left (starting from the initial gates), from right (starting from the final gates), etc.. 
+at random, from left (starting from the initial gates), from right (starting from the final gates), etc..
 For more details on folding functions, we suggest to click on the functions listed above and check the associated API docs.
 
 If not specified by the user, the default noise scaling method in Mitiq is {func}`.fold_gates_at_random()`.
@@ -208,7 +210,6 @@ We can see that only the two-qubit gates and three-qubit gates have been folded.
 Specific gate keys override the global `"single"`, `"double"`, or `"triple"` options. For example, the dictionary
 `fidelities = {"single": 1.0, "H": 0.99}` sets all single qubit gates to fidelity one except the Hadamard gate.
 
-
 A full list of string keys for gates can be found with `help(fold_method)` where `fold_method` is a valid local
 folding method. Fidelity values must be between zero and one.
 
@@ -299,21 +300,20 @@ Here, $G$ is a single circuit layer containing individual that can be performed 
 To use this method, call {func}`.zne.scaling.identity_insertion.insert_id_layers()` with both a circuit to scale, and a scale factor.
 Alternatively, pass it as the `scale_noise` argument to {func}`.zne.execute_with_zne` to use it instead of the default method of {func}`.fold_gates_at_random`.
 
-
 #### Integer and Real Scale Factors
 
-When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged. 
+When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged.
 
-For some scale factor greater than 1, there will need to be some layers inserted non-uniformly to approach the desired scale factor. This is determined by the scale factor being an integer or a float. 
+For some scale factor greater than 1, there will need to be some layers inserted non-uniformly to approach the desired scale factor. This is determined by the scale factor being an integer or a float.
 
-- When the scale factor is an integer, identity layers are inserted uniformly after each moment in the input circuit. 
-- When the scale factor is a non-integer, identity layers are inserted uniformly until the closest integer less than the scale factor is achieved. Then the layers are inserted at random to achieve a value approximately close to the intended scale factor. 
+- When the scale factor is an integer, identity layers are inserted uniformly after each moment in the input circuit.
+- When the scale factor is a non-integer, identity layers are inserted uniformly until the closest integer less than the scale factor is achieved. Then the layers are inserted at random to achieve a value approximately close to the intended scale factor.
 
 ##### Example
 
 Consider an input circuit of depth $d$.
-Let $\lambda$ be the desired scale factor, $n$ be the number of uniformly inserted identity layers and $s$ be the number of randomly inserted identity layers. 
-The scaled circuit depth is then approximated as $\lambda d \approx d(1+n) + s$. 
+Let $\lambda$ be the desired scale factor, $n$ be the number of uniformly inserted identity layers and $s$ be the number of randomly inserted identity layers.
+The scaled circuit depth is then approximated as $\lambda d \approx d(1+n) + s$.
 
 ```{figure} ../img/zne_id_scaling_example.png
 ---
@@ -323,9 +323,9 @@ name: input_circ_layers
 The diagram shows the two layers in the input circuit.
 ```
 
-Using the same circuit defined previously, the original circuit depth is $2$. If the desired scale 
+Using the same circuit defined previously, the original circuit depth is $2$. If the desired scale
 factor is $5$ then the new scaled circuit depth has to be $10$ as $5 = \frac{10}{2}$. Using above expression for $\lambda = 1+ 4$, the
-number of uniformly inserted identity layers in the scaled circuit will be $4$. 
+number of uniformly inserted identity layers in the scaled circuit will be $4$.
 
 ```{figure} ../img/zne_id_scaling_integer_factor.png
 ---
@@ -383,7 +383,7 @@ The {class}`.Factory` class has two main abstract subclasses:
 - {class}`.AdaptiveFactory` representing adaptive extrapolation algorithms in which the choice of the next noise scale factor depends on the history of the measured results.
 
 Specific classes derived from {class}`.BatchedFactory` or {class}`.AdaptiveFactory` represent different zero-noise extrapolation
-methods. 
+methods.
 
 Mitiq provides a number of built-in factories, which can be found in the module {mod}`mitiq.zne.inference` and are summarized in the following table.
 
@@ -467,7 +467,8 @@ def execute(circuit, noise_level=0.1):
 executor = Executor(execute)
 ```
 
-In the next code cell we run ZNE with several advanced options: 
+In the next code cell we run ZNE with several advanced options:
+
 - We seed the noise scaling function;
 - We fold only CNOT gates using the `fidelity` option;
 - We use a non-default extrapolation method ({class}`.ExpFactory`).

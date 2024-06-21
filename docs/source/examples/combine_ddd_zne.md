@@ -16,12 +16,12 @@ kernelspec:
 
 Noise in quantum computers can arise from a variety of sources, and sometimes applying multiple error mitigation techniques can be more beneficial than applying a single technique alone.
 
-Here we apply a combination of Digital Dynamical Decoupling (DDD) and Zero Noise Extrapolation (ZNE) on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger-Horne-Zeilinger_state). We choose this particular use case because it is a common subroutine in many circuits, and we know its expectation value beforehand, making it easy to compare fidelities with and without error mitigation. 
+Here we apply a combination of Digital Dynamical Decoupling (DDD) and Zero Noise Extrapolation (ZNE) on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger-Horne-Zeilinger_state). We choose this particular use case because it is a common subroutine in many circuits, and we know its expectation value beforehand, making it easy to compare fidelities with and without error mitigation.
 
-In [DDD](../guide/ddd.md), the input quantum circuit is modified by inserting gate sequences at regular intervals designed to reduce interaction between (i.e., decouple) the qubits from their environment. 
+In [DDD](../guide/ddd.md), the input quantum circuit is modified by inserting gate sequences at regular intervals designed to reduce interaction between (i.e., decouple) the qubits from their environment.
 
 In [ZNE](../guide/zne.md), the expectation value of the observable of interest is computed at different noise levels, and subsequently the ideal expectation value is inferred by extrapolating the measured results to the zero-noise
-limit. 
+limit.
 
 +++
 
@@ -37,10 +37,9 @@ from mitiq import MeasurementResult, Observable, PauliString
 
 ## Task
 
-We will demonstrate quantum error mitigation on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger%E2%80%93Horne%E2%80%93Zeilinger_state), entangling multiple qubits together. We can create a short function to do this for convenience. We will also define a utility function `idle_qubits`, which will give us a way to insert additional time steps in which to let our qubits idle. 
+We will demonstrate quantum error mitigation on a [GHZ state](https://en.wikipedia.org/wiki/Greenberger%E2%80%93Horne%E2%80%93Zeilinger_state), entangling multiple qubits together. We can create a short function to do this for convenience. We will also define a utility function `idle_qubits`, which will give us a way to insert additional time steps in which to let our qubits idle.
 
-
-We will explain this further in the noise model section, but suffice it to say that these are intended to amplify the effect of time correlated noise. 
+We will explain this further in the noise model section, but suffice it to say that these are intended to amplify the effect of time correlated noise.
 
 ```{code-cell}
 def idle_qubits(circuit, qubits, idle_steps):
@@ -87,17 +86,17 @@ circuit = ghz(num_qubits, idle_steps=3)
 print(circuit)
 ```
 
-In the diagram above, the horizontal brakets above and below specific gates represent the [cirq](https://quantumai.google/cirq) notion of [moments](https://quantumai.google/reference/python/cirq/Moment), which are time-slices intended to help with qubit scheduling (e.g. making sure qubits arrive at a gate at the same time). 
+In the diagram above, the horizontal brakets above and below specific gates represent the [cirq](https://quantumai.google/cirq) notion of [moments](https://quantumai.google/reference/python/cirq/Moment), which are time-slices intended to help with qubit scheduling (e.g. making sure qubits arrive at a gate at the same time).
 
 In the our noise model, we will apply errors after each moment. Adding the additional identity gates within each "moment" should amplify the effect of these time-correlated errors.
 
-**Note:** Due to cirq's definition of moments, the first two gates of the circuit (`cirq.H(qubits[0])` and `cirq.CNOT(qubits[0], qubits[i])`) are in the same moment. This means the idle steps cannot be added between these gates, and therefore the time correlated noise will have less of an effect for the start of the circuit. 
+**Note:** Due to cirq's definition of moments, the first two gates of the circuit (`cirq.H(qubits[0])` and `cirq.CNOT(qubits[0], qubits[i])`) are in the same moment. This means the idle steps cannot be added between these gates, and therefore the time correlated noise will have less of an effect for the start of the circuit.
 
 +++
 
 ## Noise model and executor
 
-**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate systematic $R_z$ rotations and depolarising noise applied to each qubit after each time step. This corresponds to noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD. 
+**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate systematic $R_z$ rotations and depolarising noise applied to each qubit after each time step. This corresponds to noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
 
 We use an [executor function](../guide/executors.md) to run the quantum circuit with the noise model applied. The default noise values have been chosen empirically to demonstrate an error model which strongly impacts our chosen circuit (creating a GHZ state), but which can still be mitigated by our chosen QEM techniques.  
 
@@ -138,17 +137,17 @@ res = execute(circuit)
 res.to_dict() # Dictionary for more convenient visualization
 ```
 
-The `'counts'` key represents the number of times a particular measurement bitstring occurred. 
+The `'counts'` key represents the number of times a particular measurement bitstring occurred.
 
 Since the default execute function includes noise in this case, we see that most of the results are all ones or all zeros, corresponding to perfect entanglement between all qubits.
 
-A few others, like `'110111'` however are one or more bitflips away from either of these states. It is these types of errors we want to mitigate. 
+A few others, like `'110111'` however are one or more bitflips away from either of these states. It is these types of errors we want to mitigate.
 
 +++
 
 ## Observable
 
-In this example, we just want to check if we have achieved entanglement across all qubits. In this case, we will measure the observable $⨂_{i=1}^n​X_i$ or measuring `X` on all qubits. 
+In this example, we just want to check if we have achieved entanglement across all qubits. In this case, we will measure the observable $⨂_{i=1}^n​X_i$ or measuring `X` on all qubits.
 
 This corresponds to projecting the state onto either the $∣+⟩^{⊗n}$ or $∣−⟩^{⊗n}$ basis. For a perfect GHZ state, this observable will have an expectation value of 1, which corresponds to all qubits being in the same state.
 
@@ -178,7 +177,7 @@ print("Unmitigated noisy value:", "{:.5f}".format(noisy.real))
 
 ### Applying Digital Dynamical Decoupling
 
-Next we choose our gate sequences to be used in the digital dynamical decoupling routine (DDD). 
+Next we choose our gate sequences to be used in the digital dynamical decoupling routine (DDD).
 More information on choosing appropriate sequences can be found in the [DDD theory](../guide/ddd-5-theory.md#common-examples-of-ddd-sequences) section of the user guide.
 
 To do this, we will insert DDD sequences into our circuit itself and then compare the original circuit with the modified one.

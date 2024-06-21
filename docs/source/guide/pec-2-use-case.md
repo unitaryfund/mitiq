@@ -20,7 +20,6 @@ it provides an unbiased estimation of expectation values.
 This means that, in the limit of many samples, the error mitigated expectation values
 converge to the ideal expectation values.
 
-
 ## Disadvantages
 
 PEC is a noise-aware technique that converges to the ideal noiseless results only if we have the full

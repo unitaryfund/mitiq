@@ -32,11 +32,11 @@ The inference step of PEC is based on the Monte Carlo estimation protocol discus
 
 As shown in the Section [How do I use PEC?](pec-1-intro.md), the standard way of applying PEC in Mitiq is based
 on the function {func}`.execute_with_pec()`. However, one may be interested in applying PEC with a lower-level of
-abstraction for reasons of efficiency or for customization proposes. 
+abstraction for reasons of efficiency or for customization proposes.
 In particular, it could be useful to explicitly split the PEC process into the two main steps shown in the figure above:
 
 - Step 1: Probabilistic generation of all the auxiliary circuits;
-- Step 2: Inference of the ideal expectation value from the noisy execution of the auxiliary circuits. 
+- Step 2: Inference of the ideal expectation value from the noisy execution of the auxiliary circuits.
 
 +++
 
@@ -171,6 +171,7 @@ We also initialize a Mitiq {class}`.Executor` object. This step is optional but 
 ```{code-cell} ipython3
 executor = mitiq.Executor(batched_execute, max_batch_size=100)
 ```
+
 We execute all the auxiliary circuits generated in the previous section to obtain a list of noisy expectation values.
 
 ```{code-cell} ipython3
@@ -223,6 +224,7 @@ unmitigated_value = executor.evaluate(circuit)[0]
 print(f"Expectation value without error mitigation:    {unmitigated_value}")
 print(f"Expectation value with error mitigation (PEC): {pec_value}")
 ```
+
 To obtain a better PEC estimation (with reduced statistical fluctuations) one should increase the number
-of probabilistically generated circuits, i.e., one should increase the argument `num_samples` when calling 
+of probabilistically generated circuits, i.e., one should increase the argument `num_samples` when calling
 the {func}`.sample_circuit()` function.

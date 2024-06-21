@@ -13,7 +13,6 @@ kernelspec:
 
 # Error mitigation with Cirq on IBMQ backends
 
-
 This tutorial shows an example of how to mitigate noise on IBMQ backends with the [Cirq frontend](https://quantumai.google/cirq).
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends.
 We can use conversions in Mitiq to use supported frontends with supported backends.
@@ -48,9 +47,7 @@ print(cirq_circuit)
 We will use the probability of the ground state as our observable to mitigate, the expectation value of which should
 evaluate to one in the noiseless setting.
 
-
 ## High-level usage
-
 
 To use Mitiq with just a few lines of code, we need to define an executor, a function which inputs a circuit and outputs
 the expectation value to mitigate. This function will:
@@ -127,9 +124,7 @@ print(f"Mitigated result {mitigated:.3f}")
 As long as a circuit and a function for executing the circuit are defined, the {func}`zne.execute_with_zne` function can
 be called as above to return zero-noise extrapolated expectation value(s).
 
-
 ## Options
-
 
 Different options for noise scaling and extrapolation can be passed into the {func}`zne.execute_with_zne` function.
 By default, noise is scaled by locally folding gates at random, and the default extrapolation is Richardson.
@@ -155,7 +150,6 @@ print(f"Mitigated result {mitigated:.3f}")
 
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 {func}`zne.execute_with_zne`.
-
 
 ## Lower-level usage
 
@@ -201,7 +195,6 @@ job = backend.run(exec_circuit, shots=shots)
 ```
 
 **Note:** We set the ``optimization_level=0`` to prevent any compilation by Qiskit transpilers.
-
 
 Once the job has finished executing, we can convert the raw measurement statistics to observable values by running the
 following code block.

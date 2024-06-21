@@ -22,6 +22,7 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
 
 ## Problem setup
+
 In this example we will simulate a noisy device to demonstrate the capabilities of REM. This method requires an {doc}`observable <observables>` to be defined, and we use $Z_0 + Z_1$ as an example.
 Since the circuit includes an $X$ gate on each qubit,  the noiseless expectation value should be $-2$.
 
@@ -38,9 +39,9 @@ observable = Observable(PauliString("ZI"), PauliString("IZ"))
 print(circuit)
 ```
 
-Next we define a simple noisy readout executor function which takes a 
-circuit as input, executes the circuit on a noisy simulator, and 
-returns the raw measurement results. See the [Executors](executors.md) 
+Next we define a simple noisy readout executor function which takes a
+circuit as input, executes the circuit on a noisy simulator, and
+returns the raw measurement results. See the [Executors](executors.md)
 section for more information on how to define more advanced executors.
 
 ```{warning}
@@ -85,7 +86,8 @@ print(f"Error without mitigation: {error:.3}")
 ```
 
 ## Apply Postselection
-The simplest version of readout error mitigation that we could do is to postselect specific bitstrings using 
+
+The simplest version of readout error mitigation that we could do is to postselect specific bitstrings using
 {mod}`mitiq.rem.post_select`. This strategy is only applicable if, from the structure of the problem, there is some kind symmetry that we can assume and therefore enforce by post-selection. For example, we observe that the circuit in our example is symmetric with respect to interchanging the
 two qubits. Assuming we are given the promise that the ideal result must be a unique bitstring, such a bitstring must
 be symmetric with respect to a bit swap. Therefore, a possible error mitigation strategy is to keep only the results
@@ -109,9 +111,10 @@ error = abs((ideal_value - mitigated_result)/ideal_value)
 print(f"Error with mitigation (PS): {error:.3}")
 ```
 
-So, if we used these postselected results, then we'd get closer to the expected noiseless expectation value. However, that comes at the cost of throwing away a fraction of our measurements. 
+So, if we used these postselected results, then we'd get closer to the expected noiseless expectation value. However, that comes at the cost of throwing away a fraction of our measurements.
 
 ## Apply REM
+
 A more elaborate readout-error mitigation technique can be easily applied with the function
 {func}`.execute_with_rem()`.
 
@@ -140,7 +143,7 @@ print(f"Error with mitigation (REM): {error:.3}")
 Here we observe that the application of REM reduces the readout error when compared
 to the unmitigated result.
 
-```{note} 
+```{note}
 It is necessary to supply the inverse confusion matrix to the REM technique.
 There are various approaches that can be used to generate the inverse 
 confusion matrix with some being more costly than others.

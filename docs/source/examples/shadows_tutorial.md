@@ -13,7 +13,7 @@ kernelspec:
 
 # Classical Shadows Protocol with Cirq
 
-**Corresponding to:** Min Li (minl2@illinois.edu)
+**Corresponding to:** Min Li (<minl2@illinois.edu>)
 
 This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the [following notebook](https://mitiq.readthedocs.io/en/stable/examples/rshadows_tutorial.html).
 
@@ -33,10 +33,9 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
 np.random.seed(666)
 ```
 
-In the context of an $n$-qubit system, where $\rho$ is an unknown quantum state residing in a $2^n$-dimensional Hilbert space, the procedure of performing classical shadow involves extracting information from the state through repeated measurements. 
+In the context of an $n$-qubit system, where $\rho$ is an unknown quantum state residing in a $2^n$-dimensional Hilbert space, the procedure of performing classical shadow involves extracting information from the state through repeated measurements.
 
 ## 1. Define a test circuit
-
 
 ```{code-cell} ipython3
 # number of qubits in the circuit
@@ -74,7 +73,7 @@ MathJax.Hub.Config({
 });
 </script>
 
-## 2. Sampling random Pauli measurements 
+## 2. Sampling random Pauli measurements
 
 This process involves applying a random unitary selected from a randomly fixed ensemble $\mathcal{U}\in U(2^n)$ to rotate the state $\rho\rightarrow U^\dagger \rho U$, followed by a computational-basis($Z$-basis) measurement, and storing a classical description $U^\dagger |\hat{b}\rangle\langle\hat{b}| U$. After the measurement, the inverse of $U$ is applied to the resulting computational basis state, collapsing $\rho$ to
   
@@ -82,7 +81,6 @@ This process involves applying a random unitary selected from a randomly fixed e
 U^\dagger|\hat{b}\rangle\langle\hat{b}| U\qquad \mathrm{where} \qquad \mathrm{Pr}[\hat{b}=b]=\langle b|U\rho U^\dagger|b\rangle.
 \end{equation}
 If the unitary group $\mathcal{U}$ is chosen to be the local Clifford group $\mathrm{CL}(2)^n$, this equivalent to performing a random Pauli measurement on each qubit. This means that for each qubit, we randomly decide to measure one of the Pauli operators. Below, we define the `cirq_executor` to take one shot of measurement and return the measurement result.
-
 
 ```{code-cell} ipython3
 def cirq_executor(
@@ -100,12 +98,11 @@ In terms of implementation, considering that the only possible measurement to be
 
 In the main function, the quantum measurement process is encapsulated within the `shadow_quantum_processing function`. This function takes the quantum circuit and the number of shots as input. It returns the measurement results as bit strings, for example, '01...0' is equivalent to the measurement basis eigenstate: $|0\rangle|1\rangle...|0\rangle$. Additionally, it provides the measured Pauli gates in string format. For instance, 'XY...Z' signifies a local X-basis measurement on the first qubit, a local Y-basis measurement on the second qubit, and a local Z-basis measurement on the last qubit in the circuit.
 
-
 ```{code-cell} ipython3
 shadow_quantum_processing(test_circuits, cirq_executor, 2)
 ```
 
-## 3. Obtain Snapshot and Classical Shadows.
+## 3. Obtain Snapshot and Classical Shadows
 
 This random measurement contains valuable information about $\rho$ in expectation:
 \begin{equation}
@@ -117,7 +114,7 @@ a classical memory. If we apply $\mathcal{M}$ to all the snapshots, the expected
 \begin{equation}
 \hat{\rho}=\mathcal{M}^{-1}\left(U^\dagger|\hat{b}\rangle\langle\hat{b}|U\right)
 \end{equation}
-which has been named a single copy of **classical shadow**. Based on *Schur's Lemma* the quantum channel $\mathcal{M}$ is a depolarizing channel $\mathcal{D}_p$ with $p=\frac{1}{2^n+1}$. It is easy to solve for the inverted map 
+which has been named a single copy of **classical shadow**. Based on *Schur's Lemma* the quantum channel $\mathcal{M}$ is a depolarizing channel $\mathcal{D}_p$ with $p=\frac{1}{2^n+1}$. It is easy to solve for the inverted map
 
 \begin{equation}
 \mathcal{M}^{-1}(\cdot)=[(2^n +1)-\mathbb{I}\cdot\mathrm{Tr}](\cdot),
@@ -134,7 +131,9 @@ which is a tensor product of $n$ qubits, each of which is a classical state. Thi
 \end{equation}
 
 ## 4. State Reconstruction from Classical Shadows
+
 ### 4.1 State Reconstruction
+
 The classical shadows state reconstruction are then obtained by taking the average of the snapshots, this process is designed to reproduce the underlying state $\rho$ exactly in expectation:
 \begin{equation}
    \rho= \mathbb{E}[\hat{\rho}],
@@ -142,13 +141,14 @@ The classical shadows state reconstruction are then obtained by taking the avera
 this is realized in the function `state_reconstruction`. In the main function `classical_post_processing`, we take the output of `shadow_quantum_processing`, then apply the inverse channel to obtain the snapshots, and finally take the average of the snapshots to obtain the reconstructed state if *state_reconstruction =* **True**. **In the current notebook, we don't preform Pauli twirling calibration, and we set** *rshadow* = **False**.
 
 #### 4.1.1 Error Analysis
-We can take a visualization of the element wise difference between the reconstructed state and the original state. 
-\begin{equation}
-\Delta\rho_{ij}=|\rho^{\mathrm{shadow}}_{ij}-\rho_{ij}|
-\end{equation}
-The difference is very small, which means that the classical shadow is a good approximation of the original state even in the sense of state tomography. 
 
-It is anticipated that the fidelity will not necessarily be lower than 1, as the state reconstructed through classical shadow estimation is not guaranteed to be a physical quantum state, given that $\mathcal{M}^{-1}$ is not a quantum channel. 
+We can take a visualization of the element wise difference between the reconstructed state and the original state.
+\begin{equation}
+\Delta\rho_{ij}=|\rho^{\mathrm{shadow}}*{ij}-\rho*{ij}|
+\end{equation}
+The difference is very small, which means that the classical shadow is a good approximation of the original state even in the sense of state tomography.
+
+It is anticipated that the fidelity will not necessarily be lower than 1, as the state reconstructed through classical shadow estimation is not guaranteed to be a physical quantum state, given that $\mathcal{M}^{-1}$ is not a quantum channel.
 
 Fidelity is defined by $F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$, when $\rho=|v\rangle\langle v|$ is a pure state $F(\rho,\sigma)=\langle v|\sigma|v\rangle$.
 Based on the theorem, if the error rate of fidelity is $\epsilon$, i.e.
@@ -161,7 +161,6 @@ N = \frac{34}{\epsilon^2}\left\|\rho-\mathrm{Tr}(\rho)/{2^n}\mathbb{I}\right\|_{
 \end{equation}
 with the shadow norm upper bound of the random Pauli measurement $\left\|\cdot\right\|_{\mathrm{shadow}}\leq 2^k\|\cdot\|_\infty$ when the operator acting on $k$ qubits, we have $N\leq 34\epsilon^{-2}2^{2n}+\mathcal{O}(e^{-n})$. Based on Fuchs–van de Graaf inequalities and properties of $L_p$ norm, $\|\rho-\sigma\|_2\leq \|\rho-\sigma\|_1 \leq (1-F(\rho,\sigma))^{1/2}$, the $L_2$ norm distance between the state reconstructed through classical shadow estimation and the state prepared by the circuit is upperbound by the fidelity error rate $\epsilon$. The dependency of the bound number of measurements $N$ to achieve the error rate $\epsilon$ is depicted in function `n_measurements_tomography_bound`.
 
-
 ```{code-cell} ipython3
 # error rate of state reconstruction epsilon < 1.
 epsilon = 1
@@ -172,8 +171,7 @@ print("n_total_measurements = {}".format(n_total_measurements))
 shadow_outcomes = shadow_quantum_processing(
     test_circuits, cirq_executor, n_total_measurements
 )
-```                                                                      
-
+```
 
 ```{code-cell} ipython3
 # get shadow reconstruction of the density matrix
@@ -184,7 +182,6 @@ output = classical_post_processing(
 rho_shadow = output["reconstructed_state"]
 ```
 
-
 ```{code-cell} ipython3
 # Compute the ideal state vector described by the input circuit.
 state_vector = test_circuits.final_state_vector().reshape(-1, 1)
@@ -193,7 +190,6 @@ rho_true = state_vector @ state_vector.conj().T
 ```
 
 We can plot the element wise difference between the reconstructed state and the original state as a thermal diagram:
-
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
@@ -245,7 +241,6 @@ plt.show()
 ```
 
 Compute the fidelity and $L_2$ distance between the state reconstructed through classical shadow estimation (which is not a quantum state) and the state prepared by the circuit $\|\rho_{\mathrm{shadow}}-\rho\|_2$, with $\|\cdot\|_2:=\sqrt{\mathrm{Tr}[(\cdot)^\dagger(\cdot)]}$.
-
 
 ```{code-cell} ipython3
 import pandas as pd
@@ -306,9 +301,6 @@ for n_measurement in n_measurement_list:
         
 ```
 
-
-
-
 ```{code-cell} ipython3
 plt.figure()
 sns.lineplot(
@@ -346,21 +338,20 @@ To estimate the expectation value of some observable, we simply replace the unkn
 \begin{equation}
     \hat{o}_i = \mathrm{Tr}(O_i\hat{\rho})~~~\mathrm{obeys}\qquad \mathrm{Tr}(O_i\rho)\equiv \mathbb{E}[\hat{o}_i],~~ 1\leq i\leq M.
 \end{equation}
- 
-One can prove that a snapshot can correctly predict **any** linear functions $f(\rho)$ of state, e.g. expectation values of obsevables $O_i$, i.e. $o_i=\mathrm{Tr}(O_i\rho)$, by taking average over the repeatedly $N$ independent classical shadows, 
+
+One can prove that a snapshot can correctly predict **any** linear functions $f(\rho)$ of state, e.g. expectation values of obsevables $O_i$, i.e. $o_i=\mathrm{Tr}(O_i\rho)$, by taking average over the repeatedly $N$ independent classical shadows,
 
 \begin{equation}
-\hat{o}_i(N)=\mathbb{E}_{j\in N}(\hat{o}_i^{(j)}\hat{\rho}_j)
+\hat{o}*i(N)=\mathbb{E}*{j\in N}(\hat{o}_i^{(j)}\hat{\rho}_j)
 \end{equation}
 
 Actually in practical, with the statistical method of taking an average called "median of means" to achieve an acceptable failure probability of estimation, which need $R=NK$ snapshots acctually,
 \begin{equation}
-\hat{o}_i(N,K):=\mathrm{median}\{\hat{o}_i^{(1)},\cdots,\hat{o}_i^{(K)}\}~~\mathrm{where}~~\hat{o}_i^{(j)}=N^{-1}\sum_{k=N(j-1)+1}^{Nj}\mathrm{Tr}(O_i\hat{\rho}_k),
+\hat{o}_i(N,K):=\mathrm{median}\{\hat{o}_i^{(1)},\cdots,\hat{o}_i^{(K)}\}~~\mathrm{where}~~\hat{o}*i^{(j)}=N^{-1}\sum*{k=N(j-1)+1}^{Nj}\mathrm{Tr}(O_i\hat{\rho}_k),
 \end{equation}
 for all $1\leq j\leq K$
 
  Now let's assume that our list of observables are a set of nearest nearist neighbour interactions on a 1D lattice, i.e. $O_i=P_i P_{i+1}$, where $P_i$ is the Pauli operator on the $i$-th qubit. We can use the classical shadow to estimate the expectation value of the observable $O_i$ by simply replacing the unknown quantum state $\rho$ with a classical shadow $\hat{\rho}$, which is a random variable that yields the correct prediction in expectation:
-
 
 ```{code-cell} ipython3
 from mitiq import Observable, PauliString
@@ -417,22 +408,24 @@ In the scenario of a random Pauli measurement, where a set of local observables 
 Here,
 \begin{equation}
 \langle{b}_i|U_i P_i U_i ^\dagger|{b}_i\rangle
-=\langle{b}_i|Z|{b}_i\rangle\cdot\delta(P_i ,U_i ^\dagger Z U_i )\qquad \mathrm{if}~~ P_i \in\{X,Y,Z\}    
+=\langle{b}_i|Z|{b}_i\rangle\cdot\delta(P_i ,U_i ^\dagger Z U_i )\qquad \mathrm{if}~~ P_i \in\{X,Y,Z\}
 \end{equation}
 When we realize this code, it's important to consider that we record the equivalent Pauli measurement in the case of local Pauli measurement. The expectation value of the observable $O_i$ can be simply computed by counting the number of exact matches between the observable and the classical shadow, and then multiplying the result by the appropriate sign given the measurement result $b_i =\pm 1$. If the operator in the observable does not match the random Pauli measurement (recorded as output in the program) that has been performed on the particular qubit, i.e. if $u_i:= U_i ^\dagger Z U_i  \neq P_i $, the result vanishes.
 
 Consequently, computing the mean estimator involves counting the number of exact matches between the observable and the classical shadow, and then multiplying the result by the appropriate sign. In the following, we present the function `expectation_estimation_shadow`, which allows for estimating any observable based on a classical shadow. This is realised by the main function `execute_with_shadows` when *state_reconstruction =* **False**.
 
-###4.3 Shadow Estimation Bound on Estimation of Expectation Values of Observables
+### 4.3 Shadow Estimation Bound on Estimation of Expectation Values of Observables
 
 The shadow estimation bound of operator expectation values is given by the following theorem:
 _________________________________________________________________________
-#### Theorem:
-A sequence of observables $\{O_i\}_{i\leq M}$ acting on $n$ qubits 
+
+#### Theorem
+
+A sequence of observables $\{O_i\}_{i\leq M}$ acting on $n$ qubits
 \begin{equation}
 K=2\log(2M \delta^{-1})\qquad N=34\epsilon^{-2}\max_i\left\|O_i-\frac{\mathrm{Tr}(O_i)\mathbb{I}}{2^n}\right\|_{\mathrm{shadow}}^2
 \end{equation}
-with error rates $\delta,\epsilon\leq 1$. 
+with error rates $\delta,\epsilon\leq 1$.
 
 Then, with probability at least $1-\delta$, a collection of $R= NK$ independent classical shadows $\{\hat{\rho}_k\}_{k\leq NK}$ allow for accurately predicting all features via median of means, i.e.
 \begin{equation}
@@ -441,13 +434,11 @@ Then, with probability at least $1-\delta$, a collection of $R= NK$ independent 
 for all $1\leq i\leq M$.
 _________________________________________________________________________
 
-
-The general form of the shadow norm $\|\cdot\|_{\mathrm{shadow}}$ is not clear and depends on the ensemble $\mathcal{U}$ from which we sampled the unitaries, but there are special cases where the shadow norm computable. For example, if we sample from the local Clifford group $\mathcal{U}=\mathrm{CL}(2)^n$, the shadow norm is given by: 
+The general form of the shadow norm $\|\cdot\|_{\mathrm{shadow}}$ is not clear and depends on the ensemble $\mathcal{U}$ from which we sampled the unitaries, but there are special cases where the shadow norm computable. For example, if we sample from the local Clifford group $\mathcal{U}=\mathrm{CL}(2)^n$, the shadow norm is given by:
 \begin{equation}
 \parallel O \parallel_{\mathrm{shadow}}\leq 4^{w}\parallel O \parallel^2,\qquad O\mathrm{~acting~on~}w\mathrm{~qubits}
 \end{equation}
  The shadow norm, in this situation, correlates with the operator ($L_2$) norm. This guarantees the accurate prediction of many local observables from only a much smaller number of measurements. We realize the bound of the shadow estimation in the function `shadow_estimation_bound`, which is called in the main function `execute_with_shadows` when *state_reconstruction =* **False**.
-
 
 ```{code-cell} ipython3
 r"""
@@ -484,7 +475,6 @@ for error in epsilon_grid:
         f"{r} totel number of snapshots required for error rate {int((error+1e-10)*10)/10}"
     )
 ```
-
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt

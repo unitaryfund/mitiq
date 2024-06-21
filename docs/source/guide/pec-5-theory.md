@@ -13,7 +13,6 @@ kernelspec:
 
 # What is the theory behind PEC?
 
-
 Probabilistic error cancellation (PEC) {cite}`Temme_2017_PRL, Sun_2021_PRAppl, Shuaining_2020_NatComm`  is a noise-aware error mitigation technique which is
 based on two main ideas:
 
@@ -53,7 +52,6 @@ However, we keep it to explicitly define gate-dependent basis of implementable o
 the  structure of the `OperationRepresentation` class discussed in [What additional options are
 available in PEC?](pec-3-options.md).*
 
-
 ## Error cancellation
 
 The aim of PEC is estimating the ideal expectation value of some observable $A=A^\dagger$ with respect to
@@ -75,7 +73,6 @@ $$
 \quad  \langle A_{\vec{\alpha}}\rangle_{\rm noisy} :=  {\rm tr}[A \Phi_{\vec{\alpha}}(\rho_0)],
 \quad \Phi_{\vec{\alpha}} := \mathcal O_{t, \alpha_t} \circ \dots \circ \mathcal O_{2, \alpha_2} \circ \mathcal O_{1, \alpha_1}.
 $$
-
 
 The coefficients $\{ \eta_{\vec{\alpha}} \}$ form a quasi-probability distribution
 for the global circuit over the noisy circuits. Indeed it is easy to check that, at the level of super-operators,

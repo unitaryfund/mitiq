@@ -12,6 +12,7 @@ kernelspec:
 ---
 
 # How do I use ZNE?
+
 ZNE is an easy to use technique which can be used in a single step
 (for those who are in a hurry), or two steps (for those who want more control over the process). Both steps characterizing ZNE — noise scaling and extrapolation — can be easily applied with Mitiq. The
 corresponding sub-modules are
@@ -34,6 +35,7 @@ frontend = "cirq"
 ```
 
 ## Problem setup
+
 We first define the circuit of interest. For simplicity, in this example we use
 a randomized-benchmarking circuit whose ideal execution is equivalent to the
 identity operation.
@@ -80,6 +82,7 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
 ## Apply ZNE
+
 Zero-noise extrapolation can be easily implemented with the function
 [`mitiq.zne.zne.execute_with_zne()`](https://mitiq.readthedocs.io/en/latest/apidoc.html#mitiq.zne.zne.execute_with_zne).
 
@@ -95,14 +98,15 @@ print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}"
 
 Here we observe that the application of ZNE reduces the estimation error when compared
 to the unmitigated result.
-In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to 
+In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to
 the default options of {func}`.execute_with_zne` where the default noise scaling method is {func}`.fold_gates_at_random()`
-and the executor computes the average expectation value once. Below we provide more details about these two aspects of ZNE 
+and the executor computes the average expectation value once. Below we provide more details about these two aspects of ZNE
 in Mitiq.
 
 +++
 
 ## Select a noise scaling method
+
 In Mitiq, one can select a noise scaling method via *noise scaling functions*.
 A noise scaling function takes a circuit and a real scale factor as two inputs and
 returns a new circuit. The returned circuit is equivalent to the input one (if executed on a noiseless backend),
@@ -125,6 +129,7 @@ print("Folded circuit:", folded, sep="\n")
 ```
 
 ## Select a noise extrapolation method
+
 Define a {class}`.Factory` object to select the noise extrapolation method and the noise scale
 factors. The section
 [What additional options are available when using ZNE?](zne-3-options.md) also

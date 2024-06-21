@@ -14,12 +14,12 @@ kernelspec:
 
 # Digital dynamical decoupling (DDD) with Qiskit on GHZ Circuits
 
-In this notebook DDD is applied to improve the success rate of the computation on a real hardware backend. 
+In this notebook DDD is applied to improve the success rate of the computation on a real hardware backend.
 A similar approach can be taken on a simulated backend, by setting the ``USE_REAL_HARDWARE`` option to ``False``
 and specifying a simulated backend from `qiskit.providers.fake_provider`, which includes a noise model that approximates the noise of the
 real device.
 
-In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 
+In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit.
 Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise.
 While the DDD module includes some built-in sequences, the user may choose to define others best suited to their application.
 For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.md).
@@ -46,6 +46,7 @@ from mitiq.ddd import insert_ddd_sequences
 ```
 
 ## Define DDD rules
+
 We now use Mitiq's DDD _rule_, i. e., a function that generates DDD sequences of different length.
 In this example, we test the performance of repeated I (default built into `get_circuit` below) and repeated IXIX, repeated XX, and XX sequences from Mitiq.
 
@@ -86,7 +87,7 @@ depths = [10, 30, 50, 100]
 We use Greenberger-Horne-Zeilinger (GHZ) circuits to benchmark the performance of the device.
 GHZ circuits are designed such that only two bitstrings $|00...0 \rangle$ and $|11...1 \rangle$
 should be sampled, with $P_0 = P_1 = 0.5$.
-As noted in *Mooney et al. (2021)* {cite}`Mooney_2021`, when GHZ circuits are run on a device, any other measured bitstrings are due to noise.
+As noted in _Mooney et al. (2021)_ {cite}`Mooney_2021`, when GHZ circuits are run on a device, any other measured bitstrings are due to noise.
 In this example the GHZ sequence is applied first, followed by a long idle window of identity gates and finally the inverse of the GHZ
 sequence.
 Therefore $P_0 = 1$, and the frequency of the $|0 \rangle$ bitstring is our target metric (in this example we only measure the first qubit).

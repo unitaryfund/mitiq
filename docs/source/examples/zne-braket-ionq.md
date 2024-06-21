@@ -12,8 +12,8 @@ kernelspec:
 ---
 
 (label-zne-braket-ionq)=
-# Zero-noise extrapolation with Braket on the IonQ backend
 
+# Zero-noise extrapolation with Braket on the IonQ backend
 
 This tutorial shows an example of how to apply zero-noise extrapolation ([ZNE](../guide/zne.md))
 with the [Braket](https://github.com/aws/amazon-braket-sdk-python)
@@ -32,9 +32,10 @@ from mitiq import zne
 USE_REAL_HARDWARE = False
 ```
 
-```{note} 
+```{note}
 When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
 ```
+
 +++
 
 We also set the number of times each quantum circuit is executed and measured using `number_of_shots`.
@@ -64,7 +65,6 @@ The expectation value evaluates to $1$ in the noiseless setting, but is usually 
 
 ## High-level usage
 
-
 To use Mitiq with just a few lines of code, we need to define an _executor_, _i.e._ a function which inputs a circuit and outputs the expectation value to mitigate.
 This function will:
 
@@ -76,7 +76,7 @@ For information on how to define more advanced executors, see the [Executors](..
 
 +++
 
-```{warning} 
+```{warning}
 Using a real IonQ device requires running this notebook within an Amazon Braket cloud session created with a valid AWS account.
 A monetary budget (or credits) is necessary.
 When `USE_REAL_HARDWARE` is set to `False`, this notebook will run on your local machine without costs.
@@ -129,20 +129,18 @@ print(f"Mitigated result {mitigated:.3f}")
 As long as a circuit and a function for executing the circuit are defined, the {func}`.execute_with_zne` function can
 be called as above to return zero-noise extrapolated expectation value(s).
 
-```{warning} 
+```{warning}
 When using a real device, the previous method may fail because the internal compiler of the device can undo the _unitary folding_ transformation that Mitiq applies to the input circuit.
 If possible, one should switch off any circuit optimization performed by the hardware device.
 If not possible, using _global unitary folding_ as shown in the next section can also be a practical way of solving this problem.  
 ```
 
-
 ## Options
-
 
 Different options for noise scaling and extrapolation can be passed into the {func}`.execute_with_zne` function.
 By default, noise is scaled by locally folding gates at random, and the default extrapolation method is Richardson extrapolation.
 
-To specify a different extrapolation technique, we can pass a different {class}`.Factory` object to {func}`.execute_with_zne`. 
+To specify a different extrapolation technique, we can pass a different {class}`.Factory` object to {func}`.execute_with_zne`.
 The following code block shows an example of using linear extrapolation with five different (noise) scale factors.
 Moreover, instead of _local unitary folding_, _global unitary folding_ is used to scale noise.
 More details on ZNE options are given [here](../guide/zne-3-options.md).
@@ -167,7 +165,6 @@ _ = factory.plot_fit()
 ```
 
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to {func}`.execute_with_zne`.
-
 
 ## Lower-level usage
 
@@ -211,6 +208,7 @@ print(f"Expectation values:\n{expectation_values}")
 Using a _batched_ executor which can take as input many circuits at once and potentially run them in parallel could speedup this step.
 More details can be found in the [Executors](../guide/executors.md) section.
 ```
+
 +++
 
 We can now see the unmitigated expectation value by printing the first element of `expectation_values`.

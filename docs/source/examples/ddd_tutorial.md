@@ -13,9 +13,9 @@ kernelspec:
 
 # Digital dynamical decoupling (DDD) with Mirror Circuits
 
-In this notebook DDD is applied to improve the success rate of the computation. 
-In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 
-Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise. 
+In this notebook DDD is applied to improve the success rate of the computation.
+In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit.
+Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise.
 For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.md).
 
 ## Setup
@@ -79,7 +79,7 @@ topology = nx.to_directed(topology)
 
 We use mirror circuits to benchmark the performance of the device.
 Mirror circuits, introduced in *Proctor et al. (2021)* {cite}`Proctor_2021_NatPhys`, are designed such that only one bitstring
-should be sampled. 
+should be sampled.
 When run on a device, any other measured bitstrings are due to noise.
 The frequency of the correct bitstring is our target metric.
 
@@ -90,9 +90,8 @@ Mirror circuits add new features to account for these shortcomings.
 For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
 ```
 
-To define a mirror circuit, we need the device graph. 
+To define a mirror circuit, we need the device graph.
 We will use a subgraph of the device, and our first step is picking a subgraph with good qubits.
-
 
 ### Generate mirror circuit
 
@@ -117,7 +116,7 @@ Now that we have a circuit, we define the `execute` function which inputs a circ
 frequency of sampling the correct bitstring.
 
 **Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate a particular noise model consisting of
-systematic $R_Z$ rotations applied to each qubit after each moment. 
+systematic $R_Z$ rotations applied to each qubit after each moment.
 This corresponds to a dephasing noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
 
 ```{code-cell} ipython3
@@ -147,7 +146,8 @@ def execute(
 ```
 
 ## Select the DDD sequences to be applied
-We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
+
+We now import a DDD *rule* from Mitiq, i. e., a function that generates DDD sequences of different length.
 In this example, we opt for YY sequences (pairs of Pauli Y operations).
 
 ```{code-cell} ipython3
@@ -228,7 +228,6 @@ plt.xlabel("Depth")
 plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
-
 
 We can see that on average DDD *slightly* improves the expectation value.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard

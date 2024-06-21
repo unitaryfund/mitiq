@@ -47,8 +47,8 @@ Notes:
 
 - The calibration process is specifically designed to mitigate noise encountered during the classical shadow protocol, such as rotation and computational basis measurements. It does not address noise that occurs during state preparation.
 - Do not need to redo the calibration stage (0. `pauli_twirling_calibration`) if:
-  1.  The input circuit has a consistent number of qubits.
-  2.  The estimated observables have the same or fewer qubit support.
+  1. The input circuit has a consistent number of qubits.
+  2. The estimated observables have the same or fewer qubit support.
 
 ## Protocol Overview
 
@@ -165,11 +165,11 @@ f_est
 
 the varible `locality` is the maximum number of qubits on which our operators of interest are acting on. E.g. if our operator is a sequence of two point correlation terms $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, then `locality` = 2. We note that one could also split the calibration process into two stages:
 
-1.  `shadow_quantum_processing`
+1. `shadow_quantum_processing`
 
 - Outcome: Get quantum measurement result of the calibration circuit $|0\rangle^{\otimes n}$ `zero_state_shadow_outcomes`.
 
-2.  `pauli_twirling_calibration`
+2. `pauli_twirling_calibration`
 
 - Outcome: A dictionary of `calibration_results`.
   For more details, please refer to [this tutorial](../examples/rshadows_tutorial.md)

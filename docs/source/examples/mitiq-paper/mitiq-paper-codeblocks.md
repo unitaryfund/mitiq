@@ -79,7 +79,6 @@ print("ZNE value:", zne_value)
 
 **Codeblock 6**
 
-
 > Note: The paper shows pseudocode; here we show an example.
 
 ```{code-cell} ipython3
@@ -147,13 +146,13 @@ print("Original circuit:", circ, sep="\n")
 ```{warning}
 The method `zne.scaling.fold_gates_from_left` has been removed as of v0.36.0.
 ```
+
 ```python
 folded = zne.scaling.fold_gates_from_left(
     circ, scale_factor=2
 )
 print("Folded circuit:", folded, sep="\n")
 ```
-
 
 **Codeblock 10**
 
@@ -167,7 +166,6 @@ folded = zne.scaling.fold_gates_from_right(
 )
 print("Folded circuit:", folded, sep="\n")
 ```
-
 
 **Codeblock 11**
 
@@ -183,7 +181,6 @@ print("Folded circuit:", folded, sep="\n")
 ```
 
 **Codeblock 12**
-
 
 > Note: The paper shows pseudocode; here we show an example.
 
@@ -395,12 +392,9 @@ print("Sampled circuit:", sampled, sep="\n")  # Run many times to see different 
 
 > Note: For a runnable code block in which PEC is applied to estimate an expectation value, see _Codeblock 7_.
 
-
 **Codeblock 25 & 26**
 
-
-See https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html.
-
+See <https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html>.
 
 **Codeblock 27**
 

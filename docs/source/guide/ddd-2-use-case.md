@@ -21,9 +21,6 @@ It is thus particularly effective against structured baths, colored noise or any
 
 Dynamical decoupling is also effective for single-shot quantum computing algorithms, i.e., it finds application beyond algorithms that just require expectation values, like variational quantum algorithms.
 
-
-
-
 ## Disadvantages
 
 Dynamical decoupling is generally applied at the pulse level. Mitiq provides it at the gate-level. For this reason, it may be difficult to know and control what decoupling sequences are actually run on the quantum processor. A way to partially alleviate this issue, is to use DDD sequences built from the native gate set of the quantum backend.

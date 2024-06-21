@@ -24,4 +24,3 @@ qse-3-options.md
 qse-4-low-level.md
 qse-5-theory.md
 ```
-

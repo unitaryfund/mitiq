@@ -17,7 +17,7 @@ Readout error mitigation (REM), is one of the most general and earliest studied 
 
 A simple version of readout error mitigation is postselection of bitstrings. For
 example, if one knows that the measured bitstrings should preserve some
-symmetry, bitstrings that do not preserve it can be discarded. Such capability 
+symmetry, bitstrings that do not preserve it can be discarded. Such capability
 is indeed available in {mod}`mitiq.rem.post_select`.
 
 With regards to the more elaborate technique of confusion matrix inversion,
@@ -40,10 +40,9 @@ Pr(11|00) & Pr(11|01) & Pr(11|10) & Pr(11|11)
 \end{bmatrix}
 $$
 
+where $Pr(ij|kl)$ is the probability of observing state $|ij\rangle$ when measuring true state $|kl\rangle$.
 
-where $Pr(ij|kl)$ is the probability of observing state $|ij\rangle$ when measuring true state $|kl\rangle$. 
-
-The most straightforward way to empirically estimate a device's full confusion matrix is to go through all the measurement basis states, and for each one $|u\rangle$, repeatedly prepare-then-measure $|u\rangle$ and record the histogram of observed outcomes. This histogram, normalized to give a probability distribution, is an estimate for the $u$th column of the confusion matrix A (i.e. the distribution of measurement outcomes when the true state is $|u\rangle$). Since the number of basis states scales exponentially with the number of qubits $n$, estimating the full confusion matrix in this way requires $O(2^n)$ samples and is therefore only practical for small devices. 
+The most straightforward way to empirically estimate a device's full confusion matrix is to go through all the measurement basis states, and for each one $|u\rangle$, repeatedly prepare-then-measure $|u\rangle$ and record the histogram of observed outcomes. This histogram, normalized to give a probability distribution, is an estimate for the $u$th column of the confusion matrix A (i.e. the distribution of measurement outcomes when the true state is $|u\rangle$). Since the number of basis states scales exponentially with the number of qubits $n$, estimating the full confusion matrix in this way requires $O(2^n)$ samples and is therefore only practical for small devices.
 
 ## Computing the pseudoinverse
 
@@ -53,7 +52,7 @@ Note that the estimated confusion matrix $A$ is circuit-independent---it charact
 
 With our raw measurement results we convert our bitstrings into a probability vector, $p$, representing our empirical
 probability distribution. After obtaining the psuedoinverse matrix $A^{+}$, we can apply it to our empirical probability
-distribution to obtain an adjusted *quasi*-probability distribution, $p' = A^{+} p$, which could possibly be 
+distribution to obtain an adjusted *quasi*-probability distribution, $p' = A^{+} p$, which could possibly be
 non-positive. As such, we want to find the closest *positive* probability distribution {cite}`Bravyi_2021` to our
 empirical probability distribution:
 

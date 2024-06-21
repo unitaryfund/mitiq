@@ -14,11 +14,11 @@ kernelspec:
 
 # Composing techniques: Readout Error Mitigation and Zero Noise Extrapolation
 
-Noise in quantum computers can arise from a variety of sources, and sometimes applying multiple error mitigation techniques can be more beneficial than applying a single technique alone. 
+Noise in quantum computers can arise from a variety of sources, and sometimes applying multiple error mitigation techniques can be more beneficial than applying a single technique alone.
 Here we apply a combination of Readout Error Mitigation (REM) and Zero Noise Extrapolation (ZNE) to a randomized benchmarking (RB) task.
 In [REM](../guide/rem.md), the inverse transition / confusion matrix is generated and applied to the noisy measurement results.
 In [ZNE](../guide/zne.md), the expectation value of the observable of interest is computed at different noise levels, and subsequently the ideal expectation value is inferred by extrapolating the measured results to the zero-noise
-limit. 
+limit.
 More information on the REM and ZNE techniques can be found in the corresponding sections of the user guide (linked
 above).
 
@@ -37,8 +37,8 @@ from mitiq import MeasurementResult, Observable, PauliString, raw
 
 ## Task
 
-We will demonstrate using REM + ZNE on RB circuits, which are generated using Mitiq's built-in benchmarking circuit generation function, {func}`.generate_rb_circuits()`. 
-More information on the RB protocol is available in the [Randomized Benchmarking section](https://qiskit.org/ecosystem/experiments/manuals/verification/randomized_benchmarking.html) of the [Qiskit Experiments Manual](https://qiskit.org/ecosystem/experiments/manuals). 
+We will demonstrate using REM + ZNE on RB circuits, which are generated using Mitiq's built-in benchmarking circuit generation function, {func}`.generate_rb_circuits()`.
+More information on the RB protocol is available in the [Randomized Benchmarking section](https://qiskit.org/ecosystem/experiments/manuals/verification/randomized_benchmarking.html) of the [Qiskit Experiments Manual](https://qiskit.org/ecosystem/experiments/manuals).
 In this example we use a two-qubit RB circuit with a Clifford depth (number of Clifford groups) of 10.
 
 ```{code-cell} ipython3
@@ -68,7 +68,7 @@ def execute(circuit: cirq.Circuit, noise_level: float = 0.002, p0: float = 0.05)
 
 ## Observable
 
-In this example, the observable of interest is $ZI + IZ$. 
+In this example, the observable of interest is $ZI + IZ$.
 For the circuit defined above, the ideal (noiseless) expectation value of the $ZI + IZ$ observable is 2, but as we will see, the unmitigated (noisy) result is impacted by depolarizing and readout errors.
 
 ```{code-cell} ipython3
@@ -83,7 +83,7 @@ ideal = raw.execute(circuit, partial(execute, noise_level=0, p0=0), obs)
 print("Unmitigated value:", "{:.5f}".format(noisy.real))
 ```
 
-Next we generate the inverse confusion matrix and apply readout error mitigation (REM). 
+Next we generate the inverse confusion matrix and apply readout error mitigation (REM).
 More information on generating the inverse confusion matrix is available in the [REM theory](../guide/rem-5-theory.md) section of the user guide.
 
 ```{code-cell} ipython3

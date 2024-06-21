@@ -21,8 +21,8 @@ import mitiq
 mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
 
-
 ## Problem setup
+
 We first define the circuit of interest. In this example, the circuit has a
 slack window with a length of 4 (in the sense that 4 single-qubit gates can fit in that window).
 
@@ -75,8 +75,10 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
 ```
 
 ## Select the DDD sequences to be applied
+
 We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
 In this example, we opt for YY sequences (pairs of Pauli Y operations).
+
 ```{code-cell} ipython3
 from mitiq import ddd
 
@@ -84,6 +86,7 @@ rule = ddd.rules.yy
 ```
 
 ## Apply DDD
+
 Digital dynamical decoupling can be easily implemented with the function
 {func}`.execute_with_ddd()`.
 

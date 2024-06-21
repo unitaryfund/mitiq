@@ -30,6 +30,7 @@ SIMULATOR = DensityMatrixSimulator()
 ```
 
 ## Defining the ideal variational circuit
+
 We define a function which returns a simple two-qubit variational circuit depending on a single parameter  $\gamma$.
 
 ```{code-cell} ipython3
@@ -56,6 +57,7 @@ print(variational_circuit(gamma=np.pi))
 ```
 
 ## Defining the executor functions with and without noise
+
 To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. To compare to the noiseless result, we define both a noiseless and a noisy executor below.
 
 ```{code-cell} ipython3
@@ -104,6 +106,7 @@ The above code block uses depolarizing noise, but any Cirq channel can be substi
 +++
 
 ## Computing the landscape without noise
+
 We now compute the energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$ on the noiseless simulator.
 
 ```{code-cell} ipython3
@@ -125,6 +128,7 @@ plt.show()
 ```
 
 ## Computing the unmitigated landscape
+
 We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$
 in the following code block.
 
@@ -148,6 +152,7 @@ plt.show()
 ```
 
 ## Computing the mitigated landscape
+
 We now repeat the same task but use Mitiq to mitigate errors.
 We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
 

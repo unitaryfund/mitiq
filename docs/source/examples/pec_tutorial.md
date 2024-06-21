@@ -82,7 +82,7 @@ depths: List[int] = [1, 5, 9]
 
 Next, we need to define both the noisy and ideal simulator backends that we will
 run our experiments on. In this case, we will be making use of the
-[`braket_dm`](https://docs.aws.amazon.com/braket/latest/developerguide/braket-send-to-local-simulator.html) simulator. 
+[`braket_dm`](https://docs.aws.amazon.com/braket/latest/developerguide/braket-send-to-local-simulator.html) simulator.
 
 We also define a graph representation of our qubits and assume a line topology.
 
@@ -111,7 +111,6 @@ For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
 ```
 
 To define a mirror circuit, we need the device graph. We will use a subgraph of the device, and our first step is picking a subgraph with good qubits.
-
 
 ### Generate mirror circuit
 

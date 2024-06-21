@@ -13,22 +13,20 @@ kernelspec:
 
 # ZNE with Qiskit: Layerwise folding
 
-
 This tutorial shows an example of how to mitigate noise on IBMQ backends using
 layerwise folding in contrast with global folding.
 
 One may ask why folding by layer is potentially beneficial to consider. One
 reason is that applying global folding will increase the length of the entire
 circuit while layerwise folding on a subset of only the noisiest layers will
-increase the circuit by a smaller factor. 
+increase the circuit by a smaller factor.
 
 If running a circuit on hardware is bottle-necked by the cost of running a long
 circuit, this technique could potentially be used to arrive at a better result
 (although not as good as global folding) but with less monetary cost.
 
-More information on the layerwise folding technique can be found in 
+More information on the layerwise folding technique can be found in
 *Calderon et al. Quantum (2023)* {cite}`Calderon_2023_Quantum`.
-
 
 - [ZNE with Qiskit: Layerwise folding](#zne-with-qiskit-layerwise-folding)
   - [Setup](#setup)
@@ -142,7 +140,7 @@ $$
 as the probability distribution over measurement outcomes at the output of a
 circuit $C$ where $k \in B^n$ with $B^n$ being the set of all $n$-length bit
 strings where $\langle \langle k |$ is the vectorized POVM element that
-corresponds to measuring bit string $k$. 
+corresponds to measuring bit string $k$.
 
 The *impact* of applying an inversion is given by
 
@@ -150,7 +148,7 @@ $$
 d \left[p(\cdot|C), p(\cdot|C^{(i)})\right]
 $$
 
-where $d$ is some distance measure. In 
+where $d$ is some distance measure. In
 *Calderon et al. Quantum (2023)* {cite}`Calderon_2023_Quantum` the authors used the total variational distance
 (TVD) measure where
 
@@ -177,7 +175,7 @@ def tvd(circuit: cirq.Circuit, num_folds: int = 1, shots: int = 10_000) -> List[
     return distances
 ```
 
-## Impact of single vs. multiple folding 
+## Impact of single vs. multiple folding
 
 We can plot the impact of applying layer inversions to the circuit.
 

@@ -25,13 +25,15 @@ The diagram shows the workflow of the zero noise extrapolation (ZNE) technique i
 ```
 
 **The first step** involves generating and executing noise-scaled quantum circuits.
-  - The user provides a `QPROGRAM`, i.e., a quantum circuit defined via any of the supported frontends.
-  - Mitiq generates a set of noise-scaled circuits by applying a scaling method (*unitary folding* or *identity insertion scaling*) with different scale factors.
-  - The noise-scaled circuits are executed on the noisy backend obtaining a set of noise-scaled expectation values.
+
+- The user provides a `QPROGRAM`, i.e., a quantum circuit defined via any of the supported frontends.
+- Mitiq generates a set of noise-scaled circuits by applying a scaling method (*unitary folding* or *identity insertion scaling*) with different scale factors.
+- The noise-scaled circuits are executed on the noisy backend obtaining a set of noise-scaled expectation values.
 
 **The second step** involves inferring the zero-noise value from the measured results.
-  - A parametrized curve is fit to the noise-scaled expectation values.
-  - The curve is extrapolated to the zero-noise limit, obtaining an error mitigated expectation value.
+
+- A parametrized curve is fit to the noise-scaled expectation values.
+- The curve is extrapolated to the zero-noise limit, obtaining an error mitigated expectation value.
 
 As demonstrated in [How do I use ZNE ?](zne-1-intro.md), the function {func}`.execute_with_zne()` applies both steps behind the scenes.
 In the next sections instead, we show how one can apply ZNE at a lower level, i.e., by applying each step independently.
@@ -45,6 +47,7 @@ Moreover, we will also show how the user can customize noise scaling methods and
 +++
 
 ### Problem setup
+
 We define a circuit and an executor, as shown in [How do I use ZNE?](zne-1-intro.md).
 
 ```{code-cell} ipython3
@@ -95,6 +98,7 @@ zne.ExpFactory.extrapolate(scale_factors, expectation_values, asymptote=0.5)
 ```
 
 Alternatively, one can also instantiate a `Factory` object, which can be useful for additional analysis and visualization of the measured data.
+
 ```{code-cell} ipython3
 # Initialize a factory
 fac = zne.inference.ExpFactory(scale_factors, asymptote=0.5)
@@ -111,7 +115,8 @@ fac.reduce()
 # Plot the extrapolation fit
 _ = fac.plot_fit()
 ```
-Both steps demonstrated above can be used for *identity insertion scaling* as well. The unitary folding function used above is now replaced with the identity insertion scaling function. 
+
+Both steps demonstrated above can be used for *identity insertion scaling* as well. The unitary folding function used above is now replaced with the identity insertion scaling function.
 
 ```{code-cell} ipython3
 from mitiq import zne
@@ -160,8 +165,6 @@ one of the [built-in factories](zne-3-options.md#extrapolation-methods-factory-o
 Alternatively, a custom adaptive extrapolation method can be derived from the abstract class {class}`.AdaptiveFactory`.
 In this case its core methods must be implemented:
 {meth}`.AdaptiveFactory.__init__`, {meth}`.AdaptiveFactory.next`, {meth}`.AdaptiveFactory.is_converged`, {meth}`.AdaptiveFactory.reduce`.
-
-
 
 A new non-adaptive method can instead be derived from the abstract {class}`.BatchedFactory` class.
 In this case it is usually sufficient to override only the {meth}`.BatchedFactory.__init__` and
@@ -250,7 +253,7 @@ In this section we present a low-level usage of a {class}`.Factory` . In typical
 
 +++
 
-### The `run` method.
+### The `run` method
 
 +++
 
@@ -264,7 +267,7 @@ fac.run(circuit, execute)
 fac.reduce()
 ```
 
-### The `run_classical` method.
+### The `run_classical` method
 
 Instead of {meth}`.Factory.run`, the {meth}`.Factory.run_classical` method can be used if we have at disposal a function which directly
 maps a noise scale factor to the corresponding expectation value.

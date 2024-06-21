@@ -32,7 +32,7 @@ from mitiq.zne import mitigate_executor
 from mitiq.zne.inference import RichardsonFactory
 ```
 
-## Defining the ideal variational circuit in Qiskit 
+## Defining the ideal variational circuit in Qiskit
 
 We define a function which returns a simple two-qubit variational circuit depending on a single parameter  $\gamma$ ("gamma").
 
@@ -64,6 +64,7 @@ print(circuit)
 ```
 
 ## Defining the executor functions with and without noise
+
 To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. To compare to the noiseless result, we define both a noiseless and a noisy executor below.
 
 ```{code-cell} ipython3
@@ -169,6 +170,7 @@ plt.show()
 ```
 
 ## Computing the unmitigated landscape
+
 We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$
 in the following code block.
 
@@ -192,6 +194,7 @@ plt.show()
 ```
 
 ## Computing the mitigated landscape
+
 We now repeat the same task but use Mitiq to mitigate errors.
 We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
 
@@ -221,8 +224,8 @@ plt.ylim(-1.5, 1.5);
 plt.show()
 ```
 
-Noise usually tends to flatten expectation values towards a constant. Therefore error mitigation 
-can be used to increase the visibility the landscape and this fact can simplify the energy minimization 
+Noise usually tends to flatten expectation values towards a constant. Therefore error mitigation
+can be used to increase the visibility the landscape and this fact can simplify the energy minimization
 which is required in most variational algorithms such as VQE or QAOA.
 
 We also observe that the minimum of mitigated energy approximates well the theoretical ground state which is equal to $-1$. Indeed:

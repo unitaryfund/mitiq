@@ -26,8 +26,6 @@ More details on the theory of Pauli Twirling are given in the section [What is t
 
 Pauli Twirling is agnostic to our knowledge on the type of noise, easy to implement, and useful to better understand and minimize the benchmarking vs performance gap.
 
-
-
 ## Disadvantages
 
 Pauli Twirling is generally combined with a compilation pass to maintain circuit depth. Mitiq thus far does not provide this compilation, and so circuit depth is increased by the additional single-qubit gates.

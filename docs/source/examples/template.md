@@ -18,10 +18,9 @@ Sphinx using the MyST parser.[^download]
 
 ## Markdown
 
-
 ### Configuration
 
-https://myst-parser.readthedocs.io/en/latest/using/intro.html#getting-started
+<https://myst-parser.readthedocs.io/en/latest/using/intro.html#getting-started>
 
 To build documentation from this notebook, the following options are set:
 
@@ -159,6 +158,7 @@ ax.scatter(*data, c=data[2])
 ## Thumbnail for the Notebook
 
 To add a thumbnail for an example notebook, first add the thumbnail image file to `docs/source/_thumbnails`. Next, modify the `docs/source/conf.py` to include the example and thumbnail in the nbsphinx_thumbnails dictionary at the end of the file. The sample below contains both a generic template and an actual example.
+
 ```{code-cell} ipython3
 nbsphinx_thumbnails = {
     "examples/{EXAMPLE_FILENAME_WITHOUT_.md}": "_static/{THUMBNAIL_FILENAME_WITH_EXTENSION}",

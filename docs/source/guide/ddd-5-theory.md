@@ -40,23 +40,18 @@ increase in statistical uncertainty in the final result.
 - If noise is time-correlated, it can suppress real errors at the physical level instead of applying a virtual noise
 reduction via classical post-processing.
 
-
-
-
 ## Digital dynamical decoupling
 
 In a quantum computing device based on the circuit model, sequences of DD pulses can be mapped to sequences
 of discrete quantum gates (typically Pauli gates). We refer to this gate-level formulation as _digital dynamical decoupling_ (DDD)
 to distinguish it from the standard pulse-level formulation.
 
-
-
 ```{note}
 This type of gate-level approach is very similar to the gate-level abstraction used in Mitiq to implement
 _digital zero-noise extrapolation_ via _unitary folding_ (see [What is the theory behind ZNE?](zne-5-theory.md)).
 ```
-Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications {cite}`Pokharel_2018_PRL, Jurcevic_2021_arxiv, GoogleQuantum_2021_nature, Smith_2021_arxiv, Das_2021_ACM`.
 
+Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications {cite}`Pokharel_2018_PRL, Jurcevic_2021_arxiv, GoogleQuantum_2021_nature, Smith_2021_arxiv, Das_2021_ACM`.
 
 ```{warning}
 Gate-level DDD can only be considered as an approximation of the ideal (pulse-level) DD technique. Moreover, quantum backends 
@@ -64,14 +59,13 @@ may internally optimize and schedule gates in unpredictable ways such that, in p
 as expected.
 ```
 
-A significant advantage of DDD with respect to pulse-level DD is the possibility of defining it in a backend-independent way, 
+A significant advantage of DDD with respect to pulse-level DD is the possibility of defining it in a backend-independent way,
 via simple transformations of abstract quantum circuits. For this reason, DDD is particularly suitable for a multi-platform library like Mitiq.
-
-
 
 ## Common examples of DDD sequences
 
 Common dynamical decoupling sequences are arrays of (evenly spaced) Pauli gates. In particular:
+
 - The _XX_ sequence is typically appropriate for mitigating (time-correlated) dephasing noise;
 - The _YY_ sequence is typically appropriate for mitigating (time-correlated) amplitude damping noise;
 - The _XYXY_ sequence is typically appropriate for mitigating generic single-qubit noise.
@@ -89,4 +83,3 @@ results are theoretically known, such that one can empirically determine what se
 
 It may happen that, for some sequences, the final error of the quantum computation is actually increased.
 As with all other error-mitigation techniques, one should always take into account that an improvement of performances is not guaranteed.
-

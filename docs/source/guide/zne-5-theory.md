@@ -14,7 +14,6 @@ kernelspec:
 
 # What is the theory behind ZNE?
 
-
 Zero noise extrapolation (ZNE) {cite}`Li_2017_PRX, Temme_2017_PRL, Kandala_2019_Nature` is an error
 mitigation technique used to extrapolate the noiseless expectation value of an
 observable from a range of expectation values computed at different noise levels.
@@ -29,12 +28,12 @@ of a quantum computation. Similar results can be obtained, at a gate-level, with
 fitting a curve (often called *extrapolation model*) to the expectation values measured at different noise levels
 to extrapolate the noiseless expectation value.
 
-## Step 1: Intentionally scale noise.
+## Step 1: Intentionally scale noise
 
 A technique to increase the noise level of a circuit at the gate level is to intentionally increase its depth.
-This can be obtained using either *unitary folding* or *identity scaling*. 
+This can be obtained using either *unitary folding* or *identity scaling*.
 
-In *unitary folding*, we perform a mapping $G \mapsto G G^\dagger G$. 
+In *unitary folding*, we perform a mapping $G \mapsto G G^\dagger G$.
 This mapping can be applied *globally* or *locally* as shown in the diagrams below.
 
 ```{figure} ../img/zne_global_folding.png
@@ -52,9 +51,10 @@ name: figzne_local
 ---
 The diagram demonstrates how gates are inserted in a circuit when *local folding* is applied.
 ```
+
 More details on the theory of unitary folding can be found in {cite}`Giurgica_Tiron_2020_arXiv`.
 
-In *identity insertion scaling*, we perform a mapping $G \mapsto I G$. 
+In *identity insertion scaling*, we perform a mapping $G \mapsto I G$.
 This mapping can be applied as shown in the diagram below.
 
 ```{figure} ../img/zne_id_scaling_layers.png
@@ -65,14 +65,13 @@ name: figid
 The diagram demonstrates how identity gates are inserted after a circuit layer when identity insertion scaling function is applied.
 ```
 
-Additional details on the theory of identity insertion scaling are similar to those in unitary folding. The only difference 
+Additional details on the theory of identity insertion scaling are similar to those in unitary folding. The only difference
 is that instead of scaling gate noise, the insertion of an identity gate increases the wait time after each circuit layer is executed. This allows the qubits to interact with the environment through some noisy process and decohere if the system-environment interaction is strong. The decoherence time for the qubits in a quantum system is determined by the amount of time our system of interest remains coherent and uncouples from the external environment. More details on decoherence can be found in {cite}`Schlosshauer_2019, Zurek_2003_arxiv`.
 
-More details on practical implementation of both methods in Mitiq can be found in 
+More details on practical implementation of both methods in Mitiq can be found in
 [What additional options are available for ZNE?](zne-3-options.md).
 
-
-A noise scaling technique similar to unitary folding is *pulse-stretching*: a method that only applies to 
+A noise scaling technique similar to unitary folding is *pulse-stretching*: a method that only applies to
 devices with pulse-level access {cite}`Temme_2017_PRL, Kandala_2019_Nature`.
 The noise of the device can be altered by increasing the time over which pulses
 are implemented, as shown in the following diagram:
@@ -106,21 +105,21 @@ expectation values $\langle E(\lambda) \rangle$ for different values of $\lambda
 to the zero-noise limit.
 
 In practice the extrapolation can be done as follows:
+
   1) Assume $E(\lambda)\simeq f(\lambda; p_1, p_2, ... p_m)$, where $f$ is an *extrapolation model*, i.e., a function
   of $\lambda$ depending on a set of real parameters $p_1, p_2, \dots, p_m$.
-  2) Fit the function $f$ to the measured noise-scaled expectation values, obtaining an optimal set of 
+  2) Fit the function $f$ to the measured noise-scaled expectation values, obtaining an optimal set of
   parameters $\tilde p_1, \tilde p_2, \dots \tilde p_m$.
   3) Evaluate the corresponding zero-noise limit, i.e., $f(0; \tilde p_1, \tilde p_2, \dots \tilde p_m)$.
 
 Different choices of $f$, produce different extrapolations. Typical choices for $f$ are: a linear function, a polynomial, an exponential.
 For example, Richardson extrapolation, corresponds to the following polynomial model:
 
-
 $$
 f(\lambda; p_1, p_2, ... p_m) = p_1 + p_2 \lambda + p_3 \lambda^2 + \dots p_m \lambda^{m-1},
 $$
 
 where $m$ is equal to the number of data points in the fit (i.e. the number of noise scaled expectation values).
- 
+
 More details on how to apply different extrapolation methods with Mitiq can be found in [What additional options
 are available in ZNE?](zne-3-options.md).

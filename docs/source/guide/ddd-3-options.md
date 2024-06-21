@@ -13,9 +13,9 @@ kernelspec:
 
 # What additional options are available when using DDD?
 
-Most additional functionalities when using DDD with Mitiq are related to the choice of dynamical decoupling sequences. 
+Most additional functionalities when using DDD with Mitiq are related to the choice of dynamical decoupling sequences.
 Since the idle windows of a quantum circuit can have different sizes, one cannot directly define a unique fixed DDD sequence.
-One can instead define a DDD _rule_, i.e., a Python function that generates a gate sequence from an input slack length. 
+One can instead define a DDD _rule_, i.e., a Python function that generates a gate sequence from an input slack length.
 
 We'll discuss several ways of defining DDD rules:
 
@@ -25,6 +25,7 @@ We'll discuss several ways of defining DDD rules:
 3. Nesting rules to fill long slack windows first, followed by shorter slack windows.
 
 ## Built-in DDD rules
+
 Mitiq provides basic built in rules to approximate dynamical decoupling sequences that are most used and discussed
 in the literature (for more details see [What is the theory behind DDD?](ddd-5-theory.md)).
 For example, the _XX_, _YY_, and _XYXY_ rules generate the corresponding gate sequences spaced evenly over the input slack window.
@@ -78,7 +79,7 @@ The default value of the `spacing` option is `-1`, which generates sequences wit
 
 ## More general sequences
 
-If the user wishes to experiment with creating other gate sequences, a {func}`.general_rule()` is provided, which takes as input a list of gates and 
+If the user wishes to experiment with creating other gate sequences, a {func}`.general_rule()` is provided, which takes as input a list of gates and
 their spacing.
 As an example, let's define a rule function that will generate an _XXYY_ sequence:
 
@@ -98,9 +99,8 @@ xxyy(slack_length=9)
 A rule defined in this manner can similarly be used with {func}`.execute_with_ddd()` to error-mitigate expectation values as shown
 at the top of this notebook.
 
-
 To create a rule that generates repeated DDD sequences, we can use the {func}`.repeated_rule()` abstraction.
-The function {func}`.repeated_rule()` fills slack windows with as many repetitions as possible of some input elementary sequence. 
+The function {func}`.repeated_rule()` fills slack windows with as many repetitions as possible of some input elementary sequence.
 
 ```{code-cell} ipython3
 def repeated_xxyy(slack_length):
@@ -113,7 +113,7 @@ repeated_xxyy(8)
 ## Custom DD rules
 
 Since in Mitiq a DDD rule is just a Python function, the user can define a custom rule from scratch. For example,
-the following rule returns sequences of Hadamard gates only if `slack_length` is 2 or 4. 
+the following rule returns sequences of Hadamard gates only if `slack_length` is 2 or 4.
 
 ```{code-cell} ipython3
 import numpy as np 

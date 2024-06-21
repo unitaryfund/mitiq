@@ -15,7 +15,7 @@ kernelspec:
 
 +++
 
-This tutorial demonstrates a method of combining quantum error mitigation (QEM) and quantum error correction (QEC), with the goal of reducing the effective logical error rate of the computation. 
+This tutorial demonstrates a method of combining quantum error mitigation (QEM) and quantum error correction (QEC), with the goal of reducing the effective logical error rate of the computation.
 While QEM techniques such as zero noise extrapolation (ZNE) and probabilistic error cancellation are typically thought of as belonging to the NISQ regime, recently it has been shown that they can also benefit applications within the fault-tolerant regime {cite}`Piveteau_2021_PRL, Suzuki_2022_PRX, Wahl_2023_arXiv_ds_zne`.
 In this example, we will apply ZNE with noise scaling by [global unitary folding](../guide/zne-3-options.md#unitary-folding) on logical randomized benchmarking (RB) circuits.
 This tutorial also introduces the use of Mitiq's ZNE functions with Cirq as the frontend and the [Stim](https://github.com/quantumlib/Stim) stabilizer simulator as the backend.
@@ -52,8 +52,8 @@ device_size = 1500
 
 Randomized benchmarking is typically performed at the physical level, but it can be applied at the logical level as shown in Ref {cite}`Combes_2017_arXiv_logical_rb`.
 The modularity of logical RB circuits allows for parallelization of circuit executions, as permitted by the size of the device and number of physical qubits required for the logical circuit.
-To generate the RB circuits, we use a built-in Mitiq function, 
-{func}`.benchmarks.randomized_benchmarking.generate_rb_circuits()`, where the `n_cliffords` argument refers to the number of Clifford groups in the circuit, and therefore scales the depth of the circuit. 
+To generate the RB circuits, we use a built-in Mitiq function,
+{func}`.benchmarks.randomized_benchmarking.generate_rb_circuits()`, where the `n_cliffords` argument refers to the number of Clifford groups in the circuit, and therefore scales the depth of the circuit.
 In this example the Clifford depth is 100, which would be around the limit of classical simulability if the operations in the circuit were instead _non-Clifford_.
 
 ```{code-cell} ipython3
@@ -99,13 +99,12 @@ for c in cirq_circuits:
 
 +++
 
-The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`: 
+The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`:
 
 ```{math}
 :label: logical-err-equation
 p_L\cong 0.03(\frac{p}{p_\mathrm{th}})^{(d+1)/2}
 ```
-
 
 ```{code-cell} ipython3
 def calculate_logical_error_rate(p_err, p_th, distance):
@@ -292,8 +291,8 @@ name: zne-stim-plot
 Plot of the unmitigated and ZNE-mitigated expectation values obtained from executing the logical RB circuits.
 ```
 
-We can see from the above plot that the ZNE-mitigated expectation values are closer to the ideal value of $1.0$ at every code distance simulated. 
-The effect is more pronounced at lower code distances, which correspond to a higher logical error rate, whereas by $d = 21$ both the mitigated and unmitigated expectation values approach $1.0$. 
+We can see from the above plot that the ZNE-mitigated expectation values are closer to the ideal value of $1.0$ at every code distance simulated.
+The effect is more pronounced at lower code distances, which correspond to a higher logical error rate, whereas by $d = 21$ both the mitigated and unmitigated expectation values approach $1.0$.
 
 ```{note}
 Not all logical circuits can be folded, even at the circuit level.
