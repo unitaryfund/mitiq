@@ -19,7 +19,7 @@ Error mitigation seeks to reduce these effects at the software level by
 compiling quantum programs in clever ways.
 
 Want to know more? Check out our
-[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide.html), chat with us on [Discord](http://discord.unitary.fund), open a [Github Discussion](https://github.com/unitaryfund/mitiq/discussions), and join our weekly community call ([public agenda](https://docs.google.com/document/d/1lZfct4AOCS7fdyWkudcGyER0n0nsCxSFKSicUEeJgtA/)).
+[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide.html). For code, repo, or theory questions, especially those requiring more detailed responses, submit a [Discussion](https://github.com/unitaryfund/mitiq/discussions). For time sensitive questions, chat with us on [Discord](http://discord.unitary.fund). Also, join our weekly community call ([public agenda](https://docs.google.com/document/d/1lZfct4AOCS7fdyWkudcGyER0n0nsCxSFKSicUEeJgtA/)).
 
 ## Quickstart
 
