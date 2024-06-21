@@ -6,6 +6,7 @@
 """Functions for converting to/from Mitiq's internal circuit representation."""
 
 from functools import wraps
+from itertools import chain
 from typing import Any, Callable, Dict, Iterable, Optional, Tuple, cast
 
 import cirq
@@ -317,6 +318,12 @@ def accept_qprogram_and_validate(
             )
             out_circuits = [out_circuit]
 
+        # for the case when the circuit modifier returns a list of circuits
+        # flatten the list of lists into a list
+        if isinstance(out_circuits[0], list):
+            new_out_circuits = list(chain(*out_circuits))
+            out_circuits = new_out_circuits
+
         circuits_to_return = []
         for out_circuit in out_circuits:
             # Post atomic conversion
@@ -379,9 +386,13 @@ def accept_qprogram_and_validate(
                     out_circuit.measure(q, c)
             circuits_to_return.append(out_circuit)
 
-        if not one_to_many:
-            assert len(circuits_to_return) == 1
-            return circuits_to_return[0]
+        try:
+            if not one_to_many:
+                assert len(circuits_to_return) == 1
+                return circuits_to_return[0]
+        except AssertionError:
+            # for the case when the circuit modifier returns a list of circuits
+            assert len(out_circuits) == len(circuits_to_return)
 
         return circuits_to_return
 

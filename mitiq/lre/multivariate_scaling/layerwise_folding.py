@@ -15,6 +15,7 @@ import numpy as np
 from cirq import Circuit
 
 from mitiq import QPROGRAM
+from mitiq.interface import accept_qprogram_and_validate
 from mitiq.utils import _append_measurements, _pop_measurements
 from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.zne.scaling.folding import _check_foldable
@@ -131,6 +132,7 @@ def _get_scale_factor_vectors(
     ]
 
 
+@accept_qprogram_and_validate
 def multivariate_layer_scaling(
     input_circuit: Circuit,
     degree: int,
