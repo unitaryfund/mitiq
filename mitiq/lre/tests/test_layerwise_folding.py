@@ -12,6 +12,7 @@ import pytest
 from cirq import Circuit, LineQubit, ops
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
+    _get_chunks,
     _get_num_layers_without_measurements,
     _get_scale_factor_vectors,
     multivariate_layer_scaling,
@@ -50,8 +51,7 @@ def test_multivariate_layerwise_scaling():
         (1, 1, 9),
     ]
 
-    i = 0
-    for scale_factor_vector in folding_pattern:
+    for i, scale_factor_vector in enumerate(folding_pattern):
         scale_layer1, scale_layer2, scale_layer3 = scale_factor_vector
         expected_circuit = Circuit(
             [ops.H.on_each(*qreg1)] * scale_layer1,
@@ -60,7 +60,6 @@ def test_multivariate_layerwise_scaling():
             [ops.TOFFOLI.on(*qreg1)] * scale_layer3,
         )
         assert expected_circuit == multiple_scaled_circuits[i]
-        i += 1
 
 
 @pytest.mark.parametrize(
@@ -72,6 +71,36 @@ def test_get_num_layers(test_input, expected):
     calculated_num_layers = _get_num_layers_without_measurements(test_input)
 
     assert calculated_num_layers == expected
+
+
+@pytest.mark.parametrize(
+    "test_input, test_chunks, expected_chunks",
+    [
+        (test_circuit1 + test_circuit1 + test_circuit1, 3, 3),
+        (test_circuit1 + test_circuit1 + test_circuit1, 1, 1),
+        (test_circuit1 + test_circuit1 + test_circuit1, 5, 5),
+    ],
+)
+def test_get_num_chunks(test_input, test_chunks, expected_chunks):
+    """Verifies the chunking function works as expected."""
+    calculated_num_chunks = len(_get_chunks(test_input, test_chunks))
+
+    assert calculated_num_chunks == expected_chunks
+
+
+def test_layers_with_chunking():
+    """Checks the order of moments in the input circuit is unchanged with
+    chunking."""
+
+    test_circuit = test_circuit1 + test_circuit1 + test_circuit1
+    calculated_circuit_chunks = _get_chunks(test_circuit, 4)
+    expected_chunks = [
+        test_circuit[0:3],
+        test_circuit[3:5],
+        test_circuit[5:7],
+        test_circuit[7:],
+    ]
+    assert calculated_circuit_chunks == expected_chunks
 
 
 @pytest.mark.parametrize(
@@ -232,6 +261,11 @@ def test_get_scale_factor_vectors_with_chunking(
             "Number of chunks 5 cannot be greater than the number of layers"
             " 3.",
         ),
+        (
+            test_circuit1,
+            -1,
+            "Number of chunks should be greater than or equal to 1.",
+        ),
     ],
 )
 def test_invalid_num_chunks(test_input, num_chunks, error_msg):
@@ -261,7 +295,7 @@ def test_invalid_num_chunks(test_input, num_chunks, error_msg):
 def test_invalid_degree_fold_multiplier(
     test_input, test_degree, test_fold_multiplier, error_msg
 ):
-    """Ensures that the number of intended chunks in the input circuit raises
+    """Ensures that the args for the main noise scaling function raise
     an error for an invalid value."""
     with pytest.raises(ValueError, match=error_msg):
         multivariate_layer_scaling(

@@ -61,7 +61,7 @@ def _get_chunks(
     if num_chunks is None:
         num_chunks = num_layers
 
-    if num_chunks == 0:
+    if num_chunks <= 0:
         raise ValueError(
             "Number of chunks should be greater than or equal to 1."
         )
