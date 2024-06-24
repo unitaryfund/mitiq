@@ -23,7 +23,7 @@ Want to know more?
 [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide.html).
 - For code, repo, or theory questions, especially those requiring more detailed responses, submit a [Discussion](https://github.com/unitaryfund/mitiq/discussions).
 - For casual or time sensitive questions, chat with us on [Discord](http://discord.unitary.fund).
-- Join our weekly community call ([public agenda](https://docs.google.com/document/d/1lZfct4AOCS7fdyWkudcGyER0n0nsCxSFKSicUEeJgtA/)) on [Discord](http://discord.unitary.fund).
+- Join our weekly community call on [Discord](http://discord.unitary.fund) ([public agenda](https://docs.google.com/document/d/1lZfct4AOCS7fdyWkudcGyER0n0nsCxSFKSicUEeJgtA/)).
 
 ## Quickstart
 
