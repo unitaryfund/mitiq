@@ -94,7 +94,20 @@ mitiq.qem_methods()
 | Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/latest/guide/pec.html) | [`mitiq.pec`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135) |
 | (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/latest/guide/cdr.html) | [`mitiq.cdr`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)                                                   |
 | Digital dynamical decoupling              | [DDD](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) | [`mitiq.ddd`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/ddd) | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768)                                                |
-| Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [`mitiq.rem`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)                                                  |
+| Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [`mitiq.rem`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)
+| Quantum Subspace Expansion                  | [QSE](https://mitiq.readthedocs.io/en/stable/guide/qse.html) | [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/qse) | [1903.05786](https://arxiv.org/abs/1903.05786)|
+| Robust Shadow Estimation   <br> WIP 🚧           | [RSE](https://mitiq.readthedocs.io/en/stable/guide/shadows.html) <br> 🚧 | [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/shadows) <br> 🚧 | [2011.09636](https://arxiv.org/abs/2011.09636) <br> [2002.08953](https://arxiv.org/abs/2002.08953)|
+| Layerwise Richardson Extrapolation <br> WIP 🚧          | Coming Soon <br> 🚧  | Coming Soon <br> 🚧 | [2402.04000](https://arxiv.org/abs/2402.04000) |
+
+
+In addition, we also have a noise tailoring technique currently available with limited functionality 🚧:
+
+
+| Noise-tailoring Technique                                 | Documentation                                                | Mitiq module                                                              | Paper Reference(s)                                                                                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pauli Twirling  <br> WIP 🚧            | [PT](https://mitiq.readthedocs.io/en/latest/guide/pt.html) <br> 🚧 | [`mitiq.pt`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/pt) <br> 🚧 |  [1512.01098](https://arxiv.org/abs/1512.01098) |
+
+
 
 See our [roadmap](https://github.com/unitaryfund/mitiq/wiki) for additional candidate techniques to implement. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=).
 
@@ -113,7 +126,7 @@ You can install Mitiq support for these frontends by specifying them during inst
 as optional extras, along with the main package.
 To install Mitiq with one or more frontends, you can specify each frontend in square brackets as part of the installation command. 
 
-For example, 
+For example,
 to install Mitiq with support for Qiskit and Qibo:
 ```bash
 pip install mitiq[qiskit,qibo]
