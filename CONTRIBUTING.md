@@ -12,7 +12,7 @@ The rest of this document describes the technical details of getting set up to d
 
 ## Development environment
 
-1. Ensure you have python 3.9 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/).
+1. Ensure you have python 3.10 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/).
 2. Set up a virtual environment to isolate dependencies. This can be done with many different tools including [Virtualenv](https://virtualenv.pypa.io/en/latest/), [Pipenv](https://pypi.org/project/pipenv/), [Poetry](https://python-poetry.org/), and [Anaconda](https://www.anaconda.com/download). In what follows we will use Anaconda, but if you're familiar with other tools feel free to use those.
 3. Set up a local version of the [Mitiq repository](https://github.com/unitaryfund/mitiq). To do this you will need to use `git` which is a version control system. If you're unfamiliar, check out the [docs](https://git-scm.com/), and learn about what the typical [`git` workflow](https://www.asmeurer.com/git-workflow/) looks like.
 4. Inside the Mitiq repository (`cd mitiq`), activate a virtual environment. With conda this is done using the following command.
