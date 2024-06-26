@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: Build Mitiq
     if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
     steps:
@@ -31,6 +32,7 @@ jobs:
           path: dist/*
 
   test-publish:
+    name: Upload release to test PyPi
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -57,7 +59,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: "3.11"
       - name: Install package from TestPyPI
         run: pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq
       - name: Set version variable
