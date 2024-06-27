@@ -100,8 +100,8 @@ extensions = [
     "sphinx_gallery.load_style",
 ]
 
-# hide primary sidebar from apidoc page
-html_sidebars = {"apidoc": []}
+# hide primary sidebar from the following pages
+html_sidebars = {"apidoc": [], "changelog": [], "bibliography": []}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.9", None),
