@@ -101,9 +101,7 @@ extensions = [
 ]
 
 # hide primary sidebar from apidoc page
-html_sidebars = {
-  "apidoc": []
-}
+html_sidebars = {"apidoc": []}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.9", None),
