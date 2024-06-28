@@ -30,6 +30,7 @@ def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
         Returns:
             num_layers: the number of layers in the input circuit without the
                 terminal measurements
+
     """
 
     _check_foldable(input_circuit)
@@ -56,12 +57,21 @@ def _get_chunks(
         Returns:
             split_circuit: Circuit of interest split into approximately equal
                 chunks
+
+        Raises:
+            ValueError:
+                When the number of chunks for the input circuit is larger than
+                    the number of layers in the input circuit.
+
+            ValueError:
+                When the number of chunks is less than 1.
+
     """
     num_layers = _get_num_layers_without_measurements(input_circuit)
     if num_chunks is None:
         num_chunks = num_layers
 
-    if num_chunks <= 0:
+    if num_chunks < 1:
         raise ValueError(
             "Number of chunks should be greater than or equal to 1."
         )
