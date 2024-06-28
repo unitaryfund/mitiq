@@ -96,16 +96,18 @@ mitiq.qem_methods()
 | Digital dynamical decoupling              | [DDD](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) | [`mitiq.ddd`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/ddd) | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768)                                                |
 | Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [`mitiq.rem`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)
 | Quantum Subspace Expansion                  | [QSE](https://mitiq.readthedocs.io/en/stable/guide/qse.html) | [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/qse) | [1903.05786](https://arxiv.org/abs/1903.05786)|
-| Robust Shadow Estimation   <br> WIP 🚧           | [RSE](https://mitiq.readthedocs.io/en/stable/guide/shadows.html) <br> 🚧 | [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/shadows) <br> 🚧 | [2011.09636](https://arxiv.org/abs/2011.09636) <br> [2002.08953](https://arxiv.org/abs/2002.08953)|
-| Layerwise Richardson Extrapolation <br> WIP 🚧          | Coming Soon <br> 🚧  | Coming Soon <br> 🚧 | [2402.04000](https://arxiv.org/abs/2402.04000) |
+| Robust Shadow Estimation   🚧           | [RSE](https://mitiq.readthedocs.io/en/stable/guide/shadows.html)| [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/shadows) | [2011.09636](https://arxiv.org/abs/2011.09636) <br> [2002.08953](https://arxiv.org/abs/2002.08953)|
+| Layerwise Richardson Extrapolation 🚧          |    Coming soon  | | [2402.04000](https://arxiv.org/abs/2402.04000) |
 
 
-In addition, we also have a noise tailoring technique currently available with limited functionality 🚧:
+In addition, we also have a noise tailoring technique currently available with limited functionality:
 
 
 | Noise-tailoring Technique                                 | Documentation                                                | Mitiq module                                                              | Paper Reference(s)                                                                                                                                 |
 | ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pauli Twirling  <br> WIP 🚧            | [PT](https://mitiq.readthedocs.io/en/latest/guide/pt.html) <br> 🚧 | [`mitiq.pt`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/pt) <br> 🚧 |  [1512.01098](https://arxiv.org/abs/1512.01098) |
+| Pauli Twirling   🚧            | [PT](https://mitiq.readthedocs.io/en/latest/guide/pt.html)  | [`mitiq.pt`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/pt) |  [1512.01098](https://arxiv.org/abs/1512.01098) |
+
+> 🚧: Technique is currently a work in progress or is untested and may have some rough edges. If you try any of these techniques and have suggestions, please open an issue!
 
 
 
