@@ -12,6 +12,8 @@ jobs:
     name: Build Mitiq
     if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.export-version.outputs.VERSION }}
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v4
@@ -23,6 +25,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install build
+      - name: Export version variable
+        id: export-version
+        run: echo "VERSION=$(cat VERSION.txt)" >> "$GITHUB_OUTPUT"
       - name: Build mitiq
         run: python -m build
       - name: Store build artifacts
@@ -52,22 +57,19 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
 
   verify-version:
-    needs: test-publish
+    needs: [build, test-publish]
     runs-on: ubuntu-latest
     environment: testpypi
     steps:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install package from TestPyPI
         run: pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq
-      - name: Set version variable
-        run: |
-          VER=$(cat VERSION.txt)
-          echo "VERSION=$VER" >> $GITHUB_ENV
-
       - name: Verify the published version
+        env:
+          VERSION: ${{ needs.build.outputs.VERSION }}
         run: |
           TEST_IMPORT_VERSION=$(python -c "import mitiq; print(mitiq.__version__)")
           if [ "$TEST_IMPORT_VERSION" != "$VERSION" ]; then
