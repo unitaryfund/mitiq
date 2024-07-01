@@ -1,6 +1,8 @@
 [run]
 omit =
     */tests/*
+    mitiq/_about.py
+
 
 [report]
 # Regexes for lines to exclude from consideration

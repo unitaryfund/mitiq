@@ -146,7 +146,7 @@ def find_optimal_representation(
                 " which are initialized with a numerical superoperator matrix."
             )
         else:
-            raise err  # pragma no cover
+            raise err  # pragma: no cover
 
     # Run numerical optimization problem
     quasi_prob_dist = minimize_one_norm(

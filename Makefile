@@ -63,6 +63,7 @@ requirements: requirements/requirements.txt
 .PHONY: test
 test:
 	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml --ignore=mitiq/interface/mitiq_pyquil
+	pytest -rP mitiq/tests/test_about.py
 
 .PHONY: test-%
 test-%:
@@ -75,3 +76,4 @@ test-pyquil:
 .PHONY: test-all
 test-all:
 	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml
+	pytest -rP mitiq/tests/test_about.py
