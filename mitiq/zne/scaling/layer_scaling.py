@@ -24,6 +24,23 @@ def layer_folding(
 ) -> cirq.Circuit:
     """Applies a variable amount of folding to select layers of a circuit.
 
+    Note that this method only works for the univariate extrapolation methods.
+    It allows a user to choose which layers in the input circuit will be
+    scaled.
+
+    .. seealso::
+
+        If you would prefer to
+        use a multivariate extrapolation method for unitary
+        folding, use
+        :func:`mitiq.lre.multivariate_scaling.layerwise_folding` instead.
+
+        The layerwise folding required for multivariate extrapolation is
+        different as the layers in the input circuit have to be scaled in
+        a specific pattern. The required specific pattern for multivariate
+        extrapolation does not allow a user to provide a choice of which
+        layers to fold.
+
     Args:
         circuit: The input circuit.
         layers_to_fold: A list with the index referring to the layer number,
