@@ -25,11 +25,11 @@ def _get_num_layers_without_measurements(input_circuit: Circuit) -> int:
     number of layers in the input circuit without the terminal measurements.
 
         Args:
-            input_circuit: Circuit of interest
+            input_circuit: Circuit of interest.
 
         Returns:
             num_layers: the number of layers in the input circuit without the
-                terminal measurements
+                terminal measurements.
 
     """
 
@@ -48,15 +48,15 @@ def _get_chunks(
     https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length
 
         Args:
-            input_circuit: Circuit of interest
-            num_chunks: Number of desired approximately equal chunks
+            input_circuit: Circuit of interest.
+            num_chunks: Number of desired approximately equal chunks,
                 * when num_chunks == num_layers, the original circuit is
-                    returned
+                    returned.
                 * when num_chunks == 1, the entire circuit is chunked into 1
-                    layer
+                    layer.
         Returns:
             split_circuit: Circuit of interest split into approximately equal
-                chunks
+                chunks.
 
         Raises:
             ValueError:
@@ -99,14 +99,15 @@ def _get_scale_factor_vectors(
     extrapolation.
 
         Args:
-            input_circuit: Circuit to be scaled
-            degree: Degree of the multivariate polynomial
-            num_chunks: Number of desired approximately equal chunks
-            fold_multiplier: Scaling gap required by unitary folding
+            input_circuit: Circuit to be scaled.
+            degree: Degree of the multivariate polynomial.
+            fold_multiplier: Scaling gap required by unitary folding.
+            num_chunks: Number of desired approximately equal chunks.
 
         Returns:
-            scale_factor_vectors: Multiple variations of scale factors for each
-                layer in the input circuit
+            scale_factor_vectors: A vector of scale factors where each
+                component in the vector corresponds to the layer in the input
+                circuit.
     """
 
     circuit_chunks = _get_chunks(input_circuit, num_chunks)
@@ -157,17 +158,17 @@ def multivariate_layer_scaling(
         instead.
 
     Args:
-        input_circuit: Circuit to be scaled
-        degree: Degree of the multivariate polynomial
-        fold_multiplier: Scaling gap required by unitary folding
+        input_circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap required by unitary folding.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`
+            :func:`fold_gates_at_random`.
 
     Returns:
-        Multiple folded variations of the input circuit
+        Multiple folded variations of the input circuit.
 
     Raises:
         ValueError:
