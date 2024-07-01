@@ -74,16 +74,16 @@ def test_get_num_layers(test_input, expected):
 
 
 @pytest.mark.parametrize(
-    "test_input, test_chunks, expected_chunks",
+    "test_input, test_chunks",
     [
-        (test_circuit1 + test_circuit1 + test_circuit1, 3, 3),
-        (test_circuit1 + test_circuit1 + test_circuit1, 1, 1),
-        (test_circuit1 + test_circuit1 + test_circuit1, 5, 5),
+        (test_circuit1 + test_circuit1 + test_circuit1, 3),
+        (test_circuit1 + test_circuit1 + test_circuit1, 1),
+        (test_circuit1 + test_circuit1 + test_circuit1, 5),
     ],
 )
-def test_get_num_chunks(test_input, test_chunks, expected_chunks):
+def test_get_num_chunks(test_input, test_chunks):
     """Verifies the chunking function works as expected."""
-    assert expected_chunks == len(_get_chunks(test_input, test_chunks))
+    assert test_chunks == len(_get_chunks(test_input, test_chunks))
 
 
 def test_layers_with_chunking():
