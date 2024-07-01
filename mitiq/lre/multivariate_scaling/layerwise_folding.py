@@ -204,6 +204,6 @@ def multivariate_layer_scaling(
                 folded_chunk_circ = folding_method(chunks_circ, scale_factor)
                 folded_circuit += folded_chunk_circ
         _append_measurements(folded_circuit, terminal_measurements)
-        multiple_folded_circuits.append((folded_circuit))
+        multiple_folded_circuits.append(folded_circuit)
 
     return multiple_folded_circuits

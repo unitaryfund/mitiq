@@ -83,9 +83,7 @@ def test_get_num_layers(test_input, expected):
 )
 def test_get_num_chunks(test_input, test_chunks, expected_chunks):
     """Verifies the chunking function works as expected."""
-    calculated_num_chunks = len(_get_chunks(test_input, test_chunks))
-
-    assert calculated_num_chunks == expected_chunks
+    assert expected_chunks == len(_get_chunks(test_input, test_chunks))
 
 
 def test_layers_with_chunking():
