@@ -5,14 +5,14 @@ The most common ways to contribute here are
 
 1. opening an [issue](https://github.com/unitaryfund/mitiq/issues/new) to report a bug or propose a new feature, or ask a question, and
 2. opening a [pull request](https://github.com/unitaryfund/mitiq/pulls) to fix a bug, or implement a desired feature.
-3. opening a [discussion post](https://github.com/unitaryfund/mitiq/discussions) to ask a question (no stupid questions!), provide feedback, or show something off!
+3. opening a [discussion post](https://github.com/unitaryfund/mitiq/discussions) to ask a question (all questions welcome!), provide feedback, or show something off!
 
 The rest of this document describes the technical details of getting set up to develop, and make your first contribution to Mitiq.
 
 
 ## Development environment
 
-1. Ensure you have python 3.9 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/).
+1. Ensure you have python 3.10 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/).
 2. Set up a virtual environment to isolate dependencies. This can be done with many different tools including [Virtualenv](https://virtualenv.pypa.io/en/latest/), [Pipenv](https://pypi.org/project/pipenv/), [Poetry](https://python-poetry.org/), and [Anaconda](https://www.anaconda.com/download). In what follows we will use Anaconda, but if you're familiar with other tools feel free to use those.
 3. Set up a local version of the [Mitiq repository](https://github.com/unitaryfund/mitiq). To do this you will need to use `git` which is a version control system. If you're unfamiliar, check out the [docs](https://git-scm.com/), and learn about what the typical [`git` workflow](https://www.asmeurer.com/git-workflow/) looks like.
 4. Inside the Mitiq repository (`cd mitiq`), activate a virtual environment. With conda this is done using the following command.
@@ -47,7 +47,7 @@ Once they pass, you can run the entire test suite (excluding those that require 
 make test
 ```
 
-This can often be slow, however, so testing your changes iteratively using `pytest` is often faster when doing development.
+This can often be slow, however, so testing your changes [iteratively](https://docs.pytest.org/en/7.1.x/how-to/usage.html#specifying-which-tests-to-run) using `pytest` is often faster when doing development. 
 
 To run the tests for the pyQuil plugins, run
 ```bash
@@ -68,7 +68,7 @@ docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
 
 ### Updating the documentation
-Follow these [instructions for contributing to the documentation](https://mitiq.readthedocs.io/en/latest/contributing_docs.html) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
+Follow these [instructions for contributing to the documentation](contributing_docs.md) which include guidelines about updating the API-doc, adding examples, and updating the user guide.
 
 ### Style guidelines
 
@@ -116,14 +116,26 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 - [Error Mitigation by Subspace Expansion](https://docs.google.com/document/d/1JyQAwiw8BRT_oucZ6tQv0id6UhSdd3df1mNSPpOvu1I) by Ammar Jahin, Dariel Mok , Preksha Naik, Abdulrahman Sahmoud (@bubakazouba) Apr 28, 2023
 - [Implementation RFC for Mitiq calibration](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
 - [Calibration tools for error mitigation RFC (abstract general solutions)](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
-- [Identity insersion scaling RFC](https://docs.google.com/document/d/1hbd9frjYiSy0WujA0iCccc-oMO4Q-kZc2G4b3lkJHdk/edit) by Purva Thakre (@purva-thakre) Jun 29, 2022
+- [Identity insertion scaling RFC](https://docs.google.com/document/d/1hbd9frjYiSy0WujA0iCccc-oMO4Q-kZc2G4b3lkJHdk/edit) by Purva Thakre (@purva-thakre) Jun 29, 2022
 - [Readout Confusion Inversion RFC](https://docs.google.com/document/d/1buO5PrO5sS02VXjcaYf37RuR0rF6xpyr4J9H1tI4vN4/edit) by Amir Ebrahimi (@amirebrahimi) Jun 16, 2022
 - [Documentation reorganization RFC](https://docs.google.com/document/d/13un5TZPknSOhmOBkrL2rsofjGfdp2jDnd-DywLpGFPc/edit) by Ryan LaRose (@rmlarose) Dec 1, 2021
 - [Learning-based PEC RFC](https://docs.google.com/document/d/1VItesy6R5SlUa_YXW1km7IjFZ8kzyFeHUepHak1fEh4/edit) by Misty Wahl (@Misty-W) Oct 25, 2021
 - [Digital dynamical decoupling RFC](https://docs.google.com/document/d/1cRwFCTn6kUjI1P0kNydtevxIYtE4r8Omd_iWK0Pe8qo/edit) by Aaron Robertson (@Aaron-Robertson) Jan 28, 2021
 
+### Checklist for adding an approved QEM Technique
+
+After your RFC is accepted, the proposed feature (for example, a new QEM Method) will require the following:
+
+- Add the new QEM method to `mitiq/abbreviated_name_of_qem_method` such that the corresponding units tests are in `mitiq/abbreviated_name_of_qem_method/tests`
+- The code must follow the formatting and style guidelines discussed [above](#style-guidelines),
+- The new module should be added to the [](apidoc.md) using the instructions found in [](contributing_docs.md#automatically-add-information-from-the-api-docs),
+- Add documentation for the new QEM method, additional details are available in [](contributing_docs.md#adding-files-to-the-user-guide),
+- Update `docs/source/guide/glossary.md` with a one-line summary of what your new feature accomplishes, and
+- Update the [](./readme.md#quick-tour) section of the `README.md` with information related to your new technique.
+
+
 ## Code of conduct
-Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
+Mitiq development abides to the [](./code_of_conduct.md).
 
 ## Lifecycle
 The basic development workflow for Mitiq is done in units of milestones which are usually one month periods where we focus our efforts on thrusts decided by the development team, alongside community members.
@@ -132,5 +144,3 @@ Milestones are tracked using the [GitHub milestone feature](https://github.com/u
 All releases for Mitiq are tagged on the `main` branch with tags for the version number of the release.
 Find all the previous releases [here](https://github.com/unitaryfund/mitiq/releases).
 
-## Code of conduct
-Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).

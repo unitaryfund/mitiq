@@ -26,11 +26,19 @@ This task has two parts:
 1.  Make sure that `CHANGELOG.md` has an entry for each pull request
     (PR) since the last release. This can be generated from the commit
     history using `git log vX.Y.Z.. --pretty=format:"- %s [%an]"`
-    where `vX.Y.Z` is the last version of mitiq which was released.
+    where `vX.Y.Z` is the last version of Mitiq which was released.
     The author names need to then be replaced with the author's GitHub
     handle. An example might look like `- Update python-rapidjson requirement from <=1.6 to <1.8 (#1389) [@dependabot[bot]]`
     once completed.
-2.  The release author should add a "Summary" section with a couple
+
+    ```{tip}
+    Alternatively, the list of released changes can be generated via [GitHub CLI](https://cli.github.com/) with the following commands:
+        
+        LATEST_TAG=$(gh release list --repo unitaryfund/mitiq --limit 1 --json tagName --jq '.[0].tagName')
+        gh api repos/unitaryfund/mitiq/compare/$LATEST_TAG...main --paginate --jq '.commits | reverse | .[] | "- " + (.commit.message | split("\n")[0]) + " [@" + .author.login + "]"'
+    This method requires installing (and authenticating on) the Github CLI, but has the advantage that the output list comes already with Github handles, hence removing a tedious step for the release manager.    
+    ``` 
+2.  The release manager should add a "Summary" section with a couple
     sentences describing the latest release, and then update the title
     of the release section to include the release date and remove the
     "In Development" designation.
@@ -108,9 +116,8 @@ release Mitiq are:
 
 ```bash
 python -m pip install --upgrade pip
-make install requirements
-pip install setuptools wheel twine
-python setup.py sdist bdist_wheel
+pip install build twine
+python -m build
 twine upload dist/*
 ```
 

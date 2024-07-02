@@ -8,12 +8,16 @@ import random
 import cirq
 import networkx as nx
 import numpy as np
+import pennylane as qml
 import pytest
 import qiskit
+from pennylane.tape import QuantumTape
 
 from mitiq.benchmarks import generate_mirror_circuit
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.pt.pt import (
+    CIRQ_NOISE_OP,
+    PENNYLANE_NOISE_OP,
     CNOT_twirling_gates,
     CZ_twirling_gates,
     pauli_twirl_circuit,
@@ -144,3 +148,43 @@ def test_no_CNOT_CZ_circuit(twirl_func):
 
     for i in range(5):
         assert _equal(circuit, twirled_output[i])
+
+
+@pytest.mark.parametrize("noise_name", ["bit-flip", "depolarize"])
+def test_noisy_cirq(noise_name):
+    p = 0.01
+    a, b = cirq.LineQubit.range(2)
+    circuit = cirq.Circuit(cirq.H.on(a), cirq.CNOT.on(a, b), cirq.CZ.on(a, b))
+    twirled_circuit = pauli_twirl_circuit(
+        circuit, num_circuits=1, noise_name=noise_name, p=p
+    )[0]
+
+    for i, current_moment in enumerate(twirled_circuit):
+        for op in current_moment:
+            if op.gate in [cirq.CNOT, cirq.CZ]:
+                for next_op in twirled_circuit[i + 1]:
+                    assert next_op.gate == CIRQ_NOISE_OP[noise_name](p=p)
+
+
+@pytest.mark.parametrize("noise_name", ["bit-flip", "depolarize"])
+def test_noisy_pennylane(noise_name):
+    p = 0.01
+    ops = [
+        qml.Hadamard(0),
+        qml.CNOT((0, 1)),
+        qml.CZ((0, 1)),
+    ]
+    circuit = QuantumTape(ops)
+    twirled_circuit = pauli_twirl_circuit(
+        circuit, num_circuits=1, noise_name=noise_name, p=p
+    )[0]
+
+    noisy_gates = ["CNOT", "CZ"]
+
+    for i, op in enumerate(twirled_circuit.operations):
+        if op.name in noisy_gates:
+            for j in range(1, len(op.wires) + 1):
+                assert (
+                    type(twirled_circuit.operations[i + j])
+                    == PENNYLANE_NOISE_OP[noise_name]
+                )

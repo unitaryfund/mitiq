@@ -12,6 +12,7 @@ import cirq
 import numpy as np
 import pytest
 import qiskit
+import qiskit.circuit
 from qiskit_aer import AerSimulator
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
@@ -540,3 +541,22 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     # Note: Unmitigated value is also (usually) within 10% of the true value.
     # This is more to test usage than effectiveness.
     assert abs(zne_value - true_value) < 0.1
+
+
+def test_execute_zne_on_qiskit_circuit_with_QFT():
+    """Tests ZNE of a Qiskit device with a QFT gate."""
+
+    def qs_noisy_simulation(
+        circuit: qiskit.QuantumCircuit, shots: int = 1
+    ) -> float:
+        noise_model = initialized_depolarizing_noise(noise_level=0.02)
+        backend = AerSimulator(noise_model=noise_model)
+        job = backend.run(circuit.decompose(), shots=shots)
+        return job.result().get_counts().get("0", 0.0) / shots
+
+    circuit = qiskit.QuantumCircuit(1)
+    circuit &= qiskit.circuit.library.QFT(1)
+    circuit.measure_all()
+
+    mitigated = execute_with_zne(circuit, qs_noisy_simulation)
+    assert abs(mitigated) < 1000
