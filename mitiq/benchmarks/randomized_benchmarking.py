@@ -16,7 +16,7 @@ import cirq
 import numpy as np
 from cirq.experiments.qubit_characterizations import (
     _find_inv_matrix,
-    _gate_seq_to_mats,
+    _reduce_gate_seq,
     _single_qubit_cliffords,
     _two_qubit_clifford,
     _two_qubit_clifford_matrices,
@@ -60,9 +60,6 @@ def generate_rb_circuits(
     rng = np.random.RandomState(seed)
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
-        cfd_mat_1q = np.array(
-            [_gate_seq_to_mats(gates) for gates in c1], dtype=np.complex64
-        )
         circuits = []
         clifford_group_size = 24
         for _ in range(trials):
@@ -70,10 +67,7 @@ def generate_rb_circuits(
             gate_sequence = [
                 gate for gate_id in gate_ids for gate in c1[gate_id]
             ]
-            idx = _find_inv_matrix(
-                _gate_seq_to_mats(gate_sequence), cfd_mat_1q
-            )
-            gate_sequence.extend(c1[idx])
+            gate_sequence.append(_reduce_gate_seq(gate_sequence) ** -1)
             circuits.append(
                 cirq.Circuit(gate(qubits[0]) for gate in gate_sequence)
             )
