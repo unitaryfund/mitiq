@@ -15,4 +15,6 @@ mitiq.egg-info/
 dist/
 build/
 coverage.xml
+.coverage
+.coverage.*
 jupyter_execute/
