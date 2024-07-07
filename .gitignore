@@ -2,7 +2,6 @@
 .vscode
 .python-version
 .idea/
-.coverage
 *.dat
 *.ipynb
 *.hdf5
@@ -14,5 +13,9 @@ docs/build/
 mitiq.egg-info/
 dist/
 build/
-coverage.xml
 jupyter_execute/
+
+# Coverage reports
+coverage.xml
+.coverage
+.coverage.*
