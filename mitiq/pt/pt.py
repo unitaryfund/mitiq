@@ -4,9 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 
 import random
-from typing import List
+from functools import singledispatch
+from typing import Callable, List, Optional
 
 import cirq
+import pennylane as qml
+from cirq import Circuit as _Circuit
+from pennylane.tape import QuantumTape
 
 from mitiq import QPROGRAM
 from mitiq.interface import accept_qprogram_and_validate
@@ -49,10 +53,24 @@ CZ_twirling_gates = [
     (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
 ]
 
+CIRQ_NOISE_FUNCTION = Callable[[float], cirq.Gate]
+
+CIRQ_NOISE_OP: dict[str, CIRQ_NOISE_FUNCTION] = {
+    "bit-flip": cirq.bit_flip,
+    "depolarize": cirq.depolarize,
+}
+
+PENNYLANE_NOISE_OP = {
+    "bit-flip": qml.BitFlip,
+    "depolarize": qml.DepolarizingChannel,
+}
+
 
 def pauli_twirl_circuit(
     circuit: QPROGRAM,
     num_circuits: int = 10,
+    noise_name: Optional[str] = None,
+    **kwargs: float,
 ) -> List[QPROGRAM]:
     r"""Return the Pauli twirled versions of the input circuit.
 
@@ -63,6 +81,14 @@ def pauli_twirl_circuit(
     Args:
         circuit: The input circuit to execute with twirling.
         num_circuits: Number of circuits to be twirled, and averaged.
+        noise_name: Name of the noisy operator acting on CNOT and CZ gates.
+        See warning.
+
+    Warning:
+        If this function is executed with a simulator backend, it is
+        necessary to use the `noise_op` argument to apply noise on CNOT
+        and CZ gates. Otherwise, the twirled circuits will not wrap the
+        noise on these gates.
 
     Returns:
         The expectation value estimated with Pauli twirling.
@@ -72,7 +98,73 @@ def pauli_twirl_circuit(
         twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
     ]
 
+    if noise_name is not None:
+        twirled_circuits = [
+            add_noise_to_two_qubit_gates(circuit, noise_name, **kwargs)
+            for circuit in twirled_circuits
+        ]
+
     return twirled_circuits
+
+
+def add_noise_to_two_qubit_gates(
+    circuit: QPROGRAM, noise_name: str, **kwargs: float
+) -> QPROGRAM:
+    """Add noise to CNOT and CZ gates on pre-twirled circuits.
+
+    Args:
+        circuit: Pre-twirled circuit
+        noise_name: name of noise operator to apply after CNOT and CZ gates
+    """
+    # here we will validate if noise_op and kwargs are valid
+    return _add_noise_to_two_qubit_gates(circuit, noise_name, **kwargs)
+
+
+@singledispatch
+def _add_noise_to_two_qubit_gates(
+    circuit: QPROGRAM, noise_name: str, **kwargs: float
+) -> QPROGRAM:
+    raise NotImplementedError(
+        f"Cannot add noise to Circuit of type {type(circuit)}."
+    )
+
+
+@_add_noise_to_two_qubit_gates.register
+def _cirq(circuit: _Circuit, noise_name: str, **kwargs: float) -> _Circuit:
+    noise_function = CIRQ_NOISE_OP[noise_name]
+    noise_op = noise_function(**kwargs)  # type: ignore
+
+    noisy_gates = [cirq.ops.CNOT, cirq.ops.CZ]
+
+    noisy_circuit = cirq.Circuit()
+    for moment in circuit:
+        layer = cirq.Circuit()
+        for op in moment:
+            layer.append(op)
+            if op.gate in noisy_gates:
+                layer.append(noise_op.on_each(op.qubits))
+        noisy_circuit += layer
+    return noisy_circuit
+
+
+@_add_noise_to_two_qubit_gates.register
+def _pennylane(
+    circuit: QuantumTape, noise_name: str, **kwargs: float
+) -> QuantumTape:
+    new_ops = []
+    noise_function = PENNYLANE_NOISE_OP[noise_name]
+
+    noisy_gates = ["CNOT", "CZ"]
+    for op in circuit:
+        new_ops.append(op)
+        if op.name in noisy_gates:
+            for wire in op.wires:
+                noise_op = noise_function(**kwargs, wires=wire)
+                new_ops.append(noise_op)
+
+    return QuantumTape(
+        ops=new_ops, measurements=circuit.measurements, shots=circuit.shots
+    )
 
 
 def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:

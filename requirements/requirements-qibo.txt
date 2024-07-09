@@ -1,1 +1,1 @@
-qibo==0.2.8 # TODO: unpin this
+qibo==0.2.9 # TODO: unpin this

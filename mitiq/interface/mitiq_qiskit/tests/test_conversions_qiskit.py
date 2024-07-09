@@ -203,6 +203,19 @@ def test_random_circuit_to_from_qasm():
     )
 
 
+def test_convert_with_qft():
+    """Tests converting a Qiskit circuit with a QFT to a Cirq circuit."""
+    circuit = qiskit.QuantumCircuit(1)
+    circuit &= qiskit.circuit.library.QFT(1)
+    circuit.measure_all()
+    qft_cirq = from_qiskit(circuit)
+    qreg = cirq.LineQubit.range(1)
+    cirq_circuit = cirq.Circuit(
+        [cirq.ops.H.on(qreg[0]), cirq.ops.measure(qreg[0], key="meas")]
+    )
+    assert _equal(cirq_circuit, qft_cirq)
+
+
 @pytest.mark.parametrize("as_qasm", (True, False))
 def test_convert_with_barrier(as_qasm):
     """Tests converting a Qiskit circuit with a barrier to a Cirq circuit."""

@@ -60,7 +60,7 @@ We can visualize the circuit for a particular $\gamma$ as follows.
 
 ```{code-cell} ipython3
 circuit = variational_circuit(gamma=np.pi)
-circuit.draw()
+print(circuit)
 ```
 
 ## Defining the executor functions with and without noise
