@@ -26,7 +26,7 @@ clean:
 	rm -rf dist
 	rm -rf mitiq.egg-info
 	rm -rf .mypy_cache .pytest_cache .ruff_cache
-	rm -rf htmlcov coverage.xml .coverage
+	rm -rf htmlcov coverage.xml .coverage .coverage.*
 	rm -rf .ipynb_checkpoints
 
 .PHONY: dist
