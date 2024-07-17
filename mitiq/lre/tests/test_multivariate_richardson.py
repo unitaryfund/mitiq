@@ -18,6 +18,10 @@ from mitiq.lre.inference.multivariate_richardson import (
     linear_combination_coefficients,
     sample_matrix,
 )
+from mitiq.lre.multivariate_scaling.layerwise_folding import (
+    _get_num_layers_without_measurements,
+    _get_scale_factor_vectors,
+)
 
 
 @pytest.mark.parametrize(
@@ -174,3 +178,55 @@ def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
     assert expected_matrix == linear_combination_coefficients(
         test_circ, test_degree, test_fold_multiplier
     )
+
+
+@pytest.mark.parametrize(
+    "test_input, test_degree, test_fold_multiplier, error_msg",
+    [
+        (
+            test_circuit1,
+            0,
+            1,
+            "Multinomial degree must be greater than or equal to 1.",
+        ),
+        (
+            test_circuit1,
+            1,
+            0,
+            "Fold multiplier must be greater than or equal to 1.",
+        ),
+    ],
+)
+def test_invalid_degree_fold_multiplier_sample_matrix(
+    test_input, test_degree, test_fold_multiplier, error_msg
+):
+    """Ensures that the args for the sample matrix
+    an error for an invalid value."""
+    with pytest.raises(ValueError, match=error_msg):
+        sample_matrix(test_input, test_degree, test_fold_multiplier)
+
+
+@pytest.mark.parametrize(
+    "test_input, degree, test_fold_multiplier",
+    [
+        (test_circuit1, 1, 1),
+        (test_circuit1, 2, 1),
+        (test_circuit1, 3, 5),
+        (test_circuit1, 4, 7),
+        (test_circuit1, 2, 2),
+        (test_circuit1, 2, 3),
+    ],
+)
+def test_square_sample_matrix(test_input, degree, test_fold_multiplier):
+    """Check if the sample matrix will always be a square.
+
+    The terms in the monomial basis define the total rows of the sample matrix
+    & the generated scale factors for some fold multiplier define the number of
+    columns.
+    """
+    num_layers = _get_num_layers_without_measurements(test_input)
+    calculated_basis = full_monomial_basis(num_layers, degree)
+    calculated_scale_factor_vectors = _get_scale_factor_vectors(
+        test_input, degree, test_fold_multiplier
+    )
+    assert len(calculated_basis) == len(calculated_scale_factor_vectors)

@@ -141,9 +141,6 @@ def linear_combination_coefficients(
         input_circuit, degree, fold_multiplier, num_chunks
     )
 
-    if np.linalg.det(input_sample_matrix) == 0:
-        raise ValueError("Sample matrix is singular.")
-
     coeff_list = []
     for i in range(num_layers):
         sample_matrix_copy = input_sample_matrix.copy()
