@@ -15,6 +15,7 @@ from mitiq.lre.inference.multivariate_richardson import (
     _create_variable_combinations,
     _get_variables,
     full_monomial_basis,
+    linear_combination_coefficients,
     sample_matrix,
 )
 
@@ -132,3 +133,44 @@ test_circuit2 = Circuit(
 )
 def test_sample_matrix(test_circ, test_degree, expected_matrix):
     assert (expected_matrix == sample_matrix(test_circ, test_degree, 1)).all()
+
+
+@pytest.mark.parametrize(
+    "test_circ, test_degree, test_fold_multiplier, expected_matrix",
+    [
+        (
+            test_circuit1,
+            2,
+            3,
+            [
+                0.013888888888888876,
+                -0.027777777777777804,
+                0.0,
+                0.013888888888888876,
+                0.0,
+                0.0,
+            ],
+        ),
+        (
+            test_circuit2,
+            2,
+            2,
+            [
+                0.03124999999999993,
+                -0.06249999999999997,
+                0.0,
+                0.0,
+                0.03124999999999993,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            ],
+        ),
+    ],
+)
+def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
+    assert expected_matrix == linear_combination_coefficients(
+        test_circ, test_degree, test_fold_multiplier
+    )

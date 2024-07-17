@@ -9,10 +9,11 @@
 
 from collections import Counter
 from itertools import chain, combinations_with_replacement
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import numpy as np
 from cirq import Circuit
+from numpy.typing import NDArray
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_num_layers_without_measurements,
@@ -33,7 +34,7 @@ def _get_variables(num_layers: int) -> List[str]:
     return [f"λ_{i}" for i in range(1, num_layers + 1)]
 
 
-def _create_variable_combinations(num_layers: int, degree: int):
+def _create_variable_combinations(num_layers: int, degree: int) -> List[Any]:
     variables = _get_variables(num_layers)
     variable_combinations = []
     for i in range(degree, -1, -1):
@@ -93,7 +94,7 @@ def sample_matrix(
     degree: int,
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
-):
+) -> NDArray[Any]:
     """Calculates the sample matrix required for extrapolation."""
     if degree < 1:
         raise ValueError(
@@ -124,5 +125,32 @@ def sample_matrix(
     return sample_matrix
 
 
-def linear_combination_coefficients():
-    """Finds the coefficients."""
+def linear_combination_coefficients(
+    input_circuit: Circuit,
+    degree: int,
+    fold_multiplier: int,
+    num_chunks: Optional[int] = None,
+) -> List[int]:
+    """Finds the coefficients according to equation 20."""
+    num_layers = len(
+        _get_scale_factor_vectors(
+            input_circuit, degree, fold_multiplier, num_chunks
+        )
+    )
+    input_sample_matrix = sample_matrix(
+        input_circuit, degree, fold_multiplier, num_chunks
+    )
+
+    if np.linalg.det(input_sample_matrix) == 0:
+        raise ValueError("Sample matrix is singular.")
+
+    coeff_list = []
+    for i in range(num_layers):
+        sample_matrix_copy = input_sample_matrix.copy()
+        sample_matrix_copy[i] = np.array([[0] * (num_layers - 1) + [1]])
+        coeff_list.append(
+            np.linalg.det(sample_matrix_copy)
+            / np.linalg.det(input_sample_matrix)
+        )
+
+    return coeff_list
