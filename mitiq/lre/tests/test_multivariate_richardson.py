@@ -147,12 +147,12 @@ def test_sample_matrix(test_circ, test_degree, expected_matrix):
             2,
             3,
             [
-                0.013888888888888876,
-                -0.027777777777777804,
-                0.0,
-                0.013888888888888876,
-                0.0,
-                0.0,
+                1.5555555555555578,
+                -0.38888888888888934,
+                -0.38888888888888934,
+                0.09722222222222215,
+                0.027777777777777804,
+                0.09722222222222232,
             ],
         ),
         (
@@ -160,16 +160,16 @@ def test_sample_matrix(test_circ, test_degree, expected_matrix):
             2,
             2,
             [
-                0.03124999999999993,
-                -0.06249999999999997,
-                0.0,
-                0.0,
-                0.03124999999999993,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
+                2.4062499999999956,
+                -0.6874999999999987,
+                -0.6874999999999987,
+                -0.6874999999999987,
+                0.15624999999999956,
+                0.06249999999999997,
+                0.06249999999999997,
+                0.15624999999999956,
+                0.06249999999999997,
+                0.15624999999999956,
             ],
         ),
     ],
@@ -230,3 +230,10 @@ def test_square_sample_matrix(test_input, degree, test_fold_multiplier):
         test_input, degree, test_fold_multiplier
     )
     assert len(calculated_basis) == len(calculated_scale_factor_vectors)
+
+
+def test_lre_inference_with_chunking():
+    circ = test_circuit1 * 7
+    chunked_sample_matrix_dim = sample_matrix(circ, 2, 2, 4).shape
+    non_chunked_sample_matrix_dim = sample_matrix(circ, 2, 2).shape
+    assert chunked_sample_matrix_dim[0] < non_chunked_sample_matrix_dim[0]

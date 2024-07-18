@@ -3,7 +3,7 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Functions for the multivariate richardson extrapolation as defined in
+"""Functions for multivariate richardson extrapolation as defined in
 :cite:`Russo_2024_LRE`.
 """
 
@@ -16,7 +16,6 @@ from cirq import Circuit
 from numpy.typing import NDArray
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
-    _get_num_layers_without_measurements,
     _get_scale_factor_vectors,
 )
 
@@ -29,12 +28,21 @@ def _get_variables(num_layers: int) -> List[str]:
         num_layers: Number of layers in the input circuit.
 
     Returns:
-        variables: Variables required for the monomial basis.
+        Variables required to create the monomial basis.
     """
     return [f"λ_{i}" for i in range(1, num_layers + 1)]
 
 
 def _create_variable_combinations(num_layers: int, degree: int) -> List[Any]:
+    """Find the variable combinations required to create the monomial terms.
+
+    Args:
+        num_layers: Number of layers in the input circuit.
+        degree: Degree of the multivariate polynomial.
+
+    Returns:
+        Variable combinations required for the monomial basis.
+    """
     variables = _get_variables(num_layers)
     variable_combinations = []
     for i in range(degree, -1, -1):
@@ -62,7 +70,7 @@ def full_monomial_basis(num_layers: int, degree: int) -> List[str]:
         degree: Degree of the multivariate polynomial.
 
     Returns:
-        monomial_basis: Monomial basis terms required for multivariate
+        Monomial basis terms required for multivariate
             extrapolation upto max degree
     """
     variable_combinations = _create_variable_combinations(num_layers, degree)
@@ -95,7 +103,31 @@ def sample_matrix(
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
 ) -> NDArray[Any]:
-    """Calculates the sample matrix required for extrapolation."""
+    r"""
+    Defines the sample matrix required for multivariate extrapolation as
+    defined in :cite:`Russo_2024_LRE`.
+
+    Args:
+        input_circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap required by unitary folding.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+
+    Returns:
+        Matrix of the evaluated monomial basis terms from the scale factor
+            vectors.
+
+    Raises:
+        ValueError:
+            When the degree for the multinomial is not greater than or
+                equal to 1; when the fold multiplier to scale the circuit is
+                greater than/equal to 1; when the number of chunks for a
+                large circuit is 0 or when the number of chunks in a circuit is
+                greater than the number of layers in the input circuit.
+
+    """
     if degree < 1:
         raise ValueError(
             "Multinomial degree must be greater than or equal to 1."
@@ -103,11 +135,10 @@ def sample_matrix(
     if fold_multiplier < 1:
         raise ValueError("Fold multiplier must be greater than or equal to 1.")
 
-    num_layers = _get_num_layers_without_measurements(input_circuit)
-
     scale_factor_vectors = _get_scale_factor_vectors(
         input_circuit, degree, fold_multiplier, num_chunks
     )
+    num_layers = len(scale_factor_vectors[0])
 
     monomial_terms = full_monomial_basis(num_layers, degree)
     if len(monomial_terms) != len(scale_factor_vectors):
@@ -131,7 +162,22 @@ def linear_combination_coefficients(
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
 ) -> List[int]:
-    """Finds the coefficients according to equation 20."""
+    r"""
+    Defines the sample matrix required for multivariate extrapolation as
+    defined in :cite:`Russo_2024_LRE`.
+
+    Args:
+        input_circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap required by unitary folding.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+
+    Returns:
+        Matrix of the evaluated monomial basis terms using the scale factor
+            vectors.
+    """
     num_layers = len(
         _get_scale_factor_vectors(
             input_circuit, degree, fold_multiplier, num_chunks
@@ -144,7 +190,7 @@ def linear_combination_coefficients(
     coeff_list = []
     for i in range(num_layers):
         sample_matrix_copy = input_sample_matrix.copy()
-        sample_matrix_copy[i] = np.array([[0] * (num_layers - 1) + [1]])
+        sample_matrix_copy[i] = np.array([[1] + [0] * (num_layers - 1)])
         coeff_list.append(
             np.linalg.det(sample_matrix_copy)
             / np.linalg.det(input_sample_matrix)
