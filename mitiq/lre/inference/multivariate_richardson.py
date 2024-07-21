@@ -46,12 +46,12 @@ def _create_variable_combinations(num_layers: int, degree: int) -> List[Any]:
     variables = _get_variables(num_layers)
     variable_combinations = []
     for i in range(degree, -1, -1):
-        # Generate combinations for the current degree
-        # Ranges from max degree, max degree -1, ...0.
+        # Generate combinations for the current degree.
+        # Ranges from max degree, max degree -1, ..., 0.
         combos = list(combinations_with_replacement(variables, i))
         variable_combinations.append(combos)
 
-    # return a flattened list
+    # Return a flattened list.
     return list(chain(*variable_combinations))
 
 
@@ -71,7 +71,7 @@ def full_monomial_basis(num_layers: int, degree: int) -> List[str]:
 
     Returns:
         Monomial basis terms required for multivariate
-            extrapolation upto max degree
+            extrapolation up to max degree
     """
     variable_combinations = _create_variable_combinations(num_layers, degree)
 
