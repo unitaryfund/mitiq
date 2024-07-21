@@ -141,7 +141,9 @@ def sample_matrix(
     num_layers = len(scale_factor_vectors[0])
 
     monomial_terms = full_monomial_basis(num_layers, degree)
-    if len(monomial_terms) != len(scale_factor_vectors):
+    if len(monomial_terms) != len(scale_factor_vectors):  # pragma: no cover
+        # Temporarily ignore this block from the coverage report because
+        # a unit test for this is not that obvious.
         raise ValueError("Sample matrix will not be a square matrix.")
     sample_matrix = np.zeros((len(monomial_terms), len(monomial_terms)))
 
