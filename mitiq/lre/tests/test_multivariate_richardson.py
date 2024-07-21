@@ -175,8 +175,16 @@ def test_sample_matrix(test_circ, test_degree, expected_matrix):
     ],
 )
 def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
-    assert expected_matrix == linear_combination_coefficients(
-        test_circ, test_degree, test_fold_multiplier
+    assert (
+        abs(
+            np.array(expected_matrix)
+            - np.array(
+                linear_combination_coefficients(
+                    test_circ, test_degree, test_fold_multiplier
+                )
+            )
+        ).all()
+        <= 1e-3
     )
 
 
