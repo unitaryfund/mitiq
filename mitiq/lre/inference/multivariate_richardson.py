@@ -163,7 +163,7 @@ def linear_combination_coefficients(
     degree: int,
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
-) -> List[int]:
+) -> List[np.float64]:
     r"""
     Defines the sample matrix required for multivariate extrapolation as
     defined in :cite:`Russo_2024_LRE`.
@@ -177,7 +177,7 @@ def linear_combination_coefficients(
             the input circuit is unchanged.
 
     Returns:
-        Matrix of the evaluated monomial basis terms using the scale factor
+        List of the evaluated monomial basis terms using the scale factor
             vectors.
     """
     num_layers = len(
