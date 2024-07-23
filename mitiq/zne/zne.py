@@ -12,6 +12,27 @@ from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.zne.inference import Factory, RichardsonFactory
 from mitiq.zne.scaling import fold_gates_at_random
 
+def scaled_circuits(
+    circuit: QPROGRAM,
+    scale_factors: list[float],
+    scale_method: Callable[[QPROGRAM, float], QPROGRAM],
+) -> list[QPROGRAM]:
+    
+    circuits = []
+    for scale_factor in scale_factors:
+        circuits.append(scale_method(circuit, scale_factor))
+    
+    return circuits
+
+def combine_results(
+    scale_factors: list[float],
+    results: list[float],
+    extrapolation_method: Callable[[list[float], list[float]], float],
+) -> float:
+    
+    res = extrapolation_method(scale_factors, results)
+
+    return res
 
 def execute_with_zne(
     circuit: QPROGRAM,
