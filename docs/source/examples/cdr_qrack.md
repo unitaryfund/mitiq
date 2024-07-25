@@ -21,9 +21,14 @@ While the Users Guide and the [Cirq: 1D Ising Simultation](https://mitiq.readthe
 
 ## Setup
 
-To start, relevant modules and libraries are imported. 
+To start, relevant modules and libraries are imported.
 
-+++
+```{code-cell} ipython3
+try:
+    from pyqrack import QrackSimulator, QrackCircuit
+except ImportError:
+    %pip install pyqrack --quiet
+```
 
 ```{note}
 In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`. This enviroment variable sets the maximum on how many qubits can be allocated on a single QEngineCPU instance. More information can be found on the [Qrack README page](https://github.com/unitaryfund/qrack?tab=readme-ov-file#maximum-allocation-guard).
@@ -50,7 +55,7 @@ from qiskit.providers.fake_provider import Fake5QV1
 
 ## Sample Circuit
 
-This sample circuit includes Clifford gates (`H`, `CNOT`, `RX`) and non-Clifford gates (`RZ`). 
+This sample circuit includes Clifford gates (`H`, `CNOT`, `RX`) and non-Clifford gates (`RZ`).
 
 ```{code-cell} ipython3
 a, b = cirq.LineQubit.range(2)
@@ -141,7 +146,7 @@ def cirq_simulate(circuit: cirq.Circuit) -> np.ndarray:
 
 With the different executor functions defined for running the Qrack, Qiskit, and Cirq simulators, the mitiq `execute_with_cdr` function can be called.
 
-Before getting the results from using CDR, `cirq_simulate` is called to get the ideal expectation value from the circuit. Next, the circuit is run on the fake Qiskit backend, using `qiskit_noisy` in order to obtain an unmitigated expectation value for `00`. Finally, `execute_with_cdr` is called to obtain the mitigated expectation value. 
+Before getting the results from using CDR, `cirq_simulate` is called to get the ideal expectation value from the circuit. Next, the circuit is run on the fake Qiskit backend, using `qiskit_noisy` in order to obtain an unmitigated expectation value for `00`. Finally, `execute_with_cdr` is called to obtain the mitigated expectation value.
 
 +++
 
