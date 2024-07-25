@@ -24,10 +24,13 @@ While the Users Guide and the [Cirq: 1D Ising Simultation](https://mitiq.readthe
 To start, relevant modules and libraries are imported.
 
 ```{code-cell} ipython3
+import os
+
 try:
     from pyqrack import QrackSimulator, QrackCircuit
 except ImportError:
     %pip install pyqrack --quiet
+    os._exit(00)
 ```
 
 ```{note}
@@ -37,7 +40,6 @@ In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`
 ```{code-cell} ipython3
 import numpy as np
 import collections
-import os
 import warnings
 warnings.simplefilter("ignore", np.ComplexWarning)
 
