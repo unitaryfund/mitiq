@@ -21,17 +21,9 @@ While the Users Guide and the [Cirq: 1D Ising Simultation](https://mitiq.readthe
 
 ## Setup
 
-To start, relevant modules and libraries are imported.
+To start, relevant modules and libraries are imported. Please ensure that the following Python modules are installed: `mitiq`, `numpy`, `pyqrack`, `cirq`, `qiskit`
 
-```{code-cell} ipython3
-import os
-
-try:
-    from pyqrack import QrackSimulator, QrackCircuit
-except ImportError:
-    %pip install pyqrack --quiet
-    os._exit(00)
-```
++++
 
 ```{note}
 In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`. This enviroment variable sets the maximum on how many qubits can be allocated on a single QEngineCPU instance. More information can be found on the [Qrack README page](https://github.com/unitaryfund/qrack?tab=readme-ov-file#maximum-allocation-guard).
@@ -40,6 +32,8 @@ In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`
 ```{code-cell} ipython3
 import numpy as np
 import collections
+
+import os
 import warnings
 warnings.simplefilter("ignore", np.ComplexWarning)
 
