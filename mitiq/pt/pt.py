@@ -91,7 +91,7 @@ def generate_pauli_twirl_variants(
         noise on these gates.
 
     Returns:
-        A list of `num_circuits` twirled versions of `circuit` 
+        A list of `num_circuits` twirled versions of `circuit`
     """
     CNOT_twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
     twirled_circuits = [

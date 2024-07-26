@@ -136,7 +136,8 @@ def test_generate_pauli_twirl_variants():
 
 
 @pytest.mark.parametrize(
-    "twirl_func", [generate_pauli_twirl_variants, twirl_CNOT_gates, twirl_CZ_gates]
+    "twirl_func",
+    [generate_pauli_twirl_variants, twirl_CNOT_gates, twirl_CZ_gates],
 )
 def test_no_CNOT_CZ_circuit(twirl_func):
     num_qubits = 2
