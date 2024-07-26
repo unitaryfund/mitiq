@@ -20,7 +20,7 @@ from mitiq.pt.pt import (
     PENNYLANE_NOISE_OP,
     CNOT_twirling_gates,
     CZ_twirling_gates,
-    pauli_twirl_circuit,
+    generate_pauli_twirl_variants,
     twirl_CNOT_gates,
     twirl_CZ_gates,
 )
@@ -122,7 +122,7 @@ def test_twirl_CNOT_increases_layer_count():
         assert num_gates_after == num_gates_before
 
 
-def test_pauli_twirl_circuit():
+def test_generate_pauli_twirl_variants():
     num_qubits = 3
     num_layers = 20
     circuit, _ = generate_mirror_circuit(
@@ -131,12 +131,12 @@ def test_pauli_twirl_circuit():
         connectivity_graph=nx.complete_graph(num_qubits),
     )
     num_circuits = 10
-    twirled_output = pauli_twirl_circuit(circuit, num_circuits)
+    twirled_output = generate_pauli_twirl_variants(circuit, num_circuits)
     assert len(twirled_output) == num_circuits
 
 
 @pytest.mark.parametrize(
-    "twirl_func", [pauli_twirl_circuit, twirl_CNOT_gates, twirl_CZ_gates]
+    "twirl_func", [generate_pauli_twirl_variants, twirl_CNOT_gates, twirl_CZ_gates]
 )
 def test_no_CNOT_CZ_circuit(twirl_func):
     num_qubits = 2
@@ -155,7 +155,7 @@ def test_noisy_cirq(noise_name):
     p = 0.01
     a, b = cirq.LineQubit.range(2)
     circuit = cirq.Circuit(cirq.H.on(a), cirq.CNOT.on(a, b), cirq.CZ.on(a, b))
-    twirled_circuit = pauli_twirl_circuit(
+    twirled_circuit = generate_pauli_twirl_variants(
         circuit, num_circuits=1, noise_name=noise_name, p=p
     )[0]
 
@@ -175,7 +175,7 @@ def test_noisy_pennylane(noise_name):
         qml.CZ((0, 1)),
     ]
     circuit = QuantumTape(ops)
-    twirled_circuit = pauli_twirl_circuit(
+    twirled_circuit = generate_pauli_twirl_variants(
         circuit, num_circuits=1, noise_name=noise_name, p=p
     )[0]
 

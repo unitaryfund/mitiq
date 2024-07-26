@@ -66,7 +66,7 @@ PENNYLANE_NOISE_OP = {
 }
 
 
-def pauli_twirl_circuit(
+def generate_pauli_twirl_variants(
     circuit: QPROGRAM,
     num_circuits: int = 10,
     noise_name: Optional[str] = None,
@@ -91,7 +91,7 @@ def pauli_twirl_circuit(
         noise on these gates.
 
     Returns:
-        The expectation value estimated with Pauli twirling.
+        A list of `num_circuits` twirled versions of `circuit` 
     """
     CNOT_twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
     twirled_circuits = [
