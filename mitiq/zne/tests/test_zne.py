@@ -41,14 +41,13 @@ from mitiq.zne.inference import (
     RichardsonFactory,
 )
 from mitiq.zne.scaling import (
+    fold_all,
     fold_gates_at_random,
+    fold_global,
     get_layer_folding,
     insert_id_layers,
-    fold_global,
-    fold_all,
 )
-
-from mitiq.zne.zne import scaled_circuits, combine_results
+from mitiq.zne.zne import combine_results, scaled_circuits
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -565,8 +564,14 @@ def test_execute_zne_on_qiskit_circuit_with_QFT():
     mitigated = execute_with_zne(circuit, qs_noisy_simulation)
     assert abs(mitigated) < 1000
 
-@pytest.mark.parametrize("noise_scaling_method", [fold_gates_at_random, insert_id_layers, fold_global, fold_all])
-@pytest.mark.parametrize("extrapolation_factory", [RichardsonFactory, LinearFactory])
+
+@pytest.mark.parametrize(
+    "noise_scaling_method",
+    [fold_gates_at_random, insert_id_layers, fold_global, fold_all],
+)
+@pytest.mark.parametrize(
+    "extrapolation_factory", [RichardsonFactory, LinearFactory]
+)
 def test_two_stage_zne(noise_scaling_method, extrapolation_factory):
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
@@ -577,7 +582,9 @@ def test_two_stage_zne(noise_scaling_method, extrapolation_factory):
     )
 
     scale_factors = [1, 3, 5]
-    circuits = scaled_circuits(cirq_circuit, scale_factors, noise_scaling_method)
+    circuits = scaled_circuits(
+        cirq_circuit, scale_factors, noise_scaling_method
+    )
 
     assert len(circuits) == len(scale_factors)
     assert all(isinstance(circ, cirq.Circuit) for circ in circuits)
@@ -589,11 +596,18 @@ def test_two_stage_zne(noise_scaling_method, extrapolation_factory):
 
     results = [executor(cirq_circuit) for _ in range(3)]
     extrapolation_method = extrapolation_factory.extrapolate
-    two_stage_zne_res = combine_results(scale_factors, results, extrapolation_method)
+    two_stage_zne_res = combine_results(
+        scale_factors, results, extrapolation_method
+    )
 
     assert isinstance(two_stage_zne_res, float)
 
     np.random.seed(42)
-    zne_res = execute_with_zne(cirq_circuit, executor, factory=extrapolation_factory(scale_factors), scale_noise=noise_scaling_method)
+    zne_res = execute_with_zne(
+        cirq_circuit,
+        executor,
+        factory=extrapolation_factory(scale_factors),
+        scale_noise=noise_scaling_method,
+    )
     # print(zne_res, two_stage_zne_res)
     assert np.isclose(zne_res, two_stage_zne_res)

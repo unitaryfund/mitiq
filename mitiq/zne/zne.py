@@ -12,27 +12,55 @@ from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.zne.inference import Factory, RichardsonFactory
 from mitiq.zne.scaling import fold_gates_at_random
 
+
 def scaled_circuits(
     circuit: QPROGRAM,
     scale_factors: list[float],
     scale_method: Callable[[QPROGRAM, float], QPROGRAM],
 ) -> list[QPROGRAM]:
-    
+    """Estimates the error-mitigated expectation value associated to the
+    input circuit, via the application of zero-noise extrapolation (ZNE).
+
+    Args:
+        circuit: The input circuit to execute with ZNE.
+        scale_factors: A list of ``float``s to scale the circuit with.
+        scale_method: The function for scaling the noise of a quantum circuit.
+            A list of built-in functions can be found in ``mitiq.zne.scaling``.
+
+    Returns:
+        The scaled circuits using the scale_method.
+    """
     circuits = []
     for scale_factor in scale_factors:
         circuits.append(scale_method(circuit, scale_factor))
-    
+
     return circuits
+
 
 def combine_results(
     scale_factors: list[float],
     results: list[float],
     extrapolation_method: Callable[[list[float], list[float]], float],
 ) -> float:
-    
+    """Computes the error-mitigated expectation value associated to the
+    input results from executing the scaled circuits, via the application
+    of zero-noise extrapolation (ZNE).
+
+    Args:
+        scale_factors: A list of ``float``s to scale the circuit with.
+        results: A list of ``float``s that is the result of applying an
+            executor to the scaled circuits.
+        extrapolation_method: The function for scaling the noise of a
+            quantum circuit. A list of built-in functions can be found
+            in ``mitiq.zne.scaling``.
+
+    Returns:
+        The expectation value estimated with ZNE.
+    """
     res = extrapolation_method(scale_factors, results)
 
     return res
+
 
 def execute_with_zne(
     circuit: QPROGRAM,
