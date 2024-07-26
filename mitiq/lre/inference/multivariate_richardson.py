@@ -7,6 +7,7 @@
 :cite:`Russo_2024_LRE`.
 """
 
+import warnings
 from collections import Counter
 from itertools import chain, combinations_with_replacement
 from typing import Any, List, Optional
@@ -189,13 +190,22 @@ def linear_combination_coefficients(
         input_circuit, degree, fold_multiplier, num_chunks
     )
 
+    try:
+        det = np.linalg.det(input_sample_matrix)
+
+    except (RuntimeWarning, det == 0, np.isnan(det)):
+        # taken from https://stackoverflow.com/a/19317237
+        warnings.warn(
+            "To account for overflow error, required determinant of"
+            + "large sample matrix is calculated through"
+            + "`np.linalg.slogdet`."
+        )
+        sign, logdet = np.linalg.slogdet(input_sample_matrix)
+        det = np.exp(logdet)
     coeff_list = []
     for i in range(num_layers):
         sample_matrix_copy = input_sample_matrix.copy()
         sample_matrix_copy[i] = np.array([[1] + [0] * (num_layers - 1)])
-        coeff_list.append(
-            np.linalg.det(sample_matrix_copy)
-            / np.linalg.det(input_sample_matrix)
-        )
+        coeff_list.append(np.linalg.det(sample_matrix_copy) / det)
 
     return coeff_list

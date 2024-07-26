@@ -21,6 +21,19 @@ from mitiq.lre.inference.multivariate_richardson import (
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_num_layers_without_measurements,
     _get_scale_factor_vectors,
+    multivariate_layer_scaling,
+)
+
+qreg1 = LineQubit.range(3)
+test_circuit1 = Circuit(
+    [ops.H.on_each(*qreg1)],
+    [ops.CNOT.on(qreg1[0], qreg1[1])],
+)
+test_circuit2 = Circuit(
+    [ops.H.on_each(*qreg1)],
+    [ops.CNOT.on(qreg1[0], qreg1[1])],
+    [ops.X.on(qreg1[2])],
+    [ops.TOFFOLI.on(*qreg1)],
 )
 
 
@@ -40,7 +53,7 @@ def test_get_variables(test_num_layers, expected_list):
 
 @pytest.mark.parametrize(
     "test_num_layers, test_degree",
-    [(2, 2), (3, 2), (4, 2), (2, 3), (3, 3)],
+    [(2, 2), (3, 2), (4, 2), (2, 3), (3, 3), (6, 7), (20, 8)],
 )
 def test_create_variable_combinations(test_num_layers, test_degree):
     calculated_variables = _create_variable_combinations(
@@ -83,19 +96,6 @@ def test_full_monomial_basis(test_num_layers, test_degree, expected_basis):
     )
 
     assert calculated_basis == expected_basis
-
-
-qreg1 = LineQubit.range(3)
-test_circuit1 = Circuit(
-    [ops.H.on_each(*qreg1)],
-    [ops.CNOT.on(qreg1[0], qreg1[1])],
-)
-test_circuit2 = Circuit(
-    [ops.H.on_each(*qreg1)],
-    [ops.CNOT.on(qreg1[0], qreg1[1])],
-    [ops.X.on(qreg1[2])],
-    [ops.TOFFOLI.on(*qreg1)],
-)
 
 
 @pytest.mark.parametrize(
@@ -229,7 +229,7 @@ def test_square_sample_matrix(test_input, degree, test_fold_multiplier):
     """Check if the sample matrix will always be a square.
 
     The terms in the monomial basis define the total rows of the sample matrix
-    & the generated scale factors for some fold multiplier define the number of
+    & the generated scale factors for a fold multiplier define the number of
     columns.
     """
     num_layers = _get_num_layers_without_measurements(test_input)
@@ -245,3 +245,22 @@ def test_lre_inference_with_chunking():
     chunked_sample_matrix_dim = sample_matrix(circ, 2, 2, 4).shape
     non_chunked_sample_matrix_dim = sample_matrix(circ, 2, 2).shape
     assert chunked_sample_matrix_dim[0] < non_chunked_sample_matrix_dim[0]
+
+
+def test_sample_matrix_numerical_stability():
+    large_circuit = Circuit([ops.H.on(LineQubit(i)) for i in range(10000)])
+    matrix = sample_matrix(large_circuit, 5, 10000)
+    assert np.isfinite(matrix).all()
+    assert not np.isnan(matrix).any()
+
+
+@pytest.mark.parametrize("num_chunks", [None, 2, 3])
+def test_eval(num_chunks):
+    coeffs = linear_combination_coefficients(
+        7 * test_circuit2, 2, 2, num_chunks
+    )
+    multiple_scaled_circuits = multivariate_layer_scaling(
+        7 * test_circuit2, 2, 2, num_chunks
+    )
+    assert len(coeffs) == len(multiple_scaled_circuits)
+    assert np.isclose(sum(coeffs), 1.0)  # Coefficients should sum to 1
