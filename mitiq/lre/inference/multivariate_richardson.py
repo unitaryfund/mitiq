@@ -74,7 +74,17 @@ def full_monomial_basis(num_layers: int, degree: int) -> List[str]:
         Monomial basis terms required for multivariate
             extrapolation up to max degree
     """
-    variable_combinations = _create_variable_combinations(num_layers, degree)
+
+    variables = [f"λ_{i}" for i in range(1, num_layers + 1)]
+    variable_combinations = []
+    for i in range(degree, -1, -1):
+        # Generate combinations for the current degree.
+        # Ranges from max degree, max degree -1, ..., 0.
+        combos = list(combinations_with_replacement(variables, i))
+        variable_combinations.append(combos)
+
+    # Return a flattened list.
+    variable_combinations = list(chain(*variable_combinations))
 
     monomial_basis = []
     for combo in variable_combinations:
@@ -189,11 +199,9 @@ def linear_combination_coefficients(
     input_sample_matrix = sample_matrix(
         input_circuit, degree, fold_multiplier, num_chunks
     )
-
     try:
         det = np.linalg.det(input_sample_matrix)
-
-    except (RuntimeWarning, det == 0, np.isnan(det)):
+    except RuntimeWarning:
         # taken from https://stackoverflow.com/a/19317237
         warnings.warn(
             "To account for overflow error, required determinant of"
@@ -202,6 +210,18 @@ def linear_combination_coefficients(
         )
         sign, logdet = np.linalg.slogdet(input_sample_matrix)
         det = np.exp(logdet)
+
+    if np.isinf(det):
+        raise ValueError(
+            "Determinant of sample matrix cannot be calculated as"
+            + "the matrix is too large. Consider chunking your"
+            + " input circuit. "
+        )
+    if det == 0.0:
+        raise ZeroDivisionError(
+            "The determinant of the sample matrix cannot be 0."
+        )
+
     coeff_list = []
     for i in range(num_layers):
         sample_matrix_copy = input_sample_matrix.copy()
