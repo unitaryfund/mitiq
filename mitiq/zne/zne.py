@@ -18,8 +18,8 @@ def scaled_circuits(
     scale_factors: list[float],
     scale_method: Callable[[QPROGRAM, float], QPROGRAM],
 ) -> list[QPROGRAM]:
-    """Estimates the error-mitigated expectation value associated to the
-    input circuit, via the application of zero-noise extrapolation (ZNE).
+    """Given a circuit, scale_factors and a scale_method, outputs a list
+       of circuits that will be used in ZNE.
 
     Args:
         circuit: The input circuit to execute with ZNE.
