@@ -49,6 +49,7 @@ jobs:
 
       - name: Build and test Sphinx docs
         run: |
+          export PYQRACK_SHARED_LIB_PATH="/opt/hostedtoolcache/Python/3.12.4/x64/lib/python3.12/site-packages/pyqrack/qrack_system/qrack_lib/libqrack_pinvoke.so"
           export BQSKIT_DOC_CHECK_OVERRIDE=1
           export PYDEVD_DISABLE_FILE_VALIDATION=1
           make docs
