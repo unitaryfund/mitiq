@@ -52,28 +52,30 @@ the circuit on a noisy simulator, and returns the probability of the ground
 state. See the [Executors](executors.md) section for more information on
 how to define more advanced executors.
 
-During execution by the simulator, a coherent error is introduced in the circuit
-by applying a rotation around the X-axis (Rx gate) to each output of any 2-qubit gate.
+During execution by the simulator, a coherent error is introduced by applying a 
+rotation around the X-axis (Rx gate) to each output of any 2-qubit gate in the circuit of interest.
+
+For the sake of this example executed by a simulator, we set the noise level to be proportional to the angle of the Rx rotation.
 
 This noise model is well-suited to highlight the effect of Pauli Twirling,
-which is a technique that transforms coherent noise into incoherent noise. The modified noise channel is described using Paulis.
-
-For the sake of this example, we define the noise level as the angle of the Rx rotation.
+which is a technique that transforms coherent noise into incoherent noise.
 
 ```{code-cell} ipython3
+from numpy import pi
 from cirq import CircuitOperation, CXPowGate, CZPowGate, DensityMatrixSimulator, Rx
 from cirq.devices.noise_model import GateSubstitutionNoiseModel
 
-def get_noise_model(x_rotation: float) -> GateSubstitutionNoiseModel:
+def get_noise_model(noise_level: float) -> GateSubstitutionNoiseModel:
     """Substitute each CZ and CNOT gate in the circuit
     with the gate itself followed by an Rx rotation on the output qubits.
     """
+    rads = pi / 2 * noise_level
     def noisy_c_gate(op):
         if isinstance(op.gate, (CZPowGate, CXPowGate)):
             return CircuitOperation(
                 Circuit(
                     op.gate.on(*op.qubits), 
-                    Rx(rads=x_rotation).on_each(op.qubits),
+                    Rx(rads=rads).on_each(op.qubits),
                 ).freeze())
         return op
 
@@ -82,7 +84,7 @@ def get_noise_model(x_rotation: float) -> GateSubstitutionNoiseModel:
 def execute(circuit: Circuit, noise_level: float):
     """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit."""
     return (
-        DensityMatrixSimulator(noise=get_noise_model(x_rotation=noise_level))
+        DensityMatrixSimulator(noise=get_noise_model(noise_level=noise_level))
         .simulate(circuit)
         .final_density_matrix[0, 0]
         .real
@@ -109,6 +111,10 @@ PT can be applied by first generating twirled variants of the circuit with the f
 {func}`.generate_pauli_twirl_variants` from the `mitiq.pt` module, 
 and then averaging over the results obtained by executing those variants.
 
+The more variants are generated and averaged over, the more visible the results of PT are.
+In this example we generate 5 twirled variants of the circuit, by setting the  `num_circuits` 
+argument of the function {func}`.generate_pauli_twirl_variants` (default value is 10.)
+
 ```{code-cell} ipython3
 from functools import partial
 import numpy as np
@@ -116,7 +122,8 @@ from mitiq.executor.executor import Executor
 from mitiq.pt import generate_pauli_twirl_variants
 
 # Generate twirled circuits
-twirled_circuits = generate_pauli_twirl_variants(circuit)
+NUM_TWIRLED_VARIANTS = 5
+twirled_circuits = generate_pauli_twirl_variants(circuit, num_circuits=NUM_TWIRLED_VARIANTS)
 # Average results executed over twirled circuits
 pt_vals = Executor(partial(execute, noise_level=NOISE_LEVEL)).evaluate(twirled_circuits)
 mitigated_result = np.average(pt_vals)
