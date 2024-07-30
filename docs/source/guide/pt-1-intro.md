@@ -14,8 +14,7 @@ kernelspec:
 # How do I use PT?
 
 ```{admonition} Warning:
-This users guide is still under construction and may change in the near future
-after some utility functions are introduced. 
+This user guide is still under construction and may change in the near future. 
 ```
 
 As with all techniques, PT is compatible with any frontend supported by Mitiq:
@@ -118,7 +117,7 @@ argument of the function {func}`.generate_pauli_twirl_variants` (default value i
 ```{code-cell} ipython3
 from functools import partial
 import numpy as np
-from mitiq.executor.executor import Executor
+from mitiq import Executor
 from mitiq.pt import generate_pauli_twirl_variants
 
 # Generate twirled circuits
