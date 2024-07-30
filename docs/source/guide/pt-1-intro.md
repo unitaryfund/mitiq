@@ -31,7 +31,7 @@ In this first section, we see how to use PT in Mitiq, starting from a circuit of
 +++
 
 ## Problem setup
-We first define the circuit, which in this example contains Hadamard, C-NOT, and C-Z gates.
+We first define the circuit, which in this example contains Hadamard (H), CNOT, and CZ gates.
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, CZ, CNOT, H
@@ -56,7 +56,7 @@ During execution by the simulator, a coherent error is introduced in the circuit
 by applying a rotation around the X-axis (Rx gate) to each output of any 2-qubit gate.
 
 This noise model is well-suited to highlight the effect of Pauli Twirling,
-which is a technique that turns coherent noise into incoherent Pauli channels.
+which is a technique that transforms coherent noise into incoherent noise. The modified noise channel is described using Paulis.
 
 For the sake of this example, we define the noise level as the angle of the Rx rotation.
 
@@ -65,8 +65,8 @@ from cirq import CircuitOperation, CXPowGate, CZPowGate, DensityMatrixSimulator,
 from cirq.devices.noise_model import GateSubstitutionNoiseModel
 
 def get_noise_model(x_rotation: float) -> GateSubstitutionNoiseModel:
-    """Substitute each C-Z and C-NOT gate in the circuit 
-    with the gate itself followed by an Rx rotation on the output qubits
+    """Substitute each CZ and CNOT gate in the circuit
+    with the gate itself followed by an Rx rotation on the output qubits.
     """
     def noisy_c_gate(op):
         if isinstance(op.gate, (CZPowGate, CXPowGate)):
@@ -80,7 +80,7 @@ def get_noise_model(x_rotation: float) -> GateSubstitutionNoiseModel:
     return GateSubstitutionNoiseModel(noisy_c_gate)
 
 def execute(circuit: Circuit, noise_level: float):
-    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit"""
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit."""
     return (
         DensityMatrixSimulator(noise=get_noise_model(x_rotation=noise_level))
         .simulate(circuit)
