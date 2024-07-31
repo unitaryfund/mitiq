@@ -141,7 +141,6 @@ def cirq_simulate(circuit: cirq.Circuit) -> np.ndarray:
 
 With the different executor functions defined for running the Qrack, Qiskit, and Cirq simulators, the `mitiq.cdr.execute_with_cdr` function can now be called.
 
-Before getting the results from using CDR, `cirq_simulate` is called to get the ideal expectation value from the circuit. Next, the circuit is run on the fake Qiskit backend, using `qiskit_noisy` in order to obtain an unmitigated expectation value for `00`. Finally, `execute_with_cdr` is called to obtain the mitigated expectation value.
 
 +++
 
