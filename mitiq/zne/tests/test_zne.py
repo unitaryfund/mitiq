@@ -609,5 +609,4 @@ def test_two_stage_zne(noise_scaling_method, extrapolation_factory):
         factory=extrapolation_factory(scale_factors),
         scale_noise=noise_scaling_method,
     )
-    # print(zne_res, two_stage_zne_res)
     assert np.isclose(zne_res, two_stage_zne_res)
