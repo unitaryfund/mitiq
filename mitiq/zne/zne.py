@@ -38,7 +38,7 @@ def scaled_circuits(
 
 
 def combine_results(
-    scale_factors: list[float],
+    scale_factors: Sequence[float],
     results: list[float],
     extrapolation_method: Callable[[list[float], list[float]], float],
 ) -> float:
