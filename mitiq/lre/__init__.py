@@ -8,7 +8,7 @@
 from mitiq.lre.multivariate_scaling.layerwise_folding import multivariate_layer_scaling
 
 from mitiq.lre.inference.multivariate_richardson import (
-    full_monomial_basis,
+    full_monomial_basis_terms,
     linear_combination_coefficients,
     sample_matrix,
 )

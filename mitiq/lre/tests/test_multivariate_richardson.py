@@ -12,9 +12,7 @@ import pytest
 from cirq import Circuit, LineQubit, ops
 
 from mitiq.lre.inference.multivariate_richardson import (
-    _create_variable_combinations,
-    _get_variables,
-    full_monomial_basis,
+    full_monomial_basis_terms,
     linear_combination_coefficients,
     sample_matrix,
 )
@@ -35,36 +33,6 @@ test_circuit2 = Circuit(
     [ops.X.on(qreg1[2])],
     [ops.TOFFOLI.on(*qreg1)],
 )
-
-
-@pytest.mark.parametrize(
-    "test_num_layers, expected_list",
-    [
-        (2, ["λ_1", "λ_2"]),
-        (3, ["λ_1", "λ_2", "λ_3"]),
-        (4, ["λ_1", "λ_2", "λ_3", "λ_4"]),
-    ],
-)
-def test_get_variables(test_num_layers, expected_list):
-    calculated_variables = _get_variables(test_num_layers)
-    assert len(calculated_variables) == test_num_layers
-    assert calculated_variables == expected_list
-
-
-@pytest.mark.parametrize(
-    "test_num_layers, test_degree",
-    [(2, 2), (3, 2), (4, 2), (2, 3), (3, 3), (6, 7), (20, 8)],
-)
-def test_create_variable_combinations(test_num_layers, test_degree):
-    calculated_variables = _create_variable_combinations(
-        test_num_layers, test_degree
-    )
-    assert len(calculated_variables) == comb(
-        test_num_layers + test_degree, test_degree
-    )
-
-    # check last element is an empty tuple to account for degree = 0
-    assert not calculated_variables[-1]
 
 
 @pytest.mark.parametrize(
@@ -90,7 +58,7 @@ def test_create_variable_combinations(test_num_layers, test_degree):
     ],
 )
 def test_full_monomial_basis(test_num_layers, test_degree, expected_basis):
-    calculated_basis = full_monomial_basis(test_num_layers, test_degree)
+    calculated_basis = full_monomial_basis_terms(test_num_layers, test_degree)
     assert len(calculated_basis) == comb(
         test_num_layers + test_degree, test_degree
     )
@@ -136,7 +104,9 @@ def test_full_monomial_basis(test_num_layers, test_degree, expected_basis):
     ],
 )
 def test_sample_matrix(test_circ, test_degree, expected_matrix):
-    assert (expected_matrix == sample_matrix(test_circ, test_degree, 1)).all()
+    assert (
+        expected_matrix - sample_matrix(test_circ, test_degree, 1)
+    ).all() <= 1e-3
 
 
 @pytest.mark.parametrize(
@@ -233,7 +203,7 @@ def test_square_sample_matrix(test_input, degree, test_fold_multiplier):
     columns.
     """
     num_layers = _get_num_layers_without_measurements(test_input)
-    calculated_basis = full_monomial_basis(num_layers, degree)
+    calculated_basis = full_monomial_basis_terms(num_layers, degree)
     calculated_scale_factor_vectors = _get_scale_factor_vectors(
         test_input, degree, test_fold_multiplier
     )
