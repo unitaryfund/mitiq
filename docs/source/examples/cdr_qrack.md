@@ -158,7 +158,6 @@ print(f"Unmitigated expectation value from Qiskit Fake backend: {unmitigated_exp
 mitigated_expval = cdr.execute_with_cdr(
     circuit,
     qiskit_noisy,
-    observable=None,
     simulator=qrack_simulate,
     seed=0,
 )
