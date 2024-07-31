@@ -49,8 +49,8 @@ jobs:
 
       - name: Build and test Sphinx docs
         run: |
-          apt update
-          apt install ocl-icd-opencl-dev
+          sudo apt update
+          sudo apt install ocl-icd-opencl-dev
           export BQSKIT_DOC_CHECK_OVERRIDE=1
           export PYDEVD_DISABLE_FILE_VALIDATION=1
           make docs
