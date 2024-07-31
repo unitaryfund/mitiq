@@ -10,7 +10,7 @@
 import warnings
 from collections import Counter
 from itertools import chain, combinations_with_replacement
-from typing import Any, List, Optional, Dict
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from cirq import Circuit
@@ -21,8 +21,9 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
 )
 
 
-def _full_monomial_basis_term_exponents(num_layers: int, degree: int) -> List[
-    Dict[int, int]]:
+def _full_monomial_basis_term_exponents(
+    num_layers: int, degree: int
+) -> List[Dict[int, int]]:
     """Exponents of monomial terms required to create the sample matrix."""
     variables = [i for i in range(1, num_layers + 1)]
     variable_combinations = []
@@ -70,7 +71,7 @@ def full_monomial_basis_terms(num_layers: int, degree: int) -> List[str]:
         variable_combinations.append(combos)
 
     # Flatten the list
-    variable_combinations = list(chain(*variable_combinations))
+    variable_combinations = list(chain(*variable_combinations))  # type: ignore[arg-type]
 
     monomial_basis = []
     for combo in variable_combinations:
@@ -82,7 +83,7 @@ def full_monomial_basis_terms(num_layers: int, degree: int) -> List[str]:
             if count > 1:
                 monomial_parts.append(f"{var}**{count}")
             else:
-                monomial_parts.append(var)
+                monomial_parts.append(var)  # type: ignore[arg-type]
         monomial = "*".join(monomial_parts)
         # Handle the case where degree is 0
         # the tuple in variable_combinations is empty
@@ -168,7 +169,7 @@ def sample_matrix(
         val_i = list(i.values())
         variable_exp_list.append(val_i)
 
-    for rows, i in enumerate(scale_factor_vectors[1:], start=1):
+    for rows, i in enumerate(scale_factor_vectors[1:], start=1):  # type: ignore[assignment]
         for cols, j in enumerate(variable_exp_list, start=1):
             evaluated_terms = []
             for base, exp in zip(list(i), j):
