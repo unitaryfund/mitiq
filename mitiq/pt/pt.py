@@ -66,7 +66,7 @@ PENNYLANE_NOISE_OP = {
 }
 
 
-def pauli_twirl_circuit(
+def generate_pauli_twirl_variants(
     circuit: QPROGRAM,
     num_circuits: int = 10,
     noise_name: Optional[str] = None,
@@ -79,19 +79,14 @@ def pauli_twirl_circuit(
     :cite:`Saki_2023_arxiv`.
 
     Args:
-        circuit: The input circuit to execute with twirling.
-        num_circuits: Number of circuits to be twirled, and averaged.
+        circuit: The input circuit on which twirling is applied.
+        num_circuits: Number of twirled variants of the circuits.
         noise_name: Name of the noisy operator acting on CNOT and CZ gates.
-        See warning.
-
-    Warning:
-        If this function is executed with a simulator backend, it is
-        necessary to use the `noise_op` argument to apply noise on CNOT
-        and CZ gates. Otherwise, the twirled circuits will not wrap the
-        noise on these gates.
+            This is useful if the user requires a noisy circuit after twirling.
+            Values allowed: ["bit-flip", "depolarize"]
 
     Returns:
-        The expectation value estimated with Pauli twirling.
+        A list of `num_circuits` twirled versions of `circuit`
     """
     CNOT_twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
     twirled_circuits = [
