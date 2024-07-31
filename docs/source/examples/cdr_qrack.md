@@ -15,7 +15,6 @@ kernelspec:
 
 In this tutorial, Clifford Data Regression (CDR) is used with [Qrack](https://qrack.readthedocs.io/en/latest/) and a Qiskit fake backend. For more detailed information about CDR, check the [Users Guide](https://mitiq.readthedocs.io/en/stable/guide/cdr.html) 
 
-While the Users Guide and the [Cirq: 1D Ising Simultation](https://mitiq.readthedocs.io/en/stable/examples/quantum_simulation_1d_ising.html) use density matrices, this example uses estimation values.
 
 +++
 
