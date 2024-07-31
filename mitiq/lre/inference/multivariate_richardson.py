@@ -9,12 +9,13 @@
 
 import warnings
 from collections import Counter
-from itertools import chain, combinations_with_replacement
+from itertools import combinations_with_replacement
 from typing import Any, Dict, List, Optional
 
 import numpy as np
 from cirq import Circuit
 from numpy.typing import NDArray
+from sympy import Symbol
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_scale_factor_vectors,
@@ -62,37 +63,26 @@ def full_monomial_basis_terms(num_layers: int, degree: int) -> List[str]:
             extrapolation up to max degree
     """
 
-    variables = [f"λ_{i}" for i in range(1, num_layers + 1)]
-    variable_combinations = []
-    for i in range(degree, -1, -1):
-        # Generate combinations for the current degree.
-        # Ranges from max degree, max degree -1, ..., 0.
-        combos = list(combinations_with_replacement(variables, i))
-        variable_combinations.append(combos)
+    var_exp = _full_monomial_basis_term_exponents(num_layers, degree)
+    num_var = len(var_exp[0])
+    var_exp_sorted = []
 
-    # Flatten the list
-    variable_combinations = list(chain(*variable_combinations))  # type: ignore[arg-type]
+    for i in var_exp:
+        var_exp_sorted.append(dict(sorted(i.items())))
 
-    monomial_basis = []
-    for combo in variable_combinations:
-        monomial_parts = []
-        counts = Counter(combo)
-        # Ensure variables are processed in lexicographical order
-        for var in sorted(counts.keys()):
-            count = counts[var]
-            if count > 1:
-                monomial_parts.append(f"{var}**{count}")
+    str_var = [Symbol(f"λ_{i}") for i in range(1, num_var + 1)]
+
+    var_prod = []
+    for i in var_exp_sorted:
+        var_prod_i = []
+        for j in range(1, num_var + 1):
+            if i[j] > 0:
+                var_prod_i.append((str_var[j - 1]) ** (i[j]))
             else:
-                monomial_parts.append(var)  # type: ignore[arg-type]
-        monomial = "*".join(monomial_parts)
-        # Handle the case where degree is 0
-        # the tuple in variable_combinations is empty
-        if not monomial:
-            monomial = "1"
-        monomial_basis.append(monomial)
-    # "1" should be the first monomial (degree = 0).
-    # max degree should be the last term
-    return monomial_basis[::-1]
+                var_prod_i.append(1)
+        var_prod.append(var_prod_i)
+
+    return [np.prod(item) for item in var_prod]
 
 
 def sample_matrix(

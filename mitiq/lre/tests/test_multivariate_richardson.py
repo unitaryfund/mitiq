@@ -10,6 +10,7 @@ from math import comb
 import numpy as np
 import pytest
 from cirq import Circuit, LineQubit, ops
+from sympy import Symbol
 
 from mitiq.lre.inference.multivariate_richardson import (
     full_monomial_basis_terms,
@@ -38,21 +39,33 @@ test_circuit2 = Circuit(
 @pytest.mark.parametrize(
     "test_num_layers, test_degree, expected_basis",
     [
-        (2, 2, ["1", "λ_2", "λ_1", "λ_2**2", "λ_1*λ_2", "λ_1**2"]),
+        (1, 1, [1, Symbol("λ_1")]),
+        (
+            2,
+            2,
+            [
+                1,
+                Symbol("λ_2"),
+                Symbol("λ_1"),
+                Symbol("λ_2") ** 2,
+                Symbol("λ_1") * Symbol("λ_2"),
+                Symbol("λ_1") ** 2,
+            ],
+        ),
         (
             3,
             2,
             [
-                "1",
-                "λ_3",
-                "λ_2",
-                "λ_1",
-                "λ_3**2",
-                "λ_2*λ_3",
-                "λ_2**2",
-                "λ_1*λ_3",
-                "λ_1*λ_2",
-                "λ_1**2",
+                1,
+                Symbol("λ_3"),
+                Symbol("λ_2"),
+                Symbol("λ_1"),
+                Symbol("λ_3") ** 2,
+                Symbol("λ_2") * Symbol("λ_3"),
+                Symbol("λ_2") ** 2,
+                Symbol("λ_1") * Symbol("λ_3"),
+                Symbol("λ_1") * Symbol("λ_2"),
+                Symbol("λ_1") ** 2,
             ],
         ),
     ],
