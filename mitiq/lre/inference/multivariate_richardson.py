@@ -201,18 +201,20 @@ def linear_combination_coefficients(
     )
     try:
         det = np.linalg.det(input_sample_matrix)
-    except RuntimeWarning:
+    except RuntimeWarning:  # pragma: no cover
         # taken from https://stackoverflow.com/a/19317237
-        warnings.warn(
+        warnings.warn(  # pragma: no cover
             "To account for overflow error, required determinant of "
             + "large sample matrix is calculated through "
             + "`np.linalg.slogdet`."
         )
-        sign, logdet = np.linalg.slogdet(input_sample_matrix)
-        det = np.exp(logdet)
+        sign, logdet = np.linalg.slogdet(  # pragma: no cover
+            input_sample_matrix
+        )
+        det = np.exp(logdet)  # pragma: no cover
 
     if np.isinf(det):
-        raise ValueError(
+        raise ValueError(  # pragma: no cover
             "Determinant of sample matrix cannot be calculated as "
             + "the matrix is too large. Consider chunking your"
             + " input circuit. "
