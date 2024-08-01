@@ -8,9 +8,14 @@
 import functools
 from typing import List
 
+import braket.circuits
 import cirq
 import numpy as np
+import pennylane.circuit_graph
+import pennylane.tape
+import pyquil.quil
 import pytest
+import qibo
 import qiskit
 import qiskit.circuit
 from qiskit_aer import AerSimulator
@@ -48,6 +53,14 @@ from mitiq.zne.scaling import (
     insert_id_layers,
 )
 from mitiq.zne.zne import combine_results, scaled_circuits
+
+from mitiq.interface.mitiq_qiskit import to_qiskit
+from mitiq.interface.mitiq_braket import to_braket
+from mitiq.interface.mitiq_pennylane import to_pennylane
+from mitiq.interface.mitiq_pyquil import to_pyquil
+from mitiq.interface.mitiq_qibo import to_qibo
+
+
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -564,7 +577,6 @@ def test_execute_zne_on_qiskit_circuit_with_QFT():
     mitigated = execute_with_zne(circuit, qs_noisy_simulation)
     assert abs(mitigated) < 1000
 
-
 @pytest.mark.parametrize(
     "noise_scaling_method",
     [fold_gates_at_random, insert_id_layers, fold_global, fold_all],
@@ -572,22 +584,41 @@ def test_execute_zne_on_qiskit_circuit_with_QFT():
 @pytest.mark.parametrize(
     "extrapolation_factory", [RichardsonFactory, LinearFactory]
 )
-def test_two_stage_zne(noise_scaling_method, extrapolation_factory):
+@pytest.mark.parametrize(
+    "to_frontend", [None, to_qiskit, to_braket, to_pennylane, to_pyquil, to_qibo]
+)
+def test_two_stage_zne(noise_scaling_method, extrapolation_factory, to_frontend):
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
         cirq.H.on_each(qreg),
         cirq.CNOT(*qreg),
         cirq.CNOT(*qreg),
         cirq.H.on_each(qreg),
-    )
+    )  
+    if to_frontend != None:
+        frontend_circuit = to_frontend(cirq_circuit)
+    else:
+        frontend_circuit = cirq_circuit
 
     scale_factors = [1, 3, 5]
-    circuits = scaled_circuits(
-        cirq_circuit, scale_factors, noise_scaling_method
+    frontend_circuits = scaled_circuits(
+        frontend_circuit, scale_factors, noise_scaling_method
     )
 
-    assert len(circuits) == len(scale_factors)
-    assert all(isinstance(circ, cirq.Circuit) for circ in circuits)
+    assert len(frontend_circuits) == len(scale_factors)
+
+    if to_frontend == to_braket:
+        assert all(isinstance(circ, braket.circuits.Circuit) for circ in frontend_circuits)
+    elif to_frontend == to_qiskit:
+        assert all(isinstance(circ, qiskit.QuantumCircuit) for circ in frontend_circuits)
+    elif to_frontend == to_pennylane:
+        assert all(isinstance(circ, pennylane.tape.QuantumTape) for circ in frontend_circuits)
+    elif to_frontend == to_pyquil:
+        assert all(isinstance(circ, pyquil.quil.Program) for circ in frontend_circuits)
+    elif to_frontend == to_qibo:
+        assert all(isinstance(circ, qibo.Circuit) for circ in frontend_circuits)
+    else:
+        assert all(isinstance(circ, cirq.Circuit) for circ in frontend_circuits)
 
     np.random.seed(42)
 
