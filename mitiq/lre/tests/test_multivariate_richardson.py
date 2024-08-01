@@ -170,6 +170,19 @@ def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
         <= 1e-3
     )
 
+    # check all the coefficients sum up to 1 or approximately close to 1
+    assert (
+        abs(
+            1.0
+            - np.sum(
+                linear_combination_coefficients(
+                    test_circ, test_degree, test_fold_multiplier
+                )
+            )
+        )
+        <= 1e-2
+    )
+
 
 @pytest.mark.parametrize(
     "test_input, test_degree, test_fold_multiplier, error_msg",
