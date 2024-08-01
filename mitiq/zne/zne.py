@@ -6,7 +6,7 @@
 """High-level zero-noise extrapolation tools."""
 
 from functools import wraps
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Sequence, Union
 
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.zne.inference import Factory, RichardsonFactory
