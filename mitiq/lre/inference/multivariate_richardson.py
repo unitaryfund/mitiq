@@ -35,12 +35,15 @@ def _full_monomial_basis_term_exponents(
     variable_exp_counter = [
         dict(Counter(term)) for term in variable_combinations
     ]
-
+    # make sure all variable numbers are used as keys
+    # if something is not in the created dictionary, add the key and exponent
+    # combination. Exponent is 0 in this case.
     for combo_key in variable_exp_counter:
         for j in variables:
             if j not in combo_key:
                 combo_key[j] = 0
-
+    # return a dictionary with variable number as the key with exponent values
+    # first term is the 0 degree term's exponent
     return variable_exp_counter[::-1]
 
 
@@ -147,15 +150,13 @@ def sample_matrix(
 
     # sort dict
     variable_exp_wout_0_degree_list = []
-
     for i in variable_exp_wout_0_degree:
         variable_exp_wout_0_degree_list.append(dict(sorted(i.items())))
+    variable_exp_no_0_degree = variable_exp_wout_0_degree_list
 
-    variable_exp_w_0_degree = variable_exp_wout_0_degree_list
-    # create a list of dict values
-
+    # create a list of dict values (just the exponents)
     variable_exp_list = []
-    for i in variable_exp_w_0_degree:
+    for i in variable_exp_no_0_degree:
         val_i = list(i.values())
         variable_exp_list.append(val_i)
 
@@ -163,7 +164,10 @@ def sample_matrix(
         for cols, j in enumerate(variable_exp_list, start=1):
             evaluated_terms = []
             for base, exp in zip(list(i), j):
+                # raise scale factor value by the exponent dict value
                 evaluated_terms.append(base**exp)
+            # multiply both elements in the list to create an evaluated
+            # monomial term
             sample_matrix[rows, cols] = np.prod(evaluated_terms)
 
     return sample_matrix

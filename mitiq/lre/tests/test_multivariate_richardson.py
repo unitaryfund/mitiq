@@ -13,6 +13,7 @@ from cirq import Circuit, LineQubit, ops
 from sympy import Symbol
 
 from mitiq.lre.inference.multivariate_richardson import (
+    _full_monomial_basis_term_exponents,
     full_monomial_basis_terms,
     linear_combination_coefficients,
     sample_matrix,
@@ -34,6 +35,59 @@ test_circuit2 = Circuit(
     [ops.X.on(qreg1[2])],
     [ops.TOFFOLI.on(*qreg1)],
 )
+
+
+@pytest.mark.parametrize(
+    "test_num_layers, test_degree, expected",
+    [
+        (1, 1, [{1: 0}, {1: 1}]),
+        (
+            2,
+            2,
+            [
+                {1: 0, 2: 0},
+                {2: 1, 1: 0},
+                {1: 1, 2: 0},
+                {2: 2, 1: 0},
+                {1: 1, 2: 1},
+                {1: 2, 2: 0},
+            ],
+        ),
+        (
+            3,
+            2,
+            [
+                {1: 0, 2: 0, 3: 0},
+                {3: 1, 1: 0, 2: 0},
+                {2: 1, 1: 0, 3: 0},
+                {1: 1, 2: 0, 3: 0},
+                {3: 2, 1: 0, 2: 0},
+                {2: 1, 3: 1, 1: 0},
+                {2: 2, 1: 0, 3: 0},
+                {1: 1, 3: 1, 2: 0},
+                {1: 1, 2: 1, 3: 0},
+                {1: 2, 2: 0, 3: 0},
+            ],
+        ),
+    ],
+)
+def test_basis_exp(test_num_layers, test_degree, expected):
+    assert (
+        _full_monomial_basis_term_exponents(test_num_layers, test_degree)
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "test_num_layers, test_degree",
+    [(1, 1), (2, 2), (3, 2), (100, 2), (10, 4)],
+)
+def test_basis_exp_len(test_num_layers, test_degree):
+    calc_dict = _full_monomial_basis_term_exponents(
+        test_num_layers, test_degree
+    )
+    for i in calc_dict:
+        assert len(i) == test_num_layers
 
 
 @pytest.mark.parametrize(
