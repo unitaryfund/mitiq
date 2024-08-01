@@ -1,7 +1,29 @@
 # Changelog
 
 ## Version 0.39.0
-_In development_
+
+<!-- ([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.38.0...v0.39.0)) -->
+
+_tbd_
+
+### Highlights
+
+#### 📓 Documentation
+
+- Complete first section of Pauli Twirling user guide (#2454) [@cosenal]
+- Hide primary sidebar from certain pages of the documentation (#2424) [@purva-thakre]
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- Separate docs build workflow (#2441) [@purva-thakre]
+- clean and git ignore all coverage reports (#2443) [@cosenal]
+- Ignore _about.py in pytest coverage (#2379) [@purva-thakre]
+- use date to make version unique for testpypi uploads (#2436) [@natestemen]
+
+#### 📦 Dependency Updates
+
+- Update scipy requirement from <=1.13.1,>=1.10.1 to >=1.10.1,<=1.14.0 (#2420) [@dependabot]
+
 
 ## Version 0.38.0 
 
