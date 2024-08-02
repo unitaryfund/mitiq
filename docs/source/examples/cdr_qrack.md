@@ -183,3 +183,5 @@ print(f"Mitigated Error:             {mitigated_error:.3f}")
 improvement_factor = unmitigated_error / mitigated_error
 print(f"Improvement factor with CDR: {improvement_factor:.2f}")
 ```
+
+To learn more about CDR, please check the [User Guide](../guide/cdr.md) or the [ZNE and CDR with Cirq: 1D Ising Simulation](./quantum_simulation_1d_ising.md) example. If you have any questions, please do not hesitate to open a [Github discussion](https://github.com/unitaryfund/mitiq/discussions) or reach out to the Mitiq team on [Discord](http://discord.unitary.fund).
