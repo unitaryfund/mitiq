@@ -1,5 +1,6 @@
 ---
 jupytext:
+  formats: ipynb,md:myst
   text_representation:
     extension: .md
     format_name: myst
@@ -70,7 +71,13 @@ circuit = 5 * circuit
 print(circuit)
 ```
 
-## Qrack Near-Clifford Simulator
+## Devices and Near-Clifford Simulator
+
+During CDR, near-Clifford representations of the original circuit are generated. Those near-Clifford representations are run with a near-Clifford simulator (Qrack Near-Clifford Simulator) and also on the quantum device (or noisy simulator, like Qiskit Fake Backend.) In this example, we also want to show how the unmitigated and mitigated results compare to the exact results, so we will use another simulator (Cirq Simulator) to generate the ideal results. 
+
++++
+
+### Qrack Near-Clifford Simulator
 
 Especially when using CDR at scale, it is important to use an efficient Near-Clifford circuit simulator. In this example, Qrack will be configured and used as the Near-Clifford Simulator. The `qrack_simulate` method accepts a Cirq circuit and the number of shots as parameters. The Qrack simulator is then called and the expectation value for `00` is returned.
 
@@ -100,7 +107,7 @@ def qrack_simulate(circuit: cirq.Circuit, shots=1000) -> float:
     return results[0]
 ```
 
-## Qiskit Fake Backend
+### Qiskit Fake Backend
 
 CDR requires the use of a quantum device or a noisy simulator. The near-Clifford circuits that are generated from the original circuit are executed on the quantum device or noisy simulator in order to compare against the simulated results.
 
@@ -127,7 +134,7 @@ def qiskit_noisy(circuit: cirq.Circuit, shots=1000):
     return ret_val
 ```
 
-## Cirq Simulator for exact result
+### Cirq Simulator for exact result
 
 The `compute_density_matrix` is the Cirq density matrix simulator with a Mitiq wrapper. It is used to obtain the exact `00` expectation value. This is then used to determine the accuracy of the mitigated and unmitigated reuslts.
 
