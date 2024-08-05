@@ -4,14 +4,16 @@
 
 <!-- ([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.38.0...v0.39.0)) -->
 
-_tbd_
-
 ### Highlights
+
+We've made updates to our documentation, beginning with the completion of the first section of the Pauli Twirling user guide, which offers a comprehensive introduction to this feature.
+Additionally, we've added a new tutorial on CDR (Clifford Data Regression) with [Qrack](https://github.com/unitaryfund/qrack/), providing users with an in-depth look at how to integrate these tools effectively.
 
 #### 📓 Documentation
 
 - Complete first section of Pauli Twirling user guide (#2454) [@cosenal]
 - Hide primary sidebar from certain pages of the documentation (#2424) [@purva-thakre]
+- CDR Tutorial with Qrack (#2451) [@bdg221]
 
 #### 🧑🏽‍💻 Developer Improvements
 
@@ -23,7 +25,6 @@ _tbd_
 #### 📦 Dependency Updates
 
 - Update scipy requirement from <=1.13.1,>=1.10.1 to >=1.10.1,<=1.14.0 (#2420) [@dependabot]
-
 
 ## Version 0.38.0 
 
