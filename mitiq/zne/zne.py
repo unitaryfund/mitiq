@@ -39,8 +39,8 @@ def scaled_circuits(
 
 def combine_results(
     scale_factors: Sequence[float],
-    results: list[float],
-    extrapolation_method: Callable[[list[float], list[float]], float],
+    results: Sequence[float],
+    extrapolation_method: Callable[[Sequence[float], Sequence[float]], float],
 ) -> float:
     """Computes the error-mitigated expectation value associated to the
     input results from executing the scaled circuits, via the application
