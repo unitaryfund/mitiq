@@ -23,7 +23,7 @@ def scaled_circuits(
 
     Args:
         circuit: The input circuit to execute with ZNE.
-        scale_factors: A list of ``float``s to scale the circuit with.
+        scale_factors: An array of noise scale factors.
         scale_method: The function for scaling the noise of a quantum circuit.
             A list of built-in functions can be found in ``mitiq.zne.scaling``.
 
@@ -47,9 +47,8 @@ def combine_results(
     of zero-noise extrapolation (ZNE).
 
     Args:
-        scale_factors: A list of ``float``s to scale the circuit with.
-        results: A list of ``float``s that is the result of applying an
-            executor to the scaled circuits.
+        scale_factors: An array of noise scale factors.
+        results: An array storing the results of running the scaled circuits.
         extrapolation_method: The function for scaling the noise of a
             quantum circuit. A list of built-in functions can be found
             in ``mitiq.zne.scaling``.
