@@ -199,6 +199,7 @@ linkcheck_ignore = [
     r"https://doi\.org/.*",
     r"https://link\.aps\.org/doi/.*",
     r"https://www\.sciencedirect\.com/science/article/.*",
+    r"https://github.com/unitaryfund/mitiq/compare/.*",
 ]
 
 linkcheck_retries = 3
