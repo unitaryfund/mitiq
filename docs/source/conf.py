@@ -203,6 +203,10 @@ linkcheck_ignore = [
 
 linkcheck_retries = 3
 
+linkcheck_anchors_ignore_for_url = [
+    "https://github.com/unitaryfund/qrack/blob/main/README.md"
+]
+
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
     """Style that mimicks APS journals."""
