@@ -29,8 +29,9 @@ def test_sample_probability_vector_single_qubit():
     bitstrings = sample_probability_vector(np.array([0, 1]), 10)
     assert all([b == [1] for b in bitstrings])
 
+    np.random.seed(0)
     bitstrings = sample_probability_vector(np.array([0.5, 0.5]), 1000)
-    assert isclose(sum([b[0] for b in bitstrings]), 500, rel_tol=0.1)
+    assert sum(b[0] for b in bitstrings) == 483
 
 
 def test_sample_probability_vector_two_qubits():
