@@ -7,7 +7,8 @@
 ### Highlights
 
 We've made updates to our documentation, beginning with the completion of the first section of the Pauli Twirling user guide, which offers a comprehensive introduction to this feature.
-Additionally, we've added a new tutorial on CDR (Clifford Data Regression) with [Qrack](https://github.com/unitaryfund/qrack/), providing users with an in-depth look at how to integrate these tools effectively.
+Additionally, we've added a new tutorial on CDR (Clifford Data Regression) using [Qrack](https://github.com/unitaryfund/qrack/) as an efficient near-Clifford simulator.
+This demonstrates a workflow that harnesses the speed of Qrack in the CDR training phase, while providing users with an in-depth look at how to integrate Mitiq and Qrack effectively.
 
 #### 📓 Documentation
 
