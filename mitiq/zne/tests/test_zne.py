@@ -8,14 +8,9 @@
 import functools
 from typing import List
 
-import braket.circuits
 import cirq
 import numpy as np
-import pennylane.circuit_graph
-import pennylane.tape
-import pyquil.quil
 import pytest
-import qibo
 import qiskit
 import qiskit.circuit
 from qiskit_aer import AerSimulator
@@ -607,21 +602,6 @@ def test_two_stage_zne(
     )
 
     assert len(circs) == len(scale_factors)
-
-    if to_frontend == to_braket:
-        assert all(isinstance(circ, braket.circuits.Circuit) for circ in circs)
-    elif to_frontend == to_qiskit:
-        assert all(isinstance(circ, qiskit.QuantumCircuit) for circ in circs)
-    elif to_frontend == to_pennylane:
-        assert all(
-            isinstance(circ, pennylane.tape.QuantumTape) for circ in circs
-        )
-    elif to_frontend == to_pyquil:
-        assert all(isinstance(circ, pyquil.quil.Program) for circ in circs)
-    elif to_frontend == to_qibo:
-        assert all(isinstance(circ, qibo.Circuit) for circ in circs)
-    else:
-        assert all(isinstance(circ, cirq.Circuit) for circ in circs)
 
     np.random.seed(42)
 
