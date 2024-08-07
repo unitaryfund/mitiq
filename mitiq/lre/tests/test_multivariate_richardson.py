@@ -5,22 +5,16 @@
 
 """Unit tests for multivariate extrapolation inference functions."""
 
-from math import comb
-
 import numpy as np
 import pytest
 from cirq import Circuit, LineQubit, ops
-from sympy import Symbol
 
 from mitiq.lre.inference.multivariate_richardson import (
     _full_monomial_basis_term_exponents,
-    full_monomial_basis_terms,
     linear_combination_coefficients,
     sample_matrix,
 )
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
-    _get_num_layers_without_measurements,
-    _get_scale_factor_vectors,
     multivariate_layer_scaling,
 )
 
@@ -88,49 +82,6 @@ def test_basis_exp_len(test_num_layers, test_degree):
     )
     for i in calc_dict:
         assert len(i) == test_num_layers
-
-
-@pytest.mark.parametrize(
-    "test_num_layers, test_degree, expected_basis",
-    [
-        (1, 1, [1, Symbol("λ_1")]),
-        (
-            2,
-            2,
-            [
-                1,
-                Symbol("λ_2"),
-                Symbol("λ_1"),
-                Symbol("λ_2") ** 2,
-                Symbol("λ_1") * Symbol("λ_2"),
-                Symbol("λ_1") ** 2,
-            ],
-        ),
-        (
-            3,
-            2,
-            [
-                1,
-                Symbol("λ_3"),
-                Symbol("λ_2"),
-                Symbol("λ_1"),
-                Symbol("λ_3") ** 2,
-                Symbol("λ_2") * Symbol("λ_3"),
-                Symbol("λ_2") ** 2,
-                Symbol("λ_1") * Symbol("λ_3"),
-                Symbol("λ_1") * Symbol("λ_2"),
-                Symbol("λ_1") ** 2,
-            ],
-        ),
-    ],
-)
-def test_full_monomial_basis(test_num_layers, test_degree, expected_basis):
-    calculated_basis = full_monomial_basis_terms(test_num_layers, test_degree)
-    assert len(calculated_basis) == comb(
-        test_num_layers + test_degree, test_degree
-    )
-
-    assert calculated_basis == expected_basis
 
 
 @pytest.mark.parametrize(
@@ -262,32 +213,6 @@ def test_invalid_degree_fold_multiplier_sample_matrix(
     an error for an invalid value."""
     with pytest.raises(ValueError, match=error_msg):
         sample_matrix(test_input, test_degree, test_fold_multiplier)
-
-
-@pytest.mark.parametrize(
-    "test_input, degree, test_fold_multiplier",
-    [
-        (test_circuit1, 1, 1),
-        (test_circuit1, 2, 1),
-        (test_circuit1, 3, 5),
-        (test_circuit1, 4, 7),
-        (test_circuit1, 2, 2),
-        (test_circuit1, 2, 3),
-    ],
-)
-def test_square_sample_matrix(test_input, degree, test_fold_multiplier):
-    """Check if the sample matrix will always be a square.
-
-    The terms in the monomial basis define the total rows of the sample matrix
-    & the generated scale factors for a fold multiplier define the number of
-    columns.
-    """
-    num_layers = _get_num_layers_without_measurements(test_input)
-    calculated_basis = full_monomial_basis_terms(num_layers, degree)
-    calculated_scale_factor_vectors = _get_scale_factor_vectors(
-        test_input, degree, test_fold_multiplier
-    )
-    assert len(calculated_basis) == len(calculated_scale_factor_vectors)
 
 
 def test_lre_inference_with_chunking():

@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 from cirq import Circuit
 from numpy.typing import NDArray
-from sympy import Symbol
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_scale_factor_vectors,
@@ -45,47 +44,6 @@ def _full_monomial_basis_term_exponents(
     # return a dictionary with variable number as the key with exponent values
     # first term is the 0 degree term's exponent
     return variable_exp_counter[::-1]
-
-
-def full_monomial_basis_terms(num_layers: int, degree: int) -> List[str]:
-    r"""Find the monomial basis terms for a number of layers in the input
-    and max degree d.
-
-    Number of layers in the input circuit dictate the number of variables
-    utilized in the combinations used for the polynomial.
-
-    Degree of the polynomial dictates the max and min degree of the monomial
-    terms.
-
-    Args:
-        num_layers: Number of layers in the input circuit.
-        degree: Degree of the multivariate polynomial.
-
-    Returns:
-        Monomial basis terms required for multivariate
-            extrapolation up to max degree
-    """
-
-    var_exp = _full_monomial_basis_term_exponents(num_layers, degree)
-    num_var = len(var_exp[0])
-    var_exp_sorted = []
-
-    for i in var_exp:
-        var_exp_sorted.append(dict(sorted(i.items())))
-
-    str_var = [Symbol(f"λ_{i}") for i in range(1, num_var + 1)]
-
-    var_prod = []
-    for i in var_exp_sorted:
-        var_prod_i = []
-        for j in range(1, num_var + 1):
-            if i[j] > 0:
-                var_prod_i.append((str_var[j - 1]) ** (i[j]))
-            else:
-                var_prod_i.append(1)
-        var_prod.append(var_prod_i)
-
-    return [np.prod(item) for item in var_prod]
 
 
 def sample_matrix(
@@ -130,10 +88,6 @@ def sample_matrix(
         input_circuit, degree, fold_multiplier, num_chunks
     )
     num_layers = len(scale_factor_vectors[0])
-
-    monomial_terms = full_monomial_basis_terms(num_layers, degree)
-
-    assert len(monomial_terms) == len(scale_factor_vectors)
 
     # Evaluate the monomial terms using the values in the scale factor vectors
     # and insert in the sample matrix
