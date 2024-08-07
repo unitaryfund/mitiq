@@ -25,7 +25,7 @@ To start, relevant modules and libraries are imported. Please ensure that the fo
 +++
 
 ```{note}
-In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`. This enviroment variable sets the maximum on how many qubits can be allocated on a single QEngineCPU instance. More information can be found on the [Qrack README page](https://github.com/unitaryfund/qrack?tab=readme-ov-file#maximum-allocation-guard).
+In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`. This enviroment variable sets the maximum on how many qubits can be allocated on a single QEngineCPU instance. More information can be found on the [Qrack README page](https://github.com/unitaryfund/qrack/blob/main/README.md#maximum-allocation-guard).
 ```
 
 ```{code-cell}

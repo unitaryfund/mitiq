@@ -199,9 +199,14 @@ linkcheck_ignore = [
     r"https://doi\.org/.*",
     r"https://link\.aps\.org/doi/.*",
     r"https://www\.sciencedirect\.com/science/article/.*",
+    r"https://github.com/unitaryfund/mitiq/compare/.*",
 ]
 
 linkcheck_retries = 3
+
+linkcheck_anchors_ignore_for_url = [
+    "https://github.com/unitaryfund/qrack/blob/main/README.md"
+]
 
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
