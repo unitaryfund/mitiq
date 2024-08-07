@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.40.0
+
+_In development._
+
 ## Version 0.39.0
 
 ([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.38.0...v0.39.0))
