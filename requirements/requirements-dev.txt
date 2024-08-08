@@ -7,13 +7,13 @@ mypy==1.0.0
 types-tabulate
 
 # Documentation and examples.
-Sphinx==7.2.6
+Sphinx==8.0.2
 sphinxcontrib-bibtex==2.6.2
 sphinx-copybutton==0.5.2
 sphinx-autodoc-typehints==2.0.0
-myst-nb==1.0.0
-myst-parser==3.0.1
-pydata-sphinx-theme==0.15.2
+myst-nb==1.1.1
+myst-parser==4.0.0
+pydata-sphinx-theme==0.15.4
 jupytext==1.16.1
 sphinx-gallery==0.15.0
 nbsphinx==0.9.3
