@@ -94,6 +94,11 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+```{eval-rst}
+.. automodule:: mitiq.lre.inference.multivariate_richardson
+   :members:
+```
+
 ### Pauli Twirling
 
 ```{eval-rst}
