@@ -14,37 +14,30 @@ from mitiq import Bitstring, MeasurementResult
 
 
 def sample_probability_vector(
-    probability_vector: npt.NDArray[np.float64], samples: int
-) -> List[Bitstring]:
+    probability_vector: Sequence[float], samples: int
+) -> list[str]:
     """Generate a number of samples from a probability distribution as
     bitstrings.
 
     Args:
         probability_vector: A probability vector.
+        samples: The number of samples to generate.
 
     Returns:
         A list of sampled bitstrings.
     """
-    # sample using the probability distribution given
     num_values = len(probability_vector)
-    choices = np.random.choice(num_values, size=samples, p=probability_vector)
-
-    # convert samples to binary strings
-    bit_width = int(np.log2(num_values))
-    binary_repr_vec = np.vectorize(np.binary_repr)
-    binary_strings = binary_repr_vec(choices, width=bit_width)
-
-    # split the binary strings into an array of ints
-    bitstrings = (
-        np.apply_along_axis(  # type: ignore
-            func1d=np.fromstring,  # type: ignore
-            axis=1,
-            arr=binary_strings[:, None],
-            dtype="U1",  # type: ignore
+    if not np.log2(num_values).is_integer():
+        raise ValueError(
+            "The length of the probability vector must be a power of 2."
         )
-        .astype(np.uint8)
-        .tolist()
+
+    sampled_indices = np.random.choice(
+        num_values, size=samples, p=probability_vector
     )
+
+    bit_width = int(np.log2(num_values))
+    bitstrings = [format(index, f"0{bit_width}b") for index in sampled_indices]
 
     return bitstrings
 
@@ -132,7 +125,7 @@ def generate_tensored_inverse_confusion_matrix(
 
 def closest_positive_distribution(
     quasi_probabilities: npt.NDArray[np.float64],
-) -> npt.NDArray[np.float64]:
+) -> List[float]:
     """Given the input quasi-probability distribution returns the closest
     positive probability distribution (with respect to the total variation
     distance).
@@ -163,7 +156,7 @@ def closest_positive_distribution(
         raise ValueError(
             "REM failed to determine the closest positive distribution."
         )
-    return result.x
+    return result.x.tolist()
 
 
 def mitigate_measurements(
