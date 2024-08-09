@@ -60,7 +60,7 @@ def bitstrings_to_probability_vector(
         bitstrings: All measured bitstrings.
 
     Returns:
-        A probabiity vector corresponding to the measured bitstrings.
+        A probability vector corresponding to the measured bitstrings.
     """
     pv = np.zeros(2 ** len(bitstrings[0]))
     for bs in bitstrings:
