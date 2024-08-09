@@ -65,20 +65,20 @@ def test_bitstrings_to_probability_vector():
     assert (pv == np.array([0, 0, 0, 1])).all()
 
 
-def test_probability_vector_roundtrip():
-    for _ in range(10):
-        pv = np.random.rand(4)
-        pv /= np.sum(pv)
-        assert isclose(
-            np.linalg.norm(
-                pv
-                - bitstrings_to_probability_vector(
-                    sample_probability_vector(pv, 1000)
-                )
-            ),
-            0,
-            abs_tol=0.1,
-        )
+@pytest.mark.parametrize("repeats", range(10))
+def test_probability_vector_roundtrip(repeats):
+    pv = np.random.rand(4)
+    pv /= np.sum(pv)
+    assert isclose(
+        np.linalg.norm(
+            pv
+            - bitstrings_to_probability_vector(
+                sample_probability_vector(pv, 1000)
+            )
+        ),
+        0,
+        abs_tol=0.1,
+    )
 
 
 def test_generate_inverse_confusion_matrix():
