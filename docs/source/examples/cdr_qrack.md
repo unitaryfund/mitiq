@@ -12,6 +12,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, cdr, qrack, cirq
+```
+
 # CDR with Qrack as Near-Clifford Simulator
 
 In this tutorial, [Clifford Data Regression](../guide/cdr.md) (CDR) is used with [Qrack](https://qrack.readthedocs.io/en/latest/) and a Qiskit fake backend.

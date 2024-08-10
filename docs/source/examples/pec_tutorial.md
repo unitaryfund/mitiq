@@ -11,6 +11,8 @@ kernelspec:
   name: python3
 ---
 
+```{tags} pec, cirq, qiskit
+```
 # Probabilistic error cancellation (PEC) with Mirror Circuits
 
 This notebook shows probabilistic error cancellation (PEC) *Temme et al. PRL (2017)* {cite}`Temme_2017_PRL`, *Sun et al. PRLAppl (2021)* {cite}`Sun_2021_PRAppl`,  *Zhang et al. NatComm (2020)* {cite}`Zhang_2020_NatComm`, improving performance of a mirror circuit benchmark  on the `braket_dm` noisy simulator.

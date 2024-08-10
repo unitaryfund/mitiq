@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} braket, zne
+```
+
 # Mitiq with Braket
 
 This notebook shows improved performance on a mirror circuit benchmark with zero-noise extrapolation on Rigetti Aspen-9 via Amazon Braket.

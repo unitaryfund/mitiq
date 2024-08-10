@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, zne
+```
+
 # Hands-on lab on error mitigation with Mitiq.
 
 +++

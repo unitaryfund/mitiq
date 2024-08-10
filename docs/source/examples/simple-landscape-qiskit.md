@@ -12,6 +12,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, zne
+```
+
 # Using ZNE to compute the energy landscape of a variational circuit with Qiskit
 
 This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation, using Qiskit as our frontend.

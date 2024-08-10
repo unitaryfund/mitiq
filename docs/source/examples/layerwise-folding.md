@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, zne
+```
+
 # ZNE with Qiskit: Layerwise folding
 
 

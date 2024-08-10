@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cirq, zne
+```
+
 # Solving MaxCut with Mitiq-improved QAOA
 
 +++

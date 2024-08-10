@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cirq, zne
+```
+
 # Estimating the potential energy surface of molecular Hydrogen with ZNE and OpenFermion
 
 In this example we apply zero-noise extrapolation (ZNE) to the estimation of the potential energy surface of molecular Hydrogen ($\rm H_2$).

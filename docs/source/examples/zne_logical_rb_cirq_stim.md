@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cirq, stim, zne
+```
+
 # ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits
 
 +++

@@ -38,3 +38,12 @@ Composing techniques: REM + ZNE <combine_rem_zne.md>
 Composing techniques: DDD + ZNE <combine_ddd_zne.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
 ```
+
+You can also search for a specific example by clicking on one of the tags below:
+
+```{toctree}
+---
+maxdepth: 2
+---
+../../_tags/tagsindex.md
+```

@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} braket, zne
+```
+
 # Using ZNE to compute the energy landscape of a variational circuit with Braket
 
 This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation, using Amazon's [Braket](https://amazon-braket-sdk-python.readthedocs.io/en/latest/) as our frontend.

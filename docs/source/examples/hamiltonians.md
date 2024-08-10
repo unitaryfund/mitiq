@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cirq, zne
+```
+
 # Defining Hamiltonians as Linear Combinations of Pauli Strings
 
 This tutorial shows an example of using Hamiltonians defined as {class}`~cirq.PauliSum` objects or similar objects in other

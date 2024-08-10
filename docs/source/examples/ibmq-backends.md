@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, zne
+```
+
 # Error mitigation on IBMQ backends with Qiskit
 
 

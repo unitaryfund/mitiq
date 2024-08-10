@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cirq, zne
+```
+
 # Mitigating the energy landscape of a variational circuit with Mitiq
 
 +++

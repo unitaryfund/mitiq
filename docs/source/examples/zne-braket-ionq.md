@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} braket, zne, ionq
+```
+
 (label-zne-braket-ionq)=
 # Zero-noise extrapolation with Braket on the IonQ backend
 

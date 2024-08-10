@@ -11,6 +11,8 @@ kernelspec:
   name: python3
 orphan: true
 ---
+```{tags} qiskit, zne
+```
 
 # Solution to hands-on lab on error mitigation with Mitiq.
 

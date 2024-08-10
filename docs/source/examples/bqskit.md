@@ -10,6 +10,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} bqskit, zne
+```
+
 # Improving the accuracy of BQSKit compiled circuits with error mitigation
 
 In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/) {cite}`Patel_2022_ACM`, a compiler for quantum circuits. BQSKit stands for Berkeley Quantum Synthesis Toolkit and it allows one "to compile quantum programs to efficient physical circuits for any QPU".

@@ -12,6 +12,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} pennylane, zne
+```
+
 # Mitigating the energy landscape of a variational circuit with Mitiq and PennyLane
 
 This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored

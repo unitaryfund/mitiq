@@ -98,7 +98,19 @@ extensions = [
     "sphinx_copybutton",
     "nbsphinx",
     "sphinx_gallery.load_style",
+    "sphinx_design",
+    "sphinx_tags",
 ]
+
+# to add tags to the documentation tutorials
+tags_create_tags = True
+tags_overview_title = "All tags"
+tags_create_badges = True
+tags_intro_text = "Tags on this page: " 
+tags_page_title = "Tags" 
+tags_page_header = "Pages with this tag: "
+tags_index_head = "Tags in the documentation tutorials: "
+tags_extension = ["md"]
 
 # hide primary sidebar from the following pages
 html_sidebars = {"apidoc": [], "changelog": [], "bibliography": []}
