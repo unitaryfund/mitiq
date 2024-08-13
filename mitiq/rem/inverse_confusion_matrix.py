@@ -25,6 +25,10 @@ def sample_probability_vector(
 
     Returns:
         A list of sampled bitstrings.
+
+    Example:
+        >>> sample_probability_vector([0, 1/2, 1/4, 1/4], 4)
+        ['01', '10', '11', '11']
     """
     num_values = len(probability_vector)
     if not np.log2(num_values).is_integer():
