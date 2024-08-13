@@ -70,8 +70,8 @@ def test_bitstrings_to_probability_vector():
     assert (pv == np.array([0, 0, 0, 1])).all()
 
 
-@pytest.mark.parametrize("repeats", range(10))
-def test_probability_vector_roundtrip(repeats):
+@pytest.mark.parametrize("_", range(10))
+def test_probability_vector_roundtrip(_):
     pv = np.random.rand(4)
     pv /= np.sum(pv)
     assert isclose(
