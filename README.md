@@ -21,6 +21,7 @@ compiling quantum programs in clever ways.
 Want to know more? 
 - Check out our
 [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide.html).
+- To see what's in store for Mitiq this year, look at the 2024 Roadmap in the [wiki](https://github.com/unitaryfund/mitiq/wiki).
 - For code, repo, or theory questions, especially those requiring more detailed responses, submit a [Discussion](https://github.com/unitaryfund/mitiq/discussions).
 - For casual or time sensitive questions, chat with us on [Discord](http://discord.unitary.fund).
 - Join our weekly community call on [Discord](http://discord.unitary.fund) ([public agenda](https://docs.google.com/document/d/1lZfct4AOCS7fdyWkudcGyER0n0nsCxSFKSicUEeJgtA/)).
