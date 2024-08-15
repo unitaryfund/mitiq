@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-from typing import List, Sequence
+from typing import Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -97,7 +97,7 @@ def generate_inverse_confusion_matrix(
 
 
 def generate_tensored_inverse_confusion_matrix(
-    num_qubits: int, confusion_matrices: List[npt.NDArray[np.float64]]
+    num_qubits: int, confusion_matrices: list[npt.NDArray[np.float64]]
 ) -> npt.NDArray[np.float64]:
     """
     Generates the inverse confusion matrix utilizing the supplied
@@ -129,7 +129,7 @@ def generate_tensored_inverse_confusion_matrix(
 
 def closest_positive_distribution(
     quasi_probabilities: npt.NDArray[np.float64],
-) -> List[float]:
+) -> list[float]:
     """Given the input quasi-probability distribution returns the closest
     positive probability distribution (with respect to the total variation
     distance).
