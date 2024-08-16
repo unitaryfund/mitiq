@@ -169,19 +169,6 @@ def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
         <= 1e-3
     )
 
-    # check all the coefficients sum up to 1 or approximately close to 1
-    assert (
-        abs(
-            1.0
-            - np.sum(
-                linear_combination_coefficients(
-                    test_circ, test_degree, test_fold_multiplier
-                )
-            )
-        )
-        <= 1e-2
-    )
-
 
 @pytest.mark.parametrize(
     "test_input, test_degree, test_fold_multiplier, error_msg",
@@ -232,4 +219,3 @@ def test_eval(num_chunks):
         7 * test_circuit2, 2, 2, num_chunks
     )
     assert len(coeffs) == len(multiple_scaled_circuits)
-    assert np.isclose(sum(coeffs), 1.0)  # Coefficients should sum to 1

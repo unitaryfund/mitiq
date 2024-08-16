@@ -150,8 +150,10 @@ def linear_combination_coefficients(
 
     coeff_list = []
     for i in range(num_layers):
-        sample_matrix_copy = input_sample_matrix.copy()
-        sample_matrix_copy[i] = np.array([[1] + [0] * (num_layers - 1)])
-        coeff_list.append(np.linalg.det(sample_matrix_copy) / det)
+        # taken from https://stackoverflow.com/a/52866044
+        sample_matrix_minor = np.delete(
+            np.delete(input_sample_matrix, i, axis=0), i, axis=1
+        )
+        coeff_list.append(np.linalg.det(sample_matrix_minor) / det)
 
     return coeff_list
