@@ -68,7 +68,8 @@ def test_basis_exp(test_num_layers, test_degree, expected):
 @pytest.mark.parametrize(
     "test_num_layers, test_degree",
     [(1, 1), (2, 2), (3, 2), (10, 4)],
-    # Note need to add (100, 2) here. This makes the unit test very slow.
+    # TO DO: Note need to add (100, 2) here.
+    # This makes the unit test very slow.
 )
 def test_basis_exp_len(test_num_layers, test_degree):
     calc_dict = _full_monomial_basis_term_exponents(
@@ -116,9 +117,9 @@ def test_basis_exp_len(test_num_layers, test_degree):
     ],
 )
 def test_sample_matrix(test_circ, test_degree, expected_matrix):
-    assert (
-        expected_matrix - sample_matrix(test_circ, test_degree, 1)
-    ).all() <= 1e-3
+    assert np.allclose(
+        expected_matrix, sample_matrix(test_circ, test_degree, 1), atol=1e-3
+    )
 
 
 @pytest.mark.parametrize(
@@ -157,16 +158,21 @@ def test_sample_matrix(test_circ, test_degree, expected_matrix):
     ],
 )
 def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
-    assert (
-        abs(
-            np.array(expected_matrix)
-            - np.array(
-                linear_combination_coefficients(
-                    test_circ, test_degree, test_fold_multiplier
-                )
+    assert np.allclose(
+        expected_matrix,
+        linear_combination_coefficients(
+            test_circ, test_degree, test_fold_multiplier
+        ),
+        atol=1e-3,
+    )
+
+    assert np.isclose(
+        sum(
+            linear_combination_coefficients(
+                test_circ, test_degree, test_fold_multiplier
             )
-        ).all()
-        <= 1e-3
+        ),
+        1.0,
     )
 
 
@@ -197,13 +203,17 @@ def test_invalid_degree_fold_multiplier_sample_matrix(
 
 
 def test_lre_inference_with_chunking():
+    """Verify the dimension of a chunked sample matrix for some input circuit
+    is smaller than the non-chunked sample matrix for the same input circuit.
+    """
     circ = test_circuit1 * 7
-    chunked_sample_matrix_dim = sample_matrix(circ, 2, 2, 4).shape
+    chunked_sample_matrix_dim = sample_matrix(circ, 2, 2, num_chunks=4).shape
     non_chunked_sample_matrix_dim = sample_matrix(circ, 2, 2).shape
     assert chunked_sample_matrix_dim[0] < non_chunked_sample_matrix_dim[0]
 
 
 def test_sample_matrix_numerical_stability():
+    """Verify sample matrix function works for very large circuits."""
     large_circuit = Circuit([ops.H.on(LineQubit(i)) for i in range(10000)])
     matrix = sample_matrix(large_circuit, 5, 10000)
     assert np.isfinite(matrix).all()
@@ -212,6 +222,8 @@ def test_sample_matrix_numerical_stability():
 
 @pytest.mark.parametrize("num_chunks", [2, 3])
 def test_eval(num_chunks):
+    """Verify the number of calculated linear combination coefficients matches
+    to the number of scaled chunked circuits."""
     coeffs = linear_combination_coefficients(
         7 * test_circuit2, 2, 2, num_chunks
     )
@@ -219,3 +231,4 @@ def test_eval(num_chunks):
         7 * test_circuit2, 2, 2, num_chunks
     )
     assert len(coeffs) == len(multiple_scaled_circuits)
+    assert np.isclose(sum(coeffs), 1.0)

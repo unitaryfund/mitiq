@@ -9,7 +9,7 @@
 
 import warnings
 from itertools import product
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 
 import numpy as np
 from cirq import Circuit
@@ -22,7 +22,7 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
 
 def _full_monomial_basis_term_exponents(
     num_layers: int, degree: int
-) -> List[Tuple[int, ...]]:
+) -> list[tuple[int, ...]]:
     """Exponents of monomial terms required to create the sample matrix."""
     exponents = {
         exps
@@ -83,15 +83,15 @@ def sample_matrix(
     variable_exp = _full_monomial_basis_term_exponents(num_layers, degree)
     sample_matrix = np.empty((len(variable_exp), len(variable_exp)))
 
-    for rows, i in enumerate(scale_factor_vectors):
-        for cols, j in enumerate(variable_exp):
+    for i, scale_factors in enumerate(scale_factor_vectors):
+        for j, exponent in enumerate(variable_exp):
             evaluated_terms = []
-            for base, exp in zip(list(i), j):
+            for base, exp in zip(scale_factors, exponent):
                 # raise scale factor value by the exponent dict value
                 evaluated_terms.append(base**exp)
             # multiply both elements in the list to create an evaluated
             # monomial term
-            sample_matrix[rows, cols] = np.prod(evaluated_terms)
+            sample_matrix[i, j] = np.prod(evaluated_terms)
 
     return sample_matrix
 
@@ -101,10 +101,11 @@ def linear_combination_coefficients(
     degree: int,
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
-) -> List[np.float64]:
+) -> list[float]:
     r"""
-    Defines the sample matrix required for multivariate extrapolation as
-    defined in :cite:`Russo_2024_LRE`.
+    Defines the function to find the linear combination coefficients from the
+    sample matrix as required for multivariate extrapolation (defined in
+    :cite:`Russo_2024_LRE`).
 
     Args:
         input_circuit: Circuit to be scaled.
@@ -118,11 +119,6 @@ def linear_combination_coefficients(
         List of the evaluated monomial basis terms using the scale factor
             vectors.
     """
-    num_layers = len(
-        _get_scale_factor_vectors(
-            input_circuit, degree, fold_multiplier, num_chunks
-        )
-    )
     input_sample_matrix = sample_matrix(
         input_circuit, degree, fold_multiplier, num_chunks
     )
@@ -138,7 +134,7 @@ def linear_combination_coefficients(
         sign, logdet = np.linalg.slogdet(  # pragma: no cover
             input_sample_matrix
         )
-        det = np.exp(logdet)  # pragma: no cover
+        det = sign * np.exp(logdet)  # pragma: no cover
 
     if np.isinf(det):
         raise ValueError(  # pragma: no cover
@@ -149,11 +145,26 @@ def linear_combination_coefficients(
     assert det != 0.0
 
     coeff_list = []
-    for i in range(num_layers):
-        # taken from https://stackoverflow.com/a/52866044
-        sample_matrix_minor = np.delete(
-            np.delete(input_sample_matrix, i, axis=0), i, axis=1
-        )
-        coeff_list.append(np.linalg.det(sample_matrix_minor) / det)
+    mat_row, mat_cols = input_sample_matrix.shape
+    assert mat_row == mat_cols
+    # replace a row of the sample matrix with [1, 0, 0, .., 0]
+    repl_row = np.array([[1] + [0] * (mat_cols - 1)])
+    for i in range(mat_row):
+        if i == 0:  # first row
+            new_mat = np.concatenate(
+                (repl_row, input_sample_matrix[1:]), axis=0
+            )
+        elif i == mat_row - 1:  # last row
+            new_mat = np.concatenate(
+                (input_sample_matrix[:i], repl_row), axis=0
+            )
+        else:
+            frst_sl = np.concatenate(
+                (input_sample_matrix[:i], repl_row), axis=0
+            )
+            sec_sl = input_sample_matrix[i + 1 :]
+            new_mat = np.concatenate((frst_sl, sec_sl), axis=0)
+
+        coeff_list.append(np.linalg.det(new_mat) / det)
 
     return coeff_list
