@@ -56,10 +56,6 @@ install-hooks:
 	@chmod +x .git-hooks/*
 	@echo "Git hooks installed."
 
-.PHONY: requirements
-requirements: requirements/requirements.txt
-	pip install -r requirements/requirements.txt
-
 .PHONY: test
 test:
 	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml --ignore=mitiq/interface/mitiq_pyquil
