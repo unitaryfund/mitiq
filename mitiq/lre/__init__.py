@@ -8,6 +8,6 @@
 from mitiq.lre.multivariate_scaling.layerwise_folding import multivariate_layer_scaling
 
 from mitiq.lre.inference.multivariate_richardson import (
-    linear_combination_coefficients,
+    multivariate_richardson_coefficients,
     sample_matrix,
 )

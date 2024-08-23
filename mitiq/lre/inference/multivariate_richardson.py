@@ -23,7 +23,23 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
 def _full_monomial_basis_term_exponents(
     num_layers: int, degree: int
 ) -> list[tuple[int, ...]]:
-    """Exponents of monomial terms required to create the sample matrix."""
+    """Exponents of monomial terms required to create the sample matrix.
+
+    Mj(λ_i, d) is the basis of monomial terms for l-layers in the input circuit
+    up to a specific degree d. The linear combination defines our polynomial of
+    interest. In general, the number of monomial terms for a variable l up to
+    degree d  can be determined through the Stars and Bars method.
+
+    We assume the terms in the monomial basis are arranged in a graded
+    lexicographic order such that the terms with the highest total degree are
+    considered to be the largest and the remaining terms are arranged in
+    lexicographic order.
+
+    For degree=2, num_layers=2, the monomial terms basis are
+    {1, x_1, x_2, x_1**2, x_1x_2, x_2**2} i.e. the function returns the
+    exponents of x_1, x_2 as {[(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)]}
+    .
+    """
     exponents = {
         exps
         for exps in product(range(degree + 1), repeat=num_layers)
@@ -96,7 +112,7 @@ def sample_matrix(
     return sample_matrix
 
 
-def linear_combination_coefficients(
+def multivariate_richardson_coefficients(
     input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
@@ -106,6 +122,15 @@ def linear_combination_coefficients(
     Defines the function to find the linear combination coefficients from the
     sample matrix as required for multivariate extrapolation (defined in
     :cite:`Russo_2024_LRE`).
+
+    We use the sample matrix to find the constants of linear combination 
+    $c = (c_1, c_2, c_3, …, c_M)$ associated with a known vector of noisy
+    expectation values $z = (<O(λ_1)>, <O(λ_2)>, <O(λ_3)>, ..., <O(λ_M)>)^T$.
+
+    The coefficients are found through the ratio of the determinants of $M_i$
+    and the sample matrix. The new matrix $M_i$ is defined by replacing the ith
+    row of the sample matrix with $e_1 = (1, 0, 0,..., 0)$.
+
 
     Args:
         input_circuit: Circuit to be scaled.
@@ -121,6 +146,11 @@ def linear_combination_coefficients(
     """
     input_sample_matrix = sample_matrix(
         input_circuit, degree, fold_multiplier, num_chunks
+    )
+    num_layers = len(
+        _get_scale_factor_vectors(
+            input_circuit, degree, fold_multiplier, num_chunks
+        )
     )
     try:
         det = np.linalg.det(input_sample_matrix)
@@ -148,23 +178,12 @@ def linear_combination_coefficients(
     mat_row, mat_cols = input_sample_matrix.shape
     assert mat_row == mat_cols
     # replace a row of the sample matrix with [1, 0, 0, .., 0]
-    repl_row = np.array([[1] + [0] * (mat_cols - 1)])
-    for i in range(mat_row):
-        if i == 0:  # first row
-            new_mat = np.concatenate(
-                (repl_row, input_sample_matrix[1:]), axis=0
-            )
-        elif i == mat_row - 1:  # last row
-            new_mat = np.concatenate(
-                (input_sample_matrix[:i], repl_row), axis=0
-            )
-        else:
-            frst_sl = np.concatenate(
-                (input_sample_matrix[:i], repl_row), axis=0
-            )
-            sec_sl = input_sample_matrix[i + 1 :]
-            new_mat = np.concatenate((frst_sl, sec_sl), axis=0)
-
-        coeff_list.append(np.linalg.det(new_mat) / det)
+    for i in range(num_layers):
+        sample_matrix_copy = input_sample_matrix.copy()
+        sample_matrix_copy[i] = np.array([[1] + [0] * (num_layers - 1)])
+        coeff_list.append(
+            np.linalg.det(sample_matrix_copy)
+            / np.linalg.det(input_sample_matrix)
+        )
 
     return coeff_list

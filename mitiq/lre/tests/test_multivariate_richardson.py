@@ -11,7 +11,7 @@ from cirq import Circuit, LineQubit, ops
 
 from mitiq.lre.inference.multivariate_richardson import (
     _full_monomial_basis_term_exponents,
-    linear_combination_coefficients,
+    multivariate_richardson_coefficients,
     sample_matrix,
 )
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
@@ -160,7 +160,7 @@ def test_sample_matrix(test_circ, test_degree, expected_matrix):
 def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
     assert np.allclose(
         expected_matrix,
-        linear_combination_coefficients(
+        multivariate_richardson_coefficients(
             test_circ, test_degree, test_fold_multiplier
         ),
         atol=1e-3,
@@ -168,7 +168,7 @@ def test_coeffs(test_circ, test_degree, test_fold_multiplier, expected_matrix):
 
     assert np.isclose(
         sum(
-            linear_combination_coefficients(
+            multivariate_richardson_coefficients(
                 test_circ, test_degree, test_fold_multiplier
             )
         ),
@@ -224,7 +224,7 @@ def test_sample_matrix_numerical_stability():
 def test_eval(num_chunks):
     """Verify the number of calculated linear combination coefficients matches
     to the number of scaled chunked circuits."""
-    coeffs = linear_combination_coefficients(
+    coeffs = multivariate_richardson_coefficients(
         7 * test_circuit2, 2, 2, num_chunks
     )
     multiple_scaled_circuits = multivariate_layer_scaling(
