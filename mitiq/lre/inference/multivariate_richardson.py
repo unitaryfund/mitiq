@@ -123,7 +123,7 @@ def multivariate_richardson_coefficients(
     sample matrix as required for multivariate extrapolation (defined in
     :cite:`Russo_2024_LRE`).
 
-    We use the sample matrix to find the constants of linear combination 
+    We use the sample matrix to find the constants of linear combination
     $c = (c_1, c_2, c_3, …, c_M)$ associated with a known vector of noisy
     expectation values $z = (<O(λ_1)>, <O(λ_2)>, <O(λ_3)>, ..., <O(λ_M)>)^T$.
 
