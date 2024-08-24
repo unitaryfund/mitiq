@@ -111,6 +111,24 @@ tags_page_title = "Tags"
 tags_page_header = "Pages with this tag: "
 tags_index_head = "Tags in the documentation tutorials: "
 tags_extension = ["md"]
+tags_badge_colors = {
+    "zne": "primary",
+    "rem": "primary",
+    "shadows": "primary",
+    "cdr": "primary",
+    "pec": "primary",
+    "ddd": "primary",
+    "calibration": "primary",
+    "cirq": "secondary",
+    "bqskit": "secondary",
+    "braket": "secondary",
+    "pennylane": "secondary",
+    "qiskit": "secondary",
+    "stim": "secondary",
+    "qrack": "secondary",
+    "qibo": "secondary",
+    "ionq": "secondary",
+}
 
 # hide primary sidebar from the following pages
 html_sidebars = {"apidoc": [], "changelog": [], "bibliography": []}
