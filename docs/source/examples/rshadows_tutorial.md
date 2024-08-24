@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} shadows, cirq
+```{tags} shadows, cirq, intermediate
 ```
 
 # Robust Shadow Estimation with Mitiq

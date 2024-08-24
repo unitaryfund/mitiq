@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} pec, cirq, qiskit
+```{tags} pec, cirq, qiskit, basic
 ```
 # Probabilistic error cancellation (PEC) with Mirror Circuits
 

@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, zne
+```{tags} cirq, zne, advanced
 ```
 
 # Estimating the potential energy surface of molecular Hydrogen with ZNE and OpenFermion

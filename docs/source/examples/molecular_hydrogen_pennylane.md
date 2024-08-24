@@ -10,7 +10,7 @@ kernelspec:
   language: python
   name: python3
 ---
-```{tags} cirq, pennylane, zne
+```{tags} cirq, pennylane, zne, advanced
 ```
 
 # Estimating the potential energy surface of molecular Hydrogen with ZNE and PennyLane + Cirq

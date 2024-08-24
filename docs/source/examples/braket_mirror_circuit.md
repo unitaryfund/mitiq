@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} braket, zne
+```{tags} braket, zne, basic
 ```
 
 # Mitiq with Braket

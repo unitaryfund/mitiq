@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} qiskit, cdr, qrack, cirq
+```{tags} qiskit, cdr, qrack, cirq, basic
 ```
 
 # CDR with Qrack as Near-Clifford Simulator

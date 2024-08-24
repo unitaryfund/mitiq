@@ -11,7 +11,7 @@ kernelspec:
   language: python
   name: python3
 ---
-```{tags} rem, zne, cirq
+```{tags} rem, zne, cirq, intermediate
 ```
 
 # Composing techniques: Readout Error Mitigation and Zero Noise Extrapolation

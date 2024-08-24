@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} pennylane, zne
+```{tags} pennylane, zne, advanced
 ```
 
 # Mitigating the energy landscape of a variational circuit with Mitiq and PennyLane

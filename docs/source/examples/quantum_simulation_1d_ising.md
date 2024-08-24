@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cdr, zne, cirq
+```{tags} cdr, zne, cirq, advanced
 ```
 
  # Using ZNE and learning-based methods to mitigate the 1D transverse-longitudinal Ising model

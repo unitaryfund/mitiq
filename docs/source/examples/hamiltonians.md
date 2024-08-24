@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, zne
+```{tags} cirq, zne, advanced
 ```
 
 # Defining Hamiltonians as Linear Combinations of Pauli Strings

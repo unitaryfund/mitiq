@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, zne, qiskit
+```{tags} cirq, zne, qiskit, basic
 ```
 
 # Error mitigation with Cirq on IBMQ backends

@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, pec
+```{tags} cirq, pec, advanced
 ```
 
 # Learning quasiprobability representations with a depolarizing noise model

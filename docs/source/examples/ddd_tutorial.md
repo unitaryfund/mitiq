@@ -10,7 +10,7 @@ kernelspec:
   language: python
   name: python3
 ---
-```{tags} ddd, cirq
+```{tags} ddd, cirq, basic
 ```
 
 # Digital dynamical decoupling (DDD) with Mirror Circuits

@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, shadows
+```{tags} cirq, shadows, intermediate
 ```
 
 # Classical Shadows Protocol with Cirq

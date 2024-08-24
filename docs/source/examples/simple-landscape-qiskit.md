@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} qiskit, zne
+```{tags} qiskit, zne, advanced
 ```
 
 # Using ZNE to compute the energy landscape of a variational circuit with Qiskit

@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} braket, zne
+```{tags} braket, zne, advanced
 ```
 
 # Using ZNE to compute the energy landscape of a variational circuit with Braket

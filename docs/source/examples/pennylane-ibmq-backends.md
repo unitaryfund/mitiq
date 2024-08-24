@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} qiskit, zne, pennylane
+```{tags} qiskit, zne, pennylane, basic
 ```
 
 # Error mitigation with Pennylane on IBMQ backends

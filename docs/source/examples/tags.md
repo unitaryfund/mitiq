@@ -1,4 +1,4 @@
-# Tags in Examples
+# Example Tags
 
 ```{toctree}
 ---

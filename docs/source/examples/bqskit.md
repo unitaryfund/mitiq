@@ -10,7 +10,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} bqskit, zne
+```{tags} bqskit, zne, intermediate
 ```
 
 # Improving the accuracy of BQSKit compiled circuits with error mitigation

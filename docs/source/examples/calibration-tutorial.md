@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} calibration, zne, qiskit
+```{tags} calibration, zne, qiskit, basic
 ```
 
 # Breaking into error mitigation with Mitiq's calibration module

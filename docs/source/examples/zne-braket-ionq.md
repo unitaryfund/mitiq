@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} braket, zne, ionq
+```{tags} braket, zne, ionq, basic
 ```
 
 (label-zne-braket-ionq)=

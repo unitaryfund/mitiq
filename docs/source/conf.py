@@ -128,6 +128,9 @@ tags_badge_colors = {
     "qrack": "secondary",
     "qibo": "secondary",
     "ionq": "secondary",
+    "basic": "success",
+    "intermediate": "success",
+    "advanced": "success",
 }
 
 # hide primary sidebar from the following pages

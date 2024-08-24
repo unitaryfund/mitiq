@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} qibo, zne
+```{tags} qibo, zne, basic
 ```
 
 # Error mitigation with Qibo using noisy simulation

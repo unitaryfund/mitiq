@@ -12,7 +12,6 @@ caption: Pages with this tag:
 ../examples/cirq-ibmq-backends.md
 ../examples/combine_ddd_zne.md
 ../examples/combine_rem_zne.md
-../examples/ggi_summer_school_solved.md
 ../examples/ggi_summer_school_unsolved.md
 ../examples/hamiltonians.md
 ../examples/ibmq-backends.md

@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, zne
+```{tags} cirq, zne, basic
 ```
 # Noise Scaling Methods
 
