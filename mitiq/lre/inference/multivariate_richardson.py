@@ -23,22 +23,23 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
 def _full_monomial_basis_term_exponents(
     num_layers: int, degree: int
 ) -> list[tuple[int, ...]]:
-    """Exponents of monomial terms required to create the sample matrix.
+    """Finds exponents of monomial terms required to create the sample matrix.
 
-    Mj(λ_i, d) is the basis of monomial terms for l-layers in the input circuit
-    up to a specific degree d. The linear combination defines our polynomial of
-    interest. In general, the number of monomial terms for a variable l up to
-    degree d  can be determined through the Stars and Bars method.
+    $Mj(λ_i, d)$ is the basis of monomial terms for $l$-layers in the input
+    circuit up to a specific degree $d$. The linear combination defines our
+    polynomial of interest. In general, the number of monomial terms for a
+    variable $l$ up to degree $d$  can be determined through the Stars and
+    Bars method.
 
     We assume the terms in the monomial basis are arranged in a graded
     lexicographic order such that the terms with the highest total degree are
     considered to be the largest and the remaining terms are arranged in
     lexicographic order.
 
-    For degree=2, num_layers=2, the monomial terms basis are
-    {1, x_1, x_2, x_1**2, x_1x_2, x_2**2} i.e. the function returns the
-    exponents of x_1, x_2 as {[(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)]}
-    .
+    For `degree=2, num_layers=2`, the monomial terms basis are
+    {$1, x_1, x_2, x_1**2, x_1x_2, x_2**2$} i.e. the function returns the
+    exponents of x_1, x_2 as
+    `{[(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)]}`.
     """
     exponents = {
         exps
@@ -56,8 +57,12 @@ def sample_matrix(
     num_chunks: Optional[int] = None,
 ) -> NDArray[Any]:
     r"""
-    Defines the sample matrix required for multivariate extrapolation as
+    Defines the square sample matrix required for multivariate extrapolation as
     defined in :cite:`Russo_2024_LRE`.
+
+    The number of monomial terms should be equal to the
+    number of scale factor vectors such that the monomial terms define the rows
+    and the scale factor vectors define the columns.
 
     Args:
         input_circuit: Circuit to be scaled.
@@ -108,6 +113,10 @@ def sample_matrix(
             # multiply both elements in the list to create an evaluated
             # monomial term
             sample_matrix[i, j] = np.prod(evaluated_terms)
+
+    # verify the matrix is square
+    mat_row, mat_cols = sample_matrix.shape
+    assert mat_row == mat_cols
 
     return sample_matrix
 
@@ -173,10 +182,7 @@ def multivariate_richardson_coefficients(
             + " input circuit. "
         )
     assert det != 0.0
-
     coeff_list = []
-    mat_row, mat_cols = input_sample_matrix.shape
-    assert mat_row == mat_cols
     # replace a row of the sample matrix with [1, 0, 0, .., 0]
     for i in range(num_layers):
         sample_matrix_copy = input_sample_matrix.copy()
