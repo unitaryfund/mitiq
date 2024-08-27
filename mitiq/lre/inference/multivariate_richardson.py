@@ -23,7 +23,8 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
 def _full_monomial_basis_term_exponents(
     num_layers: int, degree: int
 ) -> list[tuple[int, ...]]:
-    """Finds exponents of monomial terms required to create the sample matrix.
+    """Finds exponents of monomial terms required to create the sample matrix
+    as defined in Section IIB of :cite:`Russo_2024_LRE`.
 
     $Mj(λ_i, d)$ is the basis of monomial terms for $l$-layers in the input
     circuit up to a specific degree $d$. The linear combination defines our
