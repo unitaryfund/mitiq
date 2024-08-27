@@ -138,7 +138,7 @@ mitigated_expval = cdr.execute_with_cdr(
     compute_density_matrix,
     observable=obs,
     simulator=simulate,
-    seed=0,
+    random_state=0,
 ).real
 print(f"mitigated expectation value: {mitigated_expval:.2f}")
 ```

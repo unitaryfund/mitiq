@@ -14,7 +14,7 @@ kernelspec:
 # An example Jupyter Notebook
 
 This notebook is a demonstration of directly-parsing Jupyter Notebooks into
-Sphinx using the MyST parser.[^download]
+Sphinx using the MyST parser.
 
 ## Markdown
 

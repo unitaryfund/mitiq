@@ -18,13 +18,18 @@ from qiskit_aer import AerSimulator
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.interface import accept_any_qprogram_as_input, convert_from_mitiq
+from mitiq.interface.mitiq_braket import to_braket
 from mitiq.interface.mitiq_cirq import (
     compute_density_matrix,
     sample_bitstrings,
 )
+from mitiq.interface.mitiq_pennylane import to_pennylane
+from mitiq.interface.mitiq_pyquil import to_pyquil
+from mitiq.interface.mitiq_qibo import to_qibo
 from mitiq.interface.mitiq_qiskit import (
     execute_with_shots_and_noise,
     initialized_depolarizing_noise,
+    to_qiskit,
 )
 from mitiq.observable import Observable, PauliString
 from mitiq.zne import (
@@ -41,10 +46,13 @@ from mitiq.zne.inference import (
     RichardsonFactory,
 )
 from mitiq.zne.scaling import (
+    fold_all,
     fold_gates_at_random,
+    fold_global,
     get_layer_folding,
     insert_id_layers,
 )
+from mitiq.zne.zne import combine_results, scaled_circuits
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -560,3 +568,59 @@ def test_execute_zne_on_qiskit_circuit_with_QFT():
 
     mitigated = execute_with_zne(circuit, qs_noisy_simulation)
     assert abs(mitigated) < 1000
+
+
+@pytest.mark.parametrize(
+    "noise_scaling_method",
+    [fold_gates_at_random, insert_id_layers, fold_global, fold_all],
+)
+@pytest.mark.parametrize(
+    "extrapolation_factory", [RichardsonFactory, LinearFactory]
+)
+@pytest.mark.parametrize(
+    "to_frontend",
+    [None, to_qiskit, to_braket, to_pennylane, to_pyquil, to_qibo],
+)
+def test_two_stage_zne(
+    noise_scaling_method, extrapolation_factory, to_frontend
+):
+    qreg = cirq.LineQubit.range(2)
+    cirq_circuit = cirq.Circuit(
+        cirq.H.on_each(qreg),
+        cirq.CNOT(*qreg),
+        cirq.CNOT(*qreg),
+        cirq.H.on_each(qreg),
+    )
+    if to_frontend is not None:
+        frontend_circuit = to_frontend(cirq_circuit)
+    else:
+        frontend_circuit = cirq_circuit
+
+    scale_factors = [1, 3, 5]
+    circs = scaled_circuits(
+        frontend_circuit, scale_factors, noise_scaling_method
+    )
+
+    assert len(circs) == len(scale_factors)
+
+    np.random.seed(42)
+
+    def executor(circuit):
+        return np.random.random()
+
+    results = [executor(cirq_circuit) for _ in range(3)]
+    extrapolation_method = extrapolation_factory.extrapolate
+    two_stage_zne_res = combine_results(
+        scale_factors, results, extrapolation_method
+    )
+
+    assert isinstance(two_stage_zne_res, float)
+
+    np.random.seed(42)
+    zne_res = execute_with_zne(
+        cirq_circuit,
+        executor,
+        factory=extrapolation_factory(scale_factors),
+        scale_noise=noise_scaling_method,
+    )
+    assert np.isclose(zne_res, two_stage_zne_res)

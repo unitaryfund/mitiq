@@ -1,6 +1,6 @@
 # Examples
 
-Below you can find a gallery of tutorials applying Zero Noise Extrapolation (ZNE), Probabilistic Error Cancellation (PEC), and Digital Dynamical Decoupling (DDD) with Mitiq:
+Below you can find a gallery of tutorials applying Zero Noise Extrapolation (ZNE), Probabilistic Error Cancellation (PEC), Clifford Data Regression (CDR), and Digital Dynamical Decoupling (DDD) with Mitiq:
 
 ```{nbgallery}
 ZNE Calibration with Qiskit <calibration-tutorial.md>
@@ -32,6 +32,7 @@ Classical Shadows with Cirq: State Reconstruction and Observable Estimation <sha
 Robust Shadow Estimation with Cirq: Pauli Twirling Calibration of Classical Shadows <rshadows_tutorial.md>
 DDD with Cirq: Mirror circuits <ddd_tutorial.md>
 DDD with Qiskit: GHZ circuits <ddd_on_ibmq_ghz.md>
+CDR with Qrack as Near-Clifford Simulator <cdr_qrack.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>
 Composing techniques: REM + ZNE <combine_rem_zne.md>
 Composing techniques: DDD + ZNE <combine_ddd_zne.md>

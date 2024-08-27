@@ -97,7 +97,7 @@ def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
     )
     
     # Run the circuit
-    job = backend.run(circuit, shots=shots)
+    job = backend.run(exec_circuit, shots=shots)
 
     # Convert from raw measurement counts to the expectation value
     counts = job.result().get_counts()
