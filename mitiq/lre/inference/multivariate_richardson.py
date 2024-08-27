@@ -37,9 +37,9 @@ def _full_monomial_basis_term_exponents(
     lexicographic order.
 
     For `degree=2, num_layers=2`, the monomial terms basis are
-    {$1, x_1, x_2, x_1**2, x_1x_2, x_2**2$} i.e. the function returns the
+    ${1, x_1, x_2, x_1**2, x_1x_2, x_2**2}$ i.e. the function returns the
     exponents of x_1, x_2 as
-    `{[(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)]}`.
+    `[(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)]`.
     """
     exponents = {
         exps
