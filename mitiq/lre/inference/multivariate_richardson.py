@@ -110,8 +110,6 @@ def sample_matrix(
             for base, exp in zip(scale_factors, exponent):
                 # raise scale factor value by the exponent dict value
                 evaluated_terms.append(base**exp)
-            # multiply both elements in the list to create an evaluated
-            # monomial term
             sample_matrix[i, j] = np.prod(evaluated_terms)
 
     # verify the matrix is square
