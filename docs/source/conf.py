@@ -100,8 +100,11 @@ extensions = [
     "sphinx_gallery.load_style",
 ]
 
+# hide primary sidebar from the following pages
+html_sidebars = {"apidoc": [], "changelog": [], "bibliography": []}
+
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.9", None),
+    "python": ("https://docs.python.org/3.10", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     # Cirq is no longer using sphinx docs so interlinking is not possible.
@@ -196,9 +199,14 @@ linkcheck_ignore = [
     r"https://doi\.org/.*",
     r"https://link\.aps\.org/doi/.*",
     r"https://www\.sciencedirect\.com/science/article/.*",
+    r"https://github.com/unitaryfund/mitiq/compare/.*",
 ]
 
 linkcheck_retries = 3
+
+linkcheck_anchors_ignore_for_url = [
+    "https://github.com/unitaryfund/qrack/blob/main/README.md"
+]
 
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
@@ -401,6 +409,7 @@ nbsphinx_thumbnails = {
     "examples/quantum_simulation_scars_ibmq": "_static/qmbs_ibmq.png",
     "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
     "examples/quantum_simulation_1d_ising": "_static/quantum_simulation.png",
+    "examples/cdr_qrack": "_static/cdr-qrack.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

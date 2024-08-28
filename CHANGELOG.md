@@ -1,7 +1,70 @@
 # Changelog
 
-## Version 0.38.0
-_In development_
+## Version 0.40.0
+
+_In development._
+
+## Version 0.39.0
+
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.38.0...v0.39.0))
+
+### Highlights
+
+We've made updates to our documentation, beginning with the completion of the first section of the Pauli Twirling user guide, which offers a comprehensive introduction to this feature.
+Additionally, we've added a new tutorial on CDR (Clifford Data Regression) using [Qrack](https://github.com/unitaryfund/qrack/) as an efficient near-Clifford simulator.
+This demonstrates a workflow that harnesses the speed of Qrack in the CDR training phase, while providing users with an in-depth look at how to integrate Mitiq and Qrack effectively.
+
+#### 📓 Documentation
+
+- Complete first section of Pauli Twirling user guide (#2454) [@cosenal]
+- Hide primary sidebar from certain pages of the documentation (#2424) [@purva-thakre]
+- CDR Tutorial with Qrack (#2451) [@bdg221]
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- Separate docs build workflow (#2441) [@purva-thakre]
+- clean and git ignore all coverage reports (#2443) [@cosenal]
+- Ignore _about.py in pytest coverage (#2379) [@purva-thakre]
+- use date to make version unique for testpypi uploads (#2436) [@natestemen]
+
+#### 📦 Dependency Updates
+
+- Update scipy requirement from <=1.13.1,>=1.10.1 to >=1.10.1,<=1.14.0 (#2420) [@dependabot]
+
+## Version 0.38.0 
+
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.37.0...v0.38.0))
+
+### Highlights
+
+🚀 As of this release, thanks to @natestemen, **we are officially supporting Python 3.12 and dropping Python 3.9**.
+
+🌉 As part of UnitaryHack 2024, new contributor @NnguyenHTommy **fixed a Qiskit to Cirq gate conversion error** by implementing a fallback mechanism to decompose and transpile the Qiskit circuit into native Cirq gates.
+
+🌀 Another Unitary Hacker, @EmilianoG-byte **added functionality to simulate noise specifically on CNOT and CZ gates when using the Pauli Twilring technique** to symmetrize errors.
+
+🔉 As hinted in last release's spoilers, @purva-thakre has **implemented the noise scaling functionality required for the Layerwise Richardson Extrapolation (LRE) technique**, which allows a more fine-grained control over the amount of noise in circuits compared to the standard unitary folding method.
+
+### ✨ Enhancements
+- **Noise Scaling for LRE** (#2347) [@purva-thakre]
+- **Issue #2354 Fix - qiskit QFT gates error during conversion** (#2404) [@NnguyenHTommy]
+- **Simulate noise for CNOT and CZ gates in Pauli Twirling** (#2397) [@EmilianoG-byte]
+
+### 🛠️ Maintenance and Upkeep Improvements
+- Update readme (#2421) [@purva-thakre]
+- Update README with Github discussion link (#2419) [@bdg221]
+- Update contributing guide (#2382) [@purva-thakre]
+
+### 🧑🏽‍💻 Dev Environment Improvements
+- Used trusted publishers for testpypi publishing (#2320) [@natestemen]
+- bump min python version for intersphinx map (#2425) [@natestemen]
+- **Support python 3.12 and drop 3.9** (#2066) [@natestemen]
+
+#### 📦 Dependency Updates
+- Bump qibo from 0.2.8 to 0.2.9 (#2430) [@dependabot[bot]]
+- Update qiskit requirement from ~=1.1.0 to ~=1.1.1 (#2414) [@dependabot[bot]]
+- Bump pyscf from 2.6.0 to 2.6.2 (#2415) [@dependabot[bot]]
+
 
 ## Version 0.37.0
 
@@ -67,7 +130,7 @@ mitiq.qem_methods()
 ```
 This function provides an accessible way to understand the module naming of each technique supported by Mitiq.
 
-Thanks to @andre-a-alves, @cosenal, @jordandsulliva, @mistywahl, @purva-thakre for the PRs in this milestone.
+Thanks to @andre-a-alves, @cosenal, @jordandsullivan, @mistywahl, @purva-thakre for the PRs in this milestone.
 
 ### Enhancements
 

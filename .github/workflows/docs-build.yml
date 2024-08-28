@@ -1,0 +1,64 @@
+name: docs-build
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install
+
+      - name: Run the quilc & qvm Docker images
+        run: |
+          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+
+      - name: Generate hash from all files excluding example notebooks
+        id: gen_hash
+        run: |
+          HASH=$(find . -type f -not -path './docs/source/examples/*' | sort | xargs cat | sha256sum | awk '{print $1}')
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Fetch Jupyter cache
+        uses: actions/cache@v4
+        with:
+          path: ./docs/build/.jupyter_cache
+          key: jupyter-cache-${{ steps.gen_hash.outputs.hash }}
+
+      - name: Build and test Sphinx docs
+        run: |
+          sudo apt update
+          sudo apt install ocl-icd-opencl-dev
+          export BQSKIT_DOC_CHECK_OVERRIDE=1
+          export PYDEVD_DISABLE_FILE_VALIDATION=1
+          make docs
+
+      - name: Run linkcheck on 'release' PRs
+        if: github.event_name == 'pull_request'
+        run: |
+          pr_title_lower=$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')
+          if [[ "$pr_title_lower" == *"release"* ]]; then
+            make linkcheck
+          fi

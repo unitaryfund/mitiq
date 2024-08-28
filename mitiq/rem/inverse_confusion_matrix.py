@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-from typing import List, Sequence
+from typing import Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -14,37 +14,34 @@ from mitiq import Bitstring, MeasurementResult
 
 
 def sample_probability_vector(
-    probability_vector: npt.NDArray[np.float64], samples: int
-) -> List[Bitstring]:
+    probability_vector: Sequence[float], samples: int
+) -> list[str]:
     """Generate a number of samples from a probability distribution as
     bitstrings.
 
     Args:
         probability_vector: A probability vector.
+        samples: The number of samples to generate.
 
     Returns:
         A list of sampled bitstrings.
+
+    Example:
+        >>> sample_probability_vector([0, 1/2, 1/4, 1/4], 4)
+        ['01', '10', '11', '11']
     """
-    # sample using the probability distribution given
     num_values = len(probability_vector)
-    choices = np.random.choice(num_values, size=samples, p=probability_vector)
-
-    # convert samples to binary strings
-    bit_width = int(np.log2(num_values))
-    binary_repr_vec = np.vectorize(np.binary_repr)
-    binary_strings = binary_repr_vec(choices, width=bit_width)
-
-    # split the binary strings into an array of ints
-    bitstrings = (
-        np.apply_along_axis(  # type: ignore
-            func1d=np.fromstring,  # type: ignore
-            axis=1,
-            arr=binary_strings[:, None],
-            dtype="U1",  # type: ignore
+    if not np.log2(num_values).is_integer():
+        raise ValueError(
+            "The length of the probability vector must be a power of 2."
         )
-        .astype(np.uint8)
-        .tolist()
+
+    sampled_indices = np.random.choice(
+        num_values, size=samples, p=probability_vector
     )
+
+    bit_width = int(np.log2(num_values))
+    bitstrings = [format(index, f"0{bit_width}b") for index in sampled_indices]
 
     return bitstrings
 
@@ -60,7 +57,7 @@ def bitstrings_to_probability_vector(
         bitstrings: All measured bitstrings.
 
     Returns:
-        A probabiity vector corresponding to the measured bitstrings.
+        A probability vector corresponding to the measured bitstrings.
     """
     pv = np.zeros(2 ** len(bitstrings[0]))
     for bs in bitstrings:
@@ -100,7 +97,7 @@ def generate_inverse_confusion_matrix(
 
 
 def generate_tensored_inverse_confusion_matrix(
-    num_qubits: int, confusion_matrices: List[npt.NDArray[np.float64]]
+    num_qubits: int, confusion_matrices: list[npt.NDArray[np.float64]]
 ) -> npt.NDArray[np.float64]:
     """
     Generates the inverse confusion matrix utilizing the supplied
@@ -132,7 +129,7 @@ def generate_tensored_inverse_confusion_matrix(
 
 def closest_positive_distribution(
     quasi_probabilities: npt.NDArray[np.float64],
-) -> npt.NDArray[np.float64]:
+) -> list[float]:
     """Given the input quasi-probability distribution returns the closest
     positive probability distribution (with respect to the total variation
     distance).
@@ -163,7 +160,7 @@ def closest_positive_distribution(
         raise ValueError(
             "REM failed to determine the closest positive distribution."
         )
-    return result.x
+    return result.x.tolist()
 
 
 def mitigate_measurements(

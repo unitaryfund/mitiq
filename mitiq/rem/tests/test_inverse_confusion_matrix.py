@@ -22,29 +22,35 @@ from mitiq.rem.inverse_confusion_matrix import (
 )
 
 
+def test_sample_probability_vector_invalid_size():
+    with pytest.raises(ValueError, match="power of 2"):
+        sample_probability_vector([1 / 3, 1 / 3, 1 / 3], 3)
+
+
 def test_sample_probability_vector_single_qubit():
     bitstrings = sample_probability_vector(np.array([1, 0]), 10)
-    assert all([b == [0] for b in bitstrings])
+    assert all(b == "0" for b in bitstrings)
 
     bitstrings = sample_probability_vector(np.array([0, 1]), 10)
-    assert all([b == [1] for b in bitstrings])
+    assert all(b == "1" for b in bitstrings)
 
+    np.random.seed(0)
     bitstrings = sample_probability_vector(np.array([0.5, 0.5]), 1000)
-    assert isclose(sum([b[0] for b in bitstrings]), 500, rel_tol=0.1)
+    assert sum(int(b) for b in bitstrings) == 483
 
 
 def test_sample_probability_vector_two_qubits():
     bitstrings = sample_probability_vector(np.array([1, 0, 0, 0]), 10)
-    assert all([b == [0, 0] for b in bitstrings])
+    assert all(b == "00" for b in bitstrings)
 
     bitstrings = sample_probability_vector(np.array([0, 1, 0, 0]), 10)
-    assert all([b == [0, 1] for b in bitstrings])
+    assert all(b == "01" for b in bitstrings)
 
     bitstrings = sample_probability_vector(np.array([0, 0, 1, 0]), 10)
-    assert all([b == [1, 0] for b in bitstrings])
+    assert all(b == "10" for b in bitstrings)
 
     bitstrings = sample_probability_vector(np.array([0, 0, 0, 1]), 10)
-    assert all([b == [1, 1] for b in bitstrings])
+    assert all(b == "11" for b in bitstrings)
 
 
 def test_bitstrings_to_probability_vector():
@@ -64,20 +70,20 @@ def test_bitstrings_to_probability_vector():
     assert (pv == np.array([0, 0, 0, 1])).all()
 
 
-def test_probability_vector_roundtrip():
-    for _ in range(10):
-        pv = np.random.rand(4)
-        pv /= np.sum(pv)
-        assert isclose(
-            np.linalg.norm(
-                pv
-                - bitstrings_to_probability_vector(
-                    sample_probability_vector(pv, 1000)
-                )
-            ),
-            0,
-            abs_tol=0.1,
-        )
+@pytest.mark.parametrize("_", range(10))
+def test_probability_vector_roundtrip(_):
+    pv = np.random.rand(4)
+    pv /= np.sum(pv)
+    assert isclose(
+        np.linalg.norm(
+            pv
+            - bitstrings_to_probability_vector(
+                sample_probability_vector(pv, 1000)
+            )
+        ),
+        0,
+        abs_tol=0.1,
+    )
 
 
 def test_generate_inverse_confusion_matrix():
@@ -137,12 +143,12 @@ def test_generate_tensored_inverse_confusion_matrix(
                 num_qubits, confusion_matrices
             )
     else:
-        assert np.isclose(
+        assert np.allclose(
             generate_tensored_inverse_confusion_matrix(
                 num_qubits, confusion_matrices
             ),
             expected,
-        ).all()
+        )
 
 
 def test_mitigate_measurements():

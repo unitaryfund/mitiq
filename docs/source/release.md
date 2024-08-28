@@ -116,9 +116,8 @@ release Mitiq are:
 
 ```bash
 python -m pip install --upgrade pip
-make install requirements
-pip install setuptools wheel twine
-python setup.py sdist bdist_wheel
+pip install build twine
+python -m build
 twine upload dist/*
 ```
 

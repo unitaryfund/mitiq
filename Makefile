@@ -25,7 +25,9 @@ check-types:
 clean:
 	rm -rf dist
 	rm -rf mitiq.egg-info
-	rm -rf .pytest_cache/
+	rm -rf .mypy_cache .pytest_cache .ruff_cache
+	rm -rf htmlcov coverage.xml .coverage .coverage.*
+	rm -rf .ipynb_checkpoints
 
 .PHONY: dist
 dist:
@@ -53,10 +55,6 @@ install-hooks:
 	@git config --local core.hooksPath .git-hooks/
 	@chmod +x .git-hooks/*
 	@echo "Git hooks installed."
-
-.PHONY: requirements
-requirements: requirements/requirements.txt
-	pip install -r requirements/requirements.txt
 
 .PHONY: test
 test:
