@@ -513,7 +513,7 @@ else:
     circuit = circuit.transform_qubits(qubit_map=qubit_map)
 ```
 
-Define obersevable lists as two point correlation functions between the first qubit and every other qubit $\{\langle Z_0 Z_i\rangle\}_{0\leq i\leq n-1}$.
+Define a list of observables as two point correlation functions between the first qubit and every other qubit $\{\langle Z_0 Z_i\rangle\}_{0\leq i\leq n-1}$.
 
 
 ```{code-cell} ipython3
