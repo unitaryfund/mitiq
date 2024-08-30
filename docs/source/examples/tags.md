@@ -12,7 +12,7 @@ kernelspec:
 orphan: true
 ---
 
-# Example Tags
+# Tags
 
 ```{toctree}
 ---
