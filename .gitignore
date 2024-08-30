@@ -10,7 +10,7 @@
 _build
 __pycache__/
 docs/build/
-docs/build/_tags/
+docs/source/_tags/
 mitiq.egg-info/
 dist/
 build/
