@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qibo, zne, basic
+```
+
 # Error mitigation with Qibo using noisy simulation
 
 In this tutorial we will cover how to use Mitiq to apply [Zero-Noise Extrapolation](../guide/zne.md) (ZNE) to a quantum program written using [Qibo](https://qibo.science/).

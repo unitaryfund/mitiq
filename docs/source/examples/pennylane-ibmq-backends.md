@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, zne, pennylane, basic
+```
+
 # Error mitigation with Pennylane on IBMQ backends
 
 In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](https://pennylane.ai/), and further how to run error-mitigated circuits on IBMQ backends.

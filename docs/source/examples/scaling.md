@@ -11,6 +11,8 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cirq, zne, basic
+```
 # Noise Scaling Methods
 
 In this tutorial we will compare two noise scaling methods available for use in [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne.html) (ZNE): identity insertion and unitary folding.

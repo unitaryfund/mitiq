@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} cdr, zne, cirq, advanced
+```
+
  # Using ZNE and learning-based methods to mitigate the 1D transverse-longitudinal Ising model
 
 In this tutorial, we employ ZNE, CDR, and VNCDR mitigation techniques to address errors in the simulation of the 1-D Transverse-Longitudinal Ising model using Mitiq. It is important to note that the results presented here are not original, but rather an attempt to reproduce some of the findings outlined in the paper available at {cite}`Sopena_2023_Quantum`.
