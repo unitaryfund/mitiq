@@ -104,6 +104,7 @@ extensions = [
 
 # to add tags to the documentation tutorials
 tags_create_tags = True
+tags_output_dir = "tags/"
 tags_overview_title = "All tags"
 tags_create_badges = True
 tags_intro_text = "Tags on this page: "

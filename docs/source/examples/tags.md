@@ -18,5 +18,5 @@ orphan: true
 ---
 maxdepth: 2
 ---
-../../_tags/tagsindex.md
+../../tags/tagsindex.md
 ```
