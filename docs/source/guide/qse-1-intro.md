@@ -18,15 +18,16 @@ Here we show how to use QSE by means of a simple example.
 To use QSE, we call `qse.execute_with_qse()` with five “ingredients”:
 
 - A quantum circuit to prepare a state
-- A quantum computer or noisy simulator to return a QuantumResult from
+- A quantum computer or noisy simulator which returns a {class}`.QuantumResult`
 - An observable we wish to compute the error mitigated expectation value
-- A list of Check Operators which can be stabilizers, symmetries or anything else.
-- A Code Hamiltonian which defines the state with the least amount of errors
+- A list of "check operators" which can be stabilizers, symmetries, or anything else.
+- A "code Hamiltonian" which defines the state with the least amount of errors
 
 ## 1. Define a quantum circuit
 The quantum circuit can be specified as any quantum circuit supported by Mitiq.
 
-In the next cell we define (as an example) a quantum circuit that prepares the logical 0 state in the [[5,1,3]] code. For simplicity, we use Gram Schmidt orthogonalization to form a unitary matrix that we use as a gate to prepare our state.
+In the next cell we define (as an example) a quantum circuit that prepares the logical 0 state in the [[5,1,3]] code.
+For simplicity, we use Gram Schmidt orthogonalization to form a unitary matrix that we use as a gate to prepare our state.
 
 ```{code-cell} ipython3
 def prepare_logical_0_state_for_5_1_3_code():
@@ -104,13 +105,11 @@ def prepare_logical_0_state_for_5_1_3_code():
     circuit.append(g(*qubits))
 
     return circuit
-
-def demo_qse():
-  circuit = prepare_logical_0_state_for_5_1_3_code()
 ```
 
 ## 2. Define an executor
-We define an [executor](executors.md) function which inputs a circuit and returns a `QuantumResult`. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
+We define an [executor](executors.md) function which inputs a circuit and returns a `QuantumResult`.
+Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
 
 ```{code-cell} ipython3
 from typing import List
@@ -127,14 +126,11 @@ def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:
         noise_model_function=cirq.depolarize,
         noise_level=(0.01,),
     )
-
-def demo_qse():
-  circuit = prepare_logical_0_state_for_5_1_3_code()
-  executor = execute_with_depolarized_noise
 ```
 
 ## 3. Observable
-We define an observable in the code subspace: $O = ZZZZZ$. As an example, assume that we wish to compute the expectation value $Tr[\rho O]$ of the observable O. 
+We define an observable in the code subspace: $O = ZZZZZ$.
+As an example, assume that we wish to compute the expectation value $\mathrm{tr}[\rho O]$ of the observable $O$.
 
 ```{code-cell} ipython3
 def get_observable_in_code_space(observable: List[cirq.PauliString]):
@@ -152,14 +148,12 @@ def get_observable_in_code_space(observable: List[cirq.PauliString]):
         observable_in_code_space *= 0.5 * Observable(FIVE_I, g)
     return observable_in_code_space
 
-def demo_qse():
-  circuit = prepare_logical_0_state_for_5_1_3_code()
-  executor = execute_with_depolarized_noise
-  observable = get_observable_in_code_space(PauliString("ZZZZZ"))
 ```
 
 ## 4. Check Operators and Code Hamiltonian
-We then assign the check operators as a list of pauli strings, and the code Hamiltonian as an Observable for the [[5,1,3]] code. The check operators of the [[5,1,3]] code are simply the expansion of the code’s 4 generators: $[XZZXI, IXZZX, XIXZZ, ZXIXZ]$
+
+We then assign the check operators as a list of pauli strings, and the code Hamiltonian as an Observable for the [[5,1,3]] code.
+The check operators of the [[5,1,3]] code are simply the expansion of the code’s 4 generators: $[XZZXI, IXZZX, XIXZZ, ZXIXZ]$
 
 ```{code-cell} ipython3
 def get_5_1_3_code_check_operators_and_code_hamiltonian() -> tuple:
@@ -195,19 +189,11 @@ def get_5_1_3_code_check_operators_and_code_hamiltonian() -> tuple:
     ]
     Hc = Observable(*negative_Ms_as_pauliStrings)
     return Ms_as_pauliStrings, Hc
-
-
-def demo_qse():
-  circuit = prepare_logical_0_state_for_5_1_3_code()
-  executor = execute_with_depolarized_noise
-  observable = get_observable_in_code_space(PauliString("ZZZZZ"))
-  check_operators, code_hamiltonian = get_5_1_3_code_check_operators_and_code_hamiltonian()
 ```
 
-
 ## Run QSE
-Now we can run QSE. We first compute the noiseless result then the noisy result to compare to the mitigated result from QSE.
 
+With everything defined, we can now run QSE in full.
 
 ```{code-cell} ipython3
 def demo_qse():
