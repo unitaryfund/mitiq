@@ -7,6 +7,7 @@
 by error mitigation techniques to compute expectation values."""
 
 import inspect
+import itertools
 import warnings
 from collections import Counter
 from typing import (
@@ -256,10 +257,7 @@ class Executor:
                 self._call_executor(circuit, **kwargs)
 
         else:
-            stop = len(to_run)
-            step = self._max_batch_size
-            for i in range(int(np.ceil(stop / step))):
-                batch = to_run[i * step : (i + 1) * step]
+            for batch in itertools.batched(to_run, self._max_batch_size):
                 self._call_executor(batch, **kwargs)
 
         results = self._quantum_results[start_result_index:]
