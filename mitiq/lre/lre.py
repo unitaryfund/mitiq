@@ -28,7 +28,7 @@ def execute_with_lre(
     folding_method: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
     observable: Optional[Observable] = None,
-)-> float:
+) -> float:
     noise_scaled_circuits = multivariate_layer_scaling(
         input_circuit, degree, fold_multiplier, num_chunks, folding_method
     )
@@ -89,13 +89,6 @@ def lre_decorator(
 ) -> Callable[
     [Callable[[Circuit], QuantumResult]], Callable[[Circuit], float]
 ]:
-    # Raise an error if the decorator is used without parenthesis
-    if callable(observable):
-        raise TypeError(
-            "Decorator must be used with parentheses (i.e., @lre_decorator()) "
-            "with explicit arguments for shots, degree and fold_multiplier."
-        )
-
     def decorator(
         executor: Callable[[Circuit], QuantumResult],
     ) -> Callable[[Circuit], float]:
