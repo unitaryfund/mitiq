@@ -11,7 +11,7 @@ from typing import Any, Callable, Optional, Union
 import numpy as np
 from cirq import Circuit
 
-from mitiq import Observable, QuantumResult
+from mitiq import QuantumResult
 from mitiq.lre import (
     multivariate_layer_scaling,
     multivariate_richardson_coefficients,
@@ -28,8 +28,37 @@ def execute_with_lre(
         [Union[Any], float], Union[Any]
     ] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-    observable: Optional[Observable] = None,
 ) -> float:
+    r"""
+    Defines the executor required for Layerwise Richardson
+    Extrapolation as defined in :cite:`Russo_2024_LRE`.
+
+    Note that this method only works for the multivariate extrapolation
+    methods. It does not allows a user to choose which layers in the input
+    circuit will be scaled.
+
+    .. seealso::
+
+        If you would prefer to choose the layers for unitary
+        folding, use :func:`mitiq.zne.scaling.layer_scaling.get_layer_folding`
+        instead.
+
+    Args:
+        input_circuit: Circuit to be scaled.
+        executor: Executes a circuit and returns a `QuantumResult`
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap required by unitary folding.
+        folding_method: Unitary folding method. Default is
+            :func:`fold_gates_at_random`.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+
+
+    Returns:
+        Error-mitigated expectation value
+
+    """
     noise_scaled_circuits = multivariate_layer_scaling(
         input_circuit, degree, fold_multiplier, num_chunks, folding_method
     )
@@ -57,8 +86,26 @@ def mitigate_executor(
         [Union[Any], float], Union[Any]
     ] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-    observable: Optional[Observable] = None,
 ) -> Callable[[Circuit], float]:
+    """Returns a modified version of the input `executor` which is
+    error-mitigated with layerwise richardson extrapolation (LRE).
+
+    Args:
+    input_circuit: Circuit to be scaled.
+    executor: Executes a circuit and returns a `QuantumResult`
+    degree: Degree of the multivariate polynomial.
+    fold_multiplier: Scaling gap required by unitary folding.
+    folding_method: Unitary folding method. Default is
+        :func:`fold_gates_at_random`.
+    num_chunks: Number of desired approximately equal chunks. When the
+        number of chunks is the same as the layers in the input circuit,
+        the input circuit is unchanged.
+
+
+    Returns:
+        Error-mitigated version of the circuit executor.
+    """
+
     @wraps(executor)
     def new_executor(input_circuit: Circuit) -> float:
         return execute_with_lre(
@@ -68,7 +115,6 @@ def mitigate_executor(
             fold_multiplier,
             folding_method,
             num_chunks,
-            observable,
         )
 
     return new_executor
@@ -79,10 +125,28 @@ def lre_decorator(
     fold_multiplier: int,
     folding_method: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-    observable: Optional[Observable] = None,
 ) -> Callable[
     [Callable[[Circuit], QuantumResult]], Callable[[Circuit], float]
 ]:
+    """Decorator which adds an error-mitigation layer based on
+    layerwise richardson extrapolation (LRE).
+
+    Args:
+    input_circuit: Circuit to be scaled.
+    executor: Executes a circuit and returns a `QuantumResult`
+    degree: Degree of the multivariate polynomial.
+    fold_multiplier: Scaling gap required by unitary folding.
+    folding_method: Unitary folding method. Default is
+        :func:`fold_gates_at_random`.
+    num_chunks: Number of desired approximately equal chunks. When the
+        number of chunks is the same as the layers in the input circuit,
+        the input circuit is unchanged.
+
+
+    Returns:
+        Error-mitigated decorator.
+    """
+
     def decorator(
         executor: Callable[[Circuit], QuantumResult],
     ) -> Callable[[Circuit], float]:
@@ -92,7 +156,6 @@ def lre_decorator(
             fold_multiplier,
             folding_method,
             num_chunks,
-            observable,
         )
 
     return decorator
