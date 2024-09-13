@@ -91,15 +91,15 @@ def mitigate_executor(
     error-mitigated with layerwise richardson extrapolation (LRE).
 
     Args:
-    input_circuit: Circuit to be scaled.
-    executor: Executes a circuit and returns a `QuantumResult`
-    degree: Degree of the multivariate polynomial.
-    fold_multiplier: Scaling gap required by unitary folding.
-    folding_method: Unitary folding method. Default is
-        :func:`fold_gates_at_random`.
-    num_chunks: Number of desired approximately equal chunks. When the
-        number of chunks is the same as the layers in the input circuit,
-        the input circuit is unchanged.
+        input_circuit: Circuit to be scaled.
+        executor: Executes a circuit and returns a `QuantumResult`
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap required by unitary folding.
+        folding_method: Unitary folding method. Default is
+            :func:`fold_gates_at_random`.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
 
 
     Returns:
@@ -132,15 +132,15 @@ def lre_decorator(
     layerwise richardson extrapolation (LRE).
 
     Args:
-    input_circuit: Circuit to be scaled.
-    executor: Executes a circuit and returns a `QuantumResult`
-    degree: Degree of the multivariate polynomial.
-    fold_multiplier: Scaling gap required by unitary folding.
-    folding_method: Unitary folding method. Default is
-        :func:`fold_gates_at_random`.
-    num_chunks: Number of desired approximately equal chunks. When the
-        number of chunks is the same as the layers in the input circuit,
-        the input circuit is unchanged.
+        input_circuit: Circuit to be scaled.
+        executor: Executes a circuit and returns a `QuantumResult`
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap required by unitary folding.
+        folding_method: Unitary folding method. Default is
+            :func:`fold_gates_at_random`.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
 
 
     Returns:
