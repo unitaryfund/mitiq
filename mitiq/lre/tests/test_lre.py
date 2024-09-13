@@ -27,12 +27,18 @@ def execute(circuit, noise_level=0.025):
 noisy_val = execute(test_cirq)
 
 
-def test_lre_exp_value():
+@pytest.mark.parametrize(
+    "input_degree, input_fold_multiplier", [(2, 2), (2, 3), (3, 4)]
+)
+def test_lre_exp_value(input_degree, input_fold_multiplier):
     """Verify LRE executors work as expected."""
     ideal_val = execute(test_cirq, noise_level=0)
     assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
-        test_cirq, execute, degree=2, fold_multiplier=2
+        test_cirq,
+        execute,
+        degree=input_degree,
+        fold_multiplier=input_fold_multiplier,
     )
     assert lre_exp_val > noisy_val
 
