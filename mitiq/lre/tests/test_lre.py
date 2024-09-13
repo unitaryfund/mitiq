@@ -18,7 +18,6 @@ test_cirq = benchmarks.generate_rb_circuits(
 
 def execute(circuit, noise_level=0.025):
     """Default executor for all unit tests."""
-    # Replace with code based on your frontend and backend.
     noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
     return rho[0, 0].real
@@ -92,7 +91,7 @@ def test_lre_executor_with_chunking():
     ideal_val = execute(test_cirq * 200, noise_level=0)
     assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
-        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=5
+        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=2
     )
     assert lre_exp_val > noisy_val
 
