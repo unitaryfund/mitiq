@@ -150,26 +150,13 @@ class Executor:
             )
 
         # Get all required circuits to run.
-        if (
-            observable is not None
-            and self._executor_return_type in MeasurementResultLike
-        ):
+        if observable is not None:
             all_circuits = [
                 circuit_with_measurements
                 for circuit in circuits
                 for circuit_with_measurements in observable.measure_in(circuit)
             ]
             result_step = observable.ngroups
-        elif (
-            observable is not None
-            and self._executor_return_type not in MeasurementResultLike
-            and self._executor_return_type not in DensityMatrixLike
-        ):
-            raise ValueError(
-                """Executor and observable are not compatible. Executors
-                returning expectation values as float must be used with
-                observable=None"""
-            )
         else:
             all_circuits = circuits
             result_step = 1
