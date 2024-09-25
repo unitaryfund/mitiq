@@ -282,8 +282,22 @@ class PauliStringCollection:
 
         basis_rotations = set()
         support = set()
+        existing_measurements = [
+            measurement_tuple[1].qubits[0]
+            for measurement_tuple in list(
+                circuit.findall_operations_with_gate_type(cirq.MeasurementGate)
+            )
+        ]
+        # existing_measurements = circuit.all_measurement_key_names()
         for pauli in paulis.elements:
             basis_rotations.update(pauli._basis_rotations())
+            for qubit in pauli._qubits_to_measure():
+                if qubit in existing_measurements:
+                    raise ValueError(
+                        f"""More than one measaurement found for qubit: """
+                        f"""{qubit}. Only a single measurement is allowed """
+                        f"""per qubit."""
+                    )
             support.update(pauli._qubits_to_measure())
         measured = circuit + basis_rotations + cirq.measure(*sorted(support))
 
