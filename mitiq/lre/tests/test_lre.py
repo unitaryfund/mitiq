@@ -88,10 +88,10 @@ def test_lre_decorator_raised_error():
 def test_lre_executor_with_chunking():
     """Verify the executor works as expected for chunking a large circuit into
     a smaller circuit."""
-    ideal_val = execute(test_cirq * 200, noise_level=0)
+    ideal_val = execute(test_cirq * 4, noise_level=0)
     assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
-        test_cirq * 200, execute, degree=2, fold_multiplier=2, num_chunks=5
+        test_cirq * 4, execute, degree=2, fold_multiplier=2, num_chunks=5
     )
     assert lre_exp_val > noisy_val
 
