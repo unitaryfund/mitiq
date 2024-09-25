@@ -288,7 +288,6 @@ class PauliStringCollection:
                 circuit.findall_operations_with_gate_type(cirq.MeasurementGate)
             )
         ]
-        # existing_measurements = circuit.all_measurement_key_names()
         for pauli in paulis.elements:
             basis_rotations.update(pauli._basis_rotations())
             for qubit in pauli._qubits_to_measure():
