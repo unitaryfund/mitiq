@@ -24,6 +24,7 @@ def execute(circuit, noise_level=0.025):
 
 
 noisy_val = execute(test_cirq)
+ideal_val = execute(test_cirq, noise_level=0)
 
 
 @pytest.mark.parametrize(
@@ -31,7 +32,6 @@ noisy_val = execute(test_cirq)
 )
 def test_lre_exp_value(input_degree, input_fold_multiplier):
     """Verify LRE executors work as expected."""
-    ideal_val = execute(test_cirq, noise_level=0)
     assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
         test_cirq,
@@ -39,14 +39,16 @@ def test_lre_exp_value(input_degree, input_fold_multiplier):
         degree=input_degree,
         fold_multiplier=input_fold_multiplier,
     )
-    assert lre_exp_val > noisy_val
+    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
     # verify the mitigated decorator work as expected
     mitigated_executor = mitigate_executor(
         execute, degree=2, fold_multiplier=2
     )
     exp_val_from_mitigate_executor = mitigated_executor(test_cirq)
-    assert exp_val_from_mitigate_executor > noisy_val
+    assert abs(exp_val_from_mitigate_executor - ideal_val) <= abs(
+        noisy_val - ideal_val
+    )
 
 
 def test_lre_decorator():
@@ -63,12 +65,12 @@ def test_lre_decorator():
         )
         return rho[0, 0].real
 
-    assert noisy_val < execute(test_cirq)
+    assert abs(execute(test_cirq) - ideal_val) <= abs(noisy_val - ideal_val)
 
 
 def test_lre_decorator_raised_error():
-    """Verify error is raised when the defualt parameters for the decorator are
-    not specified."""
+    """Verify an error is raised when the required parameters for the decorator
+    are not specified."""
     with pytest.raises(TypeError, match=re.escape("lre_decorator() missing")):
 
         @lre_decorator()
@@ -82,18 +84,43 @@ def test_lre_decorator_raised_error():
             )
             return rho[0, 0].real
 
-        assert noisy_val < execute(test_cirq)
+        assert abs(execute(test_cirq) - ideal_val) <= abs(
+            noisy_val - ideal_val
+        )
 
 
 def test_lre_executor_with_chunking():
     """Verify the executor works as expected for chunking a large circuit into
     a smaller circuit."""
-    ideal_val = execute(test_cirq * 4, noise_level=0)
+    # define a larger circuit
+    test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=12)[
+        0
+    ]
+    ideal_val = execute(test_cirq, noise_level=0)
     assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
-        test_cirq * 4, execute, degree=2, fold_multiplier=2, num_chunks=5
+        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=10
     )
-    assert lre_exp_val > noisy_val
+    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+
+
+@pytest.mark.parametrize(
+    "test_input", [(1), (2), (3), (4), (5), (6), (7), (8), (9)]
+)
+@pytest.mark.xfail
+def test_lre_executor_with_chunking_failures(test_input):
+    """Verify chunking fails when a large number of layers are chunked into a
+    smaller number of circuit layers."""
+    # define a larger circuit
+    test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=15)[
+        0
+    ]
+    ideal_val = execute(test_cirq, noise_level=0)
+    assert abs(ideal_val - noisy_val) > 0
+    lre_exp_val = execute_with_lre(
+        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=test_input
+    )
+    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 
 @pytest.mark.parametrize("input_method", [(fold_global), (fold_all)])
@@ -109,4 +136,4 @@ def test_lre_executor_with_different_folding_methods(input_method):
         fold_multiplier=2,
         folding_method=input_method,
     )
-    assert lre_exp_val > noisy_val
+    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
