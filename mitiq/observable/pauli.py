@@ -282,12 +282,18 @@ class PauliStringCollection:
 
         basis_rotations = set()
         support = set()
-        existing_measurements = [
-            measurement_tuple[1].qubits[0]
-            for measurement_tuple in list(
-                circuit.findall_operations_with_gate_type(cirq.MeasurementGate)
-            )
-        ]
+
+        # Find any existing measurement gates in the circuit
+        existing_measurements = []
+        measurement_tuples = list(
+            circuit.findall_operations_with_gate_type(cirq.MeasurementGate)
+        )
+        if measurement_tuples:
+            existing_measurements = [
+                measurement_tuple[1].qubits[0]
+                for measurement_tuple in measurement_tuples
+            ]
+
         for pauli in paulis.elements:
             basis_rotations.update(pauli._basis_rotations())
             for qubit in pauli._qubits_to_measure():
