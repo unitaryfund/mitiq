@@ -150,7 +150,10 @@ class Executor:
             )
 
         # Get all required circuits to run.
-        if observable is not None:
+        if (
+            observable is not None
+            and self._executor_return_type in MeasurementResultLike
+        ):
             all_circuits = [
                 circuit_with_measurements
                 for circuit in circuits
