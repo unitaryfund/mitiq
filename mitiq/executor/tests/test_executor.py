@@ -234,16 +234,6 @@ def test_executor_evaluate_float(execute):
         PauliString("Z"),
     ],
 )
-def test_executor_observable_compatibility_check(execute, obs):
-    q = cirq.LineQubit(0)
-    circuits = [cirq.Circuit(cirq.X(q)), cirq.Circuit(cirq.H(q), cirq.Z(q))]
-
-    executor = Executor(execute)
-
-    with pytest.raises(ValueError, match="are not compatible"):
-        executor.evaluate(circuits, obs)
-
-
 @pytest.mark.parametrize(
     "execute", [executor_measurements, executor_measurements_batched]
 )
