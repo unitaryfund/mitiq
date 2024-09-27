@@ -149,6 +149,29 @@ class Executor:
                 "Expected observable to be hermitian. Continue with caution."
             )
 
+        # Check executor and observable compatability with type hinting
+        if self._executor_return_type in FloatLike and observable is not None:
+            raise ValueError(
+                "When using a float like result, measurements should be "
+                "included in the circuit and an observable should not be used."
+            )
+        elif (
+            self._executor_return_type in DensityMatrixLike
+            and observable is None
+        ):
+            raise ValueError(
+                "When using a density matrix like result, an observable is "
+                "required."
+            )
+        elif (
+            self._executor_return_type in MeasurementResultLike
+            and observable is None
+        ):
+            raise ValueError(
+                "When using a measurement, or bitstring, like result, an "
+                "observable is required."
+            )
+
         # Get all required circuits to run.
         if (
             observable is not None
