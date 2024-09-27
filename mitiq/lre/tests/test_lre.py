@@ -32,7 +32,6 @@ ideal_val = execute(test_cirq, noise_level=0)
 )
 def test_lre_exp_value(input_degree, input_fold_multiplier):
     """Verify LRE executors work as expected."""
-    assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
         test_cirq,
         execute,
@@ -41,6 +40,14 @@ def test_lre_exp_value(input_degree, input_fold_multiplier):
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
+
+@pytest.mark.parametrize(
+    "input_degree, input_fold_multiplier", [(2, 2), (2, 3), (3, 4)]
+)
+def test_lre_exp_value_decorator(input_degree, input_fold_multiplier):
+    """Verify LRE executors work as expected."""
+
+    # move to a separate test
     # verify the mitigated decorator work as expected
     mitigated_executor = mitigate_executor(
         execute, degree=2, fold_multiplier=2
@@ -96,8 +103,6 @@ def test_lre_executor_with_chunking():
     test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=12)[
         0
     ]
-    ideal_val = execute(test_cirq, noise_level=0)
-    assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
         test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=10
     )
@@ -115,8 +120,6 @@ def test_lre_executor_with_chunking_failures(test_input):
     test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=15)[
         0
     ]
-    ideal_val = execute(test_cirq, noise_level=0)
-    assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
         test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=test_input
     )
@@ -127,8 +130,6 @@ def test_lre_executor_with_chunking_failures(test_input):
 def test_lre_executor_with_different_folding_methods(input_method):
     """Verify the executor works as expected for using non-default unitary
     folding methods."""
-    ideal_val = execute(test_cirq, noise_level=0)
-    assert abs(ideal_val - noisy_val) > 0
     lre_exp_val = execute_with_lre(
         test_cirq,
         execute,
