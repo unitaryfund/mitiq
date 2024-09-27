@@ -16,6 +16,7 @@ test_cirq = benchmarks.generate_rb_circuits(
 )[0]
 
 
+# default execute function for all unit tests
 def execute(circuit, noise_level=0.025):
     """Default executor for all unit tests."""
     noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
@@ -45,10 +46,7 @@ def test_lre_exp_value(input_degree, input_fold_multiplier):
     "input_degree, input_fold_multiplier", [(2, 2), (2, 3), (3, 4)]
 )
 def test_lre_exp_value_decorator(input_degree, input_fold_multiplier):
-    """Verify LRE executors work as expected."""
-
-    # move to a separate test
-    # verify the mitigated decorator work as expected
+    """Verify LRE mitigated executor work as expected."""
     mitigated_executor = mitigate_executor(
         execute, degree=2, fold_multiplier=2
     )
@@ -63,8 +61,7 @@ def test_lre_decorator():
 
     @lre_decorator(degree=2, fold_multiplier=2)
     def execute(circuit, noise_level=0.025):
-        mitiq_circuit = circuit
-        noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+        noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
         rho = (
             DensityMatrixSimulator()
             .simulate(noisy_circuit)
@@ -82,8 +79,7 @@ def test_lre_decorator_raised_error():
 
         @lre_decorator()
         def execute(circuit, noise_level=0.025):
-            mitiq_circuit = circuit
-            noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+            noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
             rho = (
                 DensityMatrixSimulator()
                 .simulate(noisy_circuit)
@@ -115,7 +111,7 @@ def test_lre_executor_with_chunking():
 @pytest.mark.xfail
 def test_lre_executor_with_chunking_failures(test_input):
     """Verify chunking fails when a large number of layers are chunked into a
-    smaller number of circuit layers."""
+    smaller number of circuit chunks."""
     # define a larger circuit
     test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=15)[
         0

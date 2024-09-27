@@ -102,7 +102,8 @@ def mitigate_executor(
         input_circuit: Circuit to be scaled.
         executor: Executes a circuit and returns a `QuantumResult`
         degree: Degree of the multivariate polynomial.
-        fold_multiplier: Scaling gap required by unitary folding.
+        fold_multiplier Scaling gap value required for unitary folding which
+            is used to generate the scale factor vectors.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
@@ -143,7 +144,8 @@ def lre_decorator(
         input_circuit: Circuit to be scaled.
         executor: Executes a circuit and returns a `QuantumResult`
         degree: Degree of the multivariate polynomial.
-        fold_multiplier: Scaling gap required by unitary folding.
+        fold_multiplier Scaling gap value required for unitary folding which
+            is used to generate the scale factor vectors.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
