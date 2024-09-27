@@ -100,7 +100,7 @@ def test_lre_executor_with_chunking():
         0
     ]
     lre_exp_val = execute_with_lre(
-        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=10
+        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=14
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
