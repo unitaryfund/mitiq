@@ -12,6 +12,7 @@ import cirq
 import numpy as np
 import pyquil
 import pytest
+from qiskit import QuantumCircuit
 
 from mitiq import MeasurementResult
 from mitiq.executor.executor import Executor
@@ -37,7 +38,7 @@ def executor_batched_unique(circuits) -> List[float]:
     return [executor_serial_unique(circuit) for circuit in circuits]
 
 
-def executor_serial_unique(circuit):
+def executor_serial_unique(circuit) -> float:
     return float(len(circuit))
 
 
@@ -207,12 +208,15 @@ def test_run_executor_preserves_order(s, b):
 )
 def test_executor_evaluate_float(execute):
     q = cirq.LineQubit(0)
-    circuits = [cirq.Circuit(cirq.X(q)), cirq.Circuit(cirq.H(q), cirq.Z(q))]
+    circuits = [
+        cirq.Circuit(cirq.X(q), cirq.M(q)),
+        cirq.Circuit(cirq.H(q), cirq.Z(q), cirq.M(q)),
+    ]
 
     executor = Executor(execute)
 
     results = executor.evaluate(circuits)
-    assert np.allclose(results, [1, 2])
+    assert np.allclose(results, [2, 3])
 
     if execute is executor_serial_unique:
         assert executor.calls_to_executor == 2
@@ -220,7 +224,7 @@ def test_executor_evaluate_float(execute):
         assert executor.calls_to_executor == 1
 
     assert executor.executed_circuits == circuits
-    assert executor.quantum_results == [1, 2]
+    assert executor.quantum_results == [2, 3]
 
 
 @pytest.mark.parametrize(
@@ -314,3 +318,38 @@ def test_executor_density_matrix_without_observable_typed():
         match="When using a density matrix like result",
     ):
         executor.evaluate(circuit)
+
+
+def test_executor_float_no_typehint():
+    obs = Observable(PauliString("Z"))
+    q = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.X.on(q))
+    executor = Executor(executor_serial)
+
+    with pytest.raises(
+        ValueError,
+        match="Please use type hinting with",
+    ):
+        executor.evaluate(circuit, obs)
+
+    with pytest.raises(
+        ValueError,
+        match="Please use type hinting with the executor",
+    ):
+        executor.evaluate(circuit)
+
+
+@pytest.mark.parametrize(
+    "execute",
+    [executor_density_matrix, executor_measurements],
+)
+def test_executor_non_float_no_typehint(execute):
+    executor = Executor(execute)
+
+    qcirc = QuantumCircuit(1)
+    qcirc.h(0)
+
+    with pytest.raises(
+        ValueError, match="Please use type hinting with the executor"
+    ):
+        executor.evaluate(qcirc)

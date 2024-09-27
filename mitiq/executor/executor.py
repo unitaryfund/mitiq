@@ -23,6 +23,7 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
+from cirq import MeasurementGate
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
@@ -151,26 +152,56 @@ class Executor:
 
         # Check executor and observable compatability with type hinting
         if self._executor_return_type in FloatLike and observable is not None:
-            raise ValueError(
-                "When using a float like result, measurements should be "
-                "included in the circuit and an observable should not be used."
-            )
-        elif (
-            self._executor_return_type in DensityMatrixLike
-            and observable is None
-        ):
-            raise ValueError(
-                "When using a density matrix like result, an observable is "
-                "required."
-            )
-        elif (
-            self._executor_return_type in MeasurementResultLike
-            and observable is None
-        ):
-            raise ValueError(
-                "When using a measurement, or bitstring, like result, an "
-                "observable is required."
-            )
+            if self._executor_return_type is None:
+                raise ValueError(
+                    "Please use type hinting with the executor. Without a "
+                    "return type defined, it is assumed a float is returned. "
+                    "When returning a float, an observable should not be used."
+                )
+            else:
+                raise ValueError(
+                    "When using a float like result, measurements should be "
+                    "included in the circuit and an observable should not be "
+                    "used."
+                )
+        elif observable is None:
+            if self._executor_return_type in DensityMatrixLike:
+                raise ValueError(
+                    "When using a density matrix like result, an observable "
+                    "is required."
+                )
+            elif self._executor_return_type in MeasurementResultLike:
+                raise ValueError(
+                    "When using a measurement, or bitstring, like result, an "
+                    "observable is required."
+                )
+            else:
+                for circuit in circuits:
+                    if (
+                        len(
+                            list(
+                                convert_to_mitiq(circuit)[
+                                    0
+                                ].findall_operations_with_gate_type(
+                                    MeasurementGate
+                                )
+                            )
+                        )
+                        == 0
+                    ):
+                        if self._executor_return_type is None:
+                            raise ValueError(
+                                "Please use type hinting with the executor. "
+                                "Without a return type defined, it is assumed "
+                                "a float is returned. When returning a float, "
+                                "the circuit is expected to include "
+                                "measurements."
+                            )
+                        else:
+                            raise ValueError(
+                                "When using a float like result, measurements "
+                                "should be included in the circuit."
+                            )
 
         # Get all required circuits to run.
         if (
