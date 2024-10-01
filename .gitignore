@@ -15,7 +15,7 @@ mitiq.egg-info/
 dist/
 build/
 jupyter_execute/
-
+.mypy_cache/
 # Coverage reports
 coverage.xml
 .coverage

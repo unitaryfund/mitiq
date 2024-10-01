@@ -11,3 +11,5 @@ from mitiq.lre.inference.multivariate_richardson import (
     multivariate_richardson_coefficients,
     sample_matrix,
 )
+
+from mitiq.lre.lre import execute_with_lre, mitigate_executor, lre_decorator
