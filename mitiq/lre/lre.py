@@ -11,7 +11,7 @@ from typing import Any, Callable, Optional, Union
 import numpy as np
 from cirq import Circuit
 
-from mitiq import QPROGRAM, QuantumResult
+from mitiq import QPROGRAM
 from mitiq.lre import (
     multivariate_layer_scaling,
     multivariate_richardson_coefficients,
@@ -21,7 +21,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 def execute_with_lre(
     input_circuit: Circuit,
-    executor: Callable[[Circuit], QuantumResult],
+    executor: Callable[[Circuit], float],
     degree: int,
     fold_multiplier: int,
     folding_method: Callable[
@@ -45,7 +45,7 @@ def execute_with_lre(
 
     Args:
         input_circuit: Circuit to be scaled.
-        executor: Executes a circuit and returns a `QuantumResult`
+        executor: Executes a circuit and returns a `float`
         degree: Degree of the multivariate polynomial.
         fold_multiplier: Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
@@ -63,18 +63,14 @@ def execute_with_lre(
     noise_scaled_circuits = multivariate_layer_scaling(
         input_circuit, degree, fold_multiplier, num_chunks, folding_method
     )
+
     linear_combination_coeffs = multivariate_richardson_coefficients(
         input_circuit, degree, fold_multiplier, num_chunks
     )
 
-    lre_exp_values = []
-    for scaled_circuit in noise_scaled_circuits:
-        circ_exp_val = executor(scaled_circuit)
-        lre_exp_values.append(circ_exp_val)
-
     # verify the linear combination coefficients and the calculated expectation
     # values have the same length
-    if not len(lre_exp_values) == len(  # pragma: no cover
+    if len(noise_scaled_circuits) != len(  # pragma: no cover
         linear_combination_coeffs
     ):
         raise AssertionError(
@@ -83,11 +79,16 @@ def execute_with_lre(
             + "multivariate extrapolation."
         )
 
+    lre_exp_values = []
+    for scaled_circuit in noise_scaled_circuits:
+        circ_exp_val = executor(scaled_circuit)
+        lre_exp_values.append(circ_exp_val)
+
     return np.dot(lre_exp_values, linear_combination_coeffs)
 
 
 def mitigate_executor(
-    executor: Callable[[Circuit], QuantumResult],
+    executor: Callable[[Circuit], float],
     degree: int,
     fold_multiplier: int,
     folding_method: Callable[
@@ -100,7 +101,7 @@ def mitigate_executor(
 
     Args:
         input_circuit: Circuit to be scaled.
-        executor: Executes a circuit and returns a `QuantumResult`
+        executor: Executes a circuit and returns a `float`
         degree: Degree of the multivariate polynomial.
         fold_multiplier Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
@@ -134,15 +135,13 @@ def lre_decorator(
     fold_multiplier: int,
     folding_method: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-) -> Callable[
-    [Callable[[Circuit], QuantumResult]], Callable[[Circuit], float]
-]:
+) -> Callable[[Callable[[Circuit], float]], Callable[[Circuit], float]]:
     """Decorator which adds an error-mitigation layer based on
     layerwise richardson extrapolation (LRE).
 
     Args:
         input_circuit: Circuit to be scaled.
-        executor: Executes a circuit and returns a `QuantumResult`
+        executor: Executes a circuit and returns a `float`
         degree: Degree of the multivariate polynomial.
         fold_multiplier Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
@@ -158,7 +157,7 @@ def lre_decorator(
     """
 
     def decorator(
-        executor: Callable[[Circuit], QuantumResult],
+        executor: Callable[[Circuit], float],
     ) -> Callable[[Circuit], float]:
         return mitigate_executor(
             executor,

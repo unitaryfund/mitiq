@@ -28,24 +28,20 @@ noisy_val = execute(test_cirq)
 ideal_val = execute(test_cirq, noise_level=0)
 
 
-@pytest.mark.parametrize(
-    "input_degree, input_fold_multiplier", [(2, 2), (2, 3), (3, 4)]
-)
-def test_lre_exp_value(input_degree, input_fold_multiplier):
+@pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
+def test_lre_exp_value(degree, fold_multiplier):
     """Verify LRE executors work as expected."""
     lre_exp_val = execute_with_lre(
         test_cirq,
         execute,
-        degree=input_degree,
-        fold_multiplier=input_fold_multiplier,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 
-@pytest.mark.parametrize(
-    "input_degree, input_fold_multiplier", [(2, 2), (2, 3), (3, 4)]
-)
-def test_lre_exp_value_decorator(input_degree, input_fold_multiplier):
+@pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
+def test_lre_exp_value_decorator(degree, fold_multiplier):
     """Verify LRE mitigated executor work as expected."""
     mitigated_executor = mitigate_executor(
         execute, degree=2, fold_multiplier=2
@@ -105,21 +101,18 @@ def test_lre_executor_with_chunking():
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 
-@pytest.mark.parametrize(
-    "test_input", [(1), (2), (3), (4), (5), (6), (7), (8), (9)]
-)
-@pytest.mark.xfail
-def test_lre_executor_with_chunking_failures(test_input):
-    """Verify chunking fails when a large number of layers are chunked into a
-    smaller number of circuit chunks."""
+@pytest.mark.parametrize("num_chunks", [(1), (2), (3), (4), (5), (6), (7)])
+def test_large_circuit_with_small_chunks_poor_performance(num_chunks):
+    """Verify chunking performs poorly when a large number of layers are
+    chunked into a smaller number of circuit chunks."""
     # define a larger circuit
     test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=15)[
         0
     ]
     lre_exp_val = execute_with_lre(
-        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=test_input
+        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=num_chunks
     )
-    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+    assert abs(lre_exp_val - ideal_val) >= abs(noisy_val - ideal_val)
 
 
 @pytest.mark.parametrize("input_method", [(fold_global), (fold_all)])
