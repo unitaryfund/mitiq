@@ -12,7 +12,7 @@ kernelspec:
 ---
 
 
-```{admonition} Warning:
+```{warning}
 The user guide for LRE in Mitiq is currently under construction.
 ```
 
@@ -21,15 +21,17 @@ The user guide for LRE in Mitiq is currently under construction.
 Layerwise Richardson Extrapolation (LRE), an error mitigation technique, introduced in
 {cite}`Russo_2024_LRE` works by creating multiple noise-scaled variations of the input
 circuit such that the noiseless expectation value is extrapolated from the execution of each
-noisy circuit. Similar to [ZNE](zne.md), this process works in two steps:
+noisy circuit.
 
-- **Step 1: Intentionally create multiple noise-scaled but logically equivalent circuits** through unitary folding.
+Similar to [ZNE](zne.md), this process works in two steps:
 
-- **Step 2: Extrapolate to the noiseless limit** using multivariate richardson extrapolation.
+- **Step 1:** Intentionally create multiple noise-scaled but logically equivalent circuits through unitary folding.
+
+- **Step 2:** Extrapolate to the noiseless limit using multivariate richardson extrapolation.
 
 LRE leverages the flexible configurational space of layerwise unitary folding,
 allowing for a more nuanced mitigation of errors by treating the noise level of each layer of
-the quantum circuit as an independent variable
+the quantum circuit as an independent variable.
 
 ## Step 1: Intentionally create multiple noise-scaled but logically equivalent circuits
 
@@ -40,9 +42,9 @@ on unitary folding, go to [What is the theory behind ZNE?](zne-5-theory.md).
 
 Suppose we want to estimate the noiseless expectation value of some observable in an $n$-qubit circuit with $l$ layers.
 
-Each layer can have a different scale factor and we can create $M$ such variations of the scaled circuit. Let $\{λ_1, λ_2, λ_3, ..., λ_M\}$ be the scale factors vectors used to create multiple variations of the noise-scaled circuits $\{C_{λ_1}, C_{λ_2}, C_{λ_3}, ……, C_{λ_M}\}$ such that each vector $λ_i$ defines the scale factors for the different layers in the input circuit $\{{λ^1}_i, {λ^2}_i, {λ^3}_i, ….., {λ^l}_i\}^T$.
+Each layer can have a different scale factor and we can create $M$ such variations of the scaled circuit. Let $\{λ_1, λ_2, λ_3, \ldots, λ_M\}$ be the scale factors vectors used to create multiple variations of the noise-scaled circuits $\{C_{λ_1}, C_{λ_2}, C_{λ_3}, \ldots, C_{λ_M}\}$ such that each vector $λ_i$ defines the scale factors for the different layers in the input circuit $\{{λ^1}_i, {λ^2}_i, {λ^3}_i, \ldots, {λ^l}_i\}^T$.
 
-If $d$ is the chosen degree of our multivariate polynomial, $M_j(λ_i, d)$ corresponds to the terms in the polynomial. In general, the monomial terms for a variable $l$ up to degree $d$  can be determined through the [Stars and Bars method](https://en.wikipedia.org/wiki/Stars_and_bars_%28combinatorics%29).
+If $d$ is the chosen degree of our multivariate polynomial, $M_j(λ_i, d)$ corresponds to the terms in the polynomial. In general, the monomial terms for a variable $l$ up to degree $d$ can be determined through the [stars and bars method](https://en.wikipedia.org/wiki/Stars_and_bars_%28combinatorics%29).
 
 $$
 \text{total number of terms in the monomial basis with max degree } d = \binom{d + l}{d}
@@ -64,22 +66,20 @@ $$
 \end{bmatrix}
 $$
 
-Each monomial term in the sample matrix is evaluated using the values in the scale factor vectors. We aim to define the zero-noise limit as a linear combination of the noisy expectation values. Finding the coefficients in the linear combination becomes a problem solvable through a system of linear equations $Ac = z$ where c is the coefficients vector, $z$ is the vector of expectation values and $\mathbf{A}$ is the sample matrix evaluated using the values in the scale factor vectors.
+Each monomial term in the sample matrix is evaluated using the values in the scale factor vectors. We aim to define the zero-noise limit as a linear combination of the noisy expectation values. Finding the coefficients in the linear combination becomes a problem solvable through a system of linear equations $Ac = z$ where $c$ is the coefficients vector, $z$ is the vector of expectation values and $\mathbf{A}$ is the sample matrix evaluated using the values in the scale factor vectors.
 
 ## Step 2: Extrapolate to the noiseless limit
 
-Each noise scaled circuit $C_{λ_i}$ has an expectation value associated with it $\langle O(λ_i) \rangle$ such that we can define a vector of the noisy expectation values $z = (\langle O(λ_1) \rangle, \langle O(λ_2) \rangle, \langle O(λ_3) \rangle, ..., \langle O(λ_M)\rangle)^T$. These have a coefficient of linear combination associated with them such that 
+Each noise scaled circuit $C_{λ_i}$ has an expectation value associated with it $\langle O(λ_i) \rangle$ such that we can define a vector of the noisy expectation values $z = (\langle O(λ_1) \rangle, \langle O(λ_2) \rangle, \langle O(λ_3) \rangle, \ldots, \langle O(λ_M)\rangle)^T$. These have a coefficient of linear combination associated with them such that 
 
 $$
-
-O_{LRE} = \sum_{i=1}^{M} \eta_i \langle O(\boldsymbol{\lambda}_i) \rangle
-
+O_{LRE} = \sum_{i=1}^{M} \eta_i \langle O(\boldsymbol{\lambda}_i) \rangle.
 $$
 
 The system of linear equations is used to find the numerous $\eta_i$. As we only need to find the noiseless expectation value, we do not need to calculate the full vector of linear combination coefficients if we use the [Lagrange interpolation formula](https://files.eric.ed.gov/fulltext/EJ1231189.pdf). 
 
 $$
-O_{\rm LRE} = \sum_{i=1}^M \langle O (\boldsymbol{\lambda}_i)\rangle  \frac{\det \left(\mathbf{M}_i (\boldsymbol{0}) \right)}{\det \left(\mathbf{A}\right)}
+O_{\rm LRE} = \sum_{i=1}^M \langle O (\boldsymbol{\lambda}_i)\rangle  \frac{\det \left(\mathbf{M}_i (\boldsymbol{0}) \right)}{\det \left(\mathbf{A}\right)}.
 $$
 
-To get the matrix $\mathbf{M}_i(\mathbf{0})$, replace the $i$-th row of the sample matrix $\mathbf{A}$ by $\mathbf{e}_1=(1, 0, \ldots, 0)^t$.
+To get the matrix $\mathbf{M}_i(\mathbf{0})$, replace the $i$-th row of the sample matrix $\mathbf{A}$ by $\mathbf{e}_1=(1, 0, \ldots, 0)^T$.
