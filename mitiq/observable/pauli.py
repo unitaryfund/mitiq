@@ -23,8 +23,6 @@ class PauliString:
     coefficient. ``PauliString`` objects can be measured in any
     ``mitiq.QPROGRAM``.
 
-    Initialize a PauliString.
-
     Args:
         spec: String specifier of the PauliString. Should only contain
             characters 'I', 'X', 'Y', and 'Z'.
