@@ -133,7 +133,6 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-
 #### Learning-based PEC
 
 ```{eval-rst}
@@ -383,6 +382,7 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.interface.mitiq_pyquil.conversions
    :members:
 ```
+
 #### Qibo Conversions
 
 ```{eval-rst}
