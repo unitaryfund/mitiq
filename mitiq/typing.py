@@ -125,6 +125,11 @@ class MeasurementResult:
 
     def __post_init__(self) -> None:
         # Validate arguments
+        if isinstance(self.result, dict):
+            raise TypeError(
+                "Use the MeasurementResult.from_counts method to instantiate "
+                "a MeasurementResult object from a dictionary."
+            )
         symbols = set(b for bits in self.result for b in bits)
         if not (symbols.issubset({0, 1}) or symbols.issubset({"0", "1"})):
             raise ValueError("Bitstrings should look like '011' or [0, 1, 1].")
