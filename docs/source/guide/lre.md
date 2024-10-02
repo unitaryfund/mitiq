@@ -1,5 +1,5 @@
 
-```{warning}:
+```{warning}
 The user guide for LRE in Mitiq is currently under construction.
 ```
 
