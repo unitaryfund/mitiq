@@ -320,36 +320,31 @@ def test_executor_density_matrix_without_observable_typed():
         executor.evaluate(circuit)
 
 
-def test_executor_float_no_typehint():
-    obs = Observable(PauliString("Z"))
-    q = cirq.LineQubit(0)
-    circuit = cirq.Circuit(cirq.X.on(q))
+def test_executor_float_not_typed():
     executor = Executor(executor_serial)
-
-    with pytest.raises(
-        ValueError,
-        match="Please use type hinting with",
-    ):
-        executor.evaluate(circuit, obs)
-
-    with pytest.raises(
-        ValueError,
-        match="Please use type hinting with the executor",
-    ):
-        executor.evaluate(circuit)
-
-
-@pytest.mark.parametrize(
-    "execute",
-    [executor_density_matrix, executor_measurements],
-)
-def test_executor_non_float_no_typehint(execute):
-    executor = Executor(execute)
-
+    executor_typed = Executor(executor_serial_typed)
     qcirc = QuantumCircuit(1)
     qcirc.h(0)
+    assert executor.evaluate(qcirc) == executor_typed.evaluate(qcirc)
 
-    with pytest.raises(
-        ValueError, match="Please use type hinting with the executor"
-    ):
-        executor.evaluate(qcirc)
+
+def test_executor_density_matrix_not_typed():
+    obs = Observable(PauliString("Z"))
+    executor = Executor(executor_density_matrix)
+    executor_typed = Executor(executor_density_matrix_typed)
+    q = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.X.on(q))
+    assert np.allclose(
+        executor.evaluate(circuit, obs), executor_typed.evaluate(circuit, obs)
+    )
+
+
+def test_executor_measurements_not_typed():
+    obs = Observable(PauliString("Z"))
+    executor = Executor(executor_measurements)
+    executor_typed = Executor(executor_measurements_typed)
+    q = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.X.on(q))
+    assert executor.evaluate(circuit, obs) == executor_typed.evaluate(
+        circuit, obs
+    )
