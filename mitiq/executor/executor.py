@@ -41,6 +41,7 @@ FloatLike = [
     None,  # Untyped executors are assumed to return floats.
     float,
     np.float32,
+    np.float64,
     Iterable[float],
     List[float],
     Sequence[float],
