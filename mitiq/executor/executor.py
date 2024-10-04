@@ -23,7 +23,6 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
-from cirq import MeasurementGate
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
@@ -41,6 +40,7 @@ DensityMatrixLike = [
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
     float,
+    np.float32,
     Iterable[float],
     List[float],
     Sequence[float],
@@ -151,57 +151,27 @@ class Executor:
             )
 
         # Check executor and observable compatability with type hinting
+        # If FloatLike is specified as a return and observable is used
         if self._executor_return_type in FloatLike and observable is not None:
-            if self._executor_return_type is None:
-                raise ValueError(
-                    "Please use type hinting with the executor. Without a "
-                    "return type defined, it is assumed a float is returned. "
-                    "When returning a float, an observable should not be used."
-                )
-            else:
+            if self._executor_return_type is not None:
                 raise ValueError(
                     "When using a float like result, measurements should be "
-                    "included in the circuit and an observable should not be "
+                    "included manually and an observable should not be "
                     "used."
                 )
         elif observable is None:
+            # Type hinted as DensityMatrixLik but no observable is set
             if self._executor_return_type in DensityMatrixLike:
                 raise ValueError(
                     "When using a density matrix like result, an observable "
                     "is required."
                 )
+            # Type hinted as MeasurementResulteLike but no observable is set
             elif self._executor_return_type in MeasurementResultLike:
                 raise ValueError(
                     "When using a measurement, or bitstring, like result, an "
                     "observable is required."
                 )
-            else:
-                for circuit in circuits:
-                    if (
-                        len(
-                            list(
-                                convert_to_mitiq(circuit)[
-                                    0
-                                ].findall_operations_with_gate_type(
-                                    MeasurementGate
-                                )
-                            )
-                        )
-                        == 0
-                    ):
-                        if self._executor_return_type is None:
-                            raise ValueError(
-                                "Please use type hinting with the executor. "
-                                "Without a return type defined, it is assumed "
-                                "a float is returned. When returning a float, "
-                                "the circuit is expected to include "
-                                "measurements."
-                            )
-                        else:
-                            raise ValueError(
-                                "When using a float like result, measurements "
-                                "should be included in the circuit."
-                            )
 
         # Get all required circuits to run.
         if (
@@ -219,15 +189,39 @@ class Executor:
             result_step = 1
 
         # Run all required circuits.
-        all_results = self.run(all_circuits, force_run_all, **kwargs)
+        try:
+            all_results = self.run(all_circuits, force_run_all, **kwargs)
+        except Exception:
+            if observable is not None and self._executor_return_type is None:
+                all_circuits = [
+                    circuit_with_measurements
+                    for circuit in circuits
+                    for circuit_with_measurements in observable.measure_in(
+                        circuit
+                    )
+                ]
+                all_results = self.run(all_circuits, force_run_all, **kwargs)
+            else:
+                raise
+
+        # check returned type
+        manual_return_type = None
+        if len(all_results) > 0:
+            manual_return_type = type(all_results[0])
 
         # Parse the results.
-        if self._executor_return_type in FloatLike:
+        if (
+            self._executor_return_type in FloatLike
+            and self._executor_return_type is not None
+        ) or manual_return_type in FloatLike:
             results = np.real_if_close(
                 cast(Sequence[float], all_results)
             ).tolist()
 
-        elif self._executor_return_type in DensityMatrixLike:
+        elif (
+            self._executor_return_type in DensityMatrixLike
+            or manual_return_type in DensityMatrixLike
+        ):
             observable = cast(Observable, observable)
             all_results = cast(List[npt.NDArray[np.complex64]], all_results)
             results = [
@@ -235,7 +229,10 @@ class Executor:
                 for density_matrix in all_results
             ]
 
-        elif self._executor_return_type in MeasurementResultLike:
+        elif (
+            self._executor_return_type in MeasurementResultLike
+            or manual_return_type in MeasurementResultLike
+        ):
             observable = cast(Observable, observable)
             all_results = cast(List[MeasurementResult], all_results)
             results = [
