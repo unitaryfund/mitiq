@@ -27,7 +27,7 @@ def generate_training_circuits(
     fraction_non_clifford: float,
     method_select: str = "uniform",
     method_replace: str = "closest",
-    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    random_state: Optional[Union[int,np.random.Generator]] = None,
     **kwargs: Any,
 ) -> List[Circuit]:
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
@@ -57,8 +57,10 @@ def generate_training_circuits(
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
     """
-    if random_state is None or isinstance(random_state, int):
-        random_state = np.random.RandomState(random_state)
+    if isinstance(random_state, int):
+        random_state = np.random.default_rng(random_state)  # Use default_rng for new generator
+    elif random_state is None:
+        random_state = np.random.default_rng()  # Create a default random generator
 
     # Find the non-Clifford operations in the circuit.
     operations = list(circuit.all_operations())
@@ -98,7 +100,7 @@ def _map_to_near_clifford(
     fraction_non_clifford: float,
     method_select: str = "uniform",
     method_replace: str = "closest",
-    random_state: Optional[np.random.RandomState] = None,
+    random_state: Optional[np.random.Generator] = None,
     **kwargs: Any,
 ) -> Sequence[cirq.ops.Operation]:
     """Returns the list of non-Clifford operations with some of these replaced
@@ -152,7 +154,7 @@ def _select(
     fraction_non_clifford: float,
     method: str = "uniform",
     sigma: Optional[float] = 1.0,
-    random_state: Optional[np.random.RandomState] = None,
+    random_state: Optional[np.random.Generator] = None,
 ) -> List[int]:
     """Returns indices of non-Clifford operations selected (to be replaced)
     according to some method.
@@ -168,7 +170,7 @@ def _select(
         random_state: Random state for sampling.
     """
     if random_state is None:
-        random_state = np.random  # type: ignore
+        random_state = np.random.default_rng()   # type: ignore
 
     num_non_cliff = len(non_clifford_ops)
     num_to_replace = int(round(fraction_non_clifford * num_non_cliff))
@@ -192,7 +194,7 @@ def _select(
         )
 
     # Select (indices of) non-Clifford operations to replace.
-    selected_indices = cast(np.random.RandomState, random_state).choice(
+    selected_indices = random_state.choice(
         range(num_non_cliff),
         num_non_cliff - num_to_replace,
         replace=False,
@@ -205,7 +207,7 @@ def _replace(
     non_clifford_ops: Sequence[cirq.ops.Operation],
     method: str = "uniform",
     sigma: float = 1.0,
-    random_state: Optional[np.random.RandomState] = None,
+    random_state: Optional[np.random.Generator] = None,
 ) -> List[cirq.ops.Operation]:
     """Function that takes the non-Clifford angles and replacement and
     selection specifications, returning the projected angles according to a
@@ -229,7 +231,7 @@ def _replace(
         'uniform' or 'gaussian'.
     """
     if random_state is None:
-        random_state = np.random  # type: ignore
+        random_state = np.random.default_rng()  # type: ignore
 
     # TODO: Update these functions to act on operations instead of angles.
     non_clifford_angles = np.array(
@@ -240,7 +242,7 @@ def _replace(
 
     elif method == "uniform":
         clifford_angles = random_clifford(
-            len(non_clifford_angles), cast(np.random.RandomState, random_state)
+            len(non_clifford_angles), cast(np.random.Generator, random_state)
         )
 
     elif method == "gaussian":

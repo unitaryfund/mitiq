@@ -57,7 +57,7 @@ def generate_rb_circuits(
         )
     qubits = cirq.LineQubit.range(n_qubits)
     cliffords = _single_qubit_cliffords()
-    rng = np.random.RandomState(seed)
+    rng = np.random.default_rng(seed)
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
         circuits = []

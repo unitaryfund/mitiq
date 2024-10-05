@@ -45,7 +45,7 @@ def count_non_cliffords(circuit: Circuit) -> int:
 
 
 def random_clifford(
-    num_angles: int, random_state: np.random.RandomState
+    num_angles: int, random_state: np.random.Generator
 ) -> npt.NDArray[np.float64]:
     """Returns an array of Clifford angles chosen uniformly at random.
 
@@ -63,7 +63,7 @@ def closest_clifford(angles: npt.NDArray[np.float64]) -> float:
     """Returns the nearest Clifford angles to the input angles.
 
     Args:
-        non_Clifford_ops: Non-Clifford opperations.
+        non_Clifford_ops: Non-Clifford operations.
     """
     ang_scaled = angles / (np.pi / 2)
     # if just one min value, return the corresponding nearest cliff.
@@ -144,7 +144,7 @@ def angle_to_proximity(angle: float, sigma: float) -> float:
 def probabilistic_angle_to_clifford(
     angles: float,
     sigma: float,
-    random_state: np.random.RandomState,
+    random_state: np.random.Generator,
 ) -> npt.NDArray[np.float64]:
     """Returns a Clifford angle sampled from the distribution
 
