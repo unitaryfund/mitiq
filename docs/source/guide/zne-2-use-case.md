@@ -17,7 +17,7 @@ kernelspec:
 
 Zero noise extrapolation is one of the simplest error mitigation techniques and, in many practical situations, it can be applied with a relatively small sampling cost.
 The main advantage of ZNE is that the technique can be applied without a detailed knowledge of
-the undelying noise model. Therefore it can be a good option in situations where
+the underlying noise model. Therefore it can be a good option in situations where
 tomography is impractical.
 
 
