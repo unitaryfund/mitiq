@@ -112,6 +112,11 @@ class MeasurementResult:
             ``tuple(range(self.nqubits))``, where ``self.nqubits``
             is the bitstring length deduced from ``result``.
 
+    Example:
+        >>> mr = MeasurementResult(["001", "010", "001"])
+        >>> mr.get_counts()
+        {'001': 2, '010': 1}
+
     Note:
         Use caution when selecting the default option for ``qubit_indices``,
         especially when estimating an :class:`.Observable`
