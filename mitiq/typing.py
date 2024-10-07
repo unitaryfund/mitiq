@@ -117,7 +117,7 @@ class MeasurementResult:
         >>> mr.get_counts()
         {'001': 2, '010': 1}
 
-    Note:
+    Warning:
         Use caution when selecting the default option for ``qubit_indices``,
         especially when estimating an :class:`.Observable`
         acting on a subset of qubits. In this case Mitiq
