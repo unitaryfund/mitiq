@@ -112,7 +112,12 @@ class MeasurementResult:
             ``tuple(range(self.nqubits))``, where ``self.nqubits``
             is the bitstring length deduced from ``result``.
 
-    Note:
+    Example:
+        >>> mr = MeasurementResult(["001", "010", "001"])
+        >>> mr.get_counts()
+        {'001': 2, '010': 1}
+
+    Warning:
         Use caution when selecting the default option for ``qubit_indices``,
         especially when estimating an :class:`.Observable`
         acting on a subset of qubits. In this case Mitiq
@@ -125,6 +130,11 @@ class MeasurementResult:
 
     def __post_init__(self) -> None:
         # Validate arguments
+        if isinstance(self.result, dict):
+            raise TypeError(
+                "Use the MeasurementResult.from_counts method to instantiate "
+                "a MeasurementResult object from a dictionary."
+            )
         symbols = set(b for bits in self.result for b in bits)
         if not (symbols.issubset({0, 1}) or symbols.issubset({"0", "1"})):
             raise ValueError("Bitstrings should look like '011' or [0, 1, 1].")
