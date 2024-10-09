@@ -33,7 +33,7 @@ LRE leverages the flexible configuration space of layerwise unitary folding,
 allowing for a more nuanced mitigation of errors by treating the noise level of each layer of
 the quantum circuit as an independent variable.
 
-## Step 1: Intentionally create multiple noise-scaled but logically equivalent circuits
+## Step 1: Create noise-scaled circuits
 
 The goal is to create noise-scaled circuits of different depths where the layers in each circuit are scaled in
 a specific pattern as a result of unitary folding. This pattern is often described by the vector of scale factor vectors
@@ -44,7 +44,7 @@ Suppose we're interested in the value of some observable in an $n$-qubit circuit
 
 Each layer can have a different scale factor and we can create $M$ such variations of the scaled circuit. Let $\{λ_1, λ_2, λ_3, \ldots, λ_M\}$ be the scale factors vectors used to create multiple variations of the noise-scaled circuits $\{C_{λ_1}, C_{λ_2}, C_{λ_3}, \ldots, C_{λ_M}\}$ such that each vector $λ_i$ defines the scale factors for the different layers in the input circuit $\{{λ^1}_i, {λ^2}_i, {λ^3}_i, \ldots, {λ^l}_i\}^T$.
 
-If $d$ is the chosen degree of our multivariate polynomial, $M_j(λ_i, d)$ corresponds to the terms in the polynomial arranged in increasing order. In general, the monomial terms for a variable $l$ up to degree $d$ can be determined through the [stars and bars method](https://en.wikipedia.org/wiki/Stars_and_bars_%28combinatorics%29).
+If $d$ is the chosen degree of our multivariate polynomial, we define $M_j(λ_i, d)$ to be the terms in the polynomial arranged in increasing order. In general, the number of monomial terms with $l$ variables up to degree $d$ can be determined through the [stars and bars method](https://en.wikipedia.org/wiki/Stars_and_bars_%28combinatorics%29).
 
 $$
 \text{total number of terms in the monomial basis with max degree } d = \binom{d + l}{d}
@@ -72,7 +72,8 @@ Finding the coefficients in the linear combination becomes a problem solvable th
 
 ## Step 2: Extrapolate to the noiseless limit
 
-Each noise scaled circuit $C_{λ_i}$ has an expectation value $\langle O(λ_i) \rangle$ associated with it such that we can define a vector of the noisy expectation values $z = (\langle O(λ_1) \rangle, \langle O(λ_2) \rangle, \ldots, \langle O(λ_M)\rangle)^T$. These have a coefficient of linear combination associated with them as shown below: 
+Each noise scaled circuit $C_{λ_i}$ has an expectation value $\langle O(λ_i) \rangle$ associated with it such that we can define a vector of the noisy expectation values $z = (\langle O(λ_1) \rangle, \langle O(λ_2) \rangle, \ldots, \langle O(λ_M)\rangle)^T$.
+These values can then be combined via a linear combination to estimate the ideal value $variable$.
 
 $$
 O_{\mathrm{LRE}} = \sum_{i=1}^{M} \eta_i \langle O(λ_i) \rangle.
