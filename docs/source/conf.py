@@ -393,6 +393,9 @@ html_favicon = "img/mitiq.ico"
 html_extra_path = ["robots.txt"]
 
 html_theme_options = {
+    "announcement": "The Unitary Fund 2024 Quantum Open Source Software Survey\
+        is here! <a href='https://www.surveymonkey.com/r/qosssurvey24'>Take \
+        the survey now!</a>",
     "icon_links": [
         {
             "name": "Source Repository",
