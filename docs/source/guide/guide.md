@@ -10,6 +10,7 @@ pec.md
 cdr.md
 shadows.md
 ddd.md
+lre.md
 rem.md
 qse.md
 pt.md
