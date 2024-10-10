@@ -30,7 +30,7 @@ def generate_w_circuit(
         A W-state circuit of linear complexity acting on ``n_qubits`` qubits.
     """
     if n_qubits <= 0:
-        raise ValueError("{} is invalid for the number of qubits. ", n_qubits)
+        raise ValueError(f"{n_qubits} is invalid for the number of qubits. ")
 
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = cirq.Circuit()
