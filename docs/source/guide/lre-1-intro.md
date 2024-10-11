@@ -13,7 +13,7 @@ kernelspec:
 
 # How do I use LRE?
 
-LRE works in two main steps: generate noise-scaled circuits, and apply inference to results from executed circuits.
+LRE works in two main stages: generate noise-scaled circuits via layerwise scaling, and apply inference to resulting measurements post-execution.
 
 This workflow can be executed by a single call to {func}`.execute_with_lre`.
 If more control is needed over the protocol, Mitiq provides {func}`.multivariate_layer_scaling` and {func}`.multivariate_richardson_coefficients` to handle the first and second steps respectively.
@@ -27,7 +27,7 @@ Work on making this technique compatible with other frontends is ongoing. 🚧
 
 To demonstrate the use of LRE, we'll first define a quantum circuit, and a method of executing circuits for demonstration purposes.
 
-For simplicity, we define a simple circuit whose ideal execution is identical to the identity operation.
+For simplicity, we define a circuit whose unitary compiles to the identity operation.
 Here we will use a randomized benchmarking circuit on a single qubit, visualized below.
 
 ```{code-cell} ipython3
@@ -39,7 +39,7 @@ circuit = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=3)[0]
 print(circuit)
 ```
 
-We define an [executor](executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of the ground state.
+We define an [executor](executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of measuring the ground state.
 By altering the value for `noise_level`, ideal and noisy expectation values can be obtained.
 
 ```{code-cell} ipython3
@@ -62,7 +62,7 @@ print(f"Error without mitigation: {abs(ideal - noisy) :.5f}")
 
 ## Apply LRE directly
 
-With the circuit, and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier.
+With the circuit and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier.
 
 ```{code-cell} ipython3
 from mitiq.lre import execute_with_lre
