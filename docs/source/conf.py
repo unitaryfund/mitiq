@@ -234,6 +234,7 @@ linkcheck_ignore = [
     r"https://link\.aps\.org/doi/.*",
     r"https://www\.sciencedirect\.com/science/article/.*",
     r"https://github.com/unitaryfund/mitiq/compare/.*",
+    r"https://github.com/unitaryfund/mitiq/projects/7",
 ]
 
 linkcheck_retries = 3
