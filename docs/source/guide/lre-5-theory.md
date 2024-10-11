@@ -73,7 +73,7 @@ $$
 \end{bmatrix}
 $$
 
-For our example circuit of $l=2$ and $d=2$, each row defined by the generic monomial terms $M_i(λ_i, d)$ in the sample matrix $\mathbf{A}$ will instead be replaced by $\{1, λ_1, λ_2, {λ_1}^2, λ_1 . λ_2, {λ_2}^2 \}$.
+For our example circuit of $l=2$ and $d=2$, each row defined by the generic monomial terms $\{M_1(λ_i, d), M_2(λ_i, d), \ldots, M_N(λ_i, d)\}$ in the sample matrix $\mathbf{A}$ will instead be replaced by $\{1, λ_1, λ_2, {λ_1}^2, λ_1 . λ_2, {λ_2}^2 \}$.
 
 Here, each monomial term in the sample matrix $\mathbf{A}$ is then evaluated using the values in the scale factor vectors. In Step 2, this sample matrix will be utilized to obtain our mitigated expectation value.
 
