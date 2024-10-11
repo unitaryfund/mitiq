@@ -2,7 +2,53 @@
 
 ## Version 0.40.0
 
-_In development._
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.39.0...v0.40.0))
+
+### Highlights
+
+🔉 A new quantum error-mitigation technique is available in Mitiq!
+**Layerwise Richardson Extrapolation** is now available through `mitiq.lre.execute_with_lre`.
+Documentation is also available in the user guide, with more advanced docs and demonstrations coming in the next release.
+
+🥇 We had two **first time contributions** from @ecarlander and @mbrotos!
+Thank you both for your contributions! 
+
+🛡️ A **helpful error message** is raised when passing data of the incorrect type to the `MeasurementResult` class, where before it silently gave confusing results.
+
+#### 📓 Documentation
+
+- add QOSS survey banner (#2533) [@natestemen]
+- Update broken link in the readme (#2528) [@purva-thakre]
+- Move class documentation to class docstrings (#2525) [@natestemen]
+- QSE docs cleanup (#2490) [@natestemen]
+- Add tags to tutorials (#2467) [@purva-thakre]
+- Correct CDR and VNCDR acronyms in example (#2479) [@bdg221]
+- added roadmap link to readme (#2468) [@ecarlander]
+- Update ibmq-backends.md (#2474) [@mbrotos]
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- Remove `make requirements` (#2481) [@purva-thakre]
+- Fix flaky REM test / refactor (#2464) [@natestemen]
+
+#### 📦 Dependency Updates
+
+- Bump pyscf from 2.6.2 to 2.7.0 (#2518) [@dependabot]
+- Bump pyqrack from 1.30.24 to 1.30.30 (#2521) [@dependabot]
+- Bump pyqrack from 1.30.22 to 1.30.24 (#2497) [@dependabot]
+- Update qiskit requirement from ~=1.2.1 to ~=1.2.2 (#2507) [@dependabot]
+- Bump qibo from 0.2.10 to 0.2.12 (#2506) [@dependabot]
+- Update qiskit-aer requirement from ~=0.15.0 to ~=0.15.1 (#2504) [@dependabot]
+- Update qiskit requirement from ~=1.2.0 to ~=1.2.1 (#2503) [@dependabot]
+- Bump pyqrack from 1.30.20 to 1.30.22 (#2489) [@dependabot]
+- Update qiskit-aer requirement from ~=0.14.2 to ~=0.15.0 (#2484) [@dependabot]
+- Bump pyqrack from 1.30.8 to 1.30.20 (#2487) [@dependabot]
+- Update cirq-core requirement from <1.4.0,>=1.0.0 to >=1.0.0,<1.5.0 (#2390) [@dependabot]
+- Update qiskit requirement from ~=1.1.1 to ~=1.2.0 (#2482) [@dependabot]
+- Update scipy requirement from <=1.14.0,>=1.10.1 to >=1.10.1,<=1.14.1 (#2477) [@dependabot]
+- Bump pyqrack from 1.30.0 to 1.30.8 (#2476) [@dependabot]
+- Bump sphinx from 7.2.6 to 8.0.2 (#2455) [@dependabot]
+- Bump qibo from 0.2.9 to 0.2.10 (#2458) [@dependabot]
 
 ## Version 0.39.0
 
