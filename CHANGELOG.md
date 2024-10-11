@@ -9,14 +9,21 @@
 🔉 A new quantum error-mitigation technique is available in Mitiq!
 **Layerwise Richardson Extrapolation** is now available through `mitiq.lre.execute_with_lre`.
 Documentation is also available in the user guide, with more advanced docs and demonstrations coming in the next release.
+Special thanks to Purva Thakre for this contribution!
 
 🥇 We had two **first time contributions** from @ecarlander and @mbrotos!
 Thank you both for your contributions! 
 
 🛡️ A **helpful error message** is raised when passing data of the incorrect type to the `MeasurementResult` class, where before it silently gave confusing results.
 
+#### ✨ Enhancements
+- LRE Executors (#2499) [@purva-thakre]
+- LRE Inference Functions (#2447) [@purva-thakre]
+- Raise TypeError when a dictionary is passed to MeasurementResult constructor (#2523) [@natestemen]
+
 #### 📓 Documentation
 
+- Add theory, intro and use case pages of LRE user guide (#2522) [@purva-thakre]
 - add QOSS survey banner (#2533) [@natestemen]
 - Update broken link in the readme (#2528) [@purva-thakre]
 - Move class documentation to class docstrings (#2525) [@natestemen]
