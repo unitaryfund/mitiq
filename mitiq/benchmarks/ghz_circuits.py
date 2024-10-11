@@ -32,7 +32,7 @@ def generate_ghz_circuit(
     """
     if n_qubits <= 0:
         raise ValueError(
-            "Cannot prepare a GHZ circuit with {} qubits", n_qubits
+             f"Cannot prepare a GHZ circuit with {n_qubits} qubits"
         )
 
     qubits = cirq.LineQubit.range(n_qubits)
