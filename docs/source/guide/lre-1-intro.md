@@ -104,7 +104,7 @@ print(
 )
 ```
 
-Even though though our circuit of interest has depth 8, the noise scaled circuits are on average much longer.
+As you can see, the noise scaled circuits are on average much longer than the original circuit.
 An example noise-scaled circuit is shown below.
 
 ```{code-cell} ipython3
