@@ -28,9 +28,9 @@ LRE leverages the flexible configuration space of layerwise unitary folding, all
 The goal is to create noise-scaled circuits of different depths where the layers in each circuit are scaled in a specific pattern as a result of [unitary folding](zne-5-theory.md).
 This pattern is described by the vector of scale factor vectors which are generated after the fold multiplier and degree for multivariate Richardson extrapolation are chosen.
 
-Suppose we're interested in the value of some observable of a circuit $C$ that has $L$ layers.
-For each layer $0 \leq l \leq L$ we can choose a scale factor for how much to scale that particular layer.
-Thus a vector $\lambda \in \mathbb{R}^L_+$ corresponds to a folding configuration where $\lambda_0$ corresponds to the scale factor for the first layer, and $\lambda_{L - 1}$ is the scale factor to apply on the circuits final layer.
+Suppose we're interested in the value of some observable of a circuit $C$ that has $l$ layers.
+For each layer $0 \leq L \leq l$ we can choose a scale factor for how much to scale that particular layer.
+Thus a vector $\lambda \in \mathbb{R}^l_+$ corresponds to a folding configuration where $\lambda_0$ corresponds to the scale factor for the first layer, and $\lambda_{l - 1}$ is the scale factor to apply on the circuits final layer.
 
 Fix the number of noise-scaled circuits we wish to generate at $M\in\mathbb{N}$.
 Define $\Lambda = (λ_1, λ_2, \ldots, λ_M)^T$ to be the collection of scale factors and let $(C_{λ_1}, C_{λ_2}, \ldots, C_{λ_M})^T$ denote the noise-scaled circuits corresponding to each scale factor.
