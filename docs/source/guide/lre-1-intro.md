@@ -144,9 +144,7 @@ mitigated = sum(
     exp_val * coeff
     for exp_val, coeff in zip(noise_scaled_exp_values, coefficients)
 )
-print(
-    f"Error with mitigation (LRE): {abs(ideal - mitigated):.{3}}"
-)
+print(f"Error with mitigation (LRE): {abs(ideal - mitigated):.{3}}")
 ```
 
 As you can see we again see a nice improvement in the accuracy using a two stage application of LRE.
