@@ -78,6 +78,7 @@ mitigated = execute_with_lre(
     fold_multiplier=fold_multiplier,
 )
 
+
 print(f"Error with mitigation (LRE): {abs(ideal - mitigated):.{3}}")
 ```
 
