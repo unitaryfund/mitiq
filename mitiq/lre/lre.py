@@ -12,9 +12,11 @@ import numpy as np
 from cirq import Circuit
 
 from mitiq import QPROGRAM
-from mitiq.lre import (
-    multivariate_layer_scaling,
+from mitiq.lre.inference.multivariate_richardson import (
     multivariate_richardson_coefficients,
+)
+from mitiq.lre.multivariate_scaling.layerwise_folding import (
+    multivariate_layer_scaling,
 )
 from mitiq.zne.scaling import fold_gates_at_random
 
