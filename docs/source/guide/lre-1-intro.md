@@ -65,7 +65,7 @@ print(f"Error without mitigation: {abs(ideal - noisy) :.5f}")
 With the circuit and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier.
 
 ```{code-cell} ipython3
-from mitiq.lre import execute_with_lre
+from mitiq.lre.lre import execute_with_lre
 
 
 degree = 2
