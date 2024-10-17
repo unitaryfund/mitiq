@@ -14,7 +14,7 @@ from cirq import Circuit, LineQubit, ops
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_chunks,
     _get_num_layers_without_measurements,
-    _get_scale_factor_vectors,
+    get_scale_factor_vectors,
     multivariate_layer_scaling,
 )
 
@@ -215,11 +215,11 @@ def test_layers_with_chunking():
         ),
     ],
 )
-def test_get_scale_factor_vectors_no_chunking(
+def testget_scale_factor_vectors_no_chunking(
     test_input, degree, test_fold_multiplier, expected_scale_factor_vectors
 ):
     """Verifies vectors of scale factors are calculated accurately."""
-    calculated_scale_factor_vectors = _get_scale_factor_vectors(
+    calculated_scale_factor_vectors = get_scale_factor_vectors(
         test_input, degree, test_fold_multiplier
     )
 
@@ -234,11 +234,11 @@ def test_get_scale_factor_vectors_no_chunking(
         (test_circuit1, 2, 3, 2, 6),
     ],
 )
-def test_get_scale_factor_vectors_with_chunking(
+def testget_scale_factor_vectors_with_chunking(
     test_input, degree, test_fold_multiplier, test_chunks, expected_size
 ):
     """Verifies vectors of scale factors are calculated accurately."""
-    calculated_scale_factor_vectors = _get_scale_factor_vectors(
+    calculated_scale_factor_vectors = get_scale_factor_vectors(
         test_input, degree, test_fold_multiplier, test_chunks
     )
 
@@ -270,7 +270,7 @@ def test_invalid_num_chunks(test_input, num_chunks, error_msg):
     """Ensures that the number of intended chunks in the input circuit raises
     an error for an invalid value."""
     with pytest.raises(ValueError, match=error_msg):
-        _get_scale_factor_vectors(test_input, 2, 2, num_chunks)
+        get_scale_factor_vectors(test_input, 2, 2, num_chunks)
 
 
 @pytest.mark.parametrize(
