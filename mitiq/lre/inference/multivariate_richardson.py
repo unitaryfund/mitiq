@@ -16,7 +16,7 @@ from cirq import Circuit
 from numpy.typing import NDArray
 
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
-    _get_scale_factor_vectors,
+    get_scale_factor_vectors,
 )
 
 
@@ -93,7 +93,7 @@ def sample_matrix(
     if fold_multiplier < 1:
         raise ValueError("Fold multiplier must be greater than or equal to 1.")
 
-    scale_factor_vectors = _get_scale_factor_vectors(
+    scale_factor_vectors = get_scale_factor_vectors(
         input_circuit, degree, fold_multiplier, num_chunks
     )
     num_layers = len(scale_factor_vectors[0])
@@ -156,7 +156,7 @@ def multivariate_richardson_coefficients(
         input_circuit, degree, fold_multiplier, num_chunks
     )
     num_layers = len(
-        _get_scale_factor_vectors(
+        get_scale_factor_vectors(
             input_circuit, degree, fold_multiplier, num_chunks
         )
     )
