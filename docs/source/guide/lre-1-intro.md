@@ -93,7 +93,7 @@ In this section we demonstrate the use of {func}`.multivariate_layer_scaling` an
 We start by creating a number of noise-scaled circuits which we will pass to the executor.
 
 ```{code-cell} ipython3
-from mitiq.lre import multivariate_layer_scaling
+from mitiq.lre.multivariate_scaling import multivariate_layer_scaling
 
 
 noise_scaled_circuits = multivariate_layer_scaling(circuit, degree, fold_multiplier)
@@ -126,7 +126,7 @@ The penultimate step here is to fetch the coefficients we'll use to combine the 
 The astute reader will note that we haven't defined or used a `degree` or `fold_multiplier` parameter, and this is where they are both needed.
 
 ```{code-cell} ipython3
-from mitiq.lre import multivariate_richardson_coefficients
+from mitiq.lre.inference import multivariate_richardson_coefficients
 
 
 coefficients = multivariate_richardson_coefficients(
