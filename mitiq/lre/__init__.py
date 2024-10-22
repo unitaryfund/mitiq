@@ -6,3 +6,7 @@
 """Methods for scaling noise in circuits by layers and using multivariate extrapolation."""
 
 from mitiq.lre.lre import execute_with_lre, mitigate_executor, lre_decorator
+
+from mitiq.lre import multivariate_scaling
+
+from mitiq.lre import inference
