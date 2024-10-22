@@ -23,7 +23,7 @@ paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
 
 
 def random_paulis(
-    connectivity_graph: nx.Graph, random_state: random.RandomState
+    connectivity_graph: nx.Graph, random_state: random.Generator
 ) -> cirq.Circuit:
     """Returns a circuit with randomly selected Pauli gates on each qubit.
 
@@ -33,7 +33,7 @@ def random_paulis(
             random.
     """
     return cirq.Circuit(
-        paulis[random_state.randint(len(paulis))](cirq.LineQubit(x))
+        paulis[random_state.integers(len(paulis))](cirq.LineQubit(x))
         for x in connectivity_graph.nodes
     )
 
@@ -41,7 +41,7 @@ def random_paulis(
 def edge_grab(
     two_qubit_gate_prob: float,
     connectivity_graph: nx.Graph,
-    random_state: random.RandomState,
+    random_state: random.Generator,
 ) -> nx.Graph:
     """
     Args:
@@ -63,7 +63,7 @@ def edge_grab(
     final_edges.add_nodes_from(connectivity_graph)
 
     while connectivity_graph.edges:
-        num = random_state.randint(connectivity_graph.size())
+        num = random_state.integers(connectivity_graph.size())
         edges = list(connectivity_graph.edges)
         curr_edge = edges[num]
         candidate_edges.add_edge(*curr_edge)
@@ -77,7 +77,7 @@ def edge_grab(
 
 def random_cliffords(
     connectivity_graph: nx.Graph,
-    random_state: random.RandomState,
+    random_state: random.Generator,
     two_qubit_gate: cirq.Gate = cirq.CNOT,
 ) -> cirq.Circuit:
     """
@@ -105,7 +105,7 @@ def random_cliffords(
 
 
 def random_single_cliffords(
-    connectivity_graph: nx.Graph, random_state: random.RandomState
+    connectivity_graph: nx.Graph, random_state: random.Generator
 ) -> cirq.Circuit:
     """
     Args:
@@ -119,7 +119,7 @@ def random_single_cliffords(
     """
     gates: List[cirq.Operation] = []
     for qubit in connectivity_graph.nodes:
-        num = random_state.randint(len(cliffords))
+        num = random_state.integers(len(cliffords))
         for clifford_gate in cliffords[num]:
             gates.append(clifford_gate(cirq.LineQubit(qubit)))
     return cirq.Circuit(gates)
@@ -164,7 +164,7 @@ def generate_mirror_circuit(
         )
     two_qubit_gate = supported_two_qubit_gates[two_qubit_gate_name]
 
-    random_state = random.RandomState(seed)
+    random_state = random.default_rng(seed)
 
     single_qubit_cliffords = random_single_cliffords(
         connectivity_graph, random_state=random_state
