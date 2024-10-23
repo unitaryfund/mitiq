@@ -104,62 +104,61 @@ These terms in the monomial basis are also used to define the rows of the sample
 ```{code-cell} ipython3
 from mitiq.lre.multivariate_scaling import get_scale_factor_vectors
 
+scale_factors = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2)
 
-
-
-get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2)
+scale_factors
 ```
 
 
 In the noise scaled circuits created using the above scale factor vectors:
 
+- The term $1$ in the monomial terms basis corresponds to the `degree = 0` term in the polynomial which is equivalent to
+$\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the first noise-scaled circuit is unchanged.
 
-- first circuit is unchanged to account for the `degree = 0` term in the polynomial i.e. `1` in the monomial terms basis. This corresponds to the $\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term.
-- second circuit scales just the first layer in the circuit due to the $λ_1$ term in the monomial basis
-- third circuit scales just the second layer in the circuit due to the $λ_2$ term in the monomial basis
+- due to the $λ_1$ term in the monomial basis, the second noise-scaled circuit only scales the first layer in the circuit.
+
+- due to the $λ_2$ term in the monomial basis, the next noise-scaled circuit only scales the second layer in the circuit
+
 - and so on.
 
-
 ```{code-cell} ipython3
-print("total number of noise scaled circuits created = ", len(get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2)))
-```
-
-
-
-
-
-
-As the fold_multiplier is changed, the number of circuits also increases.
-```{code-cell} ipython3
-from mitiq.lre.multivariate_scaling.layerwise_folding import get_scale_factor_vectors
-
-
-
-
-scale_factors = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 3)
-
-
 print("total number of noise scaled circuits created = ", len(scale_factors))
 ```
 
 
-Both the number of noise scaled circuits and scale factor vectors are altered when a different value for `degree` is used while keeping everything else unchanged.
+
+
+
+
+As the `fold_multiplier` is changed, the number of scaled circuits remains the same but how the layers are scaled
+is altered.
+```{code-cell} ipython3
+
+
+scale_factors_diff_fold_multiplier = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 3)
+
+
+print("total number of noise scaled circuits created with different fold_multiplier = ", len(scale_factors_diff_fold_multiplier))
+
+print("Scale factor for some noise scaled circuit with degree = 2 and fold_multiplier = 2 : ", scale_factors[-2] ,sep="\n")
+print("Scale factor for some noise scaled circuit with degree = 2 but fold_multiplier = 3 : ", scale_factors_diff_fold_multiplier[-2] ,sep="\n")
+```
+
+
+Both the number of noise scaled circuits and scale factor vectors are changed when a different value for `degree` is used while keeping everything else the same.
 
 
 ```{code-cell} ipython3
-from mitiq.lre.multivariate_scaling.layerwise_folding import get_scale_factor_vectors
 
 
-
-
-get_scale_factor_vectors(circuit, degree = 3, fold_multiplier = 2)
+scale_factors_diff_degree = get_scale_factor_vectors(circuit, degree = 3, fold_multiplier = 2)
 ```
 
 
 ```{code-cell} ipython3
 
 
-print("total number of noise scaled circuits created = ", len(get_scale_factor_vectors(circuit, degree = 3, fold_multiplier = 2)))
+print("total number of noise scaled circuits created = ", len(scale_factors_diff_degree))
 ```
 
 
@@ -174,7 +173,8 @@ The default choice for unitary folding in {func}`.execute_with_lre` and {func}`.
 {func}`.fold_gates_at_random()`.
 
 
-However there are two other choices as well: {func}`.fold_all()` and {func}`.fold_global()`.
+However there are two other choices as well: {func}`.fold_all()` and {func}`.fold_global()` which can be used for the
+`folding_method` parameter in {func}`.execute_with_lre`.
 
 
 ```{code-cell} ipython3
@@ -206,14 +206,11 @@ print("Noise scaled circuit created using global unitary folding: ", global_fold
 ```
 
 
-Similarly, specify your non-default folding method using the parameter `folding_method` in {func}`.execute_with_lre`.
-
-
 ## Chunking a circuit into fewer layers
 
 
-When you have a large circuit, the size of the sample matrix increases as the number of monomial terms scale polynomially which increases the sampling cost. In such a case, a circuit of 100 layers could be chunked into 4 layers such that for `degree = 2` and
-`fold_multiplier = 2`, only 15 noise-scaled circuits are created. In thiscase, the sample matrix remains at dimension $15 \times 15$.
+When you have a large circuit, the size of the sample matrix increases as the number of monomial terms scale polynomially. The size of the sample matrix influences sampling cost. In such a case, a circuit of 100 layers could be grouped into 4 chunks where each chunk consists of multiple collated layers. The noise scaling function {func}`.multivariate_layer_scaling`
+treats each chunk as a layer to be scaled when the parameter `num_chunks` is used. Thus, for the 100 layer circuit grouped into 4 chunks with `degree = 2` and `fold_multiplier = 2`, only 15 noise-scaled circuits are created i.e. sample matrix is reduced to dimension $15 \times 15$.
 
 
 ```{caution}
@@ -233,12 +230,8 @@ The scale factor vectors change as shown below:
 
 
 ```{code-cell} ipython3
-from mitiq.lre.multivariate_scaling.layerwise_folding import get_scale_factor_vectors
 
-
-
-
-get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2, num_chunks = 2)
+scale_factors_with_chunking = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2, num_chunks = 2)
 ```
 
 
@@ -246,20 +239,17 @@ Thus, the total number of noise-scaled circuits is reduced by ….
 
 
 ```{code-cell} ipython3
-from mitiq.lre.multivariate_scaling.layerwise_folding import get_scale_factor_vectors
+
+print("total number of noise scaled circuits with chunking =", len(scale_factors_with_chunking))
 
 
-print("total number of noise scaled circuits with chunking =", len(get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2, num_chunks = 2)))
-
-
-print("total number of noise scaled circuits without chunking =", len(get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2)))
+print("total number of noise scaled circuits without chunking =", len(scale_factors))
 
 
 ```
 
 
-How the noise-scaled circuits are chunked differs greatly as just the chunk corresponding to a monomial term is folded
-through unitary folding.
+How the noise-scaled circuits are chunked differs greatly as each chunk in the circuit is now equivalent to a layer to be folded via unitary folding.
 
 
 ```{code-cell} ipython3
