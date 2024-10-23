@@ -6,7 +6,7 @@
 width: 700px
 name: lre-overview
 ---
-The diagram shows the workflow of the Layerwise Richardson extrapolation (LRE) in Mitiq.
+The diagram shows the workflow of the layerwise Richardson extrapolation (LRE) in Mitiq.
 ```
 
 Layerwise Richardson Extrapolation (LRE), an error mitigation technique, introduced in

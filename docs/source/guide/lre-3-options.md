@@ -16,7 +16,7 @@ kernelspec:
 
 
 In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the error mitigated expectation values
-of an input circuit with the default parameters. In this section we will detail the optional arguments this technique can be used, and tuned with.
+In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 
 
@@ -42,7 +42,7 @@ The options that can be used to control the hyperparameters are:
 
 
 - `degree` of the extrapolating polynomial
-- `fold_multiplier` to control how a circuit is scaled
+- `fold_multiplier` to control how the circuit is scaled
 - `folding_method` to choose the unitary folding method
 - `num_chunks` to alter the sampling cost
 
@@ -57,7 +57,7 @@ Depending on the choice of the degree of the polynomial, how each noise-scaled c
 in turn influences how the sample matrix for multivariate Richardson extrapolation is created.
 
 
-Suppose we have an input circuit of 4 layers.
+Suppose we have an input circuit consisting of 4 layers.
 
 
 ```{code-cell} ipython3
@@ -79,7 +79,7 @@ print(circuit)
 
 
 
-How the circuits are scaled is controlled by `degree`, `fold_multiplier` and number of layers in the input circuit. We choose
+How the circuits are scaled is controlled by `degree`, `fold_multiplier`, and the number of layers in the input circuit. We choose
 `degree = 2` and `fold_multiplier=2` for demonstration purposes.
 
 
@@ -93,7 +93,7 @@ For `degree = 2`, the terms in the monomial basis are given below where the subs
 circuit.
 
 
-$$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 . λ_2, λ_1 . λ_3, λ_1 . λ_4, λ_2^2, λ_2 . λ_3, λ_2 . λ_4, λ_3^2, λ_3 . λ_4, λ_4^2\}$$
+$$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
 
 
 ```{seealso}
@@ -113,7 +113,7 @@ scale_factors
 In the noise scaled circuits created using the above scale factor vectors:
 
 - The term $1$ in the monomial terms basis corresponds to the `degree = 0` term in the polynomial which is equivalent to
-$\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the first noise-scaled circuit is unchanged.
+the $\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the first noise-scaled circuit is unchanged.
 
 - due to the $λ_1$ term in the monomial basis, the second noise-scaled circuit only scales the first layer in the circuit.
 
@@ -122,7 +122,7 @@ $\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the first
 - and so on.
 
 ```{code-cell} ipython3
-print("total number of noise scaled circuits created = ", len(scale_factors))
+print(f"Total number of noise scaled circuits created: {len(scale_factors)}")
 ```
 
 
@@ -138,7 +138,7 @@ is altered.
 scale_factors_diff_fold_multiplier = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 3)
 
 
-print("total number of noise scaled circuits created with different fold_multiplier = ", len(scale_factors_diff_fold_multiplier))
+print(f"Total number of noise-scaled circuits created with different fold_multiplier: {len(scale_factors_diff_fold_multiplier)}")
 
 print("Scale factor for some noise scaled circuit with degree = 2 and fold_multiplier = 2 : ", scale_factors[-2] ,sep="\n")
 print("Scale factor for some noise scaled circuit with degree = 2 but fold_multiplier = 3 : ", scale_factors_diff_fold_multiplier[-2] ,sep="\n")
@@ -151,14 +151,14 @@ Both the number of noise scaled circuits and scale factor vectors are changed wh
 ```{code-cell} ipython3
 
 
-scale_factors_diff_degree = get_scale_factor_vectors(circuit, degree = 3, fold_multiplier = 2)
+scale_factors_diff_degree = get_scale_factor_vectors(circuit, degree=3, fold_multiplier=2)
 ```
 
 
 ```{code-cell} ipython3
 
 
-print("total number of noise scaled circuits created = ", len(scale_factors_diff_degree))
+print(f"Total number of noise scaled circuits created: {len(scale_factors_diff_degree)}")
 ```
 
 
@@ -223,7 +223,7 @@ Suppose we want to chunk our example circuit into 2 chunks while using `degree =
 will create a new monomial basis for the extrapolating polynomial.
 
 
-$$\{1, λ_1, λ_2, λ_1^2, λ_1 . λ_2, λ_2^2\}$$
+$$\{1, λ_1, λ_2, λ_1^2, λ_1 λ_2, λ_2^2\}$$
 
 
 The scale factor vectors change as shown below:
@@ -231,7 +231,7 @@ The scale factor vectors change as shown below:
 
 ```{code-cell} ipython3
 
-scale_factors_with_chunking = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2, num_chunks = 2)
+scale_factors_with_chunking = get_scale_factor_vectors(circuit, degree=2, fold_multiplier=2, num_chunks=2)
 ```
 
 
