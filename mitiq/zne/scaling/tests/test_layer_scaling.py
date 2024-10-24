@@ -60,20 +60,20 @@ def test_layer_folding():
     # Iterate over every possible combination of layerwise folds for a maximum
     # number of 5-folds.
     total_folds = 5
-    for i, j, k in product(range(total_folds), repeat=3):
-        folded_circuit = layer_folding(circ, [i, j, k])
+    for i1, i2, i3 in product(range(total_folds), repeat=3):
+        folded_circuit = layer_folding(circ, [i1, i2, i3])
 
         # For a given layer, the number of copies on a layer will be
         # 2n + 1 where "n" is the number of folds to perform.
         a, b, c = LineQubit.range(3)
         correct = Circuit(
             # Layer-1
-            [ops.H.on_each(*(a, b, c))] * (2 * i + 1),
+            [ops.H.on_each(*(a, b, c))] * (2 * i1 + 1),
             # Layer-2
-            [ops.CNOT.on(a, b)] * (2 * j + 1),
-            [ops.X.on(c)] * (2 * j + 1),
+            [ops.CNOT.on(a, b)] * (2 * i2 + 1),
+            [ops.X.on(c)] * (2 * i2 + 1),
             # Layer-3
-            [ops.TOFFOLI.on(*(a, b, c))] * (2 * k + 1),
+            [ops.TOFFOLI.on(*(a, b, c))] * (2 * i3 + 1),
         )
         assert folded_circuit == correct
 
