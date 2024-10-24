@@ -1,8 +1,13 @@
-```{warning}
-The user guide for LRE in Mitiq is currently under construction.
-```
 
 # Layerwise Richardson Extrapolation
+
+```{figure} ../img/lre_workflow_steps.png
+---
+width: 700px
+name: lre-overview
+---
+The diagram shows the workflow of the layerwise Richardson extrapolation (LRE) in Mitiq.
+```
 
 Layerwise Richardson Extrapolation (LRE), an error mitigation technique, introduced in
 {cite}`Russo_2024_LRE` extends the ideas found in ZNE by allowing users to create multiple noise-scaled variations of the input
@@ -24,5 +29,7 @@ maxdepth: 1
 ---
 lre-1-intro.md
 lre-2-use-case.md
+lre-3-options.md
+lre-4-low-level.md
 lre-5-theory.md
 ```
