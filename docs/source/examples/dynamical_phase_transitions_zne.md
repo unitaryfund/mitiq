@@ -123,7 +123,7 @@ from matplotlib import pyplot as plt
 def setup_plot(title : str = None):
     plt.figure(figsize=(6.0, 4.0))
     plt.xlabel("$t$")
-    plt.ylabel("$\Lambda(t)$")
+    plt.ylabel("$\\Lambda(t)$")
     if title is not None:
         plt.title(title)
 
