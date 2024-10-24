@@ -21,7 +21,7 @@ Assuming the system is in state $\psi_0 = H^{\otimes N} \ket { 0^{\otimes N} }$ 
 
 # Circuit definition
 
-The following function returns the circuit used to compute $\Lambda(k \delta t)$, shown in Fig. 1 of the paper. The parameters used for the $R_{ZZ}$, $R_{XX}$, and $R_X$ gates depend on two parameters from the transverse-field Ising model, the spin-spin couplings $J_z$ and $J_x$ and the transverse field strength $h_x$. For simplicity, here we set $J_z = 1$, and follow the paper in setting $J_x = h_x = 0.1J_z$.
+The following function returns the circuit used to compute $\Lambda(k \delta t)$, shown in Fig. 1 of the paper. The parameters used for the $R_{ZZ}$, $R_{XX}$, and $R_X$ gates depend on two parameters from the transverse-field Ising model, the spin-spin couplings $J_z$ and $J_x$ and the transverse field strength $h_x$. For simplicity, here we set $J_z = 1$, and follow Javanmard et al. in setting $J_x = h_x = 0.1J_z$.
 
 ```{code-cell} ipython3
 from qiskit import QuantumCircuit
@@ -169,7 +169,7 @@ plt.show()
 
 # Simulation with depolarizing noise
 
-The following cells run a simulation with depolarizing noise. Following the paper, we transpile the circuit with the basis gate set $\{u1, u2, u3, cx\}$ before folding. We optionally use gate folding to scale the noise.
+The next few cells run a simulation with depolarizing noise. Following the paper, we transpile the circuit with the basis gate set $\{u1, u2, u3, cx\}$, and optionally use gate folding to scale the noise.
 
 ```{code-cell} ipython3
 from qiskit import transpile
@@ -239,7 +239,7 @@ plt.legend(legend)
 plt.show()
 ```
 
-As expected, we get a lower peak. Applying gate folding suppresses the peak further. This is qualitatively consistent with the result in Fig. 2(e) of the paper. (For efficiency, this notebook uses a much coarser time step than in the paper, so we do not obtain the same results for a given value of the depolarizing noise level.)
+As expected, we get a lower peak. Applying gate folding suppresses the peak further. This is qualitatively consistent with the result in Fig. 2(e) of Javanmard et al. For efficiency, this notebook uses a much coarser time step than in the paper, so we do not obtain the same results for a given value of the depolarizing noise strength.
 
 ```{code-cell} ipython3
 scale_factors = [1, 2, 3]
