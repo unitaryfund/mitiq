@@ -215,7 +215,7 @@ def test_layers_with_chunking():
         ),
     ],
 )
-def testget_scale_factor_vectors_no_chunking(
+def test_get_scale_factor_vectors_no_chunking(
     test_input, degree, test_fold_multiplier, expected_scale_factor_vectors
 ):
     """Verifies vectors of scale factors are calculated accurately."""

@@ -19,8 +19,6 @@ In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the erro
 In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 
-
-
 ```
 from mitiq.lre import execute_with_lre
 
@@ -34,8 +32,6 @@ lre_value = execute_with_lre(
    num_chunks = <"group a large circuit into a circuit with fewer layers">
 )
 ```
-
-
 
 
 The options that can be used to control the hyperparameters are:
@@ -77,16 +73,8 @@ print(circuit)
 ```
 
 
+How the circuits are scaled is controlled by `degree`, `fold_multiplier`, and the number of layers in the input circuit. We choose `degree = 2` and `fold_multiplier = 2` for demonstration purposes.
 
-
-How the circuits are scaled is controlled by `degree`, `fold_multiplier`, and the number of layers in the input circuit. We choose
-`degree = 2` and `fold_multiplier=2` for demonstration purposes.
-
-
-```{code-cell} ipython3
-degree = 2
-fold_multiplier = 2
-```
 
 
 For `degree = 2`, the terms in the monomial basis are given below where the subscripts correspond to the 4 layers in the
@@ -104,7 +92,7 @@ These terms in the monomial basis are also used to define the rows of the sample
 ```{code-cell} ipython3
 from mitiq.lre.multivariate_scaling import get_scale_factor_vectors
 
-scale_factors = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 2)
+scale_factors = get_scale_factor_vectors(circuit, degree=2, fold_multiplier=2)
 
 scale_factors
 ```
@@ -125,23 +113,23 @@ the $\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the f
 print(f"Total number of noise scaled circuits created: {len(scale_factors)}")
 ```
 
-
-
-
-
-
 As the `fold_multiplier` is changed, the number of scaled circuits remains the same but how the layers are scaled
 is altered.
+
 ```{code-cell} ipython3
 
 
-scale_factors_diff_fold_multiplier = get_scale_factor_vectors(circuit, degree = 2, fold_multiplier = 3)
+scale_factors_diff_fold_multiplier = get_scale_factor_vectors(
+   circuit,
+   degree=2,
+   fold_multiplier=3)
 
 
-print(f"Total number of noise-scaled circuits created with different fold_multiplier: {len(scale_factors_diff_fold_multiplier)}")
+print(f"Total number of noise-scaled circuits created with different fold_multiplier:" 
+      f"{len(scale_factors_diff_fold_multiplier)}")
 
-print("Scale factor for some noise scaled circuit with degree = 2 and fold_multiplier = 2 : ", scale_factors[-2] ,sep="\n")
-print("Scale factor for some noise scaled circuit with degree = 2 but fold_multiplier = 3 : ", scale_factors_diff_fold_multiplier[-2] ,sep="\n")
+print(f"Scale factor for some noise scaled circuit with degree=2 and fold_multiplier=2: \n {scale_factors[-2]}")
+print(f"Scale factor for some noise scaled circuit with degree= 2 but fold_multiplier=3: \n {scale_factors_diff_fold_multiplier[-2]}")
 ```
 
 
@@ -151,7 +139,10 @@ Both the number of noise scaled circuits and scale factor vectors are changed wh
 ```{code-cell} ipython3
 
 
-scale_factors_diff_degree = get_scale_factor_vectors(circuit, degree=3, fold_multiplier=2)
+scale_factors_diff_degree = get_scale_factor_vectors(
+   circuit,
+   degree=3,
+   fold_multiplier=2)
 ```
 
 
@@ -231,19 +222,25 @@ The scale factor vectors change as shown below:
 
 ```{code-cell} ipython3
 
-scale_factors_with_chunking = get_scale_factor_vectors(circuit, degree=2, fold_multiplier=2, num_chunks=2)
+scale_factors_with_chunking = get_scale_factor_vectors(
+   circuit,
+   degree=2,
+   fold_multiplier=2,
+   num_chunks=2)
+
+scale_factors_with_chunking
 ```
 
 
-Thus, the total number of noise-scaled circuits is reduced by ….
+Thus, the total number of noise-scaled circuits is reduced by chunking the circuit into fewer layers to be folded.
 
 
 ```{code-cell} ipython3
 
-print("total number of noise scaled circuits with chunking =", len(scale_factors_with_chunking))
+print(f"Total number of noise scaled circuits with chunking: {len(scale_factors_with_chunking)}")
 
 
-print("total number of noise scaled circuits without chunking =", len(scale_factors))
+print(f"Total number of noise scaled circuits without chunking: {len(scale_factors)}")
 
 
 ```
@@ -266,7 +263,7 @@ chunked_circ = multivariate_layer_scaling(
 non_chunked_circ = multivariate_layer_scaling(
  circuit,
  degree = 2,
- fold_multiplier = 2)[5]
+ fold_multiplier = 2)[1]
 
 
 print("original circuit: ", circuit ,sep="\n")
