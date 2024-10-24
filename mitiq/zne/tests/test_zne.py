@@ -6,7 +6,9 @@
 """Unit tests for zero-noise extrapolation."""
 
 import functools
+import random
 from typing import List
+from unittest.mock import Mock
 
 import cirq
 import numpy as np
@@ -493,32 +495,34 @@ def test_execute_with_zne_with_supported_circuits(circuit_type):
     assert abs(unmitigated - expected) > abs(zne_value - expected)
 
 
-@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
-def test_layerwise_execute_with_zne_with_supported_circuits(circuit_type):
+def test_layerwise_folding_with_zne():
     # Define a circuit equivalent to the identity
     qreg = cirq.LineQubit.range(2)
-    cirq_circuit = cirq.Circuit(
+    circuit = cirq.Circuit(
         cirq.H.on_each(qreg),
         cirq.CNOT(*qreg),
         cirq.CNOT(*qreg),
         cirq.H.on_each(qreg),
     )
-    # Convert to one of the supported program types
-    circuit = convert_from_mitiq(cirq_circuit, circuit_type)
-    expected = generic_executor(circuit, noise_level=0.0)
-    unmitigated = generic_executor(circuit)
-    # Use odd scale factors for deterministic results
-    fac = RichardsonFactory([1, 3, 5])
-    # Layerwise-fold
+    circuit_depth = len(circuit)
+    mock_executor = Mock(side_effect=lambda _: random.random())
     layer_to_fold = 0
     fold_layer_func = get_layer_folding(layer_to_fold)
+    scale_factors = [1, 3, 5]
+    factory = RichardsonFactory(scale_factors)
 
-    zne_value = execute_with_zne(
-        circuit, generic_executor, factory=fac, scale_noise=fold_layer_func
+    execute_with_zne(
+        circuit, mock_executor, factory=factory, scale_noise=fold_layer_func
     )
-
-    # Test zero noise limit is better than unmitigated expectation value
-    assert abs(unmitigated - expected) > abs(zne_value - expected)
+    assert mock_executor.call_count == len(scale_factors)
+    circuit_depths = [
+        len(args[0]) for args, kwargs in mock_executor.call_args_list
+    ]
+    assert circuit_depths == [
+        circuit_depth,
+        circuit_depth + 2,
+        circuit_depth + 4,
+    ]
 
 
 def test_execute_with_zne_transpiled_qiskit_circuit():

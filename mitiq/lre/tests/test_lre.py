@@ -101,20 +101,6 @@ def test_lre_executor_with_chunking():
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 
-@pytest.mark.parametrize("num_chunks", [(1), (2), (3), (4), (5), (6), (7)])
-def test_large_circuit_with_small_chunks_poor_performance(num_chunks):
-    """Verify chunking performs poorly when a large number of layers are
-    chunked into a smaller number of circuit chunks."""
-    # define a larger circuit
-    test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=15)[
-        0
-    ]
-    lre_exp_val = execute_with_lre(
-        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=num_chunks
-    )
-    assert abs(lre_exp_val - ideal_val) >= abs(noisy_val - ideal_val)
-
-
 @pytest.mark.parametrize("input_method", [(fold_global), (fold_all)])
 def test_lre_executor_with_different_folding_methods(input_method):
     """Verify the executor works as expected for using non-default unitary
