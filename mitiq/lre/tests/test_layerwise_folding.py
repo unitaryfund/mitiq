@@ -234,7 +234,7 @@ def test_get_scale_factor_vectors_no_chunking(
         (test_circuit1, 2, 3, 2, 6),
     ],
 )
-def testget_scale_factor_vectors_with_chunking(
+def test_get_scale_factor_vectors_with_chunking(
     test_input, degree, test_fold_multiplier, test_chunks, expected_size
 ):
     """Verifies vectors of scale factors are calculated accurately."""
