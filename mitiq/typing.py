@@ -48,16 +48,6 @@ class EnhancedEnum(Enum, metaclass=EnhancedEnumMeta):
         return [member.value for member in cls]
 
 
-# Supported quantum programs.
-class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
-    BRAKET = "braket"
-    CIRQ = "cirq"
-    PENNYLANE = "pennylane"
-    PYQUIL = "pyquil"
-    QIBO = "qibo"
-    QISKIT = "qiskit"
-
-
 try:
     from pyquil import Program as _Program
 except ImportError:  # pragma: no cover
@@ -88,6 +78,33 @@ except ImportError:  # pragma: no cover
 QPROGRAM = Union[
     _Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape, _QiboCircuit
 ]
+
+
+# Supported quantum programs.
+class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
+    BRAKET = "braket"
+    CIRQ = "cirq"
+    PENNYLANE = "pennylane"
+    PYQUIL = "pyquil"
+    QIBO = "qibo"
+    QISKIT = "qiskit"
+
+    @classmethod
+    def _python_type(cls, identifier: str) -> QPROGRAM:
+        if identifier == "braket":
+            return _BKCircuit
+        elif identifier == "cirq":
+            return _Circuit
+        elif identifier == "pennylane":
+            return _QuantumTape
+        elif identifier == "pyquil":
+            return _Program
+        elif identifier == "qibo":
+            return _QiboCircuit
+        elif identifier == "qiskit":
+            return _QuantumCircuit
+        else:
+            raise ValueError(f"Invalid identifier: {identifier}")
 
 
 # Define MeasurementResult, a result obtained by measuring qubits on a quantum

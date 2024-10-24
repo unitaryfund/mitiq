@@ -11,6 +11,8 @@ from copy import deepcopy
 import pytest
 from cirq import Circuit, LineQubit, ops
 
+from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.interface import convert_from_mitiq
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_chunks,
     _get_num_layers_without_measurements,
@@ -30,36 +32,41 @@ test_circuit1_with_measurements = deepcopy(test_circuit1)
 test_circuit1_with_measurements.append(ops.measure_each(*qreg1))
 
 
-def test_multivariate_layerwise_scaling():
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_multivariate_layerwise_scaling(circuit_type):
     """Checks if multiple scaled circuits are returned to fit the required
     folding pattern for multivariate extrapolation."""
-    multiple_scaled_circuits = multivariate_layer_scaling(
-        test_circuit1, 2, 2, 3
+    circuit = convert_from_mitiq(test_circuit1, circuit_type)
+    scaled_circuits = multivariate_layer_scaling(circuit, 2, 2, 3)
+
+    assert len(scaled_circuits) == 10
+    assert all(
+        isinstance(circuit, SUPPORTED_PROGRAM_TYPES._python_type(circuit_type))
+        for circuit in scaled_circuits
     )
 
-    assert len(multiple_scaled_circuits) == 10
-    folding_pattern = [
-        (1, 1, 1),
-        (5, 1, 1),
-        (1, 5, 1),
-        (1, 1, 5),
-        (9, 1, 1),
-        (5, 5, 1),
-        (5, 1, 5),
-        (1, 9, 1),
-        (1, 5, 5),
-        (1, 1, 9),
-    ]
-
-    for i, scale_factor_vector in enumerate(folding_pattern):
-        scale_layer1, scale_layer2, scale_layer3 = scale_factor_vector
-        expected_circuit = Circuit(
-            [ops.H.on_each(*qreg1)] * scale_layer1,
-            [ops.CNOT.on(qreg1[0], qreg1[1]), ops.X.on(qreg1[2])]
-            * scale_layer2,
-            [ops.TOFFOLI.on(*qreg1)] * scale_layer3,
-        )
-        assert expected_circuit == multiple_scaled_circuits[i]
+    if circuit_type == "cirq":
+        folding_pattern = [
+            (1, 1, 1),
+            (5, 1, 1),
+            (1, 5, 1),
+            (1, 1, 5),
+            (9, 1, 1),
+            (5, 5, 1),
+            (5, 1, 5),
+            (1, 9, 1),
+            (1, 5, 5),
+            (1, 1, 9),
+        ]
+        for scale_factors, circuit in zip(folding_pattern, scaled_circuits):
+            scale_layer1, scale_layer2, scale_layer3 = scale_factors
+            expected_circuit = Circuit(
+                [ops.H.on_each(*qreg1)] * scale_layer1,
+                [ops.CNOT.on(qreg1[0], qreg1[1]), ops.X.on(qreg1[2])]
+                * scale_layer2,
+                [ops.TOFFOLI.on(*qreg1)] * scale_layer3,
+            )
+            assert expected_circuit == circuit
 
 
 @pytest.mark.parametrize(

@@ -15,6 +15,7 @@ import numpy as np
 from cirq import Circuit
 from numpy.typing import NDArray
 
+from mitiq.interface import accept_any_qprogram_as_input
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_scale_factor_vectors,
 )
@@ -120,6 +121,7 @@ def sample_matrix(
     return sample_matrix
 
 
+@accept_any_qprogram_as_input
 def multivariate_richardson_coefficients(
     input_circuit: Circuit,
     degree: int,
