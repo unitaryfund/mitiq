@@ -29,12 +29,7 @@ The diagram shows the workflow of the layerwise Richardson extrapolation (LRE) i
 
 
 **The first step** involves generating and executing layerwise noise-scaled quantum circuits.
-  - The user provides a `cirq` circuit.
-
-```{danger}
-LRE is currently compatible with quantum programs written using `cirq`.
-Work on making this technique compatible with other frontends is ongoing. 🚧
-```
+  - The user provides a `QPROGRAM` i.e. a frontend supported quantum circuit .
 
   - Mitiq generates a set of layerwise noise-scaled circuits by applying unitary folding based on a set of pre-determined scale factor vectors. 
   - The noise-scaled circuits are executed on the noisy backend obtaining a set of noisy expectation values.
@@ -158,16 +153,15 @@ coefficients = multivariate_richardson_coefficients(
     degree=degree,
 )
 ```
+These coefficients are calculated through solving a system of linear equations $\mathbf{A} c = z$, where each row of the sample matrix $\mathbf{A}$ is formed by the [monomial terms](lre-3-options.md) of the multivariate polynommial evaluated using the values in the scale factor vectors, $z$ is the vector of expectation values and $c$ is the coefficients vector.
 
 {func}`.sample_matrix` is used by {func}`.multivariate_richardson_coefficients` behind the scenes to calculate these coefficients as discussed in [](lre-5-theory.md).
-
-These coefficients are calculated through solving a system of linear equations $\mathbf{A} c = z$, where each row of the sample matrix $\mathbf{A}$ is formed by the [monomial terms](lre-3-options.md) of the multivariate polynommial evaluated using the values in the scale factor vectors, $z$ is the vector of expectation values and $c$ is the coefficients vector.
 
 For example, if the terms in the monomial basis are given by the following:
 
 $$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
 
-Each row of the sample matrix is defined by these monomial basis terms. Let one of the scale factor vectors be $(1, 5, 1, 1)$. To get to the sample matrix, each row is then evaluated using the scale factor vectors. A row of the sample matrix is then evaluated using $λ_1=1, λ_2=5, λ_3=1, λ_4=1$.
+Each row of the sample matrix is defined by these monomial basis terms. Let one of the scale factor vectors be $(1, 5, 1, 1)$. To get to the sample matrix, each row is then evaluated using the scale factor vectors. For the example scale factor vector, a row of the sample matrix will be evaluated using $λ_1=1, λ_2=5, λ_3=1, λ_4=1$.
 
 
 
