@@ -11,17 +11,48 @@ kernelspec:
   name: python3
 ---
 
-# Introduction
+# ZNE with Qiskit: Simulation of Loschmidt Echo Revival
 
-This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum simulation of dynamical phase transitions in noisy quantum devices"](https://arxiv.org/abs/2211.08318). We build a circuit that simulates the the time-evolution of a transverse-field Ising model (Eq. 1) after a quench at time $t = 0$, then run ideal, noisy, and noise-mitigated simulations of the circuit.
-
-Assuming the system is in state $\psi_0 = H^{\otimes N} \ket { 0^{\otimes N} }$ at $t = 0$, we want to compute the probability of returning to the initial state at time $t$, $\Lambda(t) = \left|\bra{\psi_0}U(t)\ket{\psi_0}\right|^2$. To simulate the behavior over the interval $[0, t_{\textrm{max}}]$, we divide it into $M$ steps. Letting $\delta t = t_{\textrm{max}}/M$, we construct circuits corresponding to $U(t) = [U(\delta t)]^k$ for $k = 0, \ldots, m$.
+This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum simulation of dynamical phase transitions in noisy quantum devices"](https://arxiv.org/abs/2211.08318). We build a circuit that simulates the time-evolution of a transverse-field Ising model, then run ideal, noisy, and noise-mitigated simulations of the circuit.
 
 +++
 
-# Circuit definition
+## Model definition
 
-The following function returns the circuit used to compute $\Lambda(k \delta t)$, shown in Fig. 1 of the paper. The parameters used for the $R_{ZZ}$, $R_{XX}$, and $R_X$ gates depend on two parameters from the transverse-field Ising model, the spin-spin couplings $J_z$ and $J_x$ and the transverse field strength $h_x$. For simplicity, here we set $J_z = 1$, and follow Javanmard et al. in setting $J_x = h_x = 0.1J_z$.
+The Ising model that we will simulate has the Hamiltonian
+$$H = H_{zz} + H_{xx} + H_{x}$$
+where $H_{zz}$ and $H_{xx}$ are the interactions between sites and $H_x$ is the interaction with the external magnetic field. Specifically, for $N$ sites,
+$$H_{zz} = -\frac{1}{2} \left[ \sum_{i=1}^{N-1}J_z Z_i Z_{i+1} \right], \hspace{0.4cm} H_{xx} = -\frac{1}{2} \left[ \sum_{i=1}^{N-1}J_x X_{i} X_{i+1} \right], \hspace{0.4cm} H_x = -\frac{1}{2} \left[ \sum_{i=1}^N h_x X_i \right]$$
+
+were $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
+
+Assuming the system is in state $\ket{\psi_0}$ at $t = 0$, we want to compute the probability of returning to the initial state at time $t$,
+
+$$\Lambda(t) = \left|\bra{\psi_0}U(t)\ket{\psi_0}\right|^2,$$
+
+where $U(t) = \exp(-iHt)$ is the time-evolution operator.
+
++++
+
+## Reformulation as a quantum circuit
+
+To simulate how the model behaves over $0 \leq t \leq t_{\textrm{max}}$, we divide the interval into $M$ steps. Letting $\delta t = t_{\textrm{max}}/M$, we have
+
+$$U(k\delta t) = [\exp(-iH\delta t)]^k \hspace{0.25cm} (k = 0, \ldots, M)$$
+
+Next we decompose $\exp(-iH\delta t)$. Up to an $\mathcal{O}(\delta t^2)$ error (since the terms in $H$ do not commute),
+
+$$\exp(-i \left[H_{zz} + H_{xx} + H_{x}\right] \delta t) \approx \exp(-i H_{zz} \delta t)\exp(-i H_{xx} \delta t)\exp(-i H_{x} \delta t)$$
+
+Finally, we observe that each term in the decomposition corresponds to a series of gates in an $N$-qubit circuit. For example,
+
+$$\exp(-i H_{zz} \delta t) = \prod_{i=1}^{N-1} \exp\left( -i\frac{\delta t J_z}{2} Z_i Z_{i+1} \right)$$
+
+Using the fact that $Z_i Z_{i+1} = I \otimes \cdots Z \otimes Z \cdots \otimes I$, we can rewrite this as a product of $R_{ZZ}$ gates,
+
+$$\prod_{i=1}^{N-1} R_{ZZ}^{(i, i+1)}(\delta t J_z)$$
+
+Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of $R_{XX}$ and $R_X$ gates, so we have a sequence of gates that can be repeated $k$ times to compute $\Lambda(k\delta t)$. This is implemented by the function in the following cell. For simplicity, we set $J_z = 1$ and let $J_x = h_x = 0.1J_z$.
 
 ```{code-cell} ipython3
 from qiskit import QuantumCircuit
