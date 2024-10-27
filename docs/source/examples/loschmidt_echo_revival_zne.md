@@ -49,15 +49,15 @@ $$\exp(-i \left[H_{zz} + H_{xx} + H_{x}\right] \delta t) \approx \exp(-i H_{zz} 
 
 Now we observe that each term in the decomposition corresponds to a series of gates in an $N$-qubit circuit. For example,
 
-$$\exp(-i H_{zz} \delta t) = \prod_{i=0}^{N-2} \exp\left( -i\frac{\delta t J_z}{2} Z_i Z_{i+1} \right)$$
+$$\exp(-i H_{zz} \delta t) = \prod_{i=0}^{N-2} \exp\left( -i\frac{J_z\delta t }{2} Z_i Z_{i+1} \right)$$
 
 Using the fact that $Z_i Z_{i+1} = I \otimes \cdots Z \otimes Z \cdots \otimes I$, we can rewrite this as a product of $R_{ZZ}$ gates,
 
-$$\prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z)$$
+$$\prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(J_z \delta t )$$
 
 Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of $R_{XX}$ and $R_X$ gates, yielding
 
-$$\exp(-iH\delta t) \approx \prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z) \prod_{i=0}^{N-2} R_{XX}^{(i, i+1)}(\delta t J_x) \prod_{i=0}^{N-1} R_{X}^{i}(\delta t h_x)$$
+$$\exp(-iH\delta t) \approx \prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(J_z \delta t) \prod_{i=0}^{N-2} R_{XX}^{(i, i+1)}(J_x \delta t) \prod_{i=0}^{N-1} R_{X}^{i}(h_x \delta t)$$
 
 To compute $\Lambda(k\delta t)$, we repeat this sequence of gates $k$ times. The circuit is implemented by the function in the following cell. Note that:
 * We use $\ket{\psi_0} = H^{\otimes N}\ket{0^{\otimes N}}$, i.e. the spin at every site starts out parallel to the external magnetic field.
@@ -157,7 +157,7 @@ def add_to_plot(x : np.ndarray[float],
     legend.append(label)
 ```
 
-To get the ideal result for $\Lambda(t)$, we omit the measurements from the circuit, and read the probability amplitude $\bra{0^{\otimes N}} H^{\otimes N} U(t) H^{\otimes N} \ket{0^{\otimes N}}$ directly from the final state vector.
+To get the ideal result for $\Lambda(k\delta t)$, we omit the measurements from the circuit, and read the probability amplitude $\bra{0^{\otimes N}} H^{\otimes N} U(k \delta t) H^{\otimes N} \ket{0^{\otimes N}}$ directly from the final state vector.
 
 ```{code-cell} ipython3
 from qiskit_aer import QasmSimulator
