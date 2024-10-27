@@ -21,8 +21,8 @@ This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum
 
 The Ising model that we will simulate has the Hamiltonian
 $$H = H_{zz} + H_{xx} + H_{x}$$
-where $H_{zz}$ and $H_{xx}$ are the interactions between sites and $H_x$ is the interaction with the external magnetic field. Specifically, for $N$ sites,
-$$H_{zz} = -\frac{1}{2} \left[ \sum_{i=1}^{N-1}J_z Z_i Z_{i+1} \right], \hspace{0.4cm} H_{xx} = -\frac{1}{2} \left[ \sum_{i=1}^{N-1}J_x X_{i} X_{i+1} \right], \hspace{0.4cm} H_x = -\frac{1}{2} \left[ \sum_{i=1}^N h_x X_i \right]$$
+where $H_{zz}$ and $H_{xx}$ are the interactions between neighboring sites and $H_x$ is the interaction with the external magnetic field. Specifically, for $N$ sites,
+$$H_{zz} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_z Z_i Z_{i+1} \right], \hspace{0.4cm} H_{xx} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_x X_{i} X_{i+1} \right], \hspace{0.4cm} H_x = -\frac{1}{2} \left[ \sum_{i=0}^{N-1} h_x X_i \right]$$
 
 were $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
 
@@ -44,15 +44,21 @@ Next we decompose $\exp(-iH\delta t)$. Up to an $\mathcal{O}(\delta t^2)$ error 
 
 $$\exp(-i \left[H_{zz} + H_{xx} + H_{x}\right] \delta t) \approx \exp(-i H_{zz} \delta t)\exp(-i H_{xx} \delta t)\exp(-i H_{x} \delta t)$$
 
-Finally, we observe that each term in the decomposition corresponds to a series of gates in an $N$-qubit circuit. For example,
+Now we observe that each term in the decomposition corresponds to a series of gates in an $N$-qubit circuit. For example,
 
-$$\exp(-i H_{zz} \delta t) = \prod_{i=1}^{N-1} \exp\left( -i\frac{\delta t J_z}{2} Z_i Z_{i+1} \right)$$
+$$\exp(-i H_{zz} \delta t) = \prod_{i=0}^{N-2} \exp\left( -i\frac{\delta t J_z}{2} Z_i Z_{i+1} \right)$$
 
 Using the fact that $Z_i Z_{i+1} = I \otimes \cdots Z \otimes Z \cdots \otimes I$, we can rewrite this as a product of $R_{ZZ}$ gates,
 
-$$\prod_{i=1}^{N-1} R_{ZZ}^{(i, i+1)}(\delta t J_z)$$
+$$\prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z)$$
 
-Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of $R_{XX}$ and $R_X$ gates, so we have a sequence of gates that can be repeated $k$ times to compute $\Lambda(k\delta t)$. This is implemented by the function in the following cell. For simplicity, we set $J_z = 1$ and let $J_x = h_x = 0.1J_z$.
+Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of $R_{XX}$ and $R_X$ gates, yielding
+
+$$\exp(-iH\delta t) \approx \prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z) \prod_{i=0}^{N-2} R_{XX}^{(i, i+1)}(\delta t J_x) \prod_{i=0}^{N-1} R_{x}^{i}(\delta t h_x)$$
+
+To compute $\Lambda(k\delta t)$, we repeat this sequence of gates $k$ times. The circuit is implemented by the function in the following cell. Note that:
+* We use $\ket{\psi_0} = H^{\otimes N}\ket{0^{\otimes N}}$, i.e. the spin at every site starts out parallel to the external magnetic field.
+* The $R_{ZZ}$ gates commute with each other, so we can organize them into two "layers", one layer for the pairs of adjacent qubits $(i, i+1)$ with $i$ even and another for the pairs with $i$ odd. The $R_{XX}$ gates are organized in a similar way.
 
 ```{code-cell} ipython3
 from qiskit import QuantumCircuit
@@ -60,9 +66,13 @@ from qiskit import QuantumCircuit
 def create_circuit(delta_t : float,
                    k : int,
                    n_qubits: int = 6,
-                   measure : bool = True) -> QuantumCircuit:
-    theta = -delta_t
-    phi = gamma = -0.1 * delta_t
+                   measure : bool = True,
+                   J_z : float = 1.0,
+                   J_x : float = 0.1,
+                   h_x : float = 0.1) -> QuantumCircuit:
+    theta = J_z * delta_t
+    phi = J_x * delta_t
+    gamma = h_x * delta_t
 
     circuit = QuantumCircuit(n_qubits)
     
@@ -93,9 +103,9 @@ def create_circuit(delta_t : float,
 print(create_circuit(0.01, 1))
 ```
 
-# Ideal simulation
+## Ideal simulation
 
-We first run a series of noiseless state-vector simulations.
+To get a sense of the ideal behavior of the circuit, we will run a noiseless state-vector simulation. First we define a dataclass to hold all the simulation parameters, and functions to visualize the results.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -103,8 +113,9 @@ import dataclasses
 
 @dataclasses.dataclass
 class SimulationParams:
-    '''Simulation parameters. Note that we use much coarser
-    time steps than in the paper, so that this demo runs in
+    '''Simulation parameters. Note that by default we use
+    much coarser time steps than in the paper, so that
+    the noisy simulations later in this demo run in
     a reasonably short time.'''
     t_max : float = 8.5
     M : int = 25
@@ -120,7 +131,30 @@ class SimulationParams:
         self.t_vals = np.linspace(0., self.t_max, self.M + 1, endpoint=True)
 ```
 
-To get the ideal result for $\Lambda(t)$, we omit the measurements from the circuit, and take the probability amplitude $\bra{0^{\otimes N}} H^{\otimes N} U(t) H^{\otimes N} \ket{0^{\otimes N}}$ from the final state vector.
+```{code-cell} ipython3
+from matplotlib import pyplot as plt
+
+def setup_plot(title : str = None):
+    plt.figure(figsize=(6.0, 4.0))
+    plt.xlabel("$t$")
+    plt.ylabel("$\\Lambda(t)$")
+    if title is not None:
+        plt.title(title)
+
+def add_to_plot(x : np.ndarray[float],
+                y : np.ndarray[float],
+                label : str,
+                legend : list[str]):
+    if label == "ideal":
+        plt.plot(x, y, color="black")
+    elif label == "mitigated":
+        plt.plot(x, y, marker='s', markersize=5)
+    else:
+        plt.plot(x, y, marker='.', markersize=10)
+    legend.append(label)
+```
+
+To get the ideal result for $\Lambda(t)$, we omit the measurements from the circuit, and read the probability amplitude $\bra{0^{\otimes N}} H^{\otimes N} U(t) H^{\otimes N} \ket{0^{\otimes N}}$ directly from the final state vector.
 
 ```{code-cell} ipython3
 from qiskit_aer import QasmSimulator
@@ -149,29 +183,6 @@ def run_ideal(params : SimulationParams = SimulationParams()) -> tuple[np.ndarra
 ```
 
 ```{code-cell} ipython3
-from matplotlib import pyplot as plt
-
-def setup_plot(title : str = None):
-    plt.figure(figsize=(6.0, 4.0))
-    plt.xlabel("$t$")
-    plt.ylabel("$\\Lambda(t)$")
-    if title is not None:
-        plt.title(title)
-
-def add_to_plot(x : np.ndarray[float],
-                y : np.ndarray[float],
-                label : str,
-                legend : list[str]):
-    if label == "ideal":
-        plt.plot(x, y, color="black")
-    elif label == "mitigated":
-        plt.plot(x, y, marker='s', markersize=5)
-    else:
-        plt.plot(x, y, marker='.', markersize=10)
-    legend.append(label)
-```
-
-```{code-cell} ipython3
 # Run the state-vector simulation
 result_ideal = run_ideal(SimulationParams(t_max=25.0, M=200))
 ```
@@ -184,12 +195,11 @@ plt.legend(legend)
 plt.show()
 ```
 
-The result shows a series of Loschmidt echo peaks. Intuitively, in a noisy system we expect to see $\Lambda(t)$ rapidly approach $1/2^N$, where $N$ is the number of qubits. This means that as the noise level increases, the peaks will be suppressed, starting at larger values of $t$. At higher levels of noise, we may not be able to detect the Loschmidt echo at all.
+The result shows a series of Loschmidt echo peaks. Intuitively, for a noisy system we expect that as $t$ increases $\Lambda(t)$ will approach $1/2^N$, where $N$ is the number of qubits. This means that as the noise level increases, the peaks will be suppressed, starting at larger values of $t$. At higher levels of noise, we may not be able to detect the Loschmidt echo at all.
 
-In the rest of this notebook we will run simulations with two different noise models, and try to reconstruct the peak at $t \approx 6.5$ with zero-noise extrapolation.
+In the rest of this notebook, we will run simulations with two different noise models, and try to reconstruct the peak at $t \approx 6.5$ with zero-noise extrapolation. The next cell re-plots the ideal simulation result over the values of $t$ that we will consider.
 
 ```{code-cell} ipython3
-# Re-run the simulation with the default value of t_max
 result_ideal = run_ideal(SimulationParams(M=100))
 setup_plot("State-vector simulation")
 legend = []
@@ -198,12 +208,12 @@ plt.legend(legend)
 plt.show()
 ```
 
-# Simulation with depolarizing noise
+## Simulation with depolarizing noise
 
-The next few cells run a simulation with depolarizing noise. Following the paper, we transpile the circuit with the basis gate set $\{u1, u2, u3, cx\}$, and optionally use gate folding to scale the noise.
+The next few cells run a simulation with depolarizing noise. We transpile the circuit using 1-qubit rotations and CNOT as the basis gate set, and optionally use gate folding to scale the noise.
 
 ```{code-cell} ipython3
-from qiskit import transpile
+from qiskit.compiler import transpile
 from qiskit_aer.noise import NoiseModel
 from qiskit_aer.noise.errors.standard_errors import depolarizing_error
 from mitiq.zne.scaling.folding import fold_gates_at_random
@@ -270,7 +280,7 @@ plt.legend(legend)
 plt.show()
 ```
 
-As expected, we get a lower peak. Applying gate folding suppresses the peak further. This is qualitatively consistent with the result in Fig. 2(e) of Javanmard et al. For efficiency, this notebook uses a much coarser time step than in the paper, so we do not obtain the same results for a given value of the depolarizing noise strength.
+As expected, the Loschmidt echo revival is weaker than in the ideal cases, and we get a lower peak. Applying gate folding suppresses the peak further.
 
 ```{code-cell} ipython3
 scale_factors = [1, 2, 3]
@@ -289,7 +299,7 @@ plt.legend(legend)
 plt.show()
 ```
 
-# Error mitigation with zero-noise extrapolation
+## Error mitigation with zero-noise extrapolation
 At this level of noise, we can use ZNE to mostly recover the ideal result. Running the noisy simulation is expensive (especially as the scale factor $\alpha$ increases), so rather than using the high-level functions for ZNE, we apply the static method `RichardsonFactory.extrapolate` to the results from the previous cell.
 
 ```{code-cell} ipython3
@@ -335,7 +345,7 @@ plt.legend(legend)
 plt.show()
 ```
 
-# Simulation with realistic device noise
+## Simulation with realistic device noise
 
 Next, we run simulations using the noise model of the IBM Nairobi device. Again, the relatively high noise level makes it difficult to recover something close to the ideal signal.
 
