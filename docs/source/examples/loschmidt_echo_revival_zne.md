@@ -20,11 +20,14 @@ This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum
 ## Model definition
 
 The Ising model that we will simulate has the Hamiltonian
+
 $$H = H_{zz} + H_{xx} + H_{x}$$
+
 where $H_{zz}$ and $H_{xx}$ are the interactions between neighboring sites and $H_x$ is the interaction with the external magnetic field. Specifically, for $N$ sites,
+
 $$H_{zz} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_z Z_i Z_{i+1} \right], \hspace{0.4cm} H_{xx} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_x X_{i} X_{i+1} \right], \hspace{0.4cm} H_x = -\frac{1}{2} \left[ \sum_{i=0}^{N-1} h_x X_i \right]$$
 
-were $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
+where $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
 
 Assuming the system is in state $\ket{\psi_0}$ at $t = 0$, we want to compute the probability of returning to the initial state at time $t$,
 
@@ -54,7 +57,7 @@ $$\prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z)$$
 
 Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of $R_{XX}$ and $R_X$ gates, yielding
 
-$$\exp(-iH\delta t) \approx \prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z) \prod_{i=0}^{N-2} R_{XX}^{(i, i+1)}(\delta t J_x) \prod_{i=0}^{N-1} R_{x}^{i}(\delta t h_x)$$
+$$\exp(-iH\delta t) \approx \prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(\delta t J_z) \prod_{i=0}^{N-2} R_{XX}^{(i, i+1)}(\delta t J_x) \prod_{i=0}^{N-1} R_{X}^{i}(\delta t h_x)$$
 
 To compute $\Lambda(k\delta t)$, we repeat this sequence of gates $k$ times. The circuit is implemented by the function in the following cell. Note that:
 * We use $\ket{\psi_0} = H^{\otimes N}\ket{0^{\otimes N}}$, i.e. the spin at every site starts out parallel to the external magnetic field.
