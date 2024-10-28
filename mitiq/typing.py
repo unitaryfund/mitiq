@@ -20,7 +20,6 @@ from enum import Enum, EnumMeta
 from typing import (
     Any,
     Dict,
-    Iterable,
     List,
     Optional,
     Sequence,
@@ -37,15 +36,17 @@ from cirq import Circuit as _Circuit
 
 class EnhancedEnumMeta(EnumMeta):
     def __str__(cls) -> str:
-        return ", ".join([member.value for member in cast(Type[Enum], cls)])
+        return ", ".join(
+            [member.name.lower() for member in cast(Type[Enum], cls)]
+        )
 
 
 class EnhancedEnum(Enum, metaclass=EnhancedEnumMeta):
     # This is for backwards compatibility with the old representation
     # of SUPPORTED_PROGRAM_TYPES, which was a dictionary
     @classmethod
-    def keys(cls) -> Iterable[str]:
-        return [member.value for member in cls]
+    def keys(cls) -> list[str]:
+        return [member.name.lower() for member in cls]
 
 
 try:
@@ -82,29 +83,12 @@ QPROGRAM = Union[
 
 # Supported quantum programs.
 class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
-    BRAKET = "braket"
-    CIRQ = "cirq"
-    PENNYLANE = "pennylane"
-    PYQUIL = "pyquil"
-    QIBO = "qibo"
-    QISKIT = "qiskit"
-
-    @classmethod
-    def _python_type(cls, identifier: str) -> QPROGRAM:
-        if identifier == "braket":
-            return _BKCircuit
-        elif identifier == "cirq":
-            return _Circuit
-        elif identifier == "pennylane":
-            return _QuantumTape
-        elif identifier == "pyquil":
-            return _Program
-        elif identifier == "qibo":
-            return _QiboCircuit
-        elif identifier == "qiskit":
-            return _QuantumCircuit
-        else:
-            raise ValueError(f"Invalid identifier: {identifier}")
+    BRAKET = _BKCircuit
+    CIRQ = _Circuit
+    PENNYLANE = _QuantumTape
+    PYQUIL = _Program
+    QIBO = _QiboCircuit
+    QISKIT = _QuantumCircuit
 
 
 # Define MeasurementResult, a result obtained by measuring qubits on a quantum

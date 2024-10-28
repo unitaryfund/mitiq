@@ -161,6 +161,7 @@ def convert_from_mitiq(
         circuit: Mitiq circuit to convert.
         conversion_type: String specifier for the converted circuit type.
     """
+    conversion_type = conversion_type.lower()
     conversion_function: Callable[[cirq.Circuit], QPROGRAM]
     if conversion_type == "qiskit":
         from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
