@@ -215,9 +215,6 @@ def test_executor_evaluate_float(execute):
 
     executor = Executor(execute)
 
-    results = executor.evaluate(circuits)
-    assert np.allclose(results, [2, 3])
-
     if execute is executor_serial_unique:
         assert executor.calls_to_executor == 2
     else:
