@@ -299,9 +299,9 @@ class PauliStringCollection:
             for qubit in pauli._qubits_to_measure():
                 if qubit in existing_measurements:
                     raise ValueError(
-                        f"""More than one measaurement found for qubit: """
-                        f"""{qubit}. Only a single measurement is allowed """
-                        f"""per qubit."""
+                        f"More than one measaurement found for qubit: "
+                        "{qubit}. Only a single measurement is allowed "
+                        "per qubit."
                     )
             support.update(pauli._qubits_to_measure())
         measured = circuit + basis_rotations + cirq.measure(*sorted(support))
