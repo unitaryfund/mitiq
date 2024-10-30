@@ -211,18 +211,12 @@ class Executor:
             manual_return_type = type(all_results[0])
 
         # Parse the results.
-        if (
-            self._executor_return_type in FloatLike
-            and self._executor_return_type is not None
-        ) or manual_return_type in FloatLike:
+        if manual_return_type in FloatLike:
             results = np.real_if_close(
                 cast(Sequence[float], all_results)
             ).tolist()
 
-        elif (
-            self._executor_return_type in DensityMatrixLike
-            or manual_return_type in DensityMatrixLike
-        ):
+        elif manual_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
             all_results = cast(List[npt.NDArray[np.complex64]], all_results)
             results = [
@@ -230,10 +224,7 @@ class Executor:
                 for density_matrix in all_results
             ]
 
-        elif (
-            self._executor_return_type in MeasurementResultLike
-            or manual_return_type in MeasurementResultLike
-        ):
+        elif manual_return_type in MeasurementResultLike:
             observable = cast(Observable, observable)
             all_results = cast(List[MeasurementResult], all_results)
             results = [
@@ -245,8 +236,8 @@ class Executor:
 
         else:
             raise ValueError(
-                f"Could not parse executed results from executor with type"
-                f" {self._executor_return_type}."
+                f"Could not parse executed results from executor with type "
+                f"{manual_return_type}."
             )
 
         return results
