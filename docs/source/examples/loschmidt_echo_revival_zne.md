@@ -27,7 +27,7 @@ where $H_{zz}$ and $H_{xx}$ are the interactions between neighboring sites and $
 
 $$H_{zz} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_z Z_i Z_{i+1} \right], \hspace{0.4cm} H_{xx} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_x X_{i} X_{i+1} \right], \hspace{0.4cm} H_x = -\frac{1}{2} \left[ \sum_{i=0}^{N-1} h_x X_i \right]$$
 
-where $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
+where $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
 
 Assuming the system is in state $\ket{\psi_0}$ at $t = 0$, we want to compute the probability of returning to the initial state at time $t$,
 
@@ -271,14 +271,18 @@ def run_depolarizing_noise(params : SimulationParams = SimulationParams(),
 ```
 
 ```{code-cell} ipython3
-result_depolarizing = run_depolarizing_noise(noise_level=0.0005)
+low_noise = 0.0005
+result_depolarizing = run_depolarizing_noise(noise_level=low_noise)
 ```
 
 ```{code-cell} ipython3
 setup_plot("Ideal and noisy simulations")
 legend = []
 add_to_plot(*result_ideal, "ideal", legend)
-add_to_plot(*result_depolarizing, "depolarizing noise, $p = 0.0005$", legend)
+add_to_plot(
+    *result_depolarizing,
+    "depolarizing noise, $p = {}$".format(low_noise),
+    legend)
 plt.legend(legend)
 plt.show()
 ```
@@ -288,7 +292,10 @@ As expected, the Loschmidt echo revival is weaker than in the ideal cases, and w
 ```{code-cell} ipython3
 scale_factors = [1, 2, 3]
 result_depolarizing_scaled = [
-    run_depolarizing_noise(noise_level=0.0005, scale_factor=alpha) for alpha in scale_factors
+    run_depolarizing_noise(
+        noise_level=low_noise,
+        scale_factor=alpha)
+    for alpha in scale_factors
 ]
 ```
 
@@ -313,7 +320,7 @@ result_zne = RichardsonFactory.extrapolate(scale_factors,
 ```
 
 ```{code-cell} ipython3
-setup_plot("ZNE for depolarizing noise model, $p = 0.0005$")
+setup_plot("ZNE for depolarizing noise model, $p = {}$".format(low_noise))
 legend = []
 add_to_plot(*result_ideal, "ideal", legend)
 for alpha, result in zip(scale_factors, result_depolarizing_scaled):
@@ -326,9 +333,13 @@ plt.show()
 Increasing the baseline noise level makes it much harder to reconstruct the peak with ZNE.
 
 ```{code-cell} ipython3
+high_noise = 0.005
 scale_factors = [1, 2, 3]
 result_depolarizing_scaled = [
-    run_depolarizing_noise(noise_level=0.005, scale_factor=alpha) for alpha in scale_factors
+    run_depolarizing_noise(
+        noise_level=high_noise,
+        scale_factor=alpha)
+    for alpha in scale_factors
 ]
 ```
 
@@ -338,7 +349,7 @@ result_zne = RichardsonFactory.extrapolate(scale_factors,
 ```
 
 ```{code-cell} ipython3
-setup_plot("ZNE for depolarizing noise model, $p = 0.005$")
+setup_plot("ZNE for depolarizing noise model, $p = {}$".format(high_noise))
 legend = []
 add_to_plot(*result_ideal, "ideal", legend)
 for alpha, result in zip(scale_factors, result_depolarizing_scaled):
