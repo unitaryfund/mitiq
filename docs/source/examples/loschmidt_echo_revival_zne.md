@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} zne, qiskit, intermediate
+```
+
 # ZNE with Qiskit: Simulation of Loschmidt Echo Revival
 
 This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum simulation of dynamical phase transitions in noisy quantum devices"](https://arxiv.org/abs/2211.08318). We build a circuit that simulates the time-evolution of a transverse-field Ising model, then run ideal, noisy, and noise-mitigated simulations of the circuit.
@@ -320,7 +323,7 @@ plt.show()
 ```
 
 ## Error mitigation with zero-noise extrapolation
-At this level of noise, we can use ZNE to mostly recover the ideal result. Running the noisy simulation is expensive (especially as the scale factor $\alpha$ increases), so rather than using the high-level functions for ZNE, we apply the static method `RichardsonFactory.extrapolate` to the results from the previous cell.
+At this level of noise, we can use ZNE to mostly recover the ideal result. Running the noisy simulation is expensive (especially as the scale factor $\alpha$ increases), so rather than using the high-level functions for ZNE, we apply the static method ... {meth}`.RichardsonFactory.extrapolate` ... to the results from the previous cell.
 
 ```{code-cell} ipython3
 from mitiq.zne.inference import RichardsonFactory
