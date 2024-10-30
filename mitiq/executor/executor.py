@@ -208,7 +208,12 @@ class Executor:
         # check returned type
         manual_return_type = None
         if len(all_results) > 0:
-            manual_return_type = type(all_results[0])
+            if isinstance(all_results[0], Sequence):
+                manual_return_type = type(all_results[0][0])
+            elif isinstance(all_results[0], Iterable):
+                manual_return_type = type(next(iter(all_results[0])))
+            else:
+                manual_return_type = type(all_results[0])
 
         # Parse the results.
         if manual_return_type in FloatLike:
