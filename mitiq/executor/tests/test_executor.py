@@ -215,6 +215,8 @@ def test_executor_evaluate_float(execute):
 
     executor = Executor(execute)
 
+    executor.evaluate(circuits)
+
     if execute is executor_serial_unique:
         assert executor.calls_to_executor == 2
     else:
