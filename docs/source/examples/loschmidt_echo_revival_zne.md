@@ -18,7 +18,7 @@ kernelspec:
 
 This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum simulation of dynamical phase transitions in noisy quantum devices"](https://arxiv.org/abs/2211.08318). We build a circuit that simulates the time-evolution of a transverse-field Ising model, then run ideal, noisy, and noise-mitigated simulations of the circuit.
 
-The paper includes simulations that show several effects of noise:
+The paper includes simulations that show several effects of noise on this system:
 
 * Let $\Lambda(t)$ be the probability that the system returns to its initial state at time $t$ (the Loschmidt echo). $\Lambda(t)$ has a series of peaks at quasi-periodic intervals. Adding noise flattens these peaks.
    
@@ -26,7 +26,7 @@ The paper includes simulations that show several effects of noise:
 
 * Noise weakens the correlations between adjacent sites.
 
-This tutorial covers simulating the Loschmidt echo and using zero-noise extrapolation to mitigate the effects of noise.
+This tutorial shows how to simulate the Loschmidt echo and use zero-noise extrapolation to mitigate the effects of noise.
 
 +++
 
@@ -328,8 +328,10 @@ At this level of noise, we can use ZNE to mostly recover the ideal result. Runni
 ```{code-cell} ipython3
 from mitiq.zne.inference import RichardsonFactory
 
-result_zne = RichardsonFactory.extrapolate(scale_factors,
-                                           [r[1] for r in result_depolarizing_scaled])
+result_zne = RichardsonFactory.extrapolate(
+    scale_factors,
+    [r[1] for r in result_depolarizing_scaled]
+)
 ```
 
 ```{code-cell} ipython3
@@ -357,8 +359,10 @@ result_depolarizing_scaled = [
 ```
 
 ```{code-cell} ipython3
-result_zne = RichardsonFactory.extrapolate(scale_factors,
-                                           [r[1] for r in result_depolarizing_scaled])
+result_zne = RichardsonFactory.extrapolate(
+    scale_factors,
+    [r[1] for r in result_depolarizing_scaled]
+)
 ```
 
 ```{code-cell} ipython3
@@ -404,8 +408,10 @@ result_ibm_nairobi_scaled = [
 ```
 
 ```{code-cell} ipython3
-result_zne = RichardsonFactory.extrapolate(scale_factors,
-                                           [r[1] for r in result_ibm_nairobi_scaled])
+result_zne = RichardsonFactory.extrapolate(
+    scale_factors,
+    [r[1] for r in result_ibm_nairobi_scaled]
+)
 ```
 
 ```{code-cell} ipython3
