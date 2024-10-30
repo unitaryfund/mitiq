@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ZNE Schema",
+    "description": "Schema for defining a ZNE implementation, to potentially be used as a sub-schema in larger QEM-schema",
+    "type": "object",
+    "properties": {
+        "noise_scaling_factors": {
+            "description": "Real scale factors used in the Factory for extrapolating to zero noise case, one for each point that is to be extrapolated",
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+
+        "noise_scaling_method": {
+            "description": "Method used to make the cirucit more sensitive to noise, takes circuit and scale factors as inputm, returns new circuit that is theoretically equivalent but practically noisier",
+            "type": "string",
+            "enum": ["global", "local_random", "local_all", "layer", "identity_scaling"]
+        },
+
+        "scale_factor": {
+            "description": "Indicates how many times to fold the input circuit according to the noise_scaling_method, folded circuit will have number of gates approximately equal to scale_factor * len(circuit)",
+            "type": "number"
+        },
+
+        "extrapolation": {
+            "description": "Method used to extrapolate the noise scaling factors to points not in the original set",
+            "type": "string",
+            "enum": ["linear", "richardson", "polynomial", "exponential", "poly-exp", "adaptive-exp"]
+        }
+    },
+    "additionalProperties": false
+}

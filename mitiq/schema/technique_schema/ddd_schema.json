@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DDD Schema",
+    "description": "Schema for defining a DDD implementation, to potentially be used as a sub-schema in larger QEM-schema",
+    "type": "object",
+    "required": ["rule"],
+    "properties": {
+        "rule": {
+            "description": "Method used to make the cirucit more sensitive to noise, takes circuit and scale factors as inputm, returns new circuit that is theoretically equivalent but practically noisier",
+            "type": "string",
+            "enum": ["xx", "yy", "xyxy", "general", "repeated", "custom"]
+        },
+
+        "num_trials": {
+            "description": "Number of independent experiments to average over. A number larger than 1 can be useful to average over multiple applications of a rule returning non-deterministic DDD sequences",
+            "type": "integer"
+
+        },
+
+        "full_output":{
+            "description": "Whether to return the full output of the DDD rule, or just the mitigated expectation value",
+            "type": "boolean"
+        }
+    },
+    "additionalProperties": false
+}
