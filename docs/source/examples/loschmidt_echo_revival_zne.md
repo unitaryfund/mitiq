@@ -15,6 +15,16 @@ kernelspec:
 
 This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum simulation of dynamical phase transitions in noisy quantum devices"](https://arxiv.org/abs/2211.08318). We build a circuit that simulates the time-evolution of a transverse-field Ising model, then run ideal, noisy, and noise-mitigated simulations of the circuit.
 
+The paper includes simulations that show several effects of noise:
+
+* Let $\Lambda(t)$ be the probability that the system returns to its initial state at time $t$ (the Loschmidt echo). $\Lambda(t)$ has a series of peaks at quasi-periodic intervals. Adding noise flattens these peaks.
+   
+* Let $\lambda(t) = \lim_{N->\infty} -\log(\Lambda(t))/N$, where $N$ is the number of sites in the Ising model. Dynamical quantum phase transitions (DQPTs) occur where $\lambda(t)$ is not analytic. DQPTs are observed at different times in the ideal and noisy simulations, and occur more frequently in the noisy system.
+
+* Noise weakens the correlations between adjacent sites.
+
+This tutorial covers simulating the Loschmidt echo and using zero-noise extrapolation to mitigate the effects of noise.
+
 +++
 
 ## Model definition
@@ -29,7 +39,7 @@ $$H_{zz} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_z Z_i Z_{i+1} \right], \hspace{
 
 where $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
 
-Assuming the system is in state $\ket{\psi_0}$ at $t = 0$, we want to compute the probability of returning to the initial state at time $t$,
+Assuming the system is in state $\ket{\psi_0}$ at $t = 0$, we want to compute the Loschmidt echo,
 
 $$\Lambda(t) = \left|\bra{\psi_0}U(t)\ket{\psi_0}\right|^2,$$
 
