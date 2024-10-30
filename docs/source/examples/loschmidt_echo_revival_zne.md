@@ -405,3 +405,7 @@ add_to_plot(result_depolarizing_scaled[0][0], result_zne, "mitigated", legend)
 plt.legend(legend)
 plt.show()
 ```
+
+## Summary
+
+For the system considered in this tutorial, the effectiveness of ZNE depends strongly on the level of noise. Under low-noise conditions, we can accurately recover the ideal Loschmidt echo signal. At higher noise levels, increasing the scale factor $\alpha$ almost completely flattens the first revival peak. As a result, the extrapolation procedure can qualitatively recover some of the signal, but is not quantitatively reliable.
