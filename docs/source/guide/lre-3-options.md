@@ -19,7 +19,7 @@ In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the erro
 In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 
-```
+```python
 lre_value = mitiq.lre.execute_with_lre(
     circuit,
     executor,
@@ -121,11 +121,14 @@ scale_factors_diff_fold_multiplier = get_scale_factor_vectors(
    fold_multiplier=3)
 
 
-print(f"Total number of noise-scaled circuits created with different fold_multiplier:" 
-      f"{len(scale_factors_diff_fold_multiplier)}")
+print(f"Total number of noise-scaled circuits created with different" 
+      f" fold_multiplier: {len(scale_factors_diff_fold_multiplier)}")
 
-print(f"Scale factor for some noise scaled circuit with degree=2 and fold_multiplier=2: \n {scale_factors[-2]}")
-print(f"Scale factor for some noise scaled circuit with degree= 2 but fold_multiplier=3: \n {scale_factors_diff_fold_multiplier[-2]}")
+print(f"Scale factor for some noise scaled circuit with degree=2 "
+      f"and fold_multiplier=2: \n {scale_factors[-2]}")
+
+print(f"Scale factor for some noise scaled circuit with degree= 2 "
+     f"but fold_multiplier=3:  \n {scale_factors_diff_fold_multiplier[-2]}")
 ```
 
 
@@ -139,11 +142,6 @@ scale_factors_diff_degree = get_scale_factor_vectors(
    circuit,
    degree=3,
    fold_multiplier=2)
-```
-
-
-```{code-cell} ipython3
-
 
 print(f"Total number of noise scaled circuits created: {len(scale_factors_diff_degree)}")
 ```
@@ -270,5 +268,4 @@ print("Noise scaled circuit created without chunking: ", non_chunked_circ ,sep="
 ```
 
 
-This section showed how to tune the performance of the technique by using the non-default options as well as controlling
-the default options. An in-depth discussion on these is provided in [](lre-4-low-level.md)
+This section showed in detail how to vary the default and non-default parameters required by the technique. An in-depth discussion on these is provided in [](lre-4-low-level.md)

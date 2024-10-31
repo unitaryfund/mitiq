@@ -141,7 +141,11 @@ noise_scaled_exp_values = [
 
 ## Second step: Multivariate Extrapolation for the error-mitigated expectation value
 
-The penultimate step here is to fetch the coefficients we'll use to combine the noisy data we obtained above. Each noise scaled circuit has a coefficient of linear combination and a noisy expectation value associated with it. 
+The penultimate step here is to fetch the coefficients we'll use to combine the noisy data we obtained above. Each noise scaled circuit has a coefficient of linear combination $\eta_i$ and a noisy expectation value $\langle O(λ_i) \rangle$ associated with it.
+
+$$
+O_{\mathrm{LRE}} = \sum_{i=1}^{M} \eta_i \langle O(λ_i) \rangle.
+$$
 
 ```{code-cell} ipython3
 from mitiq.lre.inference import multivariate_richardson_coefficients
