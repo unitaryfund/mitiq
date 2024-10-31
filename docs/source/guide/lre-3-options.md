@@ -19,7 +19,7 @@ In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the erro
 In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 
-```python
+```
 lre_value = mitiq.lre.execute_with_lre(
     circuit,
     executor,
@@ -28,9 +28,9 @@ lre_value = mitiq.lre.execute_with_lre(
     folding_method=<"noise scaling method imported from zne.scaling.folding">,
     num_chunks=<"number of chunks to group a large circuit into">,
 )
+```
 
-
-The options that can be used to control the hyperparameters are:
+The hyperparameters that can be controlled are:
 
 
 - `degree`: to modify the extrapolating polynomial
@@ -174,15 +174,15 @@ local_fold_circ = multivariate_layer_scaling(
  circuit,
  degree = 2,
  fold_multiplier = 2,
- folding_method = fold_all)[5]
+ folding_method = fold_all)[-2]
 
 
 # apply global folding
 global_fold_circ = multivariate_layer_scaling(
  circuit,
  degree = 2,
- fold_multiplier = 2,
- folding_method = fold_global)[5]
+ fold_multiplier = 3,
+ folding_method = fold_global)[-1]
 
 
 print("original circuit: ", circuit ,sep="\n")
