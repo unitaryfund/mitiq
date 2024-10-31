@@ -19,28 +19,24 @@ In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the erro
 In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 
-```
-from mitiq.lre import execute_with_lre
-
-
-lre_value = execute_with_lre(
-   circuit,
-   executor,
-   degree,
-   fold_multiplier,
-   folding_method = <"noise scaling method imported from zne.scaling.folding">,
-   num_chunks = <"group a large circuit into a circuit with fewer layers">
+```python
+lre_value = mitiq.lre.execute_with_lre(
+    circuit,
+    executor,
+    degree,
+    fold_multiplier,
+    folding_method=<"noise scaling method imported from zne.scaling.folding">,
+    num_chunks=<"number of chunks to group a large circuit into">,
 )
-```
 
 
 The options that can be used to control the hyperparameters are:
 
 
-- `degree` of the extrapolating polynomial
-- `fold_multiplier` to control how the circuit is scaled
-- `folding_method` to choose the unitary folding method
-- `num_chunks` to alter the sampling cost
+- `degree`: to modify the extrapolating polynomial
+- `fold_multiplier`: to control how the circuit is scaled
+- `folding_method`: to choose the unitary folding method
+- `num_chunks`: to alter the sampling cost
 
 
 ## Controlling how the noise-scaled circuits are created
