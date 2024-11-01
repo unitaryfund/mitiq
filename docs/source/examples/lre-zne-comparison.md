@@ -11,6 +11,10 @@ kernelspec:
   name: python3
 ---
 
+```{tags} lre, zne, benchmark
+
+```
+
 # Comparing LRE and ZNE
 
 Both LRE and ZNE work in two main stages: generate noise-scaled circuits via scaling, and apply inference to resulting measurements post-execution.
@@ -33,10 +37,10 @@ Here we will use the rotated randomized benchmarking circuits on a single qubit 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rotated_rb_circuits
 
-circuits = generate_rotated_rb_circuits(n_qubits=1, 
-                                        num_cliffords=3, 
-                                        theta=0.7, 
-                                        trials=50, 
+circuits = generate_rotated_rb_circuits(n_qubits=1,
+                                        num_cliffords=3,
+                                        theta=0.7,
+                                        trials=50,
                                         seed=4)
 
 print(circuits[0])
@@ -70,7 +74,7 @@ for i, circuit in enumerate(circuits):
 
 ```{code-cell} ipython3
 # The theoretical value for the probability of measuring 0 when taking an average over all the rotated rb circuits.
-p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2 
+p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2
 
 print(f'Average error for noisy values: {np.abs(np.mean(noisy_values) - p(0.7))}')
 print(f'Average error for ideal values: {np.abs(np.mean(ideal_values) - p(0.7))}')
