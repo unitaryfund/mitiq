@@ -38,5 +38,6 @@ CDR with Qrack as Near-Clifford Simulator <cdr_qrack.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>
 Composing techniques: REM + ZNE <combine_rem_zne.md>
 Composing techniques: DDD + ZNE <combine_ddd_zne.md>
+LRE and ZNE comparison tutorial <lre-zne-comparison.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
 ```
