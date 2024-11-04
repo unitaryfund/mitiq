@@ -46,7 +46,7 @@ circuits = generate_rotated_rb_circuits(n_qubits=1,
 print(circuits[0])
 ```
 
-We define an [executor](executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of measuring the ground state.
+We define an [executor](../guide/executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of measuring the ground state.
 By altering the value for `noise_level`, ideal and noisy expectation values can be obtained.
 
 ```{code-cell} ipython3
