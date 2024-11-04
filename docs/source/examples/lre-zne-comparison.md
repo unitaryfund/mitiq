@@ -11,10 +11,6 @@ kernelspec:
   name: python3
 ---
 
-```{tags} lre, zne, benchmark
-
-```
-
 # Comparing LRE and ZNE
 
 Both LRE and ZNE work in two main stages: generate noise-scaled circuits via scaling, and apply inference to resulting measurements post-execution.
@@ -37,16 +33,16 @@ Here we will use the rotated randomized benchmarking circuits on a single qubit 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rotated_rb_circuits
 
-circuits = generate_rotated_rb_circuits(n_qubits=1,
-                                        num_cliffords=3,
-                                        theta=0.7,
-                                        trials=50,
+circuits = generate_rotated_rb_circuits(n_qubits=1, 
+                                        num_cliffords=3, 
+                                        theta=0.7, 
+                                        trials=50, 
                                         seed=4)
 
 print(circuits[0])
 ```
 
-We define an [executor](../guide/executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of measuring the ground state.
+We define an [executor](executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of measuring the ground state.
 By altering the value for `noise_level`, ideal and noisy expectation values can be obtained.
 
 ```{code-cell} ipython3
@@ -74,7 +70,7 @@ for i, circuit in enumerate(circuits):
 
 ```{code-cell} ipython3
 # The theoretical value for the probability of measuring 0 when taking an average over all the rotated rb circuits.
-p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2
+p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2 
 
 print(f'Average error for noisy values: {np.abs(np.mean(noisy_values) - p(0.7))}')
 print(f'Average error for ideal values: {np.abs(np.mean(ideal_values) - p(0.7))}')
@@ -110,8 +106,11 @@ for i, circuit in enumerate(circuits):
 ```
 
 ```{code-cell} ipython3
-print(f'Average error of mitigated values using LRE: {np.abs(np.mean(mitigated_values_lre) - p(0.7))}')
-print(f'Average error of mitigated values using ZNE: {np.abs(np.mean(mitigated_values_zne) - p(0.7))}')
+error_lre = np.abs(np.mean(mitigated_values_lre) - p(0.7))
+error_zne = np.abs(np.mean(mitigated_values_zne) - p(0.7))
+
+print(f'Average error of mitigated values using LRE: {error_lre}')
+print(f'Average error of mitigated values using ZNE: {error_zne}')
 ```
 
 ## Resource estimation
@@ -163,7 +162,8 @@ print(
 ```
 
 ```{code-cell} ipython3
-np.abs(np.mean(mitigated_values_zne) - p(0.7))/np.abs(np.mean(mitigated_values_lre) - p(0.7)), 50/3
+print(f'Error improvement LRE over ZNE: {error_zne/error_lre}')
+print(f'Ratio number of circuits required for LRE vs ZNE: {avg_num_scaled_circuits_lre/avg_num_scaled_circuits_zne}')
 ```
 
 ## Conclusion
