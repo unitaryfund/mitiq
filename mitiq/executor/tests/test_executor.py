@@ -347,3 +347,11 @@ def test_executor_measurements_not_typed():
     assert executor.evaluate(circuit, obs) == executor_typed.evaluate(
         circuit, obs
     )
+
+
+def test_executor_empty_return():
+    executor = Executor(list)
+    qcirc = QuantumCircuit(1)
+    qcirc.h(0)
+    with pytest.raises(ValueError, match="Could not parse executed results"):
+        executor.evaluate(qcirc)

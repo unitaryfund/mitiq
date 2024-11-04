@@ -207,7 +207,7 @@ class Executor:
 
         # check returned type
         manual_return_type = None
-        if len(all_results) > 0:
+        if all_results:
             if isinstance(all_results[0], Sequence):
                 manual_return_type = type(all_results[0][0])
             elif isinstance(all_results[0], Iterable):
