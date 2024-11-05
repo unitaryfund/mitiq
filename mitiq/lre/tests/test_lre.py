@@ -1,5 +1,6 @@
 """Unit tests for the LRE extrapolation methods."""
 
+import math
 import random
 import re
 from unittest.mock import Mock
@@ -47,6 +48,7 @@ def test_lre_all_qprogram(circuit_type):
     """Verify LRE works with all supported frontends."""
     degree, fold_multiplier = 2, 3
     circuit = benchmarks.generate_ghz_circuit(3, circuit_type)
+    depth = 3  # not all circuit types have a simple way to compute depth
 
     mock_executor = Mock(side_effect=lambda _: random.random())
 
@@ -58,7 +60,7 @@ def test_lre_all_qprogram(circuit_type):
     )
 
     assert isinstance(lre_exp_val, float)
-    assert mock_executor.call_count == 10
+    assert mock_executor.call_count == math.comb(degree + depth, degree)
 
 
 @pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
