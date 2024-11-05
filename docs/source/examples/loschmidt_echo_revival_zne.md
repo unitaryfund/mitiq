@@ -298,7 +298,7 @@ plt.legend(legend)
 plt.show()
 ```
 
-As expected, the Loschmidt echo revival is weaker than in the ideal cases, and we get a lower peak. Applying gate folding suppresses the peak further.
+As expected, the Loschmidt echo revival is weaker than in the ideal cases, and we get a lower peak. Applying gate folding suppresses the peak further; in the next cell we do this for scale factors $\alpha = 1, 2, 3$.
 
 ```{code-cell} ipython3
 scale_factors = [1, 2, 3]
