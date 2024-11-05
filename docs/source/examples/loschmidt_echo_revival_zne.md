@@ -230,7 +230,7 @@ The next few cells run a simulation with depolarizing noise. We transpile the ci
 from qiskit.compiler import transpile
 from qiskit_aer.noise import NoiseModel
 from qiskit_aer.noise.errors.standard_errors import depolarizing_error
-from mitiq.zne.scaling.folding import fold_gates_at_random
+from mitiq.zne.scaling import fold_gates_at_random
 
 def simulate_noisy(circuit: QuantumCircuit,
                    noise_model: NoiseModel,
