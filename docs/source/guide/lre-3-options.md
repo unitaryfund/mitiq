@@ -238,10 +238,10 @@ The default choice for unitary folding in {func}`.execute_with_lre` and {func}`.
 However, there are two other choices as well: {func}`.fold_all()` and {func}`.fold_global()` which can be used for the
 `folding_method` parameter in {func}`.execute_with_lre`.
 
-Note that the choice of folding method matters only when the
-layers in the circuit are altered by chunking multiple layers into fewer layers. Otherwise the noise scaled circuits
-created using either of the folding methods will look identical as they are created by scaling
-each layer as required.
+
+```{tip}
+Note that the choice of folding method matters only when the layers in the circuit are altered by chunking multiple layers into fewer layers. Otherwise the noise scaled circuits created using either of the folding methods will look identical as they are created by scaling each layer as required.
+```
 
 
 ```{code-cell} ipython3
