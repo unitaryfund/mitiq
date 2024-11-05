@@ -38,7 +38,7 @@ where $H_{zz}$ and $H_{xx}$ are the interactions between neighboring sites and $
 
 $$H_{zz} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_z Z_i Z_{i+1} \right], \hspace{0.4cm} H_{xx} = -\frac{1}{2} \left[ \sum_{i=0}^{N-2}J_x X_{i} X_{i+1} \right], \hspace{0.4cm} H_x = -\frac{1}{2} \left[ \sum_{i=0}^{N-1} h_x X_i \right]$$
 
-where $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. (Strictly speaking, when $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.)
+where $X_i$ and $Z_i$ are the Pauli operators acting on site $i$, $J_z$ and $J_x$ are the $z$- and $x$-components of the spin-spin coupling, and $h_x$ is the strength of the external field. Here we will set $J_z > 0$ and $J_x > 0$, so that the spins at adjacent sites are correlated, and set $h_x > 0$ so that each spin prefers to have a positive $x$-component. (Strictly speaking, since $J_x \neq 0$ this is a Heisenberg model rather than an Ising model.) 
 
 Assuming the system is in state $\ket{\psi_0}$ at $t = 0$, we want to compute the Loschmidt echo,
 
