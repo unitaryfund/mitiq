@@ -15,7 +15,7 @@ kernelspec:
 # What additional options are available when using LRE?
 
 
-In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the error mitigated expectation values
+In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the error mitigated expectation values.
 In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 
@@ -69,12 +69,8 @@ print(circuit)
 ```
 
 
-How the circuits are scaled is controlled by `degree`, `fold_multiplier`, and the number of layers in the input circuit. We choose `degree = 2` and `fold_multiplier = 2` for demonstration purposes.
-
-
-
-For `degree = 2`, the terms in the monomial basis are given below where the subscripts correspond to the 4 layers in the
-circuit.
+For `degree = 2`, the terms in the monomial basis are given below.
+Here, $\lambda_i$ refers to the folding factor for the $i$-th layer.
 
 
 $$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
@@ -90,7 +86,7 @@ from mitiq.lre.multivariate_scaling import get_scale_factor_vectors
 
 scale_factors = get_scale_factor_vectors(circuit, degree=2, fold_multiplier=2)
 
-scale_factors
+print(scale_factors)
 ```
 
 
@@ -155,8 +151,8 @@ hyperparameter affecting the performance of the technique.
 ## Chunking a circuit into fewer layers
 
 
-When you have a large circuit, the size of the sample matrix increases as the number of monomial terms scale polynomially. The size of the sample matrix influences sampling cost. In such a case, a circuit of 100 layers could be grouped into 4 chunks where each chunk consists of multiple collated layers. The noise scaling function {func}`.multivariate_layer_scaling`
-treats each chunk as a layer to be scaled when the parameter `num_chunks` is used. Thus, for the 100 layer circuit grouped into 4 chunks with `degree = 2` and `fold_multiplier = 2`, only 15 noise-scaled circuits are created i.e. sample matrix is reduced to dimension $15 \times 15$.
+When you have a large circuit, the size of the sample matrix increases as the number of monomial terms scale polynomially. The size of the sample matrix influences sampling cost. In such a case, a circuit of 100 layers could be grouped into 4 chunks where each chunk consists of 25 collated layers. The noise scaling function {func}`.multivariate_layer_scaling`
+treats each chunk as a layer to be scaled when the parameter `num_chunks` is used. Thus, for the 100 layer circuit grouped into 4 chunks with `degree = 2` and `fold_multiplier = 2`, only 15 noise-scaled circuits are created i.e. sample matrix is reduced to dimension $15 \times 15$ instead of $x \times x$.
 
 
 ```{caution}
