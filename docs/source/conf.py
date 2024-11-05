@@ -445,6 +445,7 @@ nbsphinx_thumbnails = {
     "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
     "examples/quantum_simulation_1d_ising": "_static/quantum_simulation.png",
     "examples/cdr_qrack": "_static/cdr-qrack.png",
+    "examples/loschmidt_echo_revival_zne": "_static/loschmidt_echo_qiskit.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
