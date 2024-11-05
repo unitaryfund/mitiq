@@ -62,11 +62,11 @@ Now we observe that each term in the decomposition corresponds to a series of ga
 
 $$\exp(-i H_{zz} \delta t) = \prod_{i=0}^{N-2} \exp\left( -i\frac{J_z\delta t }{2} Z_i Z_{i+1} \right)$$
 
-Using the fact that $Z_i Z_{i+1} = I \otimes \cdots Z \otimes Z \cdots \otimes I$, we can rewrite this as a product of $R_{ZZ}$ gates,
+Using the fact that $Z_i Z_{i+1} = I \otimes \cdots Z \otimes Z \cdots \otimes I$, we can rewrite this as a product of [$R_{ZZ}$ gates](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.RZZGate),
 
 $$\prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(J_z \delta t )$$
 
-Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of $R_{XX}$ and $R_X$ gates, yielding
+Similarly, the terms $\exp(-i H_{xx} \delta t)$ and $\exp(-i H_{x} \delta t)$ can be rewritten in terms of [$R_{XX}$](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.RXXGate) and [$R_X$](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.RXGate) gates, yielding
 
 $$\exp(-iH\delta t) \approx \prod_{i=0}^{N-2} R_{ZZ}^{(i, i+1)}(J_z \delta t) \prod_{i=0}^{N-2} R_{XX}^{(i, i+1)}(J_x \delta t) \prod_{i=0}^{N-1} R_{X}^{i}(h_x \delta t)$$
 
@@ -181,7 +181,7 @@ def simulate_ideal(circuit: QuantumCircuit) -> float:
     
     psi = job.result().data()["statevector"]
     
-    # Get the probability of returning to $\ket{0^{\otimes N}}$
+    # Get the probability of returning to |00...0>
     amp_0 = np.asarray(psi)[0]
     return np.abs(amp_0.real**2 + amp_0.imag**2)
 
@@ -251,7 +251,7 @@ def simulate_noisy(circuit: QuantumCircuit,
     
     job = backend.run(folded_circuit, shots=n_shots)
 
-    # Get the probability of returning to $\ket{0^{\otimes N}}$
+    # Get the probability of returning to |00...0>
     counts = job.result().get_counts()
     ket = "0" * circuit.num_qubits
     if ket in counts:
@@ -354,9 +354,6 @@ result_depolarizing_scaled = [
         scale_factor=alpha)
     for alpha in scale_factors
 ]
-```
-
-```{code-cell} ipython3
 result_zne = RichardsonFactory.extrapolate(
     scale_factors,
     [r[1] for r in result_depolarizing_scaled]
