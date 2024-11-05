@@ -33,18 +33,27 @@ test_circuit1_with_measurements = deepcopy(test_circuit1)
 test_circuit1_with_measurements.append(ops.measure_each(*qreg1))
 
 
-@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES)
-def test_multivariate_layerwise_scaling(circuit_type):
-    """Ensure layer scaling works with all frontends."""
+def test_multivariate_layerwise_scaling_num_circuits():
+    """Ensure the correct number of circuits are generated."""
+    degree, fold_multiplier, num_chunks = 2, 2, 3
+    scaled_circuits = multivariate_layer_scaling(
+        test_circuit1, degree, fold_multiplier, num_chunks
+    )
+
     depth = len(test_circuit1)
+    # number of circuit is `degree` + `depth` choose `degree`
+    assert len(scaled_circuits) == math.comb(degree + depth, degree)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES)
+def test_multivariate_layerwise_scaling_types(circuit_type):
+    """Ensure layer scaling returns circuits of the correct type."""
     circuit = convert_from_mitiq(test_circuit1, circuit_type.name)
     degree, fold_multiplier, num_chunks = 2, 2, 3
     scaled_circuits = multivariate_layer_scaling(
         circuit, degree, fold_multiplier, num_chunks
     )
 
-    # number of circuit is `degree` + `depth` choose `degree`
-    assert len(scaled_circuits) == math.comb(degree + depth, degree)
     assert all(
         isinstance(circuit, circuit_type.value) for circuit in scaled_circuits
     )
