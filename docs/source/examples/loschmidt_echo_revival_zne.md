@@ -16,13 +16,13 @@ kernelspec:
 
 # ZNE with Qiskit: Simulation of Loschmidt Echo Revival
 
-This tutorial replicates some of the results from Y. Javanmard et al., ["Quantum simulation of dynamical phase transitions in noisy quantum devices"](https://arxiv.org/abs/2211.08318). We build a circuit that simulates the time-evolution of a transverse-field Ising model, then run ideal, noisy, and noise-mitigated simulations of the circuit.
+This tutorial replicates some of the results from {cite}`Javanmard_2022_arxiv`. We build a circuit that simulates the time-evolution of a transverse-field Ising model, then run ideal, noisy, and noise-mitigated simulations of the circuit.
 
 In particular, let $\Lambda(t)$ be the _Loschmidt echo_, the probability that the system returns to its initial state at time $t$. $\Lambda(t)$ has a quasi-periodic series of peaks that are flattened as the noise level increases. Here, we demonstrate how to simulate the Loschmidt echo and use zero-noise extrapolation to mitigate the effects of noise.
 
 The paper considers some additional effects of noise, which are outside the scope of this tutorial:
    
-* Let $\lambda(t) = \lim_{N->\infty} -\log(\Lambda(t))/N$, where $N$ is the number of sites in the Ising model. Dynamical quantum phase transitions (DQPTs) occur at values of $t$ where $\lambda(t)$ is not analytic. DQPTs are observed at different times in the ideal and noisy simulations, and occur more frequently in the noisy system.
+* Let $\lambda(t) = \lim_{N\to\infty} -\log(\Lambda(t))/N$, where $N$ is the number of sites in the Ising model. Dynamical quantum phase transitions (DQPTs) occur at values of $t$ where $\lambda(t)$ is not analytic. DQPTs are observed at different times in the ideal and noisy simulations, and occur more frequently in the noisy system.
 
 * Noise weakens the correlations between adjacent sites.
 
@@ -321,7 +321,7 @@ plt.show()
 ```
 
 ## Error mitigation with zero-noise extrapolation
-At this level of noise, we can use ZNE to mostly recover the ideal result. Running the noisy simulation is expensive (especially as the scale factor $\alpha$ increases), so rather than using the high-level functions for ZNE, we apply the static method {meth}`.RichardsonFactory.extrapolate` to the results from the previous cell.
+At this level of noise, we can use ZNE to mostly recover the ideal result. Running the noisy simulation is expensive (especially as the scale factor $\alpha$ increases), so rather than using the high-level functions for ZNE, we apply the static method `RichardsonFactory.extrapolate` to the results from the previous cell.
 
 ```{code-cell} ipython3
 from mitiq.zne.inference import RichardsonFactory
