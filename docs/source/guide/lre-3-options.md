@@ -21,13 +21,12 @@ In this section, we will outline the optional arguments that can be used and adj
 
 ```python
 lre_value = mitiq.lre.execute_with_lre(
-    circuit,
-    executor,
-    degree,
-    fold_multiplier,
-    folding_method=<"noise scaling method imported from zne.scaling.folding">,
-    num_chunks=<"number of chunks to group a large circuit into">,
-)
+      circuit,
+      executor,
+      degree,
+      fold_multiplier,
+      folding_method=<"noise scaling method imported from zne.scaling.folding">,
+      num_chunks=<"number of chunks to group a large circuit into">,)
 ```
 
 The hyperparameters that can be controlled are:
@@ -45,11 +44,8 @@ The hyperparameters that can be controlled are:
 ### Extrapolating polynomial
 
 
-Depending on the choice of the degree of the polynomial, how each noise-scaled circuit is scaled varies. This
-in turn influences how the sample matrix for multivariate Richardson extrapolation is created.
-
-
-Suppose we have an input circuit consisting of 4 layers.
+The chosen degree of the extrapolating polynomial effects the way in which circuits get scaled, as we'll see below.
+For this example, we'll define a circuit consisting of 4 layers.
 
 
 ```{code-cell} ipython3
@@ -58,27 +54,19 @@ from cirq import LineQubit, Circuit, CZ, CNOT, H
 
 q0, q1, q2, q3  = LineQubit.range(4)
 circuit = Circuit(
-   H(q0),
-   CNOT.on(q0, q1),
-   CZ.on(q1, q2),
-   CNOT.on(q2, q3),
-)
+      H(q0),
+      CNOT.on(q0, q1),
+      CZ.on(q1, q2),
+      CNOT.on(q2, q3),)
 
 
 print(circuit)
 ```
 
-
-For `degree = 2`, the terms in the monomial basis are given below.
-Here, $\lambda_i$ refers to the folding factor for the $i$-th layer.
+For `degree = 2`, the scale factor pattern is generated through the terms in the monomial basis for the multivariate polynomial. For more information, see [](lre-5-theory.md). Here, $\lambda_i$ refers to the folding factor for the $i$-th layer. 
 
 
 $$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
-
-
-```{seealso}
-These terms in the monomial basis are also used to define the rows of the sample matrix used for extrapolation.
-```
 
 
 ```{code-cell} ipython3
@@ -101,6 +89,8 @@ the $\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the f
 
 - and so on.
 
+The total number of noise-scaled circuits depends is given by $\binom{d + l - 1}{d}$ where $l$ is the number of layers in the circuit and $d$ is the chosen degree of the multivariate polynomial as discussed in [](lre-5-theory.md). 
+
 ```{code-cell} ipython3
 print(f"Total number of noise scaled circuits created: {len(scale_factors)}")
 ```
@@ -112,9 +102,9 @@ is altered.
 
 
 scale_factors_diff_fold_multiplier = get_scale_factor_vectors(
-   circuit,
-   degree=2,
-   fold_multiplier=3)
+      circuit,
+      degree=2,
+      fold_multiplier=3)
 
 
 print(f"Total number of noise-scaled circuits created with different" 
@@ -135,9 +125,9 @@ Both the number of noise scaled circuits and scale factor vectors are changed wh
 
 
 scale_factors_diff_degree = get_scale_factor_vectors(
-   circuit,
-   degree=3,
-   fold_multiplier=2)
+      circuit,
+      degree=3,
+      fold_multiplier=2)
 
 print(f"Total number of noise scaled circuits created: "
       f"{len(scale_factors_diff_degree)}")
@@ -174,10 +164,10 @@ The scale factor vectors change as shown below:
 ```{code-cell} ipython3
 
 scale_factors_with_chunking = get_scale_factor_vectors(
-   circuit,
-   degree=2,
-   fold_multiplier=2,
-   num_chunks=2)
+      circuit,
+      degree=2,
+      fold_multiplier=2,
+      num_chunks=2)
 
 scale_factors_with_chunking
 ```
@@ -199,7 +189,8 @@ print(f"Total number of noise scaled circuits without chunking: "
 ```
 
 
-How the noise-scaled circuits are chunked differs greatly as each chunk in the circuit is now equivalent to a layer to be folded via unitary folding.
+How the noise-scaled circuits are chunked differs greatly as each chunk in the circuit is now equivalent to a layer to be folded via unitary folding. In the example below, we compare the second noise-scaled circuit in a chunked and a non-chunked
+circuit.
 
 
 ```{code-cell} ipython3
@@ -207,17 +198,17 @@ from mitiq.lre.multivariate_scaling import multivariate_layer_scaling
 
 # apply chunking
 chunked_circ = multivariate_layer_scaling(
- circuit,
- degree = 2,
- fold_multiplier = 2,
- num_chunks = 2)[1]
+      circuit,
+      degree = 2,
+      fold_multiplier = 2,
+      num_chunks = 2)[1]
 
 
 # skip chunking
 non_chunked_circ = multivariate_layer_scaling(
- circuit,
- degree = 2,
- fold_multiplier = 2)[1]
+      circuit,
+      degree = 2,
+      fold_multiplier = 2)[1]
 
 
 print("original circuit: ", circuit ,sep="\n")
@@ -250,18 +241,18 @@ from mitiq.zne.scaling import fold_all, fold_global
 
 # apply local folding
 local_fold_circ = multivariate_layer_scaling(
- circuit,
- degree = 2,
- fold_multiplier = 2,
- folding_method = fold_all)[-2]
+      circuit,
+      degree = 2,
+      fold_multiplier = 2,
+      folding_method = fold_all)[-2]
 
 
 # apply global folding
 global_fold_circ = multivariate_layer_scaling(
- circuit,
- degree = 2,
- fold_multiplier = 2,
- num_chunks = 2,
+      circuit,
+      degree = 2,
+      fold_multiplier = 2,
+      num_chunks = 2,
  folding_method = fold_global)[-2]
 
 
