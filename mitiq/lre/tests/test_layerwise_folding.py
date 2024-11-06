@@ -6,11 +6,14 @@
 """Unit tests for scaling noise by unitary folding of layers in the input
 circuit to allow for multivariate extrapolation."""
 
+import math
 from copy import deepcopy
 
 import pytest
 from cirq import Circuit, LineQubit, ops
 
+from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.interface import convert_from_mitiq
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_chunks,
     _get_num_layers_without_measurements,
@@ -30,14 +33,35 @@ test_circuit1_with_measurements = deepcopy(test_circuit1)
 test_circuit1_with_measurements.append(ops.measure_each(*qreg1))
 
 
-def test_multivariate_layerwise_scaling():
-    """Checks if multiple scaled circuits are returned to fit the required
-    folding pattern for multivariate extrapolation."""
-    multiple_scaled_circuits = multivariate_layer_scaling(
-        test_circuit1, 2, 2, 3
+def test_multivariate_layerwise_scaling_num_circuits():
+    """Ensure the correct number of circuits are generated."""
+    degree, fold_multiplier, num_chunks = 2, 2, 3
+    scaled_circuits = multivariate_layer_scaling(
+        test_circuit1, degree, fold_multiplier, num_chunks
     )
 
-    assert len(multiple_scaled_circuits) == 10
+    depth = len(test_circuit1)
+    # number of circuit is `degree` + `depth` choose `degree`
+    assert len(scaled_circuits) == math.comb(degree + depth, degree)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES)
+def test_multivariate_layerwise_scaling_types(circuit_type):
+    """Ensure layer scaling returns circuits of the correct type."""
+    circuit = convert_from_mitiq(test_circuit1, circuit_type.name)
+    degree, fold_multiplier, num_chunks = 2, 2, 3
+    scaled_circuits = multivariate_layer_scaling(
+        circuit, degree, fold_multiplier, num_chunks
+    )
+
+    assert all(
+        isinstance(circuit, circuit_type.value) for circuit in scaled_circuits
+    )
+
+
+def test_multivariate_layerwise_scaling_cirq():
+    """Ensure the folding pattern is correct for a nontrivial case."""
+    scaled_circuits = multivariate_layer_scaling(test_circuit1, 2, 2, 3)
     folding_pattern = [
         (1, 1, 1),
         (5, 1, 1),
@@ -50,16 +74,15 @@ def test_multivariate_layerwise_scaling():
         (1, 5, 5),
         (1, 1, 9),
     ]
-
-    for i, scale_factor_vector in enumerate(folding_pattern):
-        scale_layer1, scale_layer2, scale_layer3 = scale_factor_vector
+    for scale_factors, circuit in zip(folding_pattern, scaled_circuits):
+        scale_layer1, scale_layer2, scale_layer3 = scale_factors
         expected_circuit = Circuit(
             [ops.H.on_each(*qreg1)] * scale_layer1,
             [ops.CNOT.on(qreg1[0], qreg1[1]), ops.X.on(qreg1[2])]
             * scale_layer2,
             [ops.TOFFOLI.on(*qreg1)] * scale_layer3,
         )
-        assert expected_circuit == multiple_scaled_circuits[i]
+        assert expected_circuit == circuit
 
 
 @pytest.mark.parametrize(

@@ -9,7 +9,6 @@ from functools import wraps
 from typing import Any, Callable, Optional, Union
 
 import numpy as np
-from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.lre.inference import (
@@ -22,8 +21,8 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_lre(
-    input_circuit: Circuit,
-    executor: Callable[[Circuit], float],
+    input_circuit: QPROGRAM,
+    executor: Callable[[QPROGRAM], float],
     degree: int,
     fold_multiplier: int,
     folding_method: Callable[
@@ -90,14 +89,14 @@ def execute_with_lre(
 
 
 def mitigate_executor(
-    executor: Callable[[Circuit], float],
+    executor: Callable[[QPROGRAM], float],
     degree: int,
     fold_multiplier: int,
     folding_method: Callable[
         [Union[Any], float], Union[Any]
     ] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-) -> Callable[[Circuit], float]:
+) -> Callable[[QPROGRAM], float]:
     """Returns a modified version of the input `executor` which is
     error-mitigated with layerwise richardson extrapolation (LRE).
 
@@ -119,7 +118,7 @@ def mitigate_executor(
     """
 
     @wraps(executor)
-    def new_executor(input_circuit: Circuit) -> float:
+    def new_executor(input_circuit: QPROGRAM) -> float:
         return execute_with_lre(
             input_circuit,
             executor,
@@ -135,9 +134,11 @@ def mitigate_executor(
 def lre_decorator(
     degree: int,
     fold_multiplier: int,
-    folding_method: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
+    folding_method: Callable[
+        [QPROGRAM, float], QPROGRAM
+    ] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-) -> Callable[[Callable[[Circuit], float]], Callable[[Circuit], float]]:
+) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
     """Decorator which adds an error-mitigation layer based on
     layerwise richardson extrapolation (LRE).
 
@@ -159,8 +160,8 @@ def lre_decorator(
     """
 
     def decorator(
-        executor: Callable[[Circuit], float],
-    ) -> Callable[[Circuit], float]:
+        executor: Callable[[QPROGRAM], float],
+    ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor,
             degree,
