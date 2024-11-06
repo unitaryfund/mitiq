@@ -16,13 +16,10 @@ kernelspec:
 Both LRE and ZNE work in two main stages: generate noise-scaled circuits via scaling, and apply inference to resulting measurements post-execution.
 
 This workflow can be executed by a single call to `execute_with_lre` or `execute_with_zne`.
-For resource estimation, Mitiq provides `multivariate_layer_scaling` to inspect the circuits that are to be executed.
-For ZNE we have access to the scaled circuits using the function `scaled_circuits`.
 
-```{danger}
-LRE is currently compatible with quantum programs written using `cirq`.
-Work on making this technique compatible with other frontends is ongoing. 🚧
-```
+For resource estimation, Mitiq provides `multivariate_layer_scaling` to inspect the circuits that are to be executed.
+
+For ZNE we have access to the scaled circuits using the function `scaled_circuits`.
 
 ## Problem Setup
 
@@ -33,16 +30,17 @@ Here we will use the rotated randomized benchmarking circuits on a single qubit 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rotated_rb_circuits
 
-circuits = generate_rotated_rb_circuits(n_qubits=1,
-                                        num_cliffords=3,
-                                        theta=0.7,
-                                        trials=50,
+circuits = generate_rotated_rb_circuits(n_qubits=1, 
+                                        num_cliffords=3, 
+                                        theta=0.7, 
+                                        trials=50, 
                                         seed=4)
 
 print(circuits[0])
 ```
 
 We define an [executor](../guide/executors.md) which simulates the input circuit subjected to depolarizing noise, and returns the probability of measuring the ground state.
+
 By altering the value for `noise_level`, ideal and noisy expectation values can be obtained.
 
 ```{code-cell} ipython3
@@ -54,35 +52,42 @@ def execute(circuit, noise_level=0.025):
     return rho[0, 0].real
 ```
 
+Let's compute the expectation values with and without noise.
+
 ```{code-cell} ipython3
+# Collect ideal and noisy values (probability of measuring 0 across all circuits).
+noisy_values = []
+ideal_values = []
+for circuit in circuits:
+    noisy_values.append(execute(circuit))
+    ideal_values.append(execute(circuit, noise_level=0.0))
+```
+
+```{code-cell} ipython3
+from statistics import mean
 import numpy as np
 
-# Collect ideal and noisy values (probability of measuring 0 across all 100 circuits).
-noisy_values = np.zeros(len(circuits))
-ideal_values = np.zeros(len(circuits))
-
-for i, circuit in enumerate(circuits):
-    noisy = execute(circuit)
-    noisy_values[i] = noisy
-    ideal = execute(circuit, noise_level=0.0)
-    ideal_values[i] = ideal
-```
-
-```{code-cell} ipython3
-# The theoretical value for the probability of measuring 0 when taking an average over all the rotated rb circuits.
+# The theoretical value for the probability of measuring 0 when taking
+# an average over all the rotated rb circuits.
 p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2
 
-print(f'Average error for noisy values: {np.abs(np.mean(noisy_values) - p(0.7))}')
-print(f'Average error for ideal values: {np.abs(np.mean(ideal_values) - p(0.7))}')
+print(f'Average error for noisy values: {abs(mean(noisy_values) - p(0.7))}')
+print(f'Average error for ideal values: {abs(mean(ideal_values) - p(0.7))}')
 ```
 
-For the ideal values we still see a small error, since the circuits are randomly generated and the theoretical value is achieved in the limit where we generate all the possible circuits.
+For the ideal values we still see a small error, because we are only taking the average over 50 rotated randomized benchmarking circuits, so there will be noise due to randomness.
+
+The ideal value, defined in the funcion `p`, is attained when computing this average over all the rotated randomized benchmarking circuits.
+
+If you increase the number of circuits, you will find that the average error for ideal values tends to zero.
 
 +++
 
 ## Apply LRE and ZNE directly
 
-With the circuit and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier. For ZNE we use the default values for the scale factors.
+With the circuit and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier. 
+
+For ZNE we use the default values for the scale factors.
 
 ```{code-cell} ipython3
 from mitiq.lre import execute_with_lre
@@ -91,23 +96,23 @@ from mitiq.zne import execute_with_zne
 degree = 2
 fold_multiplier = 3
 
-# Collect mitigated values (probability of measuring 0 across all 100 circuits) using LRE and ZNE.
-mitigated_values_lre = np.zeros(len(circuits))
-mitigated_values_zne = np.zeros(len(circuits))
+# Collect mitigated values (probability of measuring 0 across all circuits) using LRE and ZNE.
+mitigated_values_lre = []
+mitigated_values_zne = []
 
-for i, circuit in enumerate(circuits):
+for circuit in circuits:
     mitigated_lre = execute_with_lre(circuit,
                                      execute,
                                      degree=degree,
                                      fold_multiplier=fold_multiplier)
-    mitigated_values_lre[i] = mitigated_lre
+    mitigated_values_lre.append(mitigated_lre)
     mitigated_zne = execute_with_zne(circuit, execute)
-    mitigated_values_zne[i] = mitigated_zne
+    mitigated_values_zne.append(mitigated_zne)
 ```
 
 ```{code-cell} ipython3
-error_lre = np.abs(np.mean(mitigated_values_lre) - p(0.7))
-error_zne = np.abs(np.mean(mitigated_values_zne) - p(0.7))
+error_lre = abs(mean(mitigated_values_lre) - p(0.7))
+error_zne = abs(mean(mitigated_values_zne) - p(0.7))
 
 print(f'Average error of mitigated values using LRE: {error_lre}')
 print(f'Average error of mitigated values using ZNE: {error_zne}')
@@ -168,6 +173,8 @@ print(f'Ratio number of circuits required for LRE vs ZNE: {avg_num_scaled_circui
 
 ## Conclusion
 
-At the cost of many extra circuits to execute, in this specific case a factor of 50/3 ~= 17, LRE obtains a an improvement of ~3x in error rate.
-The number of circuits we tested the two approaches is very limited, so there is not much confidence in these numbers.
-Much more research needs to be conducted to get a better sense of the trade-off between performance and resources required.
+With an additional cost of many circuits---in this case, around 17 times more---LRE achieves a notable improvement, reducing the error rate by approximately threefold.
+
+Although our current tests were limited in the number of circuits, which means these results carry some uncertainty, the potential of LRE is clear.
+
+There’s exciting promise and further research will help us better understand the balance between performance gains and resource requirements.
