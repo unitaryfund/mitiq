@@ -44,7 +44,7 @@ The hyperparameters that can be controlled are:
 ### Extrapolating polynomial
 
 
-The chosen degree of the extrapolating polynomial effects the way in which circuits get scaled, as we'll see below.
+The chosen degree of the extrapolating polynomial affects the way in which circuits get scaled, as we'll see below.
 For this example, we'll define a circuit consisting of 4 layers.
 
 
@@ -65,10 +65,13 @@ print(circuit)
 
 For `degree = 2`, the scale factor pattern is generated through the terms in the monomial basis for the multivariate polynomial. For more information, see [](lre-5-theory.md).
 
-Here, $\lambda_i$ refers to the folding factor for the $i$-th layer. 
+Here, $\lambda_i$ refers to the folding factor for the $i$-th layer. The example monomial basis is given by:
 
 
 $$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
+
+Each vector of scale factor vectors is given by $\boldsymbol{\lambda_i} = \boldsymbol{1} + 2 \boldsymbol{m_i}$ where $\boldsymbol{1} = (1, 1, \ldots)$ and $\boldsymbol{m_i}$ is a vector of non-negative integers
+representing the number of times a layer is to be folded as dictated by the fold multiplier.
 
 
 ```{code-cell} ipython3
@@ -78,7 +81,6 @@ scale_factors = get_scale_factor_vectors(circuit, degree=2, fold_multiplier=2)
 
 print(scale_factors)
 ```
-
 
 In the noise scaled circuits created using the above scale factor vectors:
 
@@ -91,7 +93,8 @@ the $\lambda_1^0\lambda_2^0\lambda_3^0\lambda_4^0$ term. Due to this term, the f
 
 - and so on.
 
-The total number of noise-scaled circuits depends is given by $\binom{d + l - 1}{d}$ where $l$ is the number of layers in the circuit and $d$ is the chosen degree of the multivariate polynomial as discussed in [](lre-5-theory.md). 
+
+The total number of noise-scaled circuits is given by $\binom{d + l - 1}{d}$ where $l$ is the number of layers in the circuit and $d$ is the chosen degree of the multivariate polynomial as discussed in [](lre-5-theory.md). 
 
 ```{code-cell} ipython3
 print(f"Total number of noise scaled circuits created: {len(scale_factors)}")
@@ -144,7 +147,7 @@ hyperparameter affecting the performance of the technique.
 
 
 When you have a large circuit, the size of the sample matrix increases as the number of monomial terms scale polynomially. The size of the sample matrix influences sampling cost. In such a case, a circuit of 100 layers could be grouped into 4 chunks where each chunk consists of 25 collated layers. The noise scaling function {func}`.multivariate_layer_scaling`
-treats each chunk as a layer to be scaled when the parameter `num_chunks` is used. Thus, for the 100 layer circuit grouped into 4 chunks with `degree = 2` and `fold_multiplier = 2`, only 15 noise-scaled circuits are created i.e. sample matrix is reduced to dimension $15 \times 15$ instead of $x \times x$.
+treats each chunk as a layer to be scaled when the parameter `num_chunks` is used. Thus, for the 100 layer circuit grouped into 4 chunks with `degree = 2` and `fold_multiplier = 2`, only 15 noise-scaled circuits are created i.e. sample matrix is reduced to dimension $15 \times 15$.
 
 
 ```{caution}
@@ -192,7 +195,7 @@ print(f"Total number of noise scaled circuits without chunking: "
 
 
 How the noise-scaled circuits are chunked differs greatly as each chunk in the circuit is now equivalent to a layer to be folded via unitary folding. In the example below, we compare the second noise-scaled circuit in a chunked and a non-chunked
-circuit.
+circuit which corresponds to the $λ_1$ term in the monomial basis.
 
 
 ```{code-cell} ipython3
