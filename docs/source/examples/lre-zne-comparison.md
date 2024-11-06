@@ -64,15 +64,14 @@ for circuit in circuits:
 ```
 
 ```{code-cell} ipython3
-from statistics import mean
 import numpy as np
 
 # The theoretical value for the probability of measuring 0 when taking
 # an average over all the rotated rb circuits.
 p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2
 
-print(f'Average error for noisy values: {abs(mean(noisy_values) - p(0.7))}')
-print(f'Average error for ideal values: {abs(mean(ideal_values) - p(0.7))}')
+print(f'Average error for noisy values: {abs(np.mean(noisy_values) - p(0.7))}')
+print(f'Average error for ideal values: {abs(np.mean(ideal_values) - p(0.7))}')
 ```
 
 For the ideal values we still see a small error, because we are only taking the average over 50 rotated randomized benchmarking circuits, so there will be noise due to randomness.
@@ -111,8 +110,8 @@ for circuit in circuits:
 ```
 
 ```{code-cell} ipython3
-error_lre = abs(mean(mitigated_values_lre) - p(0.7))
-error_zne = abs(mean(mitigated_values_zne) - p(0.7))
+error_lre = abs(np.mean(mitigated_values_lre) - p(0.7))
+error_zne = abs(np.mean(mitigated_values_zne) - p(0.7))
 
 print(f'Average error of mitigated values using LRE: {error_lre}')
 print(f'Average error of mitigated values using ZNE: {error_zne}')
