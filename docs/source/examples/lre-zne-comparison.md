@@ -30,11 +30,9 @@ Here we will use the rotated randomized benchmarking circuits on a single qubit 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rotated_rb_circuits
 
-circuits = generate_rotated_rb_circuits(n_qubits=1, 
-                                        num_cliffords=3, 
-                                        theta=0.7, 
-                                        trials=50, 
-                                        seed=4)
+circuits = generate_rotated_rb_circuits(
+    n_qubits=1, num_cliffords=3, theta=0.7, trials=50, seed=4
+)
 
 print(circuits[0])
 ```
@@ -45,6 +43,7 @@ By altering the value for `noise_level`, ideal and noisy expectation values can 
 
 ```{code-cell} ipython3
 from cirq import DensityMatrixSimulator, depolarize
+
 
 def execute(circuit, noise_level=0.025):
     noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
@@ -68,10 +67,10 @@ import numpy as np
 
 # The theoretical value for the probability of measuring 0 when taking
 # an average over all the rotated rb circuits.
-p = lambda theta: 1 - (2/3) * np.sin(theta/2)**2
+p = lambda theta: 1 - (2 / 3) * np.sin(theta / 2) ** 2
 
-print(f'Average error for noisy values: {abs(np.mean(noisy_values) - p(0.7))}')
-print(f'Average error for ideal values: {abs(np.mean(ideal_values) - p(0.7))}')
+print(f"Average error for noisy values: {abs(np.mean(noisy_values) - p(0.7))}")
+print(f"Average error for ideal values: {abs(np.mean(ideal_values) - p(0.7))}")
 ```
 
 For the ideal values we still see a small error, because we are only taking the average over 50 rotated randomized benchmarking circuits, so there will be noise due to randomness.
@@ -80,11 +79,9 @@ The ideal value, defined in the funcion `p`, is attained when computing this ave
 
 If you increase the number of circuits, you will find that the average error for ideal values tends to zero.
 
-+++
-
 ## Apply LRE and ZNE directly
 
-With the circuit and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier. 
+With the circuit and executor defined, we just need to choose the polynomial extrapolation degree as well as the fold multiplier.
 
 For ZNE we use the default values for the scale factors.
 
@@ -100,10 +97,9 @@ mitigated_values_lre = []
 mitigated_values_zne = []
 
 for circuit in circuits:
-    mitigated_lre = execute_with_lre(circuit,
-                                     execute,
-                                     degree=degree,
-                                     fold_multiplier=fold_multiplier)
+    mitigated_lre = execute_with_lre(
+        circuit, execute, degree=degree, fold_multiplier=fold_multiplier
+    )
     mitigated_values_lre.append(mitigated_lre)
     mitigated_zne = execute_with_zne(circuit, execute)
     mitigated_values_zne.append(mitigated_zne)
@@ -113,8 +109,8 @@ for circuit in circuits:
 error_lre = abs(np.mean(mitigated_values_lre) - p(0.7))
 error_zne = abs(np.mean(mitigated_values_zne) - p(0.7))
 
-print(f'Average error of mitigated values using LRE: {error_lre}')
-print(f'Average error of mitigated values using ZNE: {error_zne}')
+print(f"Average error of mitigated values using LRE: {error_lre}")
+print(f"Average error of mitigated values using ZNE: {error_zne}")
 ```
 
 ## Resource estimation
@@ -128,16 +124,22 @@ avg_num_scaled_circuits_lre = 0.0
 avg_depth_scaled_circuits_lre = 0.0
 
 for circuit in circuits:
-    noise_scaled_circuits_lre = multivariate_layer_scaling(circuit, degree, fold_multiplier)
+    noise_scaled_circuits_lre = multivariate_layer_scaling(
+        circuit, degree, fold_multiplier
+    )
     num_scaled_circuits_lre = len(noise_scaled_circuits_lre)
 
-    avg_num_scaled_circuits_lre += num_scaled_circuits_lre/len(circuits)
-    avg_depth_scaled_circuits_lre += (1/len(circuits))*sum(len(circuit) for circuit in noise_scaled_circuits_lre) / num_scaled_circuits_lre
+    avg_num_scaled_circuits_lre += num_scaled_circuits_lre / len(circuits)
+    avg_depth_scaled_circuits_lre += (
+        (1 / len(circuits))
+        * sum(len(circuit) for circuit in noise_scaled_circuits_lre)
+        / num_scaled_circuits_lre
+    )
 
-print(f"Average number of noise-scaled circuits for LRE = {avg_num_scaled_circuits_lre}")
 print(
-    f"Average circuit depth = {avg_depth_scaled_circuits_lre}"
+    f"Average number of noise-scaled circuits for LRE = {avg_num_scaled_circuits_lre}"
 )
+print(f"Average circuit depth = {avg_depth_scaled_circuits_lre}")
 ```
 
 Next for ZNE.
@@ -152,22 +154,31 @@ avg_num_scaled_circuits_zne = 0.0
 avg_depth_scaled_circuits_zne = 0.0
 
 for circuit in circuits:
-    noise_scaled_circuits_zne = scaled_circuits(circuit=circuit, scale_factors=[1.0, 2.0, 3.0], scale_method=fold_gates_at_random)
+    noise_scaled_circuits_zne = scaled_circuits(
+        circuit=circuit,
+        scale_factors=[1.0, 2.0, 3.0],
+        scale_method=fold_gates_at_random,
+    )
     num_scaled_circuits_zne = len(noise_scaled_circuits_zne)
 
+    avg_num_scaled_circuits_zne += num_scaled_circuits_zne / len(circuits)
+    avg_depth_scaled_circuits_zne += (
+        (1 / len(circuits))
+        * sum(len(circuit) for circuit in noise_scaled_circuits_zne)
+        / num_scaled_circuits_zne
+    )
 
-    avg_num_scaled_circuits_zne += num_scaled_circuits_zne/len(circuits)
-    avg_depth_scaled_circuits_zne += (1/len(circuits))*sum(len(circuit) for circuit in noise_scaled_circuits_zne) / num_scaled_circuits_zne
-
-print(f"Average number of noise-scaled circuits for ZNE = {avg_num_scaled_circuits_zne}")
 print(
-    f"Average circuit depth = {avg_depth_scaled_circuits_zne}"
+    f"Average number of noise-scaled circuits for ZNE = {avg_num_scaled_circuits_zne}"
 )
+print(f"Average circuit depth = {avg_depth_scaled_circuits_zne}")
 ```
 
 ```{code-cell} ipython3
-print(f'Error improvement LRE over ZNE: {error_zne/error_lre}')
-print(f'Ratio number of circuits required for LRE vs ZNE: {avg_num_scaled_circuits_lre/avg_num_scaled_circuits_zne}')
+print(f"Error improvement LRE over ZNE: {error_zne/error_lre}")
+print(
+    f"Ratio number of circuits required for LRE vs ZNE: {avg_num_scaled_circuits_lre/avg_num_scaled_circuits_zne}"
+)
 ```
 
 ## Conclusion
