@@ -28,6 +28,7 @@ ZNE and CDR with Cirq: 1D Ising Simulation <quantum_simulation_1d_ising.md>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.md>
 ZNE with BQSKit compiled circuits <bqskit.md>
 ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits <zne_logical_rb_cirq_stim.md>
+LRE vs ZNE: comparing performance and overhead <lre-zne-comparison.md>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.md>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.md>
 Classical Shadows with Cirq: State Reconstruction and Observable Estimation <shadows_tutorial.md>
@@ -38,6 +39,5 @@ CDR with Qrack as Near-Clifford Simulator <cdr_qrack.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>
 Composing techniques: REM + ZNE <combine_rem_zne.md>
 Composing techniques: DDD + ZNE <combine_ddd_zne.md>
-LRE and ZNE comparison tutorial <lre-zne-comparison.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
 ```
