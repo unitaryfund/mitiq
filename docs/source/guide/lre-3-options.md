@@ -63,7 +63,9 @@ circuit = Circuit(
 print(circuit)
 ```
 
-For `degree = 2`, the scale factor pattern is generated through the terms in the monomial basis for the multivariate polynomial. For more information, see [](lre-5-theory.md). Here, $\lambda_i$ refers to the folding factor for the $i$-th layer. 
+For `degree = 2`, the scale factor pattern is generated through the terms in the monomial basis for the multivariate polynomial. For more information, see [](lre-5-theory.md).
+
+Here, $\lambda_i$ refers to the folding factor for the $i$-th layer. 
 
 
 $$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
