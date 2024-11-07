@@ -90,7 +90,7 @@ def _get_chunks(
     ]
 
 
-def _get_scale_factor_vectors(
+def get_scale_factor_vectors(
     input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
@@ -189,7 +189,7 @@ def _multivariate_layer_scaling(
     circuit_copy = deepcopy(input_circuit)
     terminal_measurements = _pop_measurements(circuit_copy)
 
-    scaling_pattern = _get_scale_factor_vectors(
+    scaling_pattern = get_scale_factor_vectors(
         circuit_copy, degree, fold_multiplier, num_chunks
     )
 
