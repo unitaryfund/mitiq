@@ -2,7 +2,34 @@
 
 ## Version 0.41.0
 
-_In development._
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.40.0...v0.41.0))
+
+### Highlights
+
+📓 The Layerwise Richardson Extrapolation **(LRE) user guide is complete**!
+The user guide contains information about both the ins and outs of using the implementation, as well as covering the theory behind the technique so you can make judgements about when to apply the technique.
+In addition to finishing the user guide, we also have a new tutorial comparing both the performance and overhead needed for LRE and ZNE.
+Big thanks to @purva-thakre and @FarLab for the documentation!
+
+📹 As part of launching LRE we made a **short tutorial video** to showcase the technique, along with how to use it.
+Check it out [here](https://www.youtube.com/watch?v=47GWi4h7TWM)!
+
+🧑‍🔬 **First time contributor** @jpacold recreated results from [a paper](https://arxiv.org/abs/2211.08318) on phase transitions in the Ising model.
+Both the paper authors, and @jpacold both used Mitiq's ZNE module to apply error mitigation.
+This is both an informative tutorial on turning physics problems into something amenable on a quantum computer, and a class in applying error-mitigation.
+
+#### ✨ Enhancements
+
+-  Ensure LRE compatibility with all supported frontends (#2547) [@natestemen]
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- remove failing test; simplify layerwise ZNE tests (#2545) [@natestemen]
+
+### 📞 Call for ideas
+
+We're currently looking into what features we could add to make Mitiq more **noise-aware**.
+If you have ideas and features requests in this area, do make a post on the GitHub discussion [here](https://github.com/unitaryfund/mitiq/discussions/2193)!
 
 ## Version 0.40.0
 
@@ -16,7 +43,7 @@ Documentation is also available in the user guide, with more advanced docs and d
 Special thanks to Purva Thakre for this contribution!
 
 🥇 We had two **first time contributions** from @ecarlander and @mbrotos!
-Thank you both for your contributions! 
+Thank you both for your contributions!
 
 🛡️ A **helpful error message** is raised when passing data of the incorrect type to the `MeasurementResult` class, where before it silently gave confusing results.
 
