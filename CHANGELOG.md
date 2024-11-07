@@ -9,6 +9,7 @@
 📓 The Layerwise Richardson Extrapolation **(LRE) user guide is complete**!
 The user guide contains information about both the ins and outs of using the implementation, as well as covering the theory behind the technique so you can make judgements about when to apply the technique.
 In addition to finishing the user guide, we also have a new tutorial comparing both the performance and overhead needed for LRE and ZNE.
+Big thanks to @purva-thakre and @FarLab for the documentation!
 
 📹 As part of launching LRE we made a **short tutorial video** to showcase the technique, along with how to use it.
 Check it out [here](https://www.youtube.com/watch?v=47GWi4h7TWM)!
@@ -19,7 +20,7 @@ This is both an informative tutorial on turning physics problems into something 
 
 #### ✨ Enhancements
 
-- LRE functionality now works with all supported frontends (instead of just cirq)
+-  Ensure LRE compatibility with all supported frontends (#2547) [@natestemen]
 
 #### 🧑🏽‍💻 Developer Improvements
 
