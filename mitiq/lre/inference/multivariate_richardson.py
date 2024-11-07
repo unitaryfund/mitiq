@@ -132,8 +132,9 @@ def multivariate_richardson_coefficients(
     :cite:`Russo_2024_LRE`).
 
     We use the sample matrix to find the constants of linear combination
-    $c = (c_1, c_2, c_3, …, c_M)$ associated with a known vector of noisy
-    expectation values $z = (<O(λ_1)>, <O(λ_2)>, <O(λ_3)>, ..., <O(λ_M)>)^T$.
+    $c = (c_1, c_2, …, c_M)$ associated with a known vector of noisy
+    expectation values :math:`z = (\langle O(λ_1)\rangle,
+    \langle O(λ_2)\rangle, ..., \langle O(λ_M)\rangle)^T`.
 
     The coefficients are found through the ratio of the determinants of $M_i$
     and the sample matrix. The new matrix $M_i$ is defined by replacing the ith
