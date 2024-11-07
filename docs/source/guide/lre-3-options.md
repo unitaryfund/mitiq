@@ -17,7 +17,9 @@ In [](lre-1-intro.md), {func}`.execute_with_lre` was used to calculated the erro
 In this section, we will outline the optional arguments that can be used and adjusted with this technique.
 
 ```python
-lre_value = mitiq.lre.execute_with_lre(
+from mitiq import lre
+
+lre_value = lre.execute_with_lre(
     circuit,
     executor,
     degree,
@@ -62,8 +64,7 @@ Here, $\lambda_i$ refers to the folding factor for the $i$-th layer. The example
 
 $$\{1, λ_1, λ_2, λ_3, λ_4, λ_1^2, λ_1 λ_2, λ_1 λ_3, λ_1 λ_4, λ_2^2, λ_2 λ_3, λ_2 λ_4, λ_3^2, λ_3 λ_4, λ_4^2\}$$
 
-Each vector of scale factor vectors is given by $\boldsymbol{\lambda_i} = \boldsymbol{1} + 2 \boldsymbol{m_i}$ where $\boldsymbol{1} = (1, 1, \ldots)$ and $\boldsymbol{m_i}$ is a vector of non-negative integers
-representing the number of times a layer is to be folded as dictated by the fold multiplier.
+Each vector of scale factor vectors is given by $\boldsymbol{\lambda}_i = \boldsymbol{1} + 2 \boldsymbol{m}_i$ where $\boldsymbol{1} = (1, 1, \ldots, 1)$ and $\boldsymbol{m}_i$ is a vector of non-negative integers representing the number of times a layer is to be folded as dictated by the fold multiplier.
 
 ```{code-cell} ipython3
 from mitiq.lre.multivariate_scaling import get_scale_factor_vectors
@@ -201,7 +202,8 @@ However, there are two other choices as well: {func}`.fold_all()` and {func}`.fo
 `folding_method` parameter in {func}`.execute_with_lre`.
 
 ```{tip}
-Note that the choice of folding method matters only when the layers in the circuit are altered by chunking multiple layers into fewer layers. Otherwise the noise scaled circuits created using either of the folding methods will look identical as they are created by scaling each layer as required.
+The choice of folding method matters only when chunking is employed.
+Otherwise the noise scaled circuits created using either of the folding methods will look identical as they are created by scaling each layer as required.
 ```
 
 ```{code-cell} ipython3
@@ -235,7 +237,7 @@ print(
     global_fold_circ,
     sep="\n",
 )
-
 ```
 
-This section showed in detail how to vary the default and non-default parameters required by the technique. An in-depth discussion on these is provided in [](lre-4-low-level.md)
+This section showed in detail how to vary the default and non-default parameters required by the technique.
+An in-depth discussion on these is provided in [](lre-4-low-level.md)

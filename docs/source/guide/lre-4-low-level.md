@@ -27,10 +27,10 @@ The diagram shows the workflow of the layerwise Richardson extrapolation (LRE) i
 
 **The first step** involves generating and executing layerwise noise-scaled quantum circuits.
 
-- The user provides a `QPROGRAM` i.e. a frontend supported quantum circuit .
-
+- The user provides a `QPROGRAM` i.e. a frontend supported quantum circuit.
 - Mitiq generates a set of layerwise noise-scaled circuits by applying unitary folding based on a set of pre-determined scale factor vectors.
-- The noise-scaled circuits are executed on the noisy backend obtaining a set of noisy expectation values.
+
+The noise-scaled circuits are then executed on a backend, obtaining a set of noisy expectation values.
 
 **The second step** involves inferring the error mitigated expectation value from the measured results through multivariate richardson extrapolation.
 
