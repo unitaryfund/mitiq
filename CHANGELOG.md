@@ -29,8 +29,7 @@ This is both an informative tutorial on turning physics problems into something 
 ### 📞 Call for ideas
 
 We're currently looking into what features we could add to make Mitiq more **noise-aware**.
-If you have ideas and features requests in this area, do get in touch!
-Contact Nate at `nate@unitary.fund`.
+If you have ideas and features requests in this area, do make a post on the GitHub discussion [here](https://github.com/unitaryfund/mitiq/discussions/2193)!
 
 ## Version 0.40.0
 
