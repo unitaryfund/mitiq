@@ -15,9 +15,7 @@ kernelspec:
 
 Mitiq benchmarks error mitigation techniques by running quantum circuits with and without mitigation, measuring improvements in accuracy, fidelity, and error rates. The process involves executing various circuit types—like GHZ, Mirror, Quantum Volume, and Randomized Benchmarking circuits—and comparing mitigated results against ideal outcomes. Analysis of these benchmarking results produces performance metrics, comparing mitigated and unmitigated outputs to quantify error reduction. This helps assess Mitiq’s effectiveness across diverse circuits, highlighting strengths and limitations in noise reduction.
 
-## GHZ Circuits
-
-The GHZ (Greenberger–Horne–Zeilinger) circuits create the GHZ states at are highly sensitive to noise. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
+The benchmark circuits can be used using the following workflow.
 
 ```{code-cell} ipython3
 import cirq
@@ -34,14 +32,23 @@ def execute(circuit, noise_level=0.005):
         .real
     )
 
-circuits = benchmarks.generate_ghz_circuit(n_qubits=10)
+circuit = #Call the required benchmark circuit function here
 
-true_value = execute(circuits, noise_level=0.0)      # Ideal quantum computer
-noisy_value = execute(circuits)                      # Noisy quantum computer
-zne_value = zne.execute_with_zne(circuits, execute)  # Noisy quantum computer + Mitiq
+true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
+noisy_value = execute(circuit)                      # Noisy quantum computer
+zne_value = zne.execute_with_zne(circuit, execute)  # Noisy quantum computer + Mitiq
 
 print(f"Error w/o  Mitiq: {abs((true_value - noisy_value) / true_value):.3f}")
 print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
+```
+
+
+## GHZ Circuits
+
+The {func}`mitiq.generate_ghz_circuit` create the GHZ states at are highly sensitive to noise. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
+
+```{code-cell} ipython3
+circuit = benchmarks.generate_ghz_circuit(n_qubits=10)
 ```
 
 ## Mirror Circuits
