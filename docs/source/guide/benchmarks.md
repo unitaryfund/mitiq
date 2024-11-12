@@ -32,7 +32,7 @@ def execute(circuit, noise_level=0.005):
         .real
     )
 
-circuit = #Call the required benchmark circuit function here
+circuit = benchmarks.generate_ghz_circuit(n_qubits=10) #Call the required benchmark circuit function here
 
 true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
 noisy_value = execute(circuit)                      # Noisy quantum computer
