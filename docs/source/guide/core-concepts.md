@@ -8,4 +8,5 @@ frontends-backends.md
 executors.md
 observables.md
 calibrators.md
+benchmarks.md
 ```
