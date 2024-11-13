@@ -61,7 +61,7 @@ cal.run()
 
 The `log` parameter can be passed in to the `run` method with either the value of `flat` or `cartesian`. By using the `log` parameter, detailed information about each experiment is shown. 
 
-The log output can be generated from the results of the calibrator by calling either [`log_results_flat()`](../../build/html/apidoc.html#mitiq.calibration.calibrator.ExperimentResults.log_results_flat) or [`log_results_cartesian()`](../../build/html/apidoc.html#mitiq.calibration.calibrator.ExperimentResults.log_results_cartesian). 
+The log output can be generated from the results of the calibrator by calling either [`log_results_flat()`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.calibration.calibrator.ExperimentResults.log_results_flat) or [`log_results_cartesian()`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.calibration.calibrator.ExperimentResults.log_results_cartesian). 
 
 The two options display the information in different formats, though both use a cross (✘) or a check (✔) to signal whether the error mitigation expirement obtained an expectation value better than the non-mitigated one.
 
