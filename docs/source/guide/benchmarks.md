@@ -101,7 +101,7 @@ circuit=circuits[0]
 
 ## Randomized Clifford+T Circuits
 
-The {func} `mitiq.randomized_clifford_t_circuit.generate_random_clifford_t_circuit` add the T gate to the standard Clifford set, adding more complex operations to the random benchmarking. This type evaluates Mitiq’s performance with gate sets that go beyond the Clifford gates, crucial for fault-tolerant computing.
+The {func}`.generate_random_clifford_t_circuit` add the T gate to the standard Clifford set, adding more complex operations to the random benchmarking. This type evaluates Mitiq’s performance with gate sets that go beyond the Clifford gates, crucial for fault-tolerant computing.
 
 ```{code-cell} ipython3
 circuit = benchmarks.randomized_clifford_t_circuit.generate_random_clifford_t_circuit(num_qubits=10, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
