@@ -65,7 +65,7 @@ circuit= benchmarks.mirror_circuits.random_cliffords(connectivity_graph=connecti
 
 ## Quantum Phase Estimation Circuits
 
-The {func}`mitiq.qpe_circuits.generate_qpe_circuit` is used to the measure eigenvalues of unitary operators. Since accurate phase estimation requires precise control over operations, these circuits test the mitigation techniques’ ability to handle small noise effects over multiple gate sequences.
+The {func}`.generate_qpe_circuit` is used to the measure eigenvalues of unitary operators. Since accurate phase estimation requires precise control over operations, these circuits test the mitigation techniques’ ability to handle small noise effects over multiple gate sequences.
 
 ```{code-cell} ipython3
 circuit = benchmarks.qpe_circuits.generate_qpe_circuit(evalue_reg=3)
