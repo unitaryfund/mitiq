@@ -109,7 +109,7 @@ circuit = benchmarks.randomized_clifford_t_circuit.generate_random_clifford_t_ci
 
 ## W State Circuits
 
-The {func}`mitiq.w_state_circuits.generate_w_circuit` are entangled circuits that distribute the entanglement across qubits differently than GHZ states. Testing with W state circuits can help explore how well a device maintains distributed entanglement in noisy environments.
+The {func}`.generate_w_circuit` are entangled circuits that distribute the entanglement across qubits differently than GHZ states. Testing with W state circuits can help explore how well a device maintains distributed entanglement in noisy environments.
 
 ```{code-cell} ipython3
 circuit = benchmarks.w_state_circuits.generate_w_circuit(n_qubits=10)
