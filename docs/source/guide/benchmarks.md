@@ -53,7 +53,7 @@ circuit = benchmarks.generate_ghz_circuit(n_qubits=10)
 
 ## Mirror Circuits
 
-The {func}`mitiq.mirror_circuits.generate_mirror_circuit` involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
+The {func}`.generate_mirror_circuit` involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
 
 ## Mirror Quantum Volume Circuits
 
