@@ -48,7 +48,10 @@ print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
 The {func}`.generate_ghz_circuit` create the GHZ states that are highly sensitive to noise. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
 
 ```{code-cell} ipython3
-circuit = benchmarks.generate_ghz_circuit(n_qubits=10)
+from mitiq.benchmarks import generate_ghz_circuit
+
+circuit = generate_ghz_circuit(n_qubits=10)
+print(circuit)
 ```
 
 ## Mirror Circuits
@@ -60,7 +63,10 @@ The {func}`.generate_mirror_circuit` involves running a quantum circuit forward 
 The {func}`.generate_mirror_qv_circuit` is designed to test `quantum volume`, a metric combining circuit depth, number of qubits, and fidelity. These circuits check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
 
 ```{code-cell} ipython3
-circuit= benchmarks.mirror_circuits.random_cliffords(connectivity_graph=connectivity_graph, random_state = rs)
+from mitiq.benchmarks import generate_mirror_qv_circuit
+
+circuit= generate_mirror_qv_circuit(num_qubits=10, depth=2)
+print(circuit)
 ```
 
 ## Quantum Phase Estimation Circuits
@@ -68,7 +74,10 @@ circuit= benchmarks.mirror_circuits.random_cliffords(connectivity_graph=connecti
 The {func}`.generate_qpe_circuit` is used to the measure eigenvalues of unitary operators. Since accurate phase estimation requires precise control over operations, these circuits test the mitigation techniques’ ability to handle small noise effects over multiple gate sequences.
 
 ```{code-cell} ipython3
-circuit = benchmarks.qpe_circuits.generate_qpe_circuit(evalue_reg=3)
+from mitiq.benchmarks import generate_w_circuit
+
+circuit = generate_w_circuit(n_qubits=10)
+print(circuit)
 ```
 
 ## Quantum Volume Circuits
@@ -76,7 +85,10 @@ circuit = benchmarks.qpe_circuits.generate_qpe_circuit(evalue_reg=3)
 The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
 
 ```{code-cell} ipython3
-circuit,_ = benchmarks.quantum_volume_circuits.generate_quantum_volume_circuit(num_qubits=4, depth=10)
+from mitiq.benchmarks import generate_quantum_volume_circuit
+
+circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=10)
+print(circuit)
 ```
 
 ## Randomized Benchmarking Circuits
@@ -84,9 +96,11 @@ circuit,_ = benchmarks.quantum_volume_circuits.generate_quantum_volume_circuit(n
 The {func}`.generate_rb_circuits` are sequences of random gates (generally Clifford gates), to estimate an average error rate. They’re standard in benchmarking for evaluating how well mitiq’s error mitigation reduces this error rate across different levels of noise.
 
 ```{code-cell} ipython3
-circuits = benchmarks.randomized_benchmarking.generate_rb_circuits(n_qubits=1, num_cliffords=5)
+from mitiq.benchmarks import generate_rb_circuits
 
+circuits = generate_rb_circuits(n_qubits=1, num_cliffords=5)
 circuit=circuits[0]
+print(circuit)
 ```
 
 ## Rotated Randomized Benchmarking Circuits
@@ -94,9 +108,11 @@ circuit=circuits[0]
 The {func}`.generate_rotated_rb_circuits` are sequences of random gates similar to {func}`.generate_rb_circuits`, but with rotations added, that allows assessment of errors beyond just the standard Clifford gates. They’re useful to check how well Mitiq handles noise in scenarios with more diverse gates.
 
 ```{code-cell} ipython3
-circuits = benchmarks.rotated_randomized_benchmarking.generate_rotated_rb_circuits(n_qubits=1, num_cliffords=5)
+from mitiq.benchmarks import generate_rotated_rb_circuits
 
+circuits = generate_rotated_rb_circuits(n_qubits=1, num_cliffords=5)
 circuit=circuits[0]
+print(circuit)
 ```
 
 ## Randomized Clifford+T Circuits
@@ -104,7 +120,10 @@ circuit=circuits[0]
 The {func}`.generate_random_clifford_t_circuit` add the T gate to the standard Clifford set, adding more complex operations to the random benchmarking. This type evaluates Mitiq’s performance with gate sets that go beyond the Clifford gates, crucial for fault-tolerant computing.
 
 ```{code-cell} ipython3
-circuit = benchmarks.randomized_clifford_t_circuit.generate_random_clifford_t_circuit(num_qubits=10, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
+from mitiq.benchmarks import generate_random_clifford_t_circuit
+
+circuit = generate_random_clifford_t_circuit(num_qubits=10, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
+print(circuit)
 ```
 
 ## W State Circuits
@@ -112,5 +131,8 @@ circuit = benchmarks.randomized_clifford_t_circuit.generate_random_clifford_t_ci
 The {func}`.generate_w_circuit` are entangled circuits that distribute the entanglement across qubits differently than GHZ states. Testing with W state circuits can help explore how well a device maintains distributed entanglement in noisy environments.
 
 ```{code-cell} ipython3
-circuit = benchmarks.w_state_circuits.generate_w_circuit(n_qubits=10)
+from mitiq.benchmarks import generate_w_circuit
+
+circuit = generate_w_circuit(n_qubits=10)
+print(circuit)
 ```
