@@ -91,7 +91,7 @@ circuit=circuits[0]
 
 ## Rotated Randomized Benchmarking Circuits
 
-The {func}`mitiq.rotated_randomized_benchmarking.generate_rotated_rb_circuits` are sequences of random gates similar to {func}`mitiq.randomized_benchmarking.generate_rb_circuits`, but with rotations added, that allows assessment of errors beyond just the standard Clifford gates. They’re useful to check how well Mitiq handles noise in scenarios with more diverse gates.
+The {func}`.generate_rotated_rb_circuits` are sequences of random gates similar to {func}`.generate_rb_circuits`, but with rotations added, that allows assessment of errors beyond just the standard Clifford gates. They’re useful to check how well Mitiq handles noise in scenarios with more diverse gates.
 
 ```{code-cell} ipython3
 circuits = benchmarks.rotated_randomized_benchmarking.generate_rotated_rb_circuits(n_qubits=1, num_cliffords=5)
