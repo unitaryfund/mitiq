@@ -53,17 +53,50 @@ circuit = benchmarks.generate_ghz_circuit(n_qubits=10)
 
 ## Mirror Circuits
 
+
+
 ## Mirror Quantum Volume Circuits
+
+```{code-cell} ipython3
+circuit= benchmarks.mirror_circuits.random_cliffords(connectivity_graph=connectivity_graph, random_state = rs)
+```
 
 ## Quantum Phase Estimation Circuits
 
+```{code-cell} ipython3
+circuit = benchmarks.qpe_circuits.generate_qpe_circuit(evalue_reg=3)
+```
+
 ## Quantum Volume Circuits
+
+```{code-cell} ipython3
+circuit,_ = benchmarks.quantum_volume_circuits.generate_quantum_volume_circuit(num_qubits=4, depth=10)
+```
 
 ## Randomized Benchmarking Circuits
 
+```{code-cell} ipython3
+circuits = benchmarks.randomized_benchmarking.generate_rb_circuits(n_qubits=1, num_cliffords=5)
+
+circuit=circuits[0]
+```
+
 ## Rotated Randomized Benchmarking Circuits
+
+```{code-cell} ipython3
+circuits = benchmarks.rotated_randomized_benchmarking.generate_rotated_rb_circuits(n_qubits=1, num_cliffords=5)
+
+circuit=circuits[0]
+```
 
 ## Randomized Clifford+T Circuits
 
+```{code-cell} ipython3
+circuit = benchmarks.randomized_clifford_t_circuit.generate_random_clifford_t_circuit(num_qubits=10, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
+```
+
 ## W State Circuits
 
+```{code-cell} ipython3
+circuit = benchmarks.w_state_circuits.generate_w_circuit(n_qubits=10)
+```
