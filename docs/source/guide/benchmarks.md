@@ -45,7 +45,7 @@ print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
 
 ## GHZ Circuits
 
-The {func}`mitiq.generate_ghz_circuit` create the GHZ states that are highly sensitive to noise. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
+The {func}`.generate_ghz_circuit` create the GHZ states that are highly sensitive to noise. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
 
 ```{code-cell} ipython3
 circuit = benchmarks.generate_ghz_circuit(n_qubits=10)
