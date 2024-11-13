@@ -81,7 +81,7 @@ circuit,_ = benchmarks.quantum_volume_circuits.generate_quantum_volume_circuit(n
 
 ## Randomized Benchmarking Circuits
 
-The {func}`mitiq.randomized_benchmarking.generate_rb_circuits` are sequences of random gates (generally Clifford gates), to estimate an average error rate. They’re standard in benchmarking for evaluating how well mitiq’s error mitigation reduces this error rate across different levels of noise.
+The {func}`.generate_rb_circuits` are sequences of random gates (generally Clifford gates), to estimate an average error rate. They’re standard in benchmarking for evaluating how well mitiq’s error mitigation reduces this error rate across different levels of noise.
 
 ```{code-cell} ipython3
 circuits = benchmarks.randomized_benchmarking.generate_rb_circuits(n_qubits=1, num_cliffords=5)
