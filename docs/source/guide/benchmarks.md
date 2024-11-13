@@ -57,7 +57,7 @@ The {func}`.generate_mirror_circuit` involves running a quantum circuit forward 
 
 ## Mirror Quantum Volume Circuits
 
-The {func}`mitiq.mirror_qv_circuits.generate_mirror_qv_circuit` is designed to test `quantum volume`, a metric combining circuit depth, number of qubits, and fidelity. These circuits check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
+The {func}`.generate_mirror_qv_circuit` is designed to test `quantum volume`, a metric combining circuit depth, number of qubits, and fidelity. These circuits check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
 
 ```{code-cell} ipython3
 circuit= benchmarks.mirror_circuits.random_cliffords(connectivity_graph=connectivity_graph, random_state = rs)
