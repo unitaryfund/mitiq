@@ -1,12 +1,13 @@
 ---
 jupytext:
+  formats: ipynb,md:myst
   text_representation:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.16.1
 kernelspec:
-  display_name: Python 3 (ipykernel)
+  display_name: mitiq
   language: python
   name: python3
 ---
@@ -59,17 +60,14 @@ cal.run()
 
 ## Verbose Log Output
 
-The `log` parameter can be passed in to the `run` method with either the value of `flat` or `cartesian`. By using the `log` parameter, detailed information about each experiment is shown. 
+To print results from the experiments the calibrator performs, the `log` parameter can be passed in to the `run` method with either the value of `flat` or `cartesian`. By using the `log` parameter, detailed information about each experiment is printed when the `run` method completes. 
 
-The log output can be generated from the results of the calibrator by calling either [`log_results_flat()`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.calibration.calibrator.ExperimentResults.log_results_flat) or [`log_results_cartesian()`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.calibration.calibrator.ExperimentResults.log_results_cartesian). 
+The detailed information can also be generated from the results of the calibrator after `run` is called by calling either {func}`.log_results_flat()` or {func}`.log_results_cartesian()`.
 
 The two options display the information in different formats, though both use a cross (✘) or a check (✔) to signal whether the error mitigation expirement obtained an expectation value better than the non-mitigated one.
 
 ```{code-cell} ipython3
-cal.results.log_results_flat()
-```
-
-```{code-cell} ipython3
+# cal.results.log_results_flat()
 cal.results.log_results_cartesian()
 ```
 
