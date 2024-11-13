@@ -73,7 +73,7 @@ circuit = benchmarks.qpe_circuits.generate_qpe_circuit(evalue_reg=3)
 
 ## Quantum Volume Circuits
 
-The {func}`mitiq.quantum_volume_circuits.generate_quantum_volume_circuit` tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
+The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
 
 ```{code-cell} ipython3
 circuit,_ = benchmarks.quantum_volume_circuits.generate_quantum_volume_circuit(num_qubits=4, depth=10)
