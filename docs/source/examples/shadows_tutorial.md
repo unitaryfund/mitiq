@@ -426,7 +426,7 @@ When we realize this code, it's important to consider that we record the equival
 
 Consequently, computing the mean estimator involves counting the number of exact matches between the observable and the classical shadow, and then multiplying the result by the appropriate sign. In the following, we present the function `expectation_estimation_shadow`, which allows for estimating any observable based on a classical shadow. This is realised by the main function `execute_with_shadows` when *state_reconstruction =* **False**.
 
-###4.3 Shadow Estimation Bound on Estimation of Expectation Values of Observables
+### 4.3 Shadow Estimation Bound on Estimation of Expectation Values of Observables
 
 The shadow estimation bound of operator expectation values is given by the following theorem:
 _________________________________________________________________________
