@@ -297,7 +297,13 @@ class Calibrator:
         }
 
     def run(self, log: Optional[OutputForm] = None) -> None:
-        """Runs all the circuits required for calibration."""
+        """Runs all the circuits required for calibration.
+
+        args:
+             log: If set, detailed results of each experiment run by the
+                calibrator are printed. The value corresponds to the format of
+                the information and can be set to “flat” or “cartesian”.
+        """
         if not self.results.is_missing_data():
             self.results.reset_data()
 
