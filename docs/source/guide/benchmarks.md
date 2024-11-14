@@ -32,7 +32,7 @@ def execute(circuit, noise_level=0.005):
         .real
     )
 
-circuit = benchmarks.generate_ghz_circuit(n_qubits=10) # Call the required benchmark circuit function here
+circuit = benchmarks.generate_ghz_circuit(n_qubits=7) # Call the required benchmark circuit function here
 
 true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
 noisy_value = execute(circuit)                      # Noisy quantum computer
@@ -50,7 +50,7 @@ The {func}`.generate_ghz_circuit` create the GHZ states that are highly sensitiv
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_ghz_circuit
 
-circuit = generate_ghz_circuit(n_qubits=10)
+circuit = generate_ghz_circuit(n_qubits=7)
 print(circuit)
 ```
 
@@ -65,7 +65,7 @@ The {func}`.generate_mirror_qv_circuit` is designed to test `quantum volume`, a 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_mirror_qv_circuit
 
-circuit= generate_mirror_qv_circuit(num_qubits=10, depth=2)
+circuit= generate_mirror_qv_circuit(num_qubits=7, depth=2)
 print(circuit)
 ```
 
@@ -76,7 +76,7 @@ The {func}`.generate_qpe_circuit` is used to the measure eigenvalues of unitary 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_w_circuit
 
-circuit = generate_w_circuit(n_qubits=10)
+circuit = generate_w_circuit(n_qubits=7)
 print(circuit)
 ```
 
@@ -87,7 +87,7 @@ The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volum
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_quantum_volume_circuit
 
-circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=10)
+circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=7)
 print(circuit)
 ```
 
@@ -122,7 +122,7 @@ The {func}`.generate_random_clifford_t_circuit` add the T gate to the standard C
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_random_clifford_t_circuit
 
-circuit = generate_random_clifford_t_circuit(num_qubits=10, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
+circuit = generate_random_clifford_t_circuit(num_qubits=7, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
 print(circuit)
 ```
 
@@ -133,6 +133,6 @@ The {func}`.generate_w_circuit` are entangled circuits that distribute the entan
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_w_circuit
 
-circuit = generate_w_circuit(n_qubits=10)
+circuit = generate_w_circuit(n_qubits=7)
 print(circuit)
 ```
