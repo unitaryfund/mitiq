@@ -33,7 +33,7 @@ def execute(circuit, noise_level=0.005):
     )
 
 circuit = benchmarks.generate_ghz_circuit(n_qubits=7) # Call the required benchmark circuit function here
-print(circuit.final_state_vector())
+print(circuit.final_state_vector()) # Shows the ideal circuit state
 
 true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
 noisy_value = execute(circuit)                      # Noisy quantum computer
@@ -58,6 +58,61 @@ print(circuit)
 ## Mirror Circuits
 
 The {func}`.generate_mirror_circuit` involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
+
+```{code-cell} ipython3
+from typing import List, Tuple
+import numpy as np
+import cirq
+import networkx as nx
+from mitiq import zne
+from mitiq import benchmarks
+
+topology = nx.complete_graph(3)
+
+def get_circuit(depth: int) -> Tuple[cirq.Circuit, List[int]]:
+    circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
+        nlayers=depth,
+        two_qubit_gate_prob=1.0,
+        connectivity_graph=topology,
+        return_type="cirq",
+    )
+    return circuit, correct_bitstring
+
+circuit, correct_bitstring = get_circuit(depth=3)
+
+def execute(
+    circuit: cirq.Circuit,
+    correct_bitstring: List[int],
+    noise_level=0.005,
+) -> float:
+    """Executes the input circuit(s) and returns ⟨A⟩, where
+    A = |correct_bitstring⟩⟨correct_bitstring| for each circuit.
+    """
+    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
+
+    noisy_circuit += cirq.measure(*sorted(circuit.all_qubits()), key="m")
+    backend = cirq.DensityMatrixSimulator()
+
+    backend = cirq.DensityMatrixSimulator()
+
+    result = backend.run(noisy_circuit)
+    expval = result.measurements["m"].tolist().count(correct_bitstring)
+    return expval
+
+def execute_with_fixed_bitstring(circuit, noise_level=0.005):
+    return execute(circuit, correct_bitstring, noise_level)
+
+print(circuit)
+print(circuit.final_state_vector()) # Shows the ideal circuit state
+
+true_value = execute(circuit, correct_bitstring,noise_level=0.0)
+noisy_value = execute(circuit, correct_bitstring)
+
+zne_value = zne.execute_with_zne(circuit, execute_with_fixed_bitstring)  # Noisy quantum computer + Mitiq
+
+print(f"Error w/o  Mitiq: {abs((true_value - noisy_value) / true_value):.3f}")
+print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
+```
 
 ## Mirror Quantum Volume Circuits
 
