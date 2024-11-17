@@ -16,7 +16,6 @@ import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
 from cirq.contrib.qasm_import.exception import QasmException
 from qiskit import qasm2
-from qiskit import transpile
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
 from qiskit.transpiler.passes import SetLayout
