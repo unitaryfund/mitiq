@@ -15,7 +15,7 @@ import numpy as np
 import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
 from cirq.contrib.qasm_import.exception import QasmException
-from qiskit import qasm2
+from qiskit import qasm2, transpile
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
 from qiskit.transpiler.passes import SetLayout
@@ -52,9 +52,7 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
     return "".join(lines)
 
 
-def _map_bit_index(
-    bit_index: int, new_register_sizes: List[int]
-) -> Tuple[int, int]:
+def _map_bit_index(bit_index: int, new_register_sizes: List[int]) -> Tuple[int, int]:
     """Returns the register index and (qu)bit index in this register for the
     mapped bit_index.
 
@@ -255,7 +253,9 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
         # Try to decompose circuit before running
         # This is necessary for converting qiskit circuits with
         # custom packaged gates, e.g., QFT gates
-        circuit = circuit.decompose(gates_to_decompose=["qft"])
+        circuit = circuit.decompose(
+            gates_to_decompose=["u1", "u2", "u3", "cx", "rx", "ry"]
+        )
         circuit = circuit.decompose()
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
     return mitiq_circuit
