@@ -52,7 +52,9 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
     return "".join(lines)
 
 
-def _map_bit_index(bit_index: int, new_register_sizes: List[int]) -> Tuple[int, int]:
+def _map_bit_index(
+    bit_index: int, new_register_sizes: List[int]
+) -> Tuple[int, int]:
     """Returns the register index and (qu)bit index in this register for the
     mapped bit_index.
 

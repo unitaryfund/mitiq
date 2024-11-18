@@ -477,6 +477,7 @@ def test_remove_identity_from_idle_with_multiple_registers():
     assert circuit_multi_reg == input_multi
     assert circuit_single_reg == input_single
 
+
 def test_convert_to_mitiq_with_rx_and_rzz():
     """Tests that convert_to_mitiq works with RX and RZZ gates."""
     test_qc = qiskit.QuantumCircuit(2)
