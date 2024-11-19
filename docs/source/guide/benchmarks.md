@@ -13,9 +13,9 @@ kernelspec:
 
 # Benchmarks
 
-Mitiq benchmarks error mitigation techniques by running quantum circuits with and without mitigation, measuring improvements in accuracy, fidelity, and error rates. The process involves executing various circuit types—like GHZ, Mirror, Quantum Volume, and Randomized Benchmarking circuits—and comparing mitigated results against ideal outcomes. Analysis of these benchmarking results produces performance metrics, comparing mitigated and unmitigated outputs to quantify error reduction. This helps assess Mitiq’s effectiveness across diverse circuits, highlighting strengths and limitations in noise reduction.
+Mitiq benchmarks error mitigation techniques by evaluating improvements in metrics such as state fidelity (the closeness of the mitigated quantum state to the ideal state), output probability distributions, and logical error rates. The benchmarking process involves running diverse circuit types—such as GHZ, Mirror, Quantum Volume, and Randomized Benchmarking circuits—and comparing mitigated results against ideal theoretical outcomes. Additionally, Mitiq evaluates the overhead associated with each error mitigation technique, such as the increase in circuit depth or the number of samples required, as seen in methods like Zero Noise Extrapolation (ZNE) and Probabilistic Error Cancellation (PEC).
 
-The benchmark circuits can be used using the following workflow.
+The following workflow demonstrates how to use benchmark circuits in Mitiq. In this example, we generate a GHZ circuit using Mitiq’s benchmarking tools and apply Zero Noise Extrapolation (ZNE) to mitigate errors introduced by depolarizing noise. The workflow is run on a simulator, where we compare results from an ideal circuit, a noisy circuit, and a mitigated circuit to evaluate the impact of error mitigation. The same approach can be extended to other benchmarking circuits provided by Mitiq.
 
 ```{code-cell} ipython3
 import cirq
@@ -34,6 +34,7 @@ def execute(circuit, noise_level=0.005):
 
 circuit = benchmarks.generate_ghz_circuit(n_qubits=7) # Call the required benchmark circuit function here
 print(circuit.final_state_vector()) # Shows the ideal circuit state
+print(circuit)
 
 true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
 noisy_value = execute(circuit)                      # Noisy quantum computer
@@ -46,73 +47,18 @@ print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
 
 ## GHZ Circuits
 
-The {func}`.generate_ghz_circuit` create the GHZ states that are highly sensitive to noise. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
+The {func}`.generate_ghz_circuit` create the GHZ states that are highly sensitive to noise. A [GHZ (Greenberger–Horne–Zeilinger)](https://en.wikipedia.org/wiki/Greenberger-Horne-Zeilinger_state) state is a maximally entangled quantum state involving multiple qubits. Thus, they make it easy to test error rates in entanglement creation and preservation, which is central for many quantum algorithms.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_ghz_circuit
 
 circuit = generate_ghz_circuit(n_qubits=7)
-print(circuit)
 ```
 
 ## Mirror Circuits
 
 The {func}`.generate_mirror_circuit` involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
 
-```{code-cell} ipython3
-from typing import List, Tuple
-import numpy as np
-import cirq
-import networkx as nx
-from mitiq import zne
-from mitiq import benchmarks
-
-topology = nx.complete_graph(3)
-
-def get_circuit(depth: int) -> Tuple[cirq.Circuit, List[int]]:
-    circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
-        nlayers=depth,
-        two_qubit_gate_prob=1.0,
-        connectivity_graph=topology,
-        return_type="cirq",
-    )
-    return circuit, correct_bitstring
-
-circuit, correct_bitstring = get_circuit(depth=3)
-
-def execute(
-    circuit: cirq.Circuit,
-    correct_bitstring: List[int],
-    noise_level=0.005,
-) -> float:
-    """Executes the input circuit(s) and returns ⟨A⟩, where
-    A = |correct_bitstring⟩⟨correct_bitstring| for each circuit.
-    """
-    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
-
-    noisy_circuit += cirq.measure(*sorted(circuit.all_qubits()), key="m")
-    backend = cirq.DensityMatrixSimulator()
-
-    backend = cirq.DensityMatrixSimulator()
-
-    result = backend.run(noisy_circuit)
-    expval = result.measurements["m"].tolist().count(correct_bitstring)
-    return expval
-
-def execute_with_fixed_bitstring(circuit, noise_level=0.005):
-    return execute(circuit, correct_bitstring, noise_level)
-
-print(circuit)
-print(circuit.final_state_vector()) # Shows the ideal circuit state
-
-true_value = execute(circuit, correct_bitstring,noise_level=0.0)
-noisy_value = execute(circuit, correct_bitstring)
-
-zne_value = zne.execute_with_zne(circuit, execute_with_fixed_bitstring)  # Noisy quantum computer + Mitiq
-
-print(f"Error w/o  Mitiq: {abs((true_value - noisy_value) / true_value):.3f}")
-print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
-```
 
 ## Mirror Quantum Volume Circuits
 
@@ -122,7 +68,6 @@ The {func}`.generate_mirror_qv_circuit` is designed to test [Quantum Volume](htt
 from mitiq.benchmarks import generate_mirror_qv_circuit
 
 circuit = generate_mirror_qv_circuit(num_qubits=7, depth=2)
-print(circuit)
 ```
 
 ## Quantum Phase Estimation Circuits
@@ -130,10 +75,9 @@ print(circuit)
 The {func}`.generate_qpe_circuit` is used to the measure eigenvalues of unitary operators. Since accurate phase estimation requires precise control over operations, these circuits test the mitigation techniques’ ability to handle small noise effects over multiple gate sequences.
 
 ```{code-cell} ipython3
-from mitiq.benchmarks import generate_w_circuit
+from mitiq.benchmarks import generate_qpe_circuit
 
-circuit = generate_w_circuit(n_qubits=7)
-print(circuit)
+circuit = generate_qpe_circuit(evalue_reg=7)
 ```
 
 ## Quantum Volume Circuits
@@ -144,7 +88,6 @@ The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volum
 from mitiq.benchmarks import generate_quantum_volume_circuit
 
 circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=7)
-print(circuit)
 ```
 
 ## Randomized Benchmarking Circuits
@@ -156,7 +99,6 @@ from mitiq.benchmarks import generate_rb_circuits
 
 circuits = generate_rb_circuits(n_qubits=1, num_cliffords=5)
 circuit=circuits[0]
-print(circuit)
 ```
 
 ## Rotated Randomized Benchmarking Circuits
@@ -168,7 +110,6 @@ from mitiq.benchmarks import generate_rotated_rb_circuits
 
 circuits = generate_rotated_rb_circuits(n_qubits=1, num_cliffords=5)
 circuit=circuits[0]
-print(circuit)
 ```
 
 ## Randomized Clifford+T Circuits
@@ -179,7 +120,6 @@ The {func}`.generate_random_clifford_t_circuit` add the T gate to the standard C
 from mitiq.benchmarks import generate_random_clifford_t_circuit
 
 circuit = generate_random_clifford_t_circuit(num_qubits=7, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
-print(circuit)
 ```
 
 ## W State Circuits
@@ -190,5 +130,4 @@ The {func}`.generate_w_circuit` are entangled circuits that distribute the entan
 from mitiq.benchmarks import generate_w_circuit
 
 circuit = generate_w_circuit(n_qubits=7)
-print(circuit)
 ```
