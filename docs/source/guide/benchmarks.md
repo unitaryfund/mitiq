@@ -121,7 +121,7 @@ The {func}`.generate_mirror_qv_circuit` is designed to test [Quantum Volume](htt
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_mirror_qv_circuit
 
-circuit= generate_mirror_qv_circuit(num_qubits=7, depth=2)
+circuit = generate_mirror_qv_circuit(num_qubits=7, depth=2)
 print(circuit)
 ```
 
