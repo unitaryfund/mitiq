@@ -159,11 +159,15 @@ Based on the theorem, if the error rate of fidelity is $\epsilon$, i.e.
 |F(\rho,\sigma)-1|\leq\epsilon,
 \end{equation}
 then the minimum number of measurements $N$ (number of snapshots) should be:
-\begin{equation}
+```{math}
+:label: eq-label
 N = \frac{34}{\epsilon^2}\left\|\rho-\mathrm{Tr}(\rho)/{2^n}\mathbb{I}\right\|_{\mathrm{shadow}}^2
-\end{equation}
+```
 with the shadow norm upper bound of the random Pauli measurement $\left\|\cdot\right\|_{\mathrm{shadow}}\leq 2^k\|\cdot\|_\infty$ when the operator acting on $k$ qubits, we have $N\leq 34\epsilon^{-2}2^{2n}+\mathcal{O}(e^{-n})$. Based on Fuchs–van de Graaf inequalities and properties of $L_p$ norm, $\|\rho-\sigma\|_2\leq \|\rho-\sigma\|_1 \leq (1-F(\rho,\sigma))^{1/2}$, the $L_2$ norm distance between the state reconstructed through classical shadow estimation and the state prepared by the circuit is upperbound by the fidelity error rate $\epsilon$. The dependency of the bound number of measurements $N$ to achieve the error rate $\epsilon$ is depicted in function `n_measurements_tomography_bound`.
 
+```{note}
+Equation {eq}`eq-label` comes from equation S13 in the paper {cite}`huang2020predicting`. It contains some numerical constants and as noted by Remark 1 these constants result from a worst case argument. You may see values much smaller in practice. 
+```
 
 ```{code-cell} ipython3
 # error rate of state reconstruction epsilon < 1.
@@ -426,7 +430,7 @@ When we realize this code, it's important to consider that we record the equival
 
 Consequently, computing the mean estimator involves counting the number of exact matches between the observable and the classical shadow, and then multiplying the result by the appropriate sign. In the following, we present the function `expectation_estimation_shadow`, which allows for estimating any observable based on a classical shadow. This is realised by the main function `execute_with_shadows` when *state_reconstruction =* **False**.
 
-###4.3 Shadow Estimation Bound on Estimation of Expectation Values of Observables
+### 4.3 Shadow Estimation Bound on Estimation of Expectation Values of Observables
 
 The shadow estimation bound of operator expectation values is given by the following theorem:
 _________________________________________________________________________
