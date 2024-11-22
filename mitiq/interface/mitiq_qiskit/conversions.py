@@ -256,10 +256,8 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
         # Try to decompose circuit before running
         # This is necessary for converting qiskit circuits with
         # custom packaged gates, e.g., QFT gates
-        gates_to_decompose = ["rxx", "rzz", "rzx", "ryy", "QFT"]
-        circuit = circuit.decompose(
-            gates_to_decompose=gates_to_decompose, reps=10
-        )
+        GATES_TO_DECOMPOSE = ["rxx", "rzz", "rzx", "ryy", "QFT"]
+        circuit = circuit.decompose(gates_to_decompose=GATES_TO_DECOMPOSE)
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
 
     return mitiq_circuit
