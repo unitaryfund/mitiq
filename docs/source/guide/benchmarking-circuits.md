@@ -59,6 +59,15 @@ circuit = generate_ghz_circuit(n_qubits=7)
 
 The {func}`.generate_mirror_circuit` involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
 
+## Quantum Volume Circuits
+
+The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
+
+```{code-cell} ipython3
+from mitiq.benchmarks import generate_quantum_volume_circuit
+
+circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=7)
+```
 
 ## Mirror Quantum Volume Circuits
 
@@ -78,16 +87,6 @@ The {func}`.generate_qpe_circuit` is used to the measure eigenvalues of unitary 
 from mitiq.benchmarks import generate_qpe_circuit
 
 circuit = generate_qpe_circuit(evalue_reg=7)
-```
-
-## Quantum Volume Circuits
-
-The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
-
-```{code-cell} ipython3
-from mitiq.benchmarks import generate_quantum_volume_circuit
-
-circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=7)
 ```
 
 ## Randomized Benchmarking Circuits
