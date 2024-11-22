@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Benchmarks
+# Benchmarking Circuits
 
 Mitiq benchmarks error mitigation techniques by evaluating improvements in metrics such as state fidelity (the closeness of the mitigated quantum state to the ideal state), output probability distributions, and logical error rates. The benchmarking process involves running diverse circuit types—such as GHZ, Mirror, Quantum Volume, and Randomized Benchmarking circuits—and comparing mitigated results against ideal theoretical outcomes. Additionally, Mitiq evaluates the overhead associated with each error mitigation technique, such as the increase in circuit depth or the number of samples required, as seen in methods like Zero Noise Extrapolation (ZNE) and Probabilistic Error Cancellation (PEC).
 
