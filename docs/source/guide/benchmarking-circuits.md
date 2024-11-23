@@ -125,8 +125,46 @@ circuit = generate_random_clifford_t_circuit(num_qubits=7, num_oneq_cliffords=2,
 
 The {func}`.generate_w_circuit` are entangled circuits that distribute the entanglement across qubits differently than GHZ states. Testing with W state circuits can help explore how well a device maintains distributed entanglement in noisy environments.
 
+A generalized multipartite $N$-qubit W-state is defined in equation {math:numref}`w_state`:
+
+$$
+\ket{W_N} = \frac{1}{\sqrt{N}} \left( \ket{100 \dots 0} + \ket{010 \dots 0} + \dots + \ket{0 \dots 01}\right)
+$$(w_state)
+
+Such a $N$-qubit W-state circuit can be generated through {func}`.generate_w_circuit` as defined in
+{cite}`Cruz_2019_Efficient`. The construction relies on an initial state $\ket{10 \dots 0}$ and a fundamental building block $B(p)$ such that
+
+$$
+B(p) \ket{00} = \ket{00} , \,
+B(p) \ket{10} = \sqrt{p} \ket{10} + \sqrt{1-p} \ket{01}
+$$
+
+This building block comprises of a controlled $G(p)$ and an inverted CNOT where $0 < p < 1$.
+
+$$
+G(p) = \begin{pmatrix}
+\sqrt{p} & -\sqrt{1-p} \\
+\sqrt{1-p} & \sqrt{p}
+\end{pmatrix}
+$$
+
+
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_w_circuit
 
-circuit = generate_w_circuit(n_qubits=7)
+circuit = generate_w_circuit(n_qubits=4)
+```
+We can also verify the final state of the circuit is equivalent to $\ket{W_4}$.
+
+$$
+\ket{W_4} = \frac{1}{\sqrt{4}} \left( \ket{1000} + \ket{0100} + \ket{0010} +  \ket{0001}\right)
+$$
+
+```{code-cell} ipython3
+import cirq 
+
+w4_state_vector_transpose = (
+        cirq.Simulator()
+        .simulate(circuit, initial_state=1000)
+        .final_state_vector)
 ```
