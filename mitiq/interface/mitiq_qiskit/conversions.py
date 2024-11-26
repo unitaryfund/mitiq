@@ -249,17 +249,36 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-
+    from qiskit.transpiler import PassManager
+    from qiskit.transpiler.passes import BasisTranslator
+    from qiskit.circuit.equivalence_library import SessionEquivalenceLibrary
+    from qiskit.transpiler.passes import UnrollCustomDefinitions, BasisTranslator
+    from qiskit.circuit.equivalence_library import StandardEquivalenceLibrary
     try:
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+        
     except QasmException:
         # Try to decompose circuit before running
         # This is necessary for converting qiskit circuits with
         # custom packaged gates, e.g., QFT gates
         GATES_TO_DECOMPOSE = ["rxx", "rzz", "rzx", "ryy", "QFT"]
         circuit = circuit.decompose(gates_to_decompose=GATES_TO_DECOMPOSE)
-        mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+        # circuit = circuit.decompose()
+        try:
+            mitiq_circuit = from_qasm(qasm2.dumps(circuit))
+        except QasmException:
+            basis_gates = ['u1', 'u2', 'u3', 'cx']
+            # Create a pass manager
+            pass_manager = PassManager()
+            # Unroll custom definitions
+            pass_manager.append(UnrollCustomDefinitions(StandardEquivalenceLibrary, basis_gates))
+            # Translate to the basis gates
+            pass_manager.append(BasisTranslator(StandardEquivalenceLibrary, basis_gates))
+            # Run the pass manager on the circuit
+            circuit = pass_manager.run(circuit)
 
+            # Try converting again
+            mitiq_circuit = from_qasm(qasm2.dumps(circuit))
     return mitiq_circuit
 
 
