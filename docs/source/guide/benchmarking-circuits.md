@@ -15,35 +15,6 @@ kernelspec:
 
 Mitiq benchmarks error mitigation techniques by evaluating improvements in metrics such as state fidelity (the closeness of the mitigated quantum state to the ideal state), output probability distributions, and logical error rates. The benchmarking process involves running diverse circuit types—such as GHZ, Mirror, Quantum Volume, and Randomized Benchmarking circuits—and comparing mitigated results against ideal theoretical outcomes. Additionally, Mitiq evaluates the overhead associated with each error mitigation technique, such as the increase in circuit depth or the number of samples required, as seen in methods like Zero Noise Extrapolation (ZNE) and Probabilistic Error Cancellation (PEC).
 
-The following workflow demonstrates how to use benchmark circuits in Mitiq. In this example, we generate a GHZ circuit using Mitiq’s benchmarking tools and apply Zero Noise Extrapolation (ZNE) to mitigate errors introduced by depolarizing noise. The workflow is run on a simulator, where we compare results from an ideal circuit, a noisy circuit, and a mitigated circuit to evaluate the impact of error mitigation. The same approach can be extended to other benchmarking circuits provided by Mitiq.
-
-```{code-cell} ipython3
-import cirq
-from mitiq import benchmarks, zne
-
-def execute(circuit, noise_level=0.005):
-    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
-    with depolarizing noise."""
-    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
-    return (
-        cirq.DensityMatrixSimulator()
-        .simulate(noisy_circuit)
-        .final_density_matrix[0, 0]
-        .real
-    )
-
-circuit = benchmarks.generate_ghz_circuit(n_qubits=7) # Call the required benchmark circuit function here
-print(circuit.final_state_vector()) # Shows the ideal circuit state
-print(circuit)
-
-true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
-noisy_value = execute(circuit)                      # Noisy quantum computer
-zne_value = zne.execute_with_zne(circuit, execute)  # Noisy quantum computer + Mitiq
-
-print(f"Error w/o  Mitiq: {abs((true_value - noisy_value) / true_value):.3f}")
-print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
-```
-
 
 ## GHZ Circuits
 
