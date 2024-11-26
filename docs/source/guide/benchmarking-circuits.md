@@ -28,11 +28,19 @@ circuit = generate_ghz_circuit(n_qubits=7)
 
 ## Mirror Circuits
 
-The {func}`.generate_mirror_circuit` involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
+The {func}`.generate_mirror_circuit`, as defined in {cite}`Proctor_2021_NatPhys`, involves running a quantum circuit forward and then “mirroring” it (applying the reverse operations). Ideally, this results in returning the system to the initial state, so they’re great for testing if the noise mitigation is effective in preserving information through complex sequences.
+
+```{code-cell} ipython3
+from mitiq.benchmarks import generate_mirror_circuit
+import networkx as nx
+
+topology = nx.complete_graph(7) # Provide appropriate topology
+circuit, correct_bitstring = generate_mirror_circuit(nlayers=7, two_qubit_gate_prob=1.0, connectivity_graph=topology, return_type="cirq")
+```
 
 ## Quantum Volume Circuits
 
-The {func}`.generate_quantum_volume_circuit` tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
+The {func}`.generate_quantum_volume_circuit`, as defined in {cite}`Cross_2019_Validating`, tests the maximum achievable "volume" or computational capacity of a quantum processor. Running these circuits with error mitigation tests if mitiq’s techniques improve the effective quantum volume.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_quantum_volume_circuit
@@ -42,7 +50,7 @@ circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=7)
 
 ## Mirror Quantum Volume Circuits
 
-The {func}`.generate_mirror_qv_circuit` is designed to test [Quantum Volume](https://en.wikipedia.org/wiki/Quantum_volume), a metric combining circuit depth, number of qubits, and fidelity. These circuits check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
+The {func}`.generate_mirror_qv_circuit`, as defined in {cite}`Amico_2023_arxiv`, is designed to test [Quantum Volume](https://en.wikipedia.org/wiki/Quantum_volume), a metric combining circuit depth, number of qubits, and fidelity. These circuits check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_mirror_qv_circuit
@@ -52,7 +60,7 @@ circuit = generate_mirror_qv_circuit(num_qubits=7, depth=2)
 
 ## Quantum Phase Estimation Circuits
 
-The {func}`.generate_qpe_circuit` is used to the measure eigenvalues of unitary operators. Since accurate phase estimation requires precise control over operations, these circuits test the mitigation techniques’ ability to handle small noise effects over multiple gate sequences.
+The {func}`.generate_qpe_circuit`, as defined in [Quantum phase estimation algorithm](https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm) is used to the measure eigenvalues of unitary operators. Since accurate phase estimation requires precise control over operations, these circuits test the mitigation techniques’ ability to handle small noise effects over multiple gate sequences.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_qpe_circuit
