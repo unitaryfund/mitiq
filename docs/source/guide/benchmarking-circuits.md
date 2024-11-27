@@ -24,6 +24,8 @@ The {func}`.generate_ghz_circuit` create the GHZ states that are highly sensitiv
 from mitiq.benchmarks import generate_ghz_circuit
 
 circuit = generate_ghz_circuit(n_qubits=7)
+
+print(circuit)
 ```
 
 ## Mirror Circuits
@@ -36,6 +38,8 @@ import networkx as nx
 
 topology = nx.complete_graph(7) # Provide appropriate topology
 circuit, correct_bitstring = generate_mirror_circuit(nlayers=7, two_qubit_gate_prob=1.0, connectivity_graph=topology, return_type="cirq")
+
+print(circuit)
 ```
 
 ## Quantum Volume Circuits
@@ -46,6 +50,8 @@ The {func}`.generate_quantum_volume_circuit`, as defined in {cite}`Cross_2019_Va
 from mitiq.benchmarks import generate_quantum_volume_circuit
 
 circuit,_ = generate_quantum_volume_circuit(num_qubits=4, depth=7)
+
+print(circuit)
 ```
 
 ## Mirror Quantum Volume Circuits
@@ -56,6 +62,8 @@ The {func}`.generate_mirror_qv_circuit`, as defined in {cite}`Amico_2023_arxiv`,
 from mitiq.benchmarks import generate_mirror_qv_circuit
 
 circuit = generate_mirror_qv_circuit(num_qubits=7, depth=2)
+
+print(circuit)
 ```
 
 ## Quantum Phase Estimation Circuits
@@ -66,6 +74,8 @@ The {func}`.generate_qpe_circuit`, as defined in [Quantum phase estimation algor
 from mitiq.benchmarks import generate_qpe_circuit
 
 circuit = generate_qpe_circuit(evalue_reg=7)
+
+print(circuit)
 ```
 
 ## Randomized Benchmarking Circuits
@@ -77,6 +87,8 @@ from mitiq.benchmarks import generate_rb_circuits
 
 circuits = generate_rb_circuits(n_qubits=1, num_cliffords=5)
 circuit=circuits[0]
+
+print(circuit)
 ```
 
 ## Rotated Randomized Benchmarking Circuits
@@ -88,6 +100,8 @@ from mitiq.benchmarks import generate_rotated_rb_circuits
 
 circuits = generate_rotated_rb_circuits(n_qubits=1, num_cliffords=5)
 circuit=circuits[0]
+
+print(circuit)
 ```
 
 ## Randomized Clifford+T Circuits
@@ -98,6 +112,8 @@ The {func}`.generate_random_clifford_t_circuit` add the T gate to the standard C
 from mitiq.benchmarks import generate_random_clifford_t_circuit
 
 circuit = generate_random_clifford_t_circuit(num_qubits=7, num_oneq_cliffords=2, num_twoq_cliffords=2, num_t_gates=2)
+
+print(circuit)
 ```
 
 ## W State Circuits
@@ -132,6 +148,8 @@ $$
 from mitiq.benchmarks import generate_w_circuit
 
 circuit = generate_w_circuit(n_qubits=4)
+
+print(circuit)
 ```
 We can also verify the final state of the circuit is equivalent to $\ket{W_4}$.
 
