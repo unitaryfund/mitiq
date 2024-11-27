@@ -16,9 +16,10 @@ import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
 from cirq.contrib.qasm_import.exception import QasmException
 from qiskit import qasm2
+from qiskit.circuit.equivalence_library import SessionEquivalenceLibrary
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
-from qiskit.transpiler.passes import SetLayout
+from qiskit.transpiler.passes import BasisTranslator, SetLayout
 
 from mitiq.interface.mitiq_qiskit.transpiler import (
     ApplyMitiqLayout,
@@ -249,32 +250,25 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    from qiskit.transpiler import PassManager
-    from qiskit.transpiler.passes import BasisTranslator
-    from qiskit.circuit.equivalence_library import SessionEquivalenceLibrary
-    from qiskit.transpiler.passes import UnrollCustomDefinitions, BasisTranslator
-    from qiskit.circuit.equivalence_library import StandardEquivalenceLibrary
     try:
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
-        
+
     except QasmException:
         # Try to decompose circuit before running
         # This is necessary for converting qiskit circuits with
         # custom packaged gates, e.g., QFT gates
         GATES_TO_DECOMPOSE = ["rxx", "rzz", "rzx", "ryy", "QFT"]
-        circuit = circuit.decompose(gates_to_decompose=GATES_TO_DECOMPOSE)
-        # circuit = circuit.decompose()
+        circuit = circuit.decompose(
+            gates_to_decompose=GATES_TO_DECOMPOSE, reps=10
+        )
         try:
             mitiq_circuit = from_qasm(qasm2.dumps(circuit))
         except QasmException:
-            basis_gates = ['u1', 'u2', 'u3', 'cx']
-            # Create a pass manager
+            basis_gates = ["u1", "u2", "u3", "cx"]
             pass_manager = PassManager()
-            # Unroll custom definitions
-            pass_manager.append(UnrollCustomDefinitions(StandardEquivalenceLibrary, basis_gates))
-            # Translate to the basis gates
-            pass_manager.append(BasisTranslator(StandardEquivalenceLibrary, basis_gates))
-            # Run the pass manager on the circuit
+            pass_manager.append(
+                BasisTranslator(SessionEquivalenceLibrary, basis_gates)
+            )
             circuit = pass_manager.run(circuit)
 
             # Try converting again
