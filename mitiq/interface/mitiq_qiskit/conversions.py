@@ -268,10 +268,10 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
             # sx, u, p, cu1, ecr, etc., decomposition is not enough
             # We translate the circuit to a supported basis
             # using PassManager to prevent over-transpilation
-            basis_gates = ["u1", "u2", "u3", "cx"]
+            BASIS_GATES = ["u1", "u2", "u3", "cx"]
             pass_manager = PassManager()
             pass_manager.append(
-                BasisTranslator(SessionEquivalenceLibrary, basis_gates)
+                BasisTranslator(SessionEquivalenceLibrary, BASIS_GATES)
             )
             circuit = pass_manager.run(circuit)
 
