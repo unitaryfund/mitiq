@@ -214,7 +214,7 @@ def mitigate_executor(
 
             - Note: When scale factors larger than 1.0 are provided, the method
             is known as "variable-noise CDR."
-            
+
         kwargs: Available keyword arguments are:
 
             - method_select (string): Specifies the method used to select the
@@ -324,22 +324,30 @@ def cdr_decorator(
         scale_noise: scale_noise: Function for scaling the noise of a quantum
             circuit.
         scale_factors: Factors by which to scale the noise.
+
             - When 1.0 is the only scale factor, the method is known as CDR.
+
             - Note: When scale factors larger than 1.0 are provided, the method
             is known as "variable-noise CDR."
+
         kwargs: Available keyword arguments are:
+
             - method_select (string): Specifies the method used to select the
             non-Clifford gates to replace when constructing the
             near-Clifford training circuits. Can be 'uniform' or
             'gaussian'.
+
             - method_replace (string): Specifies the method used to replace
             the selected non-Clifford gates with a Clifford when
             constructing the near-Clifford training circuits. Can be
             'uniform', 'gaussian', or 'closest'.
+
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
+
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
+
             - random_state (int): Seed for sampling.
     """
 
