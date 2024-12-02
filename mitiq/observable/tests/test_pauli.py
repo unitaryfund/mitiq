@@ -137,6 +137,17 @@ def test_pauli_measure_in_bad_qubits_error():
         pauli.measure_in(circuit)
 
 
+def test_pauli_measure_in_multi__measurement_per_qubit():
+    n = 4
+    pauli = PauliString(spec="Z" * n)
+    circuit = cirq.Circuit(cirq.H.on_each(cirq.LineQubit.range(n)))
+
+    # add a measurement to qubit 0 and 1
+    circuit = circuit + cirq.measure(cirq.LineQubit(0), cirq.LineQubit(1))
+    with pytest.raises(ValueError, match="More than one measurement"):
+        pauli.measure_in(circuit)
+
+
 def test_can_be_measured_with_single_qubit():
     pauli = PauliString(spec="Z")
 
