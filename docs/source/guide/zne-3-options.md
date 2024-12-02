@@ -485,7 +485,7 @@ noise_scaling_function = partial(
     fidelities = {"single": 1.0},  # Avoid folding single-qubit gates
     random_state=random_state,  # Useful to get reproducible results
 )
-# Exponential fit with scale factors [1, 2, 3], assuming an infinite-noise limit of 0.5.
+# Exponential fit with scale factors [1, 2, 3], assuming an infinite-noise limit of 0.25.
 factory = zne.inference.ExpFactory(scale_factors=[1, 2, 3], asymptote=0.25)
 
 zne_value = zne.execute_with_zne(
