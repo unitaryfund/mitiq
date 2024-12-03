@@ -1149,19 +1149,6 @@ def test_convert_from_mitiq_circuit_conversion_error(conversion_type):
         convert_from_mitiq(noisy, conversion_type)
 
 
-# def test_convert_qiskit_to_mitiq_circuit_conversion_error():
-#     # Custom gates are not supported in conversions
-#     gate = Operator([[0.0, 1.0], [-1.0, 0.0]])
-#     qreg = QuantumRegister(1)
-#     circ = QuantumCircuit(qreg)
-#     circ.unitary(gate, [0])
-
-#     with pytest.raises(
-#         CircuitConversionError, match="Circuit could not be converted to"
-#     ):
-#         convert_to_mitiq(circ)
-
-
 def test_convert_pyquil_to_mitiq_circuit_conversion_error():
     # Pragmas are not supported in conversions
     prog = Program(Pragma("INITIAL_REWIRING", ['"Partial"']))
@@ -1170,26 +1157,6 @@ def test_convert_pyquil_to_mitiq_circuit_conversion_error():
         CircuitConversionError, match="Circuit could not be converted to"
     ):
         convert_to_mitiq(prog)
-
-
-# @pytest.mark.parametrize(
-#     "fold_method",
-#     (
-#         fold_gates_at_random,
-#         fold_global,
-#     ),
-# )
-# def test_folding_circuit_conversion_error_qiskit(fold_method):
-#     # Custom gates are not supported in conversions
-#     gate = Operator([[0.0, 1.0], [-1.0, 0.0]])
-#     qreg = QuantumRegister(1)
-#     circ = QuantumCircuit(qreg)
-#     circ.unitary(gate, [0])
-
-#     with pytest.raises(
-#         CircuitConversionError, match="Circuit could not be converted to"
-#     ):
-#         fold_method(circ, scale_factor=2.0)
 
 
 @pytest.mark.parametrize(
