@@ -16,7 +16,6 @@ kernelspec:
 
 ```{code-cell} ipython3
 import qiskit
-from qiskit import QuantumCircuit
 
 from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
