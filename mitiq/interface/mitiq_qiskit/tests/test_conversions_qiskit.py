@@ -484,3 +484,127 @@ def test_convert_to_mitiq_with_rx_and_rzz():
     test_qc.rx(0.1, 0)
     test_qc.rzz(0.1, 0, 1)
     assert convert_to_mitiq(test_qc)
+
+
+def test_convert_to_mitiq_with_rx_and_ryy():
+    """
+    Tests that convert_to_mitiq works with RX and RYY gates.
+    """
+    test_qc = qiskit.QuantumCircuit(2)
+    test_qc.rx(0.1, 0)
+    test_qc.ry(0.1, 1)
+    assert convert_to_mitiq(test_qc)
+
+
+def test_convert_to_mitiq_with_sx():
+    """
+    Tests that convert_to_mitiq works with SX gates.
+    """
+    test_qc = qiskit.QuantumCircuit(1)
+    test_qc.sx(0)
+    assert convert_to_mitiq(test_qc)
+
+
+def test_convert_to_mitiq_with_u():
+    """
+    Tests that convert_to_mitiq works with U gates.
+    """
+
+    test_qc = qiskit.QuantumCircuit(1)
+    test_qc.u(0.1, 0.2, 0.3, 0)  # Apply the `u` gate
+    assert convert_to_mitiq(test_qc)
+
+
+def test_convert_to_mitiq_with_p():
+    """
+    Tests that convert_to_mitiq works with P gates.
+    """
+    circuit = qiskit.QuantumCircuit(1)
+    circuit.p(np.pi / 4, 0)
+
+    assert convert_to_mitiq(circuit)
+
+
+def test_convert_to_mitiq_with_cu1():
+    """
+    Tests that convert_to_mitiq works with CU1 gates.
+    """
+    test_qc = qiskit.QuantumCircuit(2)
+    test_qc.h(0)
+    test_qc.h(1)
+    cu1_gate = qiskit.circuit.library.CU1Gate(np.pi / 4)
+    test_qc.append(cu1_gate, [0, 1])
+    assert convert_to_mitiq(test_qc)
+
+
+def test_convert_to_mitiq_with_ecrgate():
+    """
+    Tests that convert_to_mitiq works with ECR gates.
+    """
+    circuit = qiskit.QuantumCircuit(2)
+    circuit.h(0)
+    circuit.h(1)
+    circuit.append(qiskit.circuit.library.ECRGate(), [0, 1])
+    assert convert_to_mitiq(circuit)
+
+
+def test_convert_to_mitiq_with_rxx_rzz_ecr():
+    """
+    Tests that convert_to_mitiq works with RXX, RZZ, and ECR gates.
+    """
+    circuit = qiskit.QuantumCircuit(2)
+    circuit.sx(0)
+    circuit.append(qiskit.circuit.library.RXXGate(np.pi / 3), [0, 1])
+    circuit.append(qiskit.circuit.library.RZZGate(np.pi / 4), [0, 1])
+    circuit.append(qiskit.circuit.library.ECRGate(), [0, 1])
+    assert convert_to_mitiq(circuit)
+
+
+def test_convert_to_mitiq_with_rzx_ryy_p():
+    """
+    Tests that convert_to_mitiq works with RZX, RYY, and P gates.
+    """
+    rotation_circuit = qiskit.QuantumCircuit(2)
+    rotation_circuit.p(np.pi / 8, 0)
+    rotation_circuit.append(qiskit.circuit.library.RZXGate(np.pi / 6), [0, 1])
+    rotation_circuit.append(qiskit.circuit.library.RYYGate(np.pi / 5), [0, 1])
+    assert convert_to_mitiq(rotation_circuit)
+
+
+def test_convert_to_mitiq_with_qft_cu1_rzx():
+    """
+    Tests that convert_to_mitiq works with QFT, CU1, and RZX gates.
+    """
+    circuit = qiskit.QuantumCircuit(2)
+    circuit.h(0)
+    circuit.h(1)
+    circuit.append(qiskit.circuit.library.QFT(2), [0, 1])
+    circuit.append(qiskit.circuit.library.CU1Gate(np.pi / 3), [0, 1])
+    circuit.append(qiskit.circuit.library.RZXGate(np.pi / 4), [0, 1])
+    assert convert_to_mitiq(circuit)
+
+
+def test_convert_to_mitiq_with_rzz_u_p_ecr():
+    """
+    Tests that convert_to_mitiq works with RZZ, U, P, and ECR gates.
+    """
+    circuit = qiskit.QuantumCircuit(2)
+    circuit.append(qiskit.circuit.library.RZZGate(np.pi / 4), [0, 1])
+    circuit.u(0.1, 0.2, 0.3, 0)
+    circuit.p(np.pi / 4, 0)
+    circuit.append(qiskit.circuit.library.ECRGate(), [0, 1])
+    circuit.append(qiskit.circuit.library.RZZGate(np.pi / 2), [0, 1])
+    assert convert_to_mitiq(circuit)
+
+
+def test_convert_to_mitiq_with_rxx_ryy_sx_cu1():
+    """
+    Tests that convert_to_mitiq works with RXX, RYY, SX, and CU1 gates.
+    """
+    circuit = qiskit.QuantumCircuit(2)
+    circuit.sx(0)
+    circuit.append(qiskit.circuit.library.RXXGate(np.pi / 4), [0, 1])
+    circuit.append(qiskit.circuit.library.RYYGate(np.pi / 6), [0, 1])
+    circuit.append(qiskit.circuit.library.CU1Gate(np.pi / 8), [0, 1])
+    circuit.u(0.5, 0.7, 0.2, 0)
+    assert convert_to_mitiq(circuit)
