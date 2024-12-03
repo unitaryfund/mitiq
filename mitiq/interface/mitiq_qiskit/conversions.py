@@ -16,10 +16,9 @@ import qiskit
 from cirq.contrib.qasm_import import circuit_from_qasm
 from cirq.contrib.qasm_import.exception import QasmException
 from qiskit import qasm2
-from qiskit.circuit.equivalence_library import SessionEquivalenceLibrary
 from qiskit.transpiler import PassManager
 from qiskit.transpiler.layout import Layout
-from qiskit.transpiler.passes import BasisTranslator, SetLayout
+from qiskit.transpiler.passes import SetLayout
 
 from mitiq.interface.mitiq_qiskit.transpiler import (
     ApplyMitiqLayout,
@@ -258,35 +257,36 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
         # This is necessary for converting qiskit circuits with
         # custom packaged gates, e.g., QFT gates
         BASIS_GATES = [
-                "sx",
-                "sxdg",
-                "rx",
-                "ry",
-                "rz",
-                "id",
-                "u1",
-                "u2",
-                "u3",
-                "r",
-                "x",
-                "y",
-                "z",
-                "h",
-                "s",
-                "t",
-                "cx",
-                "cy",
-                "cz",
-                "ch",
-                "swap",
-                "cswap",
-                "ccx",
-                "sdg",
-                "tdg",
-            ]
+            "sx",
+            "sxdg",
+            "rx",
+            "ry",
+            "rz",
+            "id",
+            "u1",
+            "u2",
+            "u3",
+            "r",
+            "x",
+            "y",
+            "z",
+            "h",
+            "s",
+            "t",
+            "cx",
+            "cy",
+            "cz",
+            "ch",
+            "swap",
+            "cswap",
+            "ccx",
+            "sdg",
+            "tdg",
+        ]
         circuit = qiskit.transpile(circuit, basis_gates=BASIS_GATES)
         mitiq_circuit = from_qasm(qasm2.dumps(circuit))
     return mitiq_circuit
+
 
 def from_qasm(qasm: QASMType) -> cirq.Circuit:
     """Returns a Mitiq circuit equivalent to the input QASM string.

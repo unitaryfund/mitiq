@@ -22,7 +22,6 @@ from cirq import (
 from pyquil import Program, gates
 from pyquil.quilbase import Pragma
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
-from qiskit.quantum_info.operators import Operator
 from sympy import Symbol
 
 from mitiq.interface import (
