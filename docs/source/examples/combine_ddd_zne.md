@@ -11,6 +11,8 @@ kernelspec:
   language: python
   name: python3
 ---
+```{tags} ddd, zne, cirq, intermediate
+```
 
 # Composing techniques: Digital Dynamical Decoupling and Zero Noise Extrapolation
 

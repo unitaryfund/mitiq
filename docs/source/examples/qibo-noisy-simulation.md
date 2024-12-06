@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -10,6 +10,9 @@ kernelspec:
   language: python
   name: python3
 ---
+
+```{tags} qibo, zne, basic
+```
 
 # Error mitigation with Qibo using noisy simulation
 

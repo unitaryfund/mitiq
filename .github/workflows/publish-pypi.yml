@@ -25,7 +25,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          make install requirements
+          make install
           pip install setuptools wheel twine
       - name: Build and publish
         env:

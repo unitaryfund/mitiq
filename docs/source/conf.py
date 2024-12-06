@@ -98,7 +98,41 @@ extensions = [
     "sphinx_copybutton",
     "nbsphinx",
     "sphinx_gallery.load_style",
+    "sphinx_design",
+    "sphinx_tags",
 ]
+
+# to add tags to the documentation tutorials
+tags_create_tags = True
+tags_output_dir = "tags/"
+tags_overview_title = "All tags"
+tags_create_badges = True
+tags_intro_text = "Tags on this page: "
+tags_page_title = "Tags"
+tags_page_header = "Pages with this tag: "
+tags_index_head = "Tags in the documentation tutorials: "
+tags_extension = ["md"]
+tags_badge_colors = {
+    "zne": "primary",
+    "rem": "primary",
+    "shadows": "primary",
+    "cdr": "primary",
+    "pec": "primary",
+    "ddd": "primary",
+    "calibration": "primary",
+    "cirq": "secondary",
+    "bqskit": "secondary",
+    "braket": "secondary",
+    "pennylane": "secondary",
+    "qiskit": "secondary",
+    "stim": "secondary",
+    "qrack": "secondary",
+    "qibo": "secondary",
+    "ionq": "secondary",
+    "basic": "success",
+    "intermediate": "success",
+    "advanced": "success",
+}
 
 # hide primary sidebar from the following pages
 html_sidebars = {"apidoc": [], "changelog": [], "bibliography": []}
@@ -200,6 +234,7 @@ linkcheck_ignore = [
     r"https://link\.aps\.org/doi/.*",
     r"https://www\.sciencedirect\.com/science/article/.*",
     r"https://github.com/unitaryfund/mitiq/compare/.*",
+    r"https://github.com/unitaryfund/mitiq/projects/7",
 ]
 
 linkcheck_retries = 3
@@ -410,6 +445,7 @@ nbsphinx_thumbnails = {
     "examples/zne_logical_rb_cirq_stim": "_static/mitiq_stim_logo.png",
     "examples/quantum_simulation_1d_ising": "_static/quantum_simulation.png",
     "examples/cdr_qrack": "_static/cdr-qrack.png",
+    "examples/loschmidt_echo_revival_zne": "_static/loschmidt_echo_qiskit.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

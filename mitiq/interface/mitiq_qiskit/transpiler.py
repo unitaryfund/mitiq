@@ -37,14 +37,12 @@ class ApplyMitiqLayout(TransformationPass):  # type: ignore
     qubits by applying the Layout given in `property_set`.
     Requires either of passes to set/select Layout, e.g. `SetLayout`,
     `TrivialLayout`. Assumes the Layout has full physical qubits.
+
+    Args:
+        new_qregs: The new quantum registers for the circuit.
     """
 
     def __init__(self, new_qregs: List[QuantumRegister]) -> None:
-        """ApplyMitiqLayout constructor.
-
-        Args:
-            new_qregs: The new quantum registers for the circuit.
-        """
         super().__init__()
         self._new_qregs = new_qregs
 
@@ -104,7 +102,6 @@ class ClearLayout(TransformationPass):  # type: ignore
     """Clears the layout of the DAGCircuit"""
 
     def __init__(self) -> None:
-        """ClearLayout"""
         super().__init__()
 
     def run(self, dag: DAGCircuit) -> None:

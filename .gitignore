@@ -10,11 +10,12 @@
 _build
 __pycache__/
 docs/build/
+docs/source/tags/
 mitiq.egg-info/
 dist/
 build/
 jupyter_execute/
-
+.mypy_cache/
 # Coverage reports
 coverage.xml
 .coverage

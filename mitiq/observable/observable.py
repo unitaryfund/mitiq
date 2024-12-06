@@ -20,15 +20,11 @@ class Observable:
     """A quantum observable typically used to compute its mitigated expectation
     value.
 
+    Args:
+        paulis: PauliStrings used to define the observable.
     """
 
     def __init__(self, *paulis: PauliString) -> None:
-        """Initializes an `Observable` with :class:`.PauliString` objects.
-
-        Args:
-            paulis: PauliStrings used to define the observable.
-
-        """
         self._paulis = _combine_duplicate_pauli_strings(paulis)
         self._groups: List[PauliStringCollection]
         self._ngroups: int

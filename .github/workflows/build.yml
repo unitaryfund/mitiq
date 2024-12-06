@@ -26,7 +26,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          make install requirements
+          make install
 
       - name: Check types with mypy
         run: make check-types
@@ -79,7 +79,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          make install requirements
+          make install
       - name: Run the quilc & qvm Docker images
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -90,7 +90,7 @@ jobs:
       - name: Submit coverage report to Codecov
         # Only submit to Codecov once.
         if: ${{ matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'}}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

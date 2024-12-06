@@ -11,6 +11,8 @@ kernelspec:
   language: python
   name: python3
 ---
+```{tags} ddd, qiskit, basic
+```
 
 # Digital dynamical decoupling (DDD) with Qiskit on GHZ Circuits
 

@@ -95,7 +95,7 @@ class BenchmarkProblem:
         """
         circuit = self.circuit.copy()
         circuit.append(cirq.measure(circuit.all_qubits()))
-        return convert_from_mitiq(circuit, circuit_type.value)
+        return convert_from_mitiq(circuit, circuit_type.name)
 
     @property
     def num_qubits(self) -> int:

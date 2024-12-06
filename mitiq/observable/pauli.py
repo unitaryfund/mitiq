@@ -18,9 +18,21 @@ from mitiq.utils import _cirq_pauli_to_string
 
 
 class PauliString:
-    """A `PauliString` is a (tensor) product of single-qubit Pauli gates I, X,
-    Y, and Z, with a leading (real or complex) coefficient. `PauliString`s can
-    be measured in any `mitiq.QPROGRAM`.
+    """A ``PauliString`` is a (tensor) product of single-qubit Pauli gates
+    :math:`I, X, Y`, and :math:`Z`, with a leading (real or complex)
+    coefficient. ``PauliString`` objects can be measured in any
+    ``mitiq.QPROGRAM``.
+
+    Args:
+        spec: String specifier of the PauliString. Should only contain
+            characters 'I', 'X', 'Y', and 'Z'.
+        coeff: Coefficient of the PauliString.
+        support: Qubits the ``spec`` acts on, if provided.
+
+    Examples:
+        >>> PauliString(spec="IXY")  # X(1)*Y(2)
+        >>> PauliString(spec="ZZ", coeff=-0.5)  # -0.5*Z(0)*Z(1)
+        >>> PauliString(spec="XZ", support=(10, 17))  # X(10)*Z(17)
     """
 
     _string_to_gate_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
@@ -31,19 +43,6 @@ class PauliString:
         coeff: complex = 1.0,
         support: Optional[Sequence[int]] = None,
     ) -> None:
-        """Initialize a PauliString.
-
-        Args:
-            spec: String specifier of the PauliString. Should only contain
-                characters 'I', 'X', 'Y', and 'Z'.
-            coeff: Coefficient of the PauliString.
-            support: Qubits the ``spec`` acts on, if provided.
-
-        Examples:
-            >>> PauliString(spec="IXY")  # X(1)*Y(2)
-            >>> PauliString(spec="ZZ", coeff=-0.5)  # -0.5*Z(0)*Z(1)
-            >>> PauliString(spec="XZ", support=(10, 17))  # X(10)*Z(17)
-        """
         if not set(spec).issubset(set(self._string_to_gate_map.keys())):
             raise ValueError(
                 f"One or more invalid characters in spec {spec}. Valid "
@@ -181,34 +180,32 @@ class PauliString:
 class PauliStringCollection:
     """A collection of PauliStrings that qubit-wise commute and so can be
     measured with a single circuit.
+
+    Args:
+        paulis: PauliStrings to add to the collection.
+        check_precondition: If True, raises an error if some of the
+            ``PauliString`` objects do not qubit-wise commute.
+
+    Example:
+        >>> pcol = PauliStringCollection(
+        >>>     PauliString(spec="X"),
+        >>>     PauliString(spec="IZ", coeff=-2.2)
+        >>> )
+        >>> print(pcol)  # X(0) + (-2.2+0j)*Z(1)
+        >>> print(pcol.support())  # {0, 1}
+        >>>
+        >>> # XZ qubit-wise commutes with X(0) and Z(1), so can be added.
+        >>> print(pcol.can_add(PauliString(spec="XZ")))  # True.
+        >>> pcol.add(PauliString(spec="XZ"))
+        >>> print(pcol)  # X(0) + (-2.2+0j)*Z(1) + X(0)*Z(1)
+        >>>
+        >>> # Z(0) doesn't qubit-wise commute with X(0), so can't be added.
+        >>> print(pcol.can_add(PauliString(spec="Z")))  # False.
     """
 
     def __init__(
         self, *paulis: PauliString, check_precondition: bool = True
     ) -> None:
-        """Initializes a `PauliStringCollection`.
-
-        Args:
-            paulis: PauliStrings to add to the collection.
-            check_precondition: If True, raises an error if some of the
-                `PauliString`s do not qubit-wise commute.
-
-        Example:
-            >>> pcol = PauliStringCollection(
-            >>>     PauliString(spec="X"),
-            >>>     PauliString(spec="IZ", coeff=-2.2)
-            >>> )
-            >>> print(pcol)  # X(0) + (-2.2+0j)*Z(1)
-            >>> print(pcol.support())  # {0, 1}
-            >>>
-            >>> # XZ qubit-wise commutes with X(0) and Z(1), so can be added.
-            >>> print(pcol.can_add(PauliString(spec="XZ")))  # True.
-            >>> pcol.add(PauliString(spec="XZ"))
-            >>> print(pcol)  # X(0) + (-2.2+0j)*Z(1) + X(0)*Z(1)
-            >>>
-            >>> # Z(0) doesn't qubit-wise commute with X(0), so can't be added.
-            >>> print(pcol.can_add(PauliString(spec="Z")))  # False.
-        """
         self._paulis_by_weight: Dict[int, TCounter[PauliString]] = dict()
         self.add(*paulis, check_precondition=check_precondition)
 
@@ -282,10 +279,25 @@ class PauliStringCollection:
 
         basis_rotations = set()
         support = set()
+        qubits_with_measurements = set[cirq.Qid]()
+
+        # Find any existing measurement gates in the circuit
+        for _, op, _ in circuit.findall_operations_with_gate_type(
+            cirq.MeasurementGate
+        ):
+            qubits_with_measurements.update(op.qubits)
+
         for pauli in paulis.elements:
             basis_rotations.update(pauli._basis_rotations())
             support.update(pauli._qubits_to_measure())
         measured = circuit + basis_rotations + cirq.measure(*sorted(support))
+
+        if support & qubits_with_measurements:
+            raise ValueError(
+                f"More than one measurement found for qubits: "
+                f"{support & qubits_with_measurements}. Only a single "
+                f"measurement is allowed per qubit."
+            )
 
         # Transform circuit back to original qubits.
         reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))

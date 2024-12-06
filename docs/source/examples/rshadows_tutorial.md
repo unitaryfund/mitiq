@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} shadows, cirq, intermediate
+```
+
 # Robust Shadow Estimation with Mitiq
 
 **Corresponding to:** Min Li (minl2@illinois.edu)
@@ -77,9 +80,8 @@ num_qubits = 8
 qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
 
 if download_ising_circuits:
-    with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
-        old_cirq_circuit = pickle.load(file)
-        circuit = cirq.Circuit(old_cirq_circuit.all_operations())
+    with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.json", "rb") as file:
+        circuit = cirq.read_json(json_text=file.read())
     g = 1
 
 # or user can import from tensorflow_quantum
@@ -499,9 +501,8 @@ Import groud state of 1-D Ising model with periodic boundary condition
 num_qubits = 16
 qubits = cirq.LineQubit.range(num_qubits)
 if download_ising_circuits:
-    with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.pkl", "rb") as file:
-        old_cirq_circuit = pickle.load(file)
-        circuit = cirq.Circuit(old_cirq_circuit.all_operations())
+    with open(f"{file_directory}/rshadows-tutorial-1D_Ising_g=1_{num_qubits}qubits.json", "rb") as file:
+        circuit = cirq.read_json(json_text=file.read())
     g = 1
 else:
     qbs = cirq.GridQubit.rect(num_qubits, 1)
@@ -515,7 +516,7 @@ else:
     circuit = circuit.transform_qubits(qubit_map=qubit_map)
 ```
 
-Define obersevables lists as two point correlation functions between the first qubit and the rest of the qubits $\{\langle Z_0 Z_i\rangle\}_{0\geq i\leq n-1}$
+Define a list of observables as two point correlation functions between the first qubit and every other qubit $\{\langle Z_0 Z_i\rangle\}_{0\leq i\leq n-1}$.
 
 
 ```{code-cell} ipython3

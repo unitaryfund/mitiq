@@ -11,6 +11,9 @@ kernelspec:
   name: python3
 ---
 
+```{tags} qiskit, zne, advanced
+```
+
 ```{code-cell} ipython3
 import qiskit
 from qiskit import QuantumCircuit

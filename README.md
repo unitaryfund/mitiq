@@ -98,7 +98,7 @@ mitiq.qem_methods()
 | Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [`mitiq.rem`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)
 | Quantum Subspace Expansion                  | [QSE](https://mitiq.readthedocs.io/en/stable/guide/qse.html) | [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/qse) | [1903.05786](https://arxiv.org/abs/1903.05786)|
 | Robust Shadow Estimation   🚧           | [RSE](https://mitiq.readthedocs.io/en/stable/guide/shadows.html)| [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/shadows) | [2011.09636](https://arxiv.org/abs/2011.09636) <br> [2002.08953](https://arxiv.org/abs/2002.08953)|
-| Layerwise Richardson Extrapolation 🚧          |    Coming soon  | | [2402.04000](https://arxiv.org/abs/2402.04000) |
+| Layerwise Richardson Extrapolation  | [LRE](https://mitiq.readthedocs.io/en/stable/guide/lre.html) |  [`mitiq.lre`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/lre) | [2402.04000](https://arxiv.org/abs/2402.04000) |
 
 
 In addition, we also have a noise tailoring technique currently available with limited functionality:
@@ -147,7 +147,7 @@ You can use Mitiq with any backend you have access to that can interface with su
 
 If you use Mitiq in your research, please reference the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) using the bibtex entry found in [`CITATION.bib`](https://github.com/unitaryfund/mitiq/blob/main/CITATION.bib).
 
-A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?cites=12810395086731011605) / [Semantic Scholar](https://api.semanticscholar.org/CorpusID:221555755?).
+A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?oi=bibs&hl=en&cites=1985661232443186918) / [Semantic Scholar](https://api.semanticscholar.org/CorpusID:221555755?).
 
 ## License
 

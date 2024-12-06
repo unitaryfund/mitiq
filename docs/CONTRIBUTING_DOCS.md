@@ -212,7 +212,7 @@ To call sphinx directly, `cd` into the `docs` directory and run
 sphinx-build -b html source build
 ```
 
-These commands generate the `docs/build` folder, which is ignore by the `.gitignore` file.
+These commands generate the `docs/build` folder, which is ignored by the `.gitignore` file.
 Once the documentation is generated you can view it by opening it in your browser.
 
 ## Testing the Documentation 
