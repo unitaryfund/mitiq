@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "PEC Schema",
+    "description": "Schema for defining a PEC implementation, to potentially be used as a sub-schema in larger QEM-schema",
+    "type": "object",
+    "properties": {
+        "technique": {
+            "description": "Technique name, this is reuqired when composing techniques",
+            "type": "string",
+            "enum": ["pec"]
+        },
+
+        "operation_representations": {
+            "description": "Representations of the ideal gates in the circuit, expressed as a linear combination of noisy gates",
+            "type": "array",
+            "items": {}
+        },
+
+        "observable": {
+            "description": "Observable to compute the expectation value of. If None, the executor must return an expectation value"
+        },
+
+        "precision": {
+            "description": "The desired estimation precision (assuming the observable is bounded by 1), ignored if num_samples is given",
+            "type": "number",
+            "minimum": 0
+        },
+
+        "num_samples": {
+            "description": "The number of noisy circuits to be sampled for PEC. If not given, deduced from the precision",
+            "type": "integer",
+            "minimum": 1
+        },
+
+        "force_run_all": {
+            "description": "If True, all sampled circuits are executed regardless of uniqueness, else a minimal unique set is executed",
+            "type": "boolean"
+        },
+
+        "random_state": {
+            "description": "Seed for sampling circuits",
+            "type": "integer"
+        },
+
+        "full_output": {
+            "description": "If False only the average PEC value is returned. If True a dictionary containing all PEC data is returned too",
+            "type": "boolean"
+        }
+
+    },
+    "additionalProperties": false
+}

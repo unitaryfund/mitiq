@@ -5,10 +5,27 @@
     "type": "object",
     "required": ["rule"],
     "properties": {
+        "technique": {
+            "description": "Technique name, this is reuqired when composing techniques",
+            "type": "string",
+            "enum": ["ddd"]
+        },
+
+        "observable": {
+            "description": "Observable to compute the expectation value of. If None, the executor must return an expectation value",
+            "type": "object"
+        },
+        
+
         "rule": {
             "description": "Method used to make the cirucit more sensitive to noise, takes circuit and scale factors as inputm, returns new circuit that is theoretically equivalent but practically noisier",
             "type": "string",
             "enum": ["xx", "yy", "xyxy", "general", "repeated", "custom"]
+        },
+
+        "rule_args": {
+            "description": " An optional dictionary of keyword arguments for rule (if using rule not in ['xx', 'yy', 'xyxy'])",
+            "type": "object"
         },
 
         "num_trials": {

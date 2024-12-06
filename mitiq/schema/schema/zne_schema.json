@@ -4,6 +4,12 @@
     "description": "Schema for defining a ZNE implementation, to potentially be used as a sub-schema in larger QEM-schema",
     "type": "object",
     "properties": {
+        "technique": {
+            "description": "Technique name, this is reuqired when composing techniques",
+            "type": "string",
+            "enum": ["zne"]
+        },
+
         "noise_scaling_factors": {
             "description": "Real scale factors used in the Factory for extrapolating to zero noise case, one for each point that is to be extrapolated",
             "type": "array",
