@@ -420,6 +420,19 @@ class BatchedFactory(Factory, ABC):
 
     Specific (non-adaptive) extrapolation algorithms are derived from this
     class by defining the `reduce` method.
+
+    Args:
+        scale_factors: Sequence of noise scale factors at which expectation
+            values should be measured.
+        shot_list: Optional sequence of integers corresponding to the
+            number of samples taken for each expectation value. If this
+            argument is explicitly passed to the factory, it must have the
+            same length of scale_factors and the executor function must
+            accept "shots" as a valid keyword argument.
+
+    Raises:
+        ValueError: If the number of scale factors is less than 2.
+        TypeError: If shot_list is provided and has any non-integer values.
     """
 
     def __init__(
@@ -427,21 +440,6 @@ class BatchedFactory(Factory, ABC):
         scale_factors: Sequence[float],
         shot_list: Optional[List[int]] = None,
     ) -> None:
-        """Constructs a BatchedFactory.
-
-        Args:
-            scale_factors: Sequence of noise scale factors at which expectation
-                values should be measured.
-            shot_list: Optional sequence of integers corresponding to the
-                number of samples taken for each expectation value. If this
-                argument is explicitly passed to the factory, it must have the
-                same length of scale_factors and the executor function must
-                accept "shots" as a valid keyword argument.
-
-        Raises:
-            ValueError: If the number of scale factors is less than 2.
-            TypeError: If shot_list is provided and has any non-integer values.
-        """
         if len(scale_factors) < 2:
             raise ValueError("At least 2 scale factors are necessary.")
 
@@ -805,7 +803,6 @@ class PolyFactory(BatchedFactory):
         order: int,
         shot_list: Optional[List[int]] = None,
     ) -> None:
-        """Instantiates a new object of this Factory class."""
         if order > len(scale_factors) - 1:
             raise ValueError(
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
@@ -1127,7 +1124,6 @@ class ExpFactory(BatchedFactory):
         avoid_log: bool = False,
         shot_list: Optional[List[int]] = None,
     ) -> None:
-        """Instantiate an new object of this Factory class."""
         super(ExpFactory, self).__init__(scale_factors, shot_list)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
@@ -1247,7 +1243,6 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: bool = False,
         shot_list: Optional[List[int]] = None,
     ) -> None:
-        """Instantiates a new object of this Factory class."""
         super(PolyExpFactory, self).__init__(scale_factors, shot_list)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
@@ -1519,7 +1514,6 @@ class AdaExpFactory(AdaptiveFactory):
         avoid_log: bool = False,
         max_scale_factor: float = 6.0,
     ) -> None:
-        """Instantiate a new object of this Factory class."""
         super(AdaExpFactory, self).__init__()
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(

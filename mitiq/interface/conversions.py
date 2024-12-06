@@ -6,7 +6,18 @@
 """Functions for converting to/from Mitiq's internal circuit representation."""
 
 from functools import wraps
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple, cast
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Concatenate,
+    Dict,
+    Optional,
+    ParamSpec,
+    Tuple,
+    TypeVar,
+    cast,
+)
 
 import cirq
 
@@ -150,6 +161,7 @@ def convert_from_mitiq(
         circuit: Mitiq circuit to convert.
         conversion_type: String specifier for the converted circuit type.
     """
+    conversion_type = conversion_type.lower()
     conversion_function: Callable[[cirq.Circuit], QPROGRAM]
     if conversion_type == "qiskit":
         from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
@@ -199,13 +211,21 @@ def convert_from_mitiq(
     return converted_circuit
 
 
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
 def accept_any_qprogram_as_input(
-    accept_cirq_circuit_function: Callable[[cirq.Circuit], Any],
-) -> Callable[[QPROGRAM], Any]:
+    accept_cirq_circuit_function: Callable[Concatenate[cirq.Circuit, P], R],
+) -> Callable[Concatenate[QPROGRAM, P], R]:
+    """Converts functions which take as input cirq.Circuit object (and return
+    anything), to function which can accept any QPROGRAM.
+    """
+
     @wraps(accept_cirq_circuit_function)
     def accept_any_qprogram_function(
-        circuit: QPROGRAM, *args: Any, **kwargs: Any
-    ) -> Any:
+        circuit: QPROGRAM, *args: P.args, **kwargs: P.kwargs
+    ) -> R:
         cirq_circuit, _ = convert_to_mitiq(circuit)
         return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)
 
@@ -245,15 +265,19 @@ def atomic_converter(
 
 
 def atomic_one_to_many_converter(
-    cirq_circuit_modifier: Callable[..., Iterable[cirq.Circuit]],
-) -> Callable[..., Iterable[QPROGRAM]]:
+    cirq_circuit_modifier: Callable[..., Collection[cirq.Circuit]],
+) -> Callable[..., Collection[QPROGRAM]]:
+    """Convert function which returns multiple cirq.Circuits into a function
+    which returns multiple QPROGRAM instances.
+    """
+
     @wraps(cirq_circuit_modifier)
     def qprogram_modifier(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
-    ) -> Iterable[QPROGRAM]:
+    ) -> Collection[QPROGRAM]:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
 
-        modified_circuits: Iterable[cirq.Circuit] = cirq_circuit_modifier(
+        modified_circuits = cirq_circuit_modifier(
             mitiq_circuit, *args, **kwargs
         )
 

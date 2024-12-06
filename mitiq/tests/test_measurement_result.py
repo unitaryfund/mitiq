@@ -38,6 +38,11 @@ def test_measurement_result_not_bits():
         MeasurementResult(result=[[0, 0], [0, 1], [-1, 0]])
 
 
+def test_measurement_result_invoked_with_dict():
+    with pytest.raises(TypeError, match="from_counts"):
+        MeasurementResult({"001": 123, "010": 456})
+
+
 def test_filter_qubits():
     result = MeasurementResult([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
     assert np.allclose(result.filter_qubits([0]), np.array([[0], [0], [1]]))

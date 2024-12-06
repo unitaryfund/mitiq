@@ -8,6 +8,7 @@ from mitiq.benchmarks.rotated_randomized_benchmarking import (
     generate_rotated_rb_circuits,
 )
 from mitiq.benchmarks.mirror_circuits import generate_mirror_circuit
+from mitiq.benchmarks.mirror_qv_circuits import generate_mirror_qv_circuit
 from mitiq.benchmarks.ghz_circuits import generate_ghz_circuit
 from mitiq.benchmarks.quantum_volume_circuits import (
     generate_quantum_volume_circuit,

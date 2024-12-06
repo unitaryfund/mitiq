@@ -59,6 +59,13 @@ MeasurementResultLike = [
 class Executor:
     """Tool for efficiently scheduling/executing quantum programs and storing
     the results.
+
+    Args:
+        executor: A function which inputs a program and outputs a
+            ``mitiq.QuantumResult``, or inputs a sequence of programs and
+            outputs a sequence of ``mitiq.QuantumResult`` s.
+        max_batch_size: Maximum number of programs that can be sent in a
+            single batch (if the executor is batched).
     """
 
     def __init__(
@@ -66,15 +73,6 @@ class Executor:
         executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
         max_batch_size: int = 75,
     ) -> None:
-        """Initializes an Executor.
-
-        Args:
-            executor: A function which inputs a program and outputs a
-                ``mitiq.QuantumResult``, or inputs a sequence of programs and
-                outputs a sequence of ``mitiq.QuantumResult`` s.
-            max_batch_size: Maximum number of programs that can be sent in a
-                single batch (if the executor is batched).
-        """
         self._executor = executor
 
         executor_annotation = inspect.getfullargspec(executor).annotations

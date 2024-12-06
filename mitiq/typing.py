@@ -20,7 +20,6 @@ from enum import Enum, EnumMeta
 from typing import (
     Any,
     Dict,
-    Iterable,
     List,
     Optional,
     Sequence,
@@ -37,25 +36,17 @@ from cirq import Circuit as _Circuit
 
 class EnhancedEnumMeta(EnumMeta):
     def __str__(cls) -> str:
-        return ", ".join([member.value for member in cast(Type[Enum], cls)])
+        return ", ".join(
+            [member.name.lower() for member in cast(Type[Enum], cls)]
+        )
 
 
 class EnhancedEnum(Enum, metaclass=EnhancedEnumMeta):
     # This is for backwards compatibility with the old representation
     # of SUPPORTED_PROGRAM_TYPES, which was a dictionary
     @classmethod
-    def keys(cls) -> Iterable[str]:
-        return [member.value for member in cls]
-
-
-# Supported quantum programs.
-class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
-    BRAKET = "braket"
-    CIRQ = "cirq"
-    PENNYLANE = "pennylane"
-    PYQUIL = "pyquil"
-    QIBO = "qibo"
-    QISKIT = "qiskit"
+    def keys(cls) -> list[str]:
+        return [member.name.lower() for member in cls]
 
 
 try:
@@ -90,6 +81,16 @@ QPROGRAM = Union[
 ]
 
 
+# Supported quantum programs.
+class SUPPORTED_PROGRAM_TYPES(EnhancedEnum):
+    BRAKET = _BKCircuit
+    CIRQ = _Circuit
+    PENNYLANE = _QuantumTape
+    PYQUIL = _Program
+    QIBO = _QiboCircuit
+    QISKIT = _QuantumCircuit
+
+
 # Define MeasurementResult, a result obtained by measuring qubits on a quantum
 # computer.
 Bitstring = Union[str, List[int]]
@@ -112,7 +113,12 @@ class MeasurementResult:
             ``tuple(range(self.nqubits))``, where ``self.nqubits``
             is the bitstring length deduced from ``result``.
 
-    Note:
+    Example:
+        >>> mr = MeasurementResult(["001", "010", "001"])
+        >>> mr.get_counts()
+        {'001': 2, '010': 1}
+
+    Warning:
         Use caution when selecting the default option for ``qubit_indices``,
         especially when estimating an :class:`.Observable`
         acting on a subset of qubits. In this case Mitiq
@@ -125,6 +131,11 @@ class MeasurementResult:
 
     def __post_init__(self) -> None:
         # Validate arguments
+        if isinstance(self.result, dict):
+            raise TypeError(
+                "Use the MeasurementResult.from_counts method to instantiate "
+                "a MeasurementResult object from a dictionary."
+            )
         symbols = set(b for bits in self.result for b in bits)
         if not (symbols.issubset({0, 1}) or symbols.issubset({"0", "1"})):
             raise ValueError("Bitstrings should look like '011' or [0, 1, 1].")

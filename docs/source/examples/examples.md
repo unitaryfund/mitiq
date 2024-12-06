@@ -19,6 +19,7 @@ ZNE with Qiskit: Energy landscape of a variational circuit <simple-landscape-qis
 ZNE with Pennylane Energy landscape of a variational circuit <simple-landscape-pennylane.md>
 ZNE with Qiskit: Layerwise folding <layerwise-folding.md>
 ZNE with Qiskit: Quantum simulation of quantum many body scars <quantum_simulation_scars_ibmq.md>
+ZNE with Qiskit: Simulation of Loschmidt echo revival <loschmidt_echo_revival_zne.md>
 ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.md>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.md>
@@ -28,6 +29,7 @@ ZNE and CDR with Cirq: 1D Ising Simulation <quantum_simulation_1d_ising.md>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.md>
 ZNE with BQSKit compiled circuits <bqskit.md>
 ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits <zne_logical_rb_cirq_stim.md>
+LRE vs ZNE: comparing performance and overhead <lre-zne-comparison.md>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.md>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.md>
 Classical Shadows with Cirq: State Reconstruction and Observable Estimation <shadows_tutorial.md>
