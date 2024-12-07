@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "file:////Users/ellac/Documents/Unitary_Fund/qem_schema/schema/composition_schema.json",
+    "type": "object",
+    "properties": {
+      "experiments": {
+        "type": "array",
+        "description": "Array of individual experiments the user wishes to check compatibility for",
+        "items": {
+          "oneOf": [
+            { "$ref": "./zne_schema.json" },
+            { "$ref": "./ddd_schema.json" },
+            { "$ref": "./pec_schema.json" },
+            { "$ref": "./rem_schema.json" }
+          ]
+        },
+        "minItems": 1,
+        "uniqueItems": true
+      }
+    },
+    "required": ["experiments"],
+    "additionalProperties": false
+  }
