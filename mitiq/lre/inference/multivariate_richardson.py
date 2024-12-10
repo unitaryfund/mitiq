@@ -52,6 +52,7 @@ def _full_monomial_basis_term_exponents(
     return sorted(exponents, key=lambda term: (sum(term), term[::-1]))
 
 
+@accept_any_qprogram_as_input
 def sample_matrix(
     input_circuit: Circuit,
     degree: int,
@@ -67,7 +68,7 @@ def sample_matrix(
     and the scale factor vectors define the columns.
 
     Args:
-        input_circuit: Circuit to be scaled.
+        input_circuit: Quantum circuit to be scaled.
         degree: Degree of the multivariate polynomial.
         fold_multiplier: Scaling gap required by unitary folding.
         num_chunks: Number of desired approximately equal chunks. When the
