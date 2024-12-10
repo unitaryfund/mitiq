@@ -15,7 +15,10 @@ import numpy as np
 from cirq import Circuit
 
 from mitiq import QPROGRAM
-from mitiq.interface import accept_qprogram_and_validate
+from mitiq.interface import (
+    accept_any_qprogram_as_input,
+    accept_qprogram_and_validate,
+)
 from mitiq.utils import _append_measurements, _pop_measurements
 from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.zne.scaling.folding import _check_foldable
@@ -90,8 +93,9 @@ def _get_chunks(
     ]
 
 
+@accept_any_qprogram_as_input
 def get_scale_factor_vectors(
-    input_circuit: Circuit,
+    input_circuit: QPROGRAM,
     degree: int,
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
@@ -100,7 +104,7 @@ def get_scale_factor_vectors(
     extrapolation.
 
         Args:
-            input_circuit: Circuit to be scaled.
+            input_circuit: Quantum circuit to be scaled.
             degree: Degree of the multivariate polynomial.
             fold_multiplier: Scaling gap required by unitary folding.
             num_chunks: Number of desired approximately equal chunks.
