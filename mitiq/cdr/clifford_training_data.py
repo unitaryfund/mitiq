@@ -52,8 +52,10 @@ def generate_training_circuits(
             'closest'.
         random_state: Seed for sampling.
         kwargs: Available keyword arguments are:
+
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
+            
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
     """
@@ -115,10 +117,12 @@ def _map_to_near_clifford(
             'closest'.
         random_state: Seed for sampling.
         kwargs: Additional options for selection / replacement methods.
-            sigma_select (float): Width of the Gaussian distribution used for
-                ``method_select='gaussian'``.
-            sigma_replace (float): Width of the Gaussian distribution used for
-                ``method_replace='gaussian'``.
+
+            - sigma_select (float): Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+
+            - sigma_replace (float): Width of the Gaussian distribution used
+            for ``method_replace='gaussian'``.
     """
     sigma_select: float = kwargs.get("sigma_select", 0.5)
     sigma_replace: float = kwargs.get("sigma_replace", 0.5)
