@@ -95,7 +95,7 @@ def _get_chunks(
 
 @accept_any_qprogram_as_input
 def get_scale_factor_vectors(
-    input_circuit: QPROGRAM,
+    input_circuit: Circuit,
     degree: int,
     fold_multiplier: int,
     num_chunks: Optional[int] = None,
