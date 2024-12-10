@@ -55,7 +55,7 @@ def generate_training_circuits(
 
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
-            
+
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
     """
