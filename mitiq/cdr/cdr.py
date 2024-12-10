@@ -83,14 +83,13 @@ def execute_with_cdr(
         kwargs: Available keyword arguments are:
 
             - method_select (string): Specifies the method used to select the
-            non-Clifford gates to replace when constructing the
-            near-Clifford training circuits. Can be 'uniform' or
-            'gaussian'.
+            non-Clifford gates to replace when constructing the near-Clifford 
+            training circuits. Can be 'uniform' or 'gaussian'.
 
-            - method_replace (string): Specifies the method used to replace
-            the selected non-Clifford gates with a Clifford when
-            constructing the near-Clifford training circuits. Can be
-            'uniform', 'gaussian', or 'closest'.
+            - method_replace (string): Specifies the method used to replace the
+            selected non-Clifford gates with a Clifford when constructing the 
+            near-Clifford training circuits. Can be 'uniform', 'gaussian', or 
+            'closest'.
 
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
@@ -218,14 +217,13 @@ def mitigate_executor(
         kwargs: Available keyword arguments are:
 
             - method_select (string): Specifies the method used to select the
-            non-Clifford gates to replace when constructing the
-            near-Clifford training circuits. Can be 'uniform' or
-            'gaussian'.
+            non-Clifford gates to replace when constructing the near-Clifford
+            training circuits. Can be 'uniform' or 'gaussian'.
 
             - method_replace (string): Specifies the method used to replace
-            the selected non-Clifford gates with a Clifford when
-            constructing the near-Clifford training circuits. Can be
-            'uniform', 'gaussian', or 'closest'.
+            the selected non-Clifford gates with a Clifford when constructing
+            the near-Clifford training circuits. Can be 'uniform', 'gaussian',
+            or 'closest'.
 
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
@@ -333,14 +331,13 @@ def cdr_decorator(
         kwargs: Available keyword arguments are:
 
             - method_select (string): Specifies the method used to select the
-            non-Clifford gates to replace when constructing the
-            near-Clifford training circuits. Can be 'uniform' or
-            'gaussian'.
+            non-Clifford gates to replace when constructing the near-Clifford
+            training circuits. Can be 'uniform' or 'gaussian'.
 
-            - method_replace (string): Specifies the method used to replace
-            the selected non-Clifford gates with a Clifford when
-            constructing the near-Clifford training circuits. Can be
-            'uniform', 'gaussian', or 'closest'.
+            - method_replace (string): Specifies the method used to replace the
+            selected non-Clifford gates with a Clifford when constructing the
+            near-Clifford training circuits. Can be 'uniform', 'gaussian', or 
+            'closest'.
 
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
