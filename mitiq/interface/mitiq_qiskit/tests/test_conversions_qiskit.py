@@ -11,6 +11,7 @@ import cirq
 import numpy as np
 import pytest
 import qiskit
+import qiskit.quantum_info
 from qiskit import qasm2
 
 from mitiq.interface import convert_to_mitiq
@@ -492,7 +493,7 @@ def test_convert_to_mitiq_with_rx_and_ryy():
     """
     test_qc = qiskit.QuantumCircuit(2)
     test_qc.rx(0.1, 0)
-    test_qc.ry(0.1, 1)
+    test_qc.ryy(0.1, 0, 1)
     assert convert_to_mitiq(test_qc)
 
 
@@ -511,7 +512,7 @@ def test_convert_to_mitiq_with_u():
     """
 
     test_qc = qiskit.QuantumCircuit(1)
-    test_qc.u(0.1, 0.2, 0.3, 0)  # Apply the `u` gate
+    test_qc.u(0.1, 0.2, 0.3, 0)
     assert convert_to_mitiq(test_qc)
 
 
@@ -608,3 +609,14 @@ def test_convert_to_mitiq_with_rxx_ryy_sx_cu1():
     circuit.append(qiskit.circuit.library.CU1Gate(np.pi / 8), [0, 1])
     circuit.u(0.5, 0.7, 0.2, 0)
     assert convert_to_mitiq(circuit)
+
+
+def test_convert_qiskit_to_mitiq_circuit_with_custom_operator():
+    """
+    Tests that convert_to_mitiq works with a custom operator.
+    """
+    gate = qiskit.quantum_info.Operator([[0.0, 1.0], [-1.0, 0.0]])
+    qreg = qiskit.QuantumRegister(1)
+    circ = qiskit.QuantumCircuit(qreg)
+    circ.unitary(gate, [0])
+    assert convert_to_mitiq(circ)
