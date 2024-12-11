@@ -56,7 +56,7 @@ print(circuit)
 
 ## Mirror Quantum Volume Circuits
 
-The {func}`.generate_mirror_qv_circuit`, as defined in {cite}`Amico_2023_arxiv`, is designed to test [Quantum Volume](https://en.wikipedia.org/wiki/Quantum_volume), a metric combining circuit depth, number of qubits, and fidelity. These circuits check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
+The {func}`.generate_mirror_qv_circuit`, as defined in {cite}`Amico_2023_arxiv`, is designed to test [Quantum Volume](https://en.wikipedia.org/wiki/Quantum_volume), a metric combining circuit depth, number of qubits, and fidelity. These circuits run a quantum circuit forward and then “mirroring” it to check whether error mitigation techniques help achieve higher effective quantum volumes on noisy devices.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_mirror_qv_circuit
