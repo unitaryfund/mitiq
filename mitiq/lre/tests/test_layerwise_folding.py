@@ -296,6 +296,30 @@ def test_invalid_num_chunks(test_input, num_chunks, error_msg):
         get_scale_factor_vectors(test_input, 2, 2, num_chunks)
 
 
+@pytest.mark.parametrize("frontend", SUPPORTED_PROGRAM_TYPES.keys())
+def test_get_scale_factor_vectors_with_QPROGRAM(frontend):
+    """Ensures the scale factor vectors are correctly generated for all
+    supported frontends."""
+    from mitiq.benchmarks import generate_ghz_circuit
+
+    circuit = generate_ghz_circuit(3, frontend)
+
+    scale_factor_vectors = get_scale_factor_vectors(circuit, 2, 2)
+    expected_scale_factor_vectors = [
+        (1, 1, 1),
+        (5, 1, 1),
+        (1, 5, 1),
+        (1, 1, 5),
+        (9, 1, 1),
+        (5, 5, 1),
+        (5, 1, 5),
+        (1, 9, 1),
+        (1, 5, 5),
+        (1, 1, 9),
+    ]
+    assert scale_factor_vectors == expected_scale_factor_vectors
+
+
 @pytest.mark.parametrize(
     "test_input, test_degree, test_fold_multiplier, error_msg",
     [
