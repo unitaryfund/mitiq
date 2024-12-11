@@ -611,7 +611,7 @@ def test_convert_to_mitiq_with_rxx_ryy_sx_cu1():
     assert convert_to_mitiq(circuit)
 
 
-def test_convert_qiskit_to_mitiq_circuit_with_custom_operator():
+def test_convert_to_mitiq_with_custom_operator():
     """
     Tests that convert_to_mitiq works with a custom operator.
     """
