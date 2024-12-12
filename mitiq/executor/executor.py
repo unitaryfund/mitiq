@@ -159,7 +159,7 @@ class Executor:
                     "used."
                 )
         elif observable is None:
-            # Type hinted as DensityMatrixLik but no observable is set
+            # Type hinted as DensityMatrixLike but no observable is set
             if self._executor_return_type in DensityMatrixLike:
                 raise ValueError(
                     "When using a density matrix like result, an observable "
