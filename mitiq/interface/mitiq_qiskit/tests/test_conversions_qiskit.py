@@ -11,7 +11,6 @@ import cirq
 import numpy as np
 import pytest
 import qiskit
-import qiskit.quantum_info
 from qiskit import qasm2
 
 from mitiq.interface import convert_to_mitiq
