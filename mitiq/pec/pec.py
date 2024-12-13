@@ -11,12 +11,15 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     List,
+    Literal,
     Optional,
     Sequence,
     Tuple,
     Union,
     cast,
+    overload,
 )
 
 import numpy as np
@@ -35,6 +38,113 @@ _LARGE_SAMPLE_WARN = (
     "The number of PEC samples is very large. It may take several minutes."
     " It may be necessary to reduce 'precision' or 'num_samples'."
 )
+
+
+@overload
+def intermediary_sampled_circuits(
+    circuit: QPROGRAM,
+    representations: Sequence[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: int | None = None,
+    random_state: int | np.random.RandomState | None = None,
+    return_signs: Literal[False] = False,
+) -> list[QPROGRAM]: ...
+@overload
+def intermediary_sampled_circuits(
+    circuit: QPROGRAM,
+    representations: Sequence[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: int | None = None,
+    random_state: int | np.random.RandomState | None = None,
+    *,
+    return_signs: Literal[True],
+) -> tuple[list[QPROGRAM], list[int], float, int]: ...
+def intermediary_sampled_circuits(
+    circuit: QPROGRAM,
+    representations: Sequence[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: int | None = None,
+    random_state: int | np.random.RandomState | None = None,
+    return_signs: bool = False,
+) -> list[QPROGRAM] | tuple[list[QPROGRAM], list[int], float, int]:
+    """Generates a list of sampled circuits based on the given
+    quasi-probability representations.
+
+    Args:
+        circuit: The quantum circuit to be sampled.
+        representations: The quasi-probability representations of the circuit
+            operations.
+        precision: The desired precision for the sampling process.
+            Default is 0.03.
+        num_samples: The number of samples to generate. If None, the number of
+            samples is deduced based on the precision. Default is None.
+        random_state: The random state or seed for reproducibility.
+        return_signs: If True, returns the signs and the norm along with the
+            sampled circuits. Default is False.
+
+    Returns:
+        A list of sampled circuits. If return_signs is True, also returns a
+        list of signs and the norm.
+
+    Raises:
+        ValueError: If the precision is not within the interval (0, 1].
+    """
+    if isinstance(random_state, int):
+        random_state = np.random.RandomState(random_state)
+
+    if not (0 < precision <= 1):
+        raise ValueError(
+            "The value of 'precision' should be within the interval (0, 1],"
+            f" but precision is {precision}."
+        )
+
+    # Get the 1-norm of the circuit quasi-probability representation
+    _, _, norm = sample_circuit(
+        circuit,
+        representations,
+        num_samples=1,
+    )
+
+    # Deduce the number of samples (if not given by the user)
+    if num_samples is None:
+        num_samples = int((norm / precision) ** 2)
+
+    if num_samples > 10**5:
+        warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
+
+    sampled_circuits, signs, _ = sample_circuit(
+        circuit,
+        representations,
+        random_state=random_state,
+        num_samples=num_samples,
+    )
+
+    if return_signs:
+        return sampled_circuits, signs, norm, num_samples
+    return sampled_circuits
+
+
+def combine_results(
+    results: Iterable[float], norm: float, signs: Iterable[int]
+) -> float:
+    """Combine expectation values coming from probabilistically sampled
+    circuits.
+
+    Warning:
+        The ``results`` must be in the same order as the circuits were
+        generated.
+
+    Args:
+        results: Results as obtained from running circuits.
+        norm:
+
+    Returns:
+        The PEC estimate of the expectation value.
+    """
+    unbiased_estimators = [norm * s * val for s, val in zip(signs, results)]
+
+    pec_value = cast(float, np.average(unbiased_estimators))
+    return pec_value
 
 
 def execute_with_pec(
@@ -98,36 +208,13 @@ def execute_with_pec(
         ``pec_value``. If ``full_output`` is ``True``, only ``pec_value`` is
         returned.
     """
-    if isinstance(random_state, int):
-        random_state = np.random.RandomState(random_state)
-
-    if not (0 < precision <= 1):
-        raise ValueError(
-            "The value of 'precision' should be within the interval (0, 1],"
-            f" but precision is {precision}."
-        )
-
-    # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(
+    sampled_circuits, signs, norm, num_samples = intermediary_sampled_circuits(
         circuit,
         representations,
-        num_samples=1,
-    )
-
-    # Deduce the number of samples (if not given by the user)
-    if not isinstance(num_samples, int):
-        num_samples = int((norm / precision) ** 2)
-
-    # Issue warning for very large sample size
-    if num_samples > 10**5:
-        warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
-
-    # Sample all the circuits
-    sampled_circuits, signs, _ = sample_circuit(
-        circuit,
-        representations,
+        precision,
+        num_samples,
         random_state=random_state,
-        num_samples=num_samples,
+        return_signs=True,
     )
 
     # Execute all sampled circuits

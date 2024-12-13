@@ -5,9 +5,9 @@
 
 """Unit tests for PEC."""
 
-import warnings
 from functools import partial
 from typing import List, Optional
+from unittest.mock import patch
 
 import cirq
 import numpy as np
@@ -21,10 +21,13 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.pec import (
     NoisyOperation,
     OperationRepresentation,
+    combine_results,
     execute_with_pec,
+    intermediary_sampled_circuits,
     mitigate_executor,
     pec_decorator,
 )
+from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
@@ -364,63 +367,58 @@ def test_execute_with_pec_error_scaling(num_samples: int):
 
 
 @pytest.mark.parametrize("precision", [0.2, 0.1])
-def test_precision_option_in_execute_with_pec(precision: float):
+def test_precision_option_used_in_num_samples(precision):
     """Tests that the 'precision' argument is used to deduce num_samples."""
-    # For a noiseless circuit we expect num_samples = 1/precision^2:
-    _, pec_data = execute_with_pec(
+    _, _, _, num_samples = intermediary_sampled_circuits(
         oneq_circ,
-        partial(fake_executor, random_state=np.random.RandomState(0)),
         representations=pauli_representations,
         precision=precision,
-        force_run_all=True,
-        full_output=True,
+        return_signs=True,
         random_state=1,
     )
-    # The error should scale as precision
-    assert np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.15)
+    # we expect num_samples = 1/precision^2:
+    assert np.isclose(precision**2 * num_samples, 1, atol=0.2)
 
-    # Check precision is ignored when num_samples is given.
-    num_samples = 1
-    _, pec_data = execute_with_pec(
+
+def test_precision_ignored_when_num_samples_present():
+    """Check precision is ignored when num_samples is given."""
+    num_samples_expected = 123
+    _, _, _, num_samples = intermediary_sampled_circuits(
         oneq_circ,
-        partial(fake_executor, random_state=np.random.RandomState(0)),
         representations=pauli_representations,
-        precision=precision,
-        num_samples=num_samples,
-        force_run_all=False,
-        full_output=True,
+        precision=0.1,
+        num_samples=num_samples_expected,
+        return_signs=True,
+        random_state=1,
     )
-    assert pec_data["num_samples"] == num_samples
+    assert num_samples == num_samples_expected
 
 
 @pytest.mark.parametrize("bad_value", (0, -1, 2))
-def test_bad_precision_argument(bad_value: float):
+def test_bad_precision_argument(bad_value):
     """Tests that if 'precision' is not within (0, 1] an error is raised."""
     with pytest.raises(ValueError, match="The value of 'precision' should"):
-        execute_with_pec(
+        intermediary_sampled_circuits(
             oneq_circ,
-            serial_executor,
             representations=pauli_representations,
             precision=bad_value,
         )
 
 
-def test_large_sample_size_warning():
-    """Tests whether a warning is raised when PEC sample size
-    is greater than 10 ** 5.
-    """
-    warnings.simplefilter("error")
-    with pytest.raises(
-        Warning,
-        match="The number of PEC samples is very large.",
-    ):
-        execute_with_pec(
+@patch("mitiq.pec.pec.sample_circuit")
+def test_large_sample_size_warning(mock_sample_circuit):
+    """Ensure a warning is raised when sample size is greater than 100k."""
+
+    mock_sample_circuit.return_value = ([], [], 0.911)
+
+    with pytest.warns(LargeSampleWarning):
+        intermediary_sampled_circuits(
             oneq_circ,
-            partial(fake_executor, random_state=np.random.RandomState(0)),
-            representations=pauli_representations,
-            num_samples=100001,
-            force_run_all=False,
+            representations=[],
+            num_samples=100_001,
         )
+
+    assert mock_sample_circuit.call_count == 2
 
 
 def test_pec_data_with_full_output():
@@ -647,3 +645,12 @@ def test_executed_circuits_have_the_expected_type(circuit_type):
         num_samples=1,
     )
     assert np.isclose(mitigated, 0.0)
+
+
+def test_combining_results():
+    """simple arithmetic test"""
+    results = [0.1, 0.2, 0.3]
+    norm = 23
+    signs = [1, -1, 1]
+    pec_estimate = combine_results(results, norm, signs)
+    assert np.isclose(pec_estimate, 1.53, atol=0.01)
