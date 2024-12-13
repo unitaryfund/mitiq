@@ -93,7 +93,7 @@ class ApplyMitiqLayout(TransformationPass):  # type: ignore
                 node.op, qargs, node.cargs, check=False
             )
 
-        new_dag._global_phase = dag._global_phase
+        new_dag.global_phase = dag.global_phase
 
         return new_dag
 
