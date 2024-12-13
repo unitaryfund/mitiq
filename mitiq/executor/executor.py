@@ -40,8 +40,6 @@ DensityMatrixLike = [
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
     float,
-    np.float32,
-    np.float64,
     Iterable[float],
     List[float],
     Sequence[float],
@@ -154,14 +152,21 @@ class Executor:
         # Check executor and observable compatability with type hinting
         # If FloatLike is specified as a return and observable is used
         if self._executor_return_type in FloatLike and observable is not None:
+            # Type hinted as FloatLike and observable passed
             if self._executor_return_type is not None:
                 raise ValueError(
                     "When using a float like result, measurements should be "
                     "included manually and an observable should not be "
                     "used."
                 )
+            else:
+                # Using an observable but no type hinting
+                raise ValueError(
+                    "When using an observable, the return type must be "
+                    "specified on the user defined executor."
+                )
         elif observable is None:
-            # Type hinted as DensityMatrixLik but no observable is set
+            # Type hinted as DensityMatrixLike but no observable is set
             if self._executor_return_type in DensityMatrixLike:
                 raise ValueError(
                     "When using a density matrix like result, an observable "
@@ -190,38 +195,15 @@ class Executor:
             result_step = 1
 
         # Run all required circuits.
-        try:
-            all_results = self.run(all_circuits, force_run_all, **kwargs)
-        except Exception:
-            if observable is not None and self._executor_return_type is None:
-                all_circuits = [
-                    circuit_with_measurements
-                    for circuit in circuits
-                    for circuit_with_measurements in observable.measure_in(
-                        circuit
-                    )
-                ]
-                all_results = self.run(all_circuits, force_run_all, **kwargs)
-            else:
-                raise
-
-        # check returned type
-        manual_return_type = None
-        if all_results:
-            if isinstance(all_results[0], Sequence):
-                manual_return_type = type(all_results[0][0])
-            elif isinstance(all_results[0], Iterable):
-                manual_return_type = type(next(iter(all_results[0])))
-            else:
-                manual_return_type = type(all_results[0])
+        all_results = self.run(all_circuits, force_run_all, **kwargs)
 
         # Parse the results.
-        if manual_return_type in FloatLike:
+        if self._executor_return_type in FloatLike:
             results = np.real_if_close(
                 cast(Sequence[float], all_results)
             ).tolist()
 
-        elif manual_return_type in DensityMatrixLike:
+        elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
             all_results = cast(List[npt.NDArray[np.complex64]], all_results)
             results = [
@@ -229,7 +211,7 @@ class Executor:
                 for density_matrix in all_results
             ]
 
-        elif manual_return_type in MeasurementResultLike:
+        elif self._executor_return_type in MeasurementResultLike:
             observable = cast(Observable, observable)
             all_results = cast(List[MeasurementResult], all_results)
             results = [
@@ -242,7 +224,7 @@ class Executor:
         else:
             raise ValueError(
                 f"Could not parse executed results from executor with type "
-                f"{manual_return_type}."
+                f"{self._executor_return_type}."
             )
 
         return results

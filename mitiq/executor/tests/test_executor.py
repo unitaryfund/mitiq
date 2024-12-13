@@ -330,28 +330,22 @@ def test_executor_float_not_typed():
 def test_executor_density_matrix_not_typed():
     obs = Observable(PauliString("Z"))
     executor = Executor(executor_density_matrix)
-    executor_typed = Executor(executor_density_matrix_typed)
     q = cirq.LineQubit(0)
     circuit = cirq.Circuit(cirq.X.on(q))
-    assert np.allclose(
-        executor.evaluate(circuit, obs), executor_typed.evaluate(circuit, obs)
-    )
+    with pytest.raises(
+        ValueError,
+        match="When using an observable",
+    ):
+        executor.evaluate(circuit, obs)
 
 
 def test_executor_measurements_not_typed():
     obs = Observable(PauliString("Z"))
     executor = Executor(executor_measurements)
-    executor_typed = Executor(executor_measurements_typed)
     q = cirq.LineQubit(0)
     circuit = cirq.Circuit(cirq.X.on(q))
-    assert executor.evaluate(circuit, obs) == executor_typed.evaluate(
-        circuit, obs
-    )
-
-
-def test_executor_empty_return():
-    executor = Executor(list)
-    qcirc = QuantumCircuit(1)
-    qcirc.h(0)
-    with pytest.raises(ValueError, match="Could not parse executed results"):
-        executor.evaluate(qcirc)
+    with pytest.raises(
+        ValueError,
+        match="When using an observable",
+    ):
+        executor.evaluate(circuit, obs)
