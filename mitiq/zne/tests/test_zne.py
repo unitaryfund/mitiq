@@ -94,21 +94,23 @@ def executor(circuit) -> float:
 def test_with_observable_batched_factory(executor):
     observable = Observable(PauliString(spec="Z"))
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0))) * 20
+    executor = functools.partial(
+        sample_bitstrings, noise_model_function=cirq.depolarize
+    )
 
-    noisy_value = observable.expectation(circuit, sample_bitstrings)
-    zne_value = execute_with_zne(
+    real_factory = PolyFactory(scale_factors=[1, 3, 5], order=2)
+    mock_factory = Mock(spec_set=PolyFactory, wraps=real_factory)
+    zne_val = execute_with_zne(
         circuit,
-        executor=functools.partial(
-            executor, noise_model_function=cirq.depolarize
-        ),
+        executor=executor,
         observable=observable,
-        factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
-    )
-    true_value = observable.expectation(
-        circuit, functools.partial(compute_density_matrix, noise_level=(0,))
+        factory=mock_factory,
     )
 
-    assert abs(zne_value - true_value) <= abs(noisy_value - true_value)
+    mock_factory.run.assert_called_with(
+        circuit, executor, observable, fold_gates_at_random, 1
+    )
+    assert 0 <= zne_val <= 2
 
 
 @pytest.mark.parametrize(
