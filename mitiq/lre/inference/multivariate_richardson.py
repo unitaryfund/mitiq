@@ -15,8 +15,9 @@ import numpy as np
 from cirq import Circuit
 from numpy.typing import NDArray
 
+from mitiq.interface import accept_any_qprogram_as_input
 from mitiq.lre.multivariate_scaling.layerwise_folding import (
-    _get_scale_factor_vectors,
+    get_scale_factor_vectors,
 )
 
 
@@ -93,7 +94,7 @@ def sample_matrix(
     if fold_multiplier < 1:
         raise ValueError("Fold multiplier must be greater than or equal to 1.")
 
-    scale_factor_vectors = _get_scale_factor_vectors(
+    scale_factor_vectors = get_scale_factor_vectors(
         input_circuit, degree, fold_multiplier, num_chunks
     )
     num_layers = len(scale_factor_vectors[0])
@@ -120,6 +121,7 @@ def sample_matrix(
     return sample_matrix
 
 
+@accept_any_qprogram_as_input
 def multivariate_richardson_coefficients(
     input_circuit: Circuit,
     degree: int,
@@ -132,8 +134,9 @@ def multivariate_richardson_coefficients(
     :cite:`Russo_2024_LRE`).
 
     We use the sample matrix to find the constants of linear combination
-    $c = (c_1, c_2, c_3, …, c_M)$ associated with a known vector of noisy
-    expectation values $z = (<O(λ_1)>, <O(λ_2)>, <O(λ_3)>, ..., <O(λ_M)>)^T$.
+    $c = (c_1, c_2, …, c_M)$ associated with a known vector of noisy
+    expectation values :math:`z = (\langle O(λ_1)\rangle,
+    \langle O(λ_2)\rangle, ..., \langle O(λ_M)\rangle)^T`.
 
     The coefficients are found through the ratio of the determinants of $M_i$
     and the sample matrix. The new matrix $M_i$ is defined by replacing the ith
@@ -156,7 +159,7 @@ def multivariate_richardson_coefficients(
         input_circuit, degree, fold_multiplier, num_chunks
     )
     num_layers = len(
-        _get_scale_factor_vectors(
+        get_scale_factor_vectors(
             input_circuit, degree, fold_multiplier, num_chunks
         )
     )

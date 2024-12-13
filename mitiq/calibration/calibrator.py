@@ -94,30 +94,32 @@ class ExperimentResults:
         return noisy_error, mitigated_error
 
     def log_results_flat(self) -> None:
-        """Prints calibration results in the following form
-        ┌──────────────────────────┬──────────────────────────────┬────────────────────────────┐
-        │ benchmark                │ strategy                     │ performance                │
-        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
-        │ Type: rb                 │ Technique: ZNE               │ ✔                          │
-        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
-        │ Circuit depth: 323       │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0294    │
-        │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 3.4398 │
-        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
-        │ Type: rb                 │ Technique: ZNE               │ ✔                          │
-        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
-        │ Circuit depth: 323       │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │
-        │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 2.016  │
-        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
-        │ Type: ghz                │ Technique: ZNE               │ ✔                          │
-        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
-        │ Circuit depth: 2         │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0082    │
-        │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 1.561  │
-        ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
-        │ Type: ghz                │ Technique: ZNE               │ ✘                          │
-        │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
-        │ Circuit depth: 2         │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0137    │
-        │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 0.9369 │
-        └──────────────────────────┴──────────────────────────────┴────────────────────────────┘
+        """
+        Prints the results of the calibrator in flat form::
+
+            ┌──────────────────────────┬──────────────────────────────┬────────────────────────────┐
+            │ benchmark                │ strategy                     │ performance                │
+            ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+            │ Type: rb                 │ Technique: ZNE               │ ✔                          │
+            │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
+            │ Circuit depth: 323       │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0294    │
+            │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 3.4398 │
+            ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+            │ Type: rb                 │ Technique: ZNE               │ ✔                          │
+            │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.101         │
+            │ Circuit depth: 323       │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │
+            │ Two qubit gate count: 77 │ Scale method: fold_global    │ Improvement factor: 2.016  │
+            ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+            │ Type: ghz                │ Technique: ZNE               │ ✔                          │
+            │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
+            │ Circuit depth: 2         │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0082    │
+            │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 1.561  │
+            ├──────────────────────────┼──────────────────────────────┼────────────────────────────┤
+            │ Type: ghz                │ Technique: ZNE               │ ✘                          │
+            │ Num qubits: 2            │ Factory: Richardson          │ Noisy error: 0.0128        │
+            │ Circuit depth: 2         │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0137    │
+            │ Two qubit gate count: 1  │ Scale method: fold_global    │ Improvement factor: 0.9369 │
+            └──────────────────────────┴──────────────────────────────┴────────────────────────────┘
         """  # noqa: E501
         table: List[List[Union[str, float]]] = []
         headers: List[str] = ["benchmark", "strategy", "performance"]
@@ -140,23 +142,25 @@ class ExperimentResults:
         return print(tabulate(table, headers, tablefmt="simple_grid"))
 
     def log_results_cartesian(self) -> None:
-        """Prints calibration results in the following form
-        ┌──────────────────────────────┬────────────────────────────┬────────────────────────────┐
-        │ strategy\benchmark           │ Type: rb                   │ Type: ghz                  │
-        │                              │ Num qubits: 2              │ Num qubits: 2              │
-        │                              │ Circuit depth: 337         │ Circuit depth: 2           │
-        │                              │ Two qubit gate count: 80   │ Two qubit gate count: 1    │
-        ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
-        │ Technique: ZNE               │ ✔                          │ ✘                          │
-        │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
-        │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │ Mitigated error: 0.0439    │
-        │ Scale method: fold_global    │ Improvement factor: 2.2515 │ Improvement factor: 0.2665 │
-        ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
-        │ Technique: ZNE               │ ✔                          │ ✘                          │
-        │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
-        │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0408    │ Mitigated error: 0.0171    │
-        │ Scale method: fold_global    │ Improvement factor: 2.7672 │ Improvement factor: 0.6852 │
-        └──────────────────────────────┴────────────────────────────┴────────────────────────────┘
+        """
+        Prints the results of the calibrator in cartesian form::
+
+            ┌──────────────────────────────┬────────────────────────────┬────────────────────────────┐
+            │ strategy\\benchmark           │ Type: rb                   │ Type: ghz                  │
+            │                              │ Num qubits: 2              │ Num qubits: 2              │
+            │                              │ Circuit depth: 337         │ Circuit depth: 2           │
+            │                              │ Two qubit gate count: 80   │ Two qubit gate count: 1    │
+            ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
+            │ Technique: ZNE               │ ✔                          │ ✘                          │
+            │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
+            │ Scale factors: 1.0, 2.0, 3.0 │ Mitigated error: 0.0501    │ Mitigated error: 0.0439    │
+            │ Scale method: fold_global    │ Improvement factor: 2.2515 │ Improvement factor: 0.2665 │
+            ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
+            │ Technique: ZNE               │ ✔                          │ ✘                          │
+            │ Factory: Richardson          │ Noisy error: 0.1128        │ Noisy error: 0.0117        │
+            │ Scale factors: 1.0, 3.0, 5.0 │ Mitigated error: 0.0408    │ Mitigated error: 0.0171    │
+            │ Scale method: fold_global    │ Improvement factor: 2.7672 │ Improvement factor: 0.6852 │
+            └──────────────────────────────┴────────────────────────────┴────────────────────────────┘
         """  # noqa: E501
         table: List[List[str]] = []
         headers: List[str] = ["strategy\\benchmark"]
@@ -293,7 +297,13 @@ class Calibrator:
         }
 
     def run(self, log: Optional[OutputForm] = None) -> None:
-        """Runs all the circuits required for calibration."""
+        """Runs all the circuits required for calibration.
+
+        args:
+             log: If set, detailed results of each experiment run by the
+                calibrator are printed. The value corresponds to the format of
+                the information and can be set to “flat” or “cartesian”.
+        """
         if not self.results.is_missing_data():
             self.results.reset_data()
 

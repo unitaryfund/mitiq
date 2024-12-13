@@ -90,6 +90,11 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 ### Layerwise Richardson Extrapolation
 
 ```{eval-rst}
+.. automodule:: mitiq.lre.lre
+   :members:
+```
+
+```{eval-rst}
 .. automodule:: mitiq.lre.multivariate_scaling.layerwise_folding
    :members:
 ```
@@ -127,7 +132,6 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.pec.representations.depolarizing
    :members:
 ```
-
 
 #### Learning-based PEC
 
@@ -378,6 +382,7 @@ See Ref. {cite}`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.interface.mitiq_pyquil.conversions
    :members:
 ```
+
 #### Qibo Conversions
 
 ```{eval-rst}
