@@ -95,7 +95,7 @@ def test_with_observable_batched_factory(executor):
     observable = Observable(PauliString(spec="Z"))
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0))) * 20
     executor = functools.partial(
-        sample_bitstrings, noise_model_function=cirq.depolarize
+        executor, noise_model_function=cirq.depolarize
     )
 
     real_factory = PolyFactory(scale_factors=[1, 3, 5], order=2)
