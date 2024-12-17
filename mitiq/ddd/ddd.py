@@ -59,13 +59,11 @@ def execute_with_ddd(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
-    rule_partial: Callable[[int], QPROGRAM]
-    rule_partial = partial(rule, **rule_args)
-
     # Insert DDD sequences in (a copy of) the input circuit
-    circuits_with_ddd = [
-        insert_ddd_sequences(circuit, rule_partial) for _ in range(num_trials)
-    ]
+    circuits_with_ddd = generate_circuits_with_ddd(
+        circuit, rule, rule_args, num_trials
+    )
+
     results = executor.evaluate(
         circuits_with_ddd,
         observable,
@@ -74,7 +72,11 @@ def execute_with_ddd(
 
     assert len(results) == num_trials
 
-    ddd_value = np.sum(results) / num_trials
+    ddd_value = generate_ddd_value(results, num_trials)
+
+    # Brian test TODO check and remove
+    # check that np.average(results) == np.sum(results) / num_trials
+
     if not full_output:
         return ddd_value
 
@@ -84,6 +86,29 @@ def execute_with_ddd(
         "circuits_with_ddd": circuits_with_ddd,
     }
     return ddd_value, ddd_data
+
+
+# TODO rename and docstring
+def generate_ddd_value(results: list[float]) -> float:
+    return np.average(results)
+
+
+# TODO rename and docstring
+def generate_circuits_with_ddd(
+    circuit: QPROGRAM,
+    rule: Callable[[int], QPROGRAM],
+    rule_args: Dict[str, Any] = {},
+    num_trials: int = 1,
+) -> list[QPROGRAM]:
+    rule_partial: Callable[[int], QPROGRAM]
+    rule_partial = partial(rule, **rule_args)
+
+    # Insert DDD sequences in (a copy of) the input circuit
+    circuits_with_ddd = [
+        insert_ddd_sequences(circuit, rule_partial) for _ in range(num_trials)
+    ]
+
+    return circuits_with_ddd
 
 
 def mitigate_executor(
