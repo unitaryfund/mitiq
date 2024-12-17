@@ -153,21 +153,21 @@ class Executor:
             # Type hinted as FloatLike and observable passed
             if self._executor_return_type is not None:
                 raise ValueError(
-                    "When using a float like result, measurements should be "
-                    "included manually and an observable should not be "
-                    "used."
+                    "When using an executor which returns a float-like "
+                    "result, measurements should be added before the circuit "
+                    "is executed instead of with an observable."
                 )
             else:
                 # Using an observable but no type hinting
                 raise ValueError(
-                    "When using an observable, the return type must be "
-                    "specified on the user defined executor."
+                    "When using an observable, the return type of the "
+                    "executor must be specified using typehinting."
                 )
         elif observable is None:
             # Type hinted as DensityMatrixLike but no observable is set
             if self._executor_return_type in DensityMatrixLike:
                 raise ValueError(
-                    "When using a density matrix like result, an observable "
+                    "When using a density matrix result, an observable "
                     "is required."
                 )
             # Type hinted as MeasurementResulteLike but no observable is set
