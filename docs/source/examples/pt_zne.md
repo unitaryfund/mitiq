@@ -362,10 +362,10 @@ for strength in noise_strength:
     
 plt.plot(noise_strength, error_no_zne_no_twirling,"-d", label="Noisy", color="#1f77b4")
 plt.plot(noise_strength, error_with_twirling,"-^", label="Twirling", color="#ff7f0e")
-plt.plot(noise_strength, error_with_twirling_and_zne, "-+", label="ZNE + Twirling", color="#2ca02c")
+plt.plot(noise_strength, error_with_twirling_and_zne, "-*", label="ZNE + Twirling", color="#2ca02c")
 
 
-plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2} \times \text{noise_strength})$")
+plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2 \times \text{noise_strength}})$")
 plt.ylabel("Differences between expectation values")
 plt.title("Comparison of technique based expectation values to ideal")
 plt.legend()
