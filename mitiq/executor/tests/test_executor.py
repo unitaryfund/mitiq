@@ -292,7 +292,7 @@ def test_executor_float_with_observable_typed():
     executor = Executor(executor_serial_typed)
     with pytest.raises(
         ValueError,
-        match="When using a float like result",
+        match="When using an executor which returns a float-like ",
     ):
         executor.evaluate(circuit, obs)
 
@@ -314,7 +314,7 @@ def test_executor_density_matrix_without_observable_typed():
     executor = Executor(executor_density_matrix_typed)
     with pytest.raises(
         ValueError,
-        match="When using a density matrix like result",
+        match="When using a density matrix result",
     ):
         executor.evaluate(circuit)
 
