@@ -327,7 +327,50 @@ print(f"Error with ideal and twirling: {abs(ideal_value - twirled_result) :.3}")
 print(f"Error with ideal and ZNE + PT: {abs(ideal_value - mitigated_result) :.3}")
 
 ```
-Accordingly, just PT or ZNE do not work that well compared to a combination of PT and ZNE.
+Accordingly, depending on the noise strength, a combination of PT and ZNE do not work that well compared to just PT or ZNE. Thus, it is important to understand when combining a noisy tailoring technique with an error mitigation technique only contributes to the resource overhead without providing a significant advantage. 
+
+```{code-cell} ipython3
+
+import matplotlib.pyplot as plt
+
+# Plot error vs noise strength
+noise_strength = range(1, 10)
+error_no_zne_no_twirling = []
+error_with_twirling = []
+error_with_twirling_and_zne = []
+NUM_TWIRLED_VARIANTS = 300
+
+for strength in noise_strength:
+    ideal_value = execute(circuit, noise_level=0.0)
+    noisy_value = execute(circuit, noise_level=strength)
+    id_noisy_diff = abs(ideal_value - noisy_value)
+    error_no_zne_no_twirling.append(id_noisy_diff)
+
+    twirled_circuits = generate_pauli_twirl_variants(circuit, num_circuits=NUM_TWIRLED_VARIANTS)
+    pt_vals = Executor(partial(execute, noise_level=strength)).evaluate(twirled_circuits)
+    twirled_result = np.average(pt_vals)
+    twirled_noisy_diff = abs(ideal_value - twirled_result)
+    error_with_twirling.append(twirled_noisy_diff)
+
+    executor=partial(execute, noise_level=strength)
+    
+    zne_pt_vals = []
+    for i in twirled_circuits:
+        zne_pt_vals.append(execute_with_zne(i, executor))
+    mitigated_twirled_result = np.average(zne_pt_vals)
+    error_with_twirling_and_zne.append(abs(ideal_value - mitigated_twirled_result))
+    
+plt.plot(noise_strength, error_no_zne_no_twirling,"-d", label="Noisy", color="#1f77b4")
+plt.plot(noise_strength, error_with_twirling,"-^", label="Twirling", color="#ff7f0e")
+plt.plot(noise_strength, error_with_twirling_and_zne, "-+", label="ZNE + Twirling", color="#2ca02c")
+
+
+plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2} \times \text{noise_strength})$")
+plt.ylabel("Differences between expectation values")
+plt.title("Comparison of technique based expectation values to ideal")
+plt.legend()
+plt.show()
+```
 
 ## Conclusion
 
