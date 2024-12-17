@@ -84,6 +84,10 @@ def executor_density_matrix_batched(circuits) -> List[np.ndarray]:
     return [executor_density_matrix_typed(circuit) for circuit in circuits]
 
 
+def executor_typed_npfloat32(circuit) -> np.float32:
+    return np.float32(3.14)
+
+
 def test_executor_simple():
     collector = Executor(executor=executor_batched, max_batch_size=10)
     assert collector.can_batch
@@ -347,5 +351,17 @@ def test_executor_measurements_not_typed():
     with pytest.raises(
         ValueError,
         match="When using an observable",
+    ):
+        executor.evaluate(circuit, obs)
+
+
+def test_executor_unknown_type():
+    obs = Observable(PauliString("Z"))
+    executor = Executor(executor_typed_npfloat32)
+    q = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.X.on(q))
+    with pytest.raises(
+        ValueError,
+        match="Could not parse executed results",
     ):
         executor.evaluate(circuit, obs)
