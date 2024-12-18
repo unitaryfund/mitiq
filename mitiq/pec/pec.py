@@ -45,7 +45,7 @@ def generate_sampled_circuits(
     num_samples: int | None = None,
     random_state: int | np.random.RandomState | None = None,
     full_output: bool = False,
-) -> list[QPROGRAM] | tuple[list[QPROGRAM], list[int], float, int]:
+) -> list[QPROGRAM] | tuple[list[QPROGRAM], list[int], float]:
     """Generates a list of sampled circuits based on the given
     quasi-probability representations.
 
@@ -63,7 +63,7 @@ def generate_sampled_circuits(
 
     Returns:
         A list of sampled circuits. If ``full_output`` is True, also returns a
-        list of signs, the norm and the number of samples used.
+        list of signs, the norm.
 
     Raises:
         ValueError: If the precision is not within the interval (0, 1].
@@ -99,7 +99,7 @@ def generate_sampled_circuits(
     )
 
     if full_output:
-        return sampled_circuits, signs, norm, num_samples
+        return sampled_circuits, signs, norm
     return sampled_circuits
 
 
@@ -186,10 +186,10 @@ def execute_with_pec(
         The error is estimated as ``pec_std / sqrt(num_samples)``, where
         ``pec_std`` is the standard deviation of the PEC samples, i.e., the
         square root of the mean squared deviation of the sampled values from
-        ``pec_value``. If ``full_output`` is ``True``, only ``pec_value`` is
+        ``pec_value``. If ``full_output`` is ``False``, only ``pec_value`` is
         returned.
     """
-    sampled_circuits, signs, norm, num_circuits = generate_sampled_circuits(
+    sampled_circuits, signs, norm = generate_sampled_circuits(
         circuit,
         representations,
         precision,
@@ -212,6 +212,7 @@ def execute_with_pec(
     if not full_output:
         return pec_value
 
+    num_circuits = len(sampled_circuits)
     # Build dictionary with additional results and data
     pec_data: Dict[str, Any] = {
         "num_samples": num_circuits,

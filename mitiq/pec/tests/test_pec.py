@@ -369,29 +369,31 @@ def test_execute_with_pec_error_scaling(num_samples: int):
 @pytest.mark.parametrize("precision", [0.2, 0.1])
 def test_precision_option_used_in_num_samples(precision):
     """Tests that the 'precision' argument is used to deduce num_samples."""
-    _, _, _, num_samples = generate_sampled_circuits(
+    circuits, _, _ = generate_sampled_circuits(
         oneq_circ,
         representations=pauli_representations,
         precision=precision,
         full_output=True,
         random_state=1,
     )
+    num_circuits = len(circuits)
     # we expect num_samples = 1/precision^2:
-    assert np.isclose(precision**2 * num_samples, 1, atol=0.2)
+    assert np.isclose(precision**2 * num_circuits, 1, atol=0.2)
 
 
 def test_precision_ignored_when_num_samples_present():
     """Check precision is ignored when num_samples is given."""
-    num_samples_expected = 123
-    _, _, _, num_samples = generate_sampled_circuits(
+    num_expected_circuits = 123
+    circuits, _, _ = generate_sampled_circuits(
         oneq_circ,
         representations=pauli_representations,
         precision=0.1,
-        num_samples=num_samples_expected,
+        num_samples=num_expected_circuits,
         full_output=True,
         random_state=1,
     )
-    assert num_samples == num_samples_expected
+    num_circuits = len(circuits)
+    assert num_circuits == num_expected_circuits
 
 
 @pytest.mark.parametrize("bad_value", (0, -1, 2))
