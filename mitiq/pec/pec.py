@@ -83,8 +83,8 @@ def intermediary_sampled_circuits(
             sampled circuits. Default is False.
 
     Returns:
-        A list of sampled circuits. If return_signs is True, also returns a
-        list of signs and the norm.
+        A list of sampled circuits. If ``return_signs`` is True, also returns a
+        list of signs, the norm and the number of samples used.
 
     Raises:
         ValueError: If the precision is not within the interval (0, 1].
@@ -136,7 +136,9 @@ def combine_results(
 
     Args:
         results: Results as obtained from running circuits.
-        norm:
+        norm: The one-norm of the circuit representation.
+        signs: The signs corresponding to the positivity of the sampled
+            circuits.
 
     Returns:
         The PEC estimate of the expectation value.
