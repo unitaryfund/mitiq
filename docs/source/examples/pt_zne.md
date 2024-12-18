@@ -236,15 +236,9 @@ Lets define a larger circuit of CNOT, CZ and H gates.
 
 ```{code-cell} ipython3
 
-from cirq import LineQubit, Circuit, CZ, CNOT, H
+from mitiq.benchmarks import generate_ghz_circuit
 
-q0, q1, q2, q3  = LineQubit.range(4)
-circuit = Circuit(
-    H(q0),
-    CNOT.on(q0, q1),
-    CZ.on(q1, q2),
-    CNOT.on(q2, q3),
-)
+circuit = generate_ghz_circuit(n_qubits=7)
 
 print(circuit)
 
@@ -262,7 +256,7 @@ from cirq.devices.noise_model import GateSubstitutionNoiseModel
 
 def get_noise_model(noise_level: float) -> GateSubstitutionNoiseModel:
     """Substitute each CZ and CNOT gate in the circuit
-    with the gate itself followed by an Rx rotation on the output qubits.
+    with the gate itself followed by an Ry rotation on the output qubits.
     """
     rads = pi / 2 * noise_level
     def noisy_c_gate(op):
@@ -287,7 +281,7 @@ def execute(circuit: Circuit, noise_level: float):
 
 
 # Set the intensity of the noise
-NOISE_LEVEL = 7
+NOISE_LEVEL = 0.2
 
 
 # Compute the expectation value of the |0><0| observable
@@ -334,40 +328,45 @@ Accordingly, depending on the noise strength, a combination of PT and ZNE do not
 import matplotlib.pyplot as plt
 
 # Plot error vs noise strength
-noise_strength = range(1, 10)
+noise_strength = np.linspace(0.0, 1.0, 200)
 error_no_zne_no_twirling = []
 error_with_twirling = []
 error_with_twirling_and_zne = []
-NUM_TWIRLED_VARIANTS = 300
+zne_vals = []
+ideal_values = []
+NUM_TWIRLED_VARIANTS = 30
 
 for strength in noise_strength:
     ideal_value = execute(circuit, noise_level=0.0)
+    ideal_values.append(ideal_value)
     noisy_value = execute(circuit, noise_level=strength)
-    id_noisy_diff = abs(ideal_value - noisy_value)
+    id_noisy_diff = abs(ideal_value-noisy_value)
     error_no_zne_no_twirling.append(id_noisy_diff)
 
     twirled_circuits = generate_pauli_twirl_variants(circuit, num_circuits=NUM_TWIRLED_VARIANTS)
     pt_vals = Executor(partial(execute, noise_level=strength)).evaluate(twirled_circuits)
     twirled_result = np.average(pt_vals)
-    twirled_noisy_diff = abs(ideal_value - twirled_result)
+    twirled_noisy_diff = abs(ideal_value-twirled_result)
     error_with_twirling.append(twirled_noisy_diff)
 
     executor=partial(execute, noise_level=strength)
+    zne_vals.append(abs(ideal_value - execute_with_zne(circuit, executor)))
     
     zne_pt_vals = []
     for i in twirled_circuits:
         zne_pt_vals.append(execute_with_zne(i, executor))
     mitigated_twirled_result = np.average(zne_pt_vals)
     error_with_twirling_and_zne.append(abs(ideal_value - mitigated_twirled_result))
-    
-plt.plot(noise_strength, error_no_zne_no_twirling,"-d", label="Noisy", color="#1f77b4")
-plt.plot(noise_strength, error_with_twirling,"-^", label="Twirling", color="#ff7f0e")
-plt.plot(noise_strength, error_with_twirling_and_zne, "-*", label="ZNE + Twirling", color="#2ca02c")
 
+plt.plot(noise_strength, ideal_values, "", label="Ideal", color="#17becf")   
+plt.plot(noise_strength, error_no_zne_no_twirling,"", label=r"|Ideal - Noisy|", color="#1f77b4")
+plt.plot(noise_strength, zne_vals, "", label=r"|Ideal - ZNE|", color="#bcbd22")
+plt.plot(noise_strength, error_with_twirling,"", label=r"|Ideal - Twirling|", color="#ff7f0e")
+plt.plot(noise_strength, error_with_twirling_and_zne, "", label=r"|Ideal - (ZNE + Twirling)|", color="#2ca02c")
 
-plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2 \times \text{noise_strength}})$")
-plt.ylabel("Differences between expectation values")
-plt.title("Comparison of technique based expectation values to ideal")
+plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2} \times \text{noise_strength})$")
+plt.ylabel("Expectation Values Difference")
+plt.title("Comparison of expectation values with ideal as a function of noise strength")
 plt.legend()
 plt.show()
 ```
