@@ -13,13 +13,11 @@ from typing import (
     Dict,
     Iterable,
     List,
-    Literal,
     Optional,
     Sequence,
     Tuple,
     Union,
     cast,
-    overload,
 )
 
 import numpy as np
@@ -40,32 +38,13 @@ _LARGE_SAMPLE_WARN = (
 )
 
 
-@overload
-def intermediary_sampled_circuits(
+def generate_sampled_circuits(
     circuit: QPROGRAM,
     representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: int | None = None,
     random_state: int | np.random.RandomState | None = None,
-    return_signs: Literal[False] = False,
-) -> list[QPROGRAM]: ...
-@overload
-def intermediary_sampled_circuits(
-    circuit: QPROGRAM,
-    representations: Sequence[OperationRepresentation],
-    precision: float = 0.03,
-    num_samples: int | None = None,
-    random_state: int | np.random.RandomState | None = None,
-    *,
-    return_signs: Literal[True],
-) -> tuple[list[QPROGRAM], list[int], float, int]: ...
-def intermediary_sampled_circuits(
-    circuit: QPROGRAM,
-    representations: Sequence[OperationRepresentation],
-    precision: float = 0.03,
-    num_samples: int | None = None,
-    random_state: int | np.random.RandomState | None = None,
-    return_signs: bool = False,
+    full_output: bool = False,
 ) -> list[QPROGRAM] | tuple[list[QPROGRAM], list[int], float, int]:
     """Generates a list of sampled circuits based on the given
     quasi-probability representations.
@@ -79,11 +58,11 @@ def intermediary_sampled_circuits(
         num_samples: The number of samples to generate. If None, the number of
             samples is deduced based on the precision. Default is None.
         random_state: The random state or seed for reproducibility.
-        return_signs: If True, returns the signs and the norm along with the
+        full_output: If True, returns the signs and the norm along with the
             sampled circuits. Default is False.
 
     Returns:
-        A list of sampled circuits. If ``return_signs`` is True, also returns a
+        A list of sampled circuits. If ``full_output`` is True, also returns a
         list of signs, the norm and the number of samples used.
 
     Raises:
@@ -119,7 +98,7 @@ def intermediary_sampled_circuits(
         num_samples=num_samples,
     )
 
-    if return_signs:
+    if full_output:
         return sampled_circuits, signs, norm, num_samples
     return sampled_circuits
 
@@ -210,13 +189,13 @@ def execute_with_pec(
         ``pec_value``. If ``full_output`` is ``True``, only ``pec_value`` is
         returned.
     """
-    sampled_circuits, signs, norm, num_samples = intermediary_sampled_circuits(
+    sampled_circuits, signs, norm, num_circuits = generate_sampled_circuits(
         circuit,
         representations,
         precision,
         num_samples,
         random_state=random_state,
-        return_signs=True,
+        full_output=True,
     )
 
     # Execute all sampled circuits
@@ -235,10 +214,10 @@ def execute_with_pec(
 
     # Build dictionary with additional results and data
     pec_data: Dict[str, Any] = {
-        "num_samples": num_samples,
+        "num_samples": num_circuits,
         "precision": precision,
         "pec_value": pec_value,
-        "pec_error": np.std(unbiased_estimators) / np.sqrt(num_samples),
+        "pec_error": np.std(unbiased_estimators) / np.sqrt(num_circuits),
         "unbiased_estimators": unbiased_estimators,
         "measured_expectation_values": results,
         "sampled_circuits": sampled_circuits,
