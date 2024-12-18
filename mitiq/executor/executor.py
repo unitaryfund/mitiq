@@ -147,6 +147,36 @@ class Executor:
                 "Expected observable to be hermitian. Continue with caution."
             )
 
+        # Check executor and observable compatability with type hinting
+        # If FloatLike is specified as a return and observable is used
+        if self._executor_return_type in FloatLike and observable is not None:
+            # Type hinted as FloatLike and observable passed
+            if self._executor_return_type is not None:
+                raise ValueError(
+                    "When using an executor which returns a float-like "
+                    "result, measurements should be added before the circuit "
+                    "is executed instead of with an observable."
+                )
+            else:
+                # Using an observable but no type hinting
+                raise ValueError(
+                    "When using an observable, the return type of the "
+                    "executor must be specified using typehinting."
+                )
+        elif observable is None:
+            # Type hinted as DensityMatrixLike but no observable is set
+            if self._executor_return_type in DensityMatrixLike:
+                raise ValueError(
+                    "When using a density matrix result, an observable "
+                    "is required."
+                )
+            # Type hinted as MeasurementResulteLike but no observable is set
+            elif self._executor_return_type in MeasurementResultLike:
+                raise ValueError(
+                    "When using a measurement, or bitstring, like result, an "
+                    "observable is required."
+                )
+
         # Get all required circuits to run.
         if (
             observable is not None
@@ -158,16 +188,6 @@ class Executor:
                 for circuit_with_measurements in observable.measure_in(circuit)
             ]
             result_step = observable.ngroups
-        elif (
-            observable is not None
-            and self._executor_return_type not in MeasurementResultLike
-            and self._executor_return_type not in DensityMatrixLike
-        ):
-            raise ValueError(
-                """Executor and observable are not compatible. Executors
-                returning expectation values as float must be used with
-                observable=None"""
-            )
         else:
             all_circuits = circuits
             result_step = 1
@@ -201,8 +221,8 @@ class Executor:
 
         else:
             raise ValueError(
-                f"Could not parse executed results from executor with type"
-                f" {self._executor_return_type}."
+                f"Could not parse executed results from executor with type "
+                f"{self._executor_return_type}."
             )
 
         return results
