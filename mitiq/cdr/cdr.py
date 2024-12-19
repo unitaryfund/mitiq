@@ -71,25 +71,31 @@ def execute_with_cdr(
             noisy and data and parameters returning a float. See
             ``cdr.linear_fit_function`` for an example.
         num_fit_parameters: The number of parameters the fit_function takes.
-        scale_noise: scale_noise: Function for scaling the noise of a quantum
-            circuit.
+        scale_noise: Function for scaling the noise of a quantum circuit.
         scale_factors: Factors by which to scale the noise.
+
             - When 1.0 is the only scale factor, the method is known as CDR.
+
             - Note: When scale factors larger than 1.0 are provided, the method
-            is known as "variable-noise CDR."
+              is known as "variable-noise CDR."
+
         kwargs: Available keyword arguments are:
+
             - method_select (string): Specifies the method used to select the
-            non-Clifford gates to replace when constructing the
-            near-Clifford training circuits. Can be 'uniform' or
-            'gaussian'.
-            - method_replace (string): Specifies the method used to replace
-            the selected non-Clifford gates with a Clifford when
-            constructing the near-Clifford training circuits. Can be
-            'uniform', 'gaussian', or 'closest'.
+              non-Clifford gates to replace when constructing the near-Clifford
+              training circuits. Can be 'uniform' or 'gaussian'.
+
+            - method_replace (string): Specifies the method used to replace the
+              selected non-Clifford gates with a Clifford when constructing the
+              near-Clifford training circuits. Can be 'uniform', 'gaussian', or
+              'closest'.
+
             - sigma_select (float): Width of the Gaussian distribution used for
-            ``method_select='gaussian'``.
+              ``method_select='gaussian'``.
+
             - sigma_replace (float): Width of the Gaussian distribution used
-            for ``method_replace='gaussian'``.
+              for ``method_replace='gaussian'``.
+
             - random_state (int): Seed for sampling.
     """
     # Handle keyword arguments for generating training circuits.
@@ -198,25 +204,31 @@ def mitigate_executor(
             noisy and data and parameters returning a float. See
             ``cdr.linear_fit_function`` for an example.
         num_fit_parameters: The number of parameters the fit_function takes.
-        scale_noise: scale_noise: Function for scaling the noise of a quantum
-            circuit.
+        scale_noise: Function for scaling the noise of a quantum circuit.
         scale_factors: Factors by which to scale the noise.
+
             - When 1.0 is the only scale factor, the method is known as CDR.
+
             - Note: When scale factors larger than 1.0 are provided, the method
-            is known as "variable-noise CDR."
+              is known as "variable-noise CDR."
+
         kwargs: Available keyword arguments are:
+
             - method_select (string): Specifies the method used to select the
-            non-Clifford gates to replace when constructing the
-            near-Clifford training circuits. Can be 'uniform' or
-            'gaussian'.
+              non-Clifford gates to replace when constructing the near-Clifford
+              training circuits. Can be 'uniform' or 'gaussian'.
+
             - method_replace (string): Specifies the method used to replace
-            the selected non-Clifford gates with a Clifford when
-            constructing the near-Clifford training circuits. Can be
-            'uniform', 'gaussian', or 'closest'.
+              the selected non-Clifford gates with a Clifford when constructing
+              the near-Clifford training circuits. Can be 'uniform', 'gaussian'
+              , or 'closest'.
+
             - sigma_select (float): Width of the Gaussian distribution used for
-            ``method_select='gaussian'``.
+              ``method_select='gaussian'``.
+
             - sigma_replace (float): Width of the Gaussian distribution used
-            for ``method_replace='gaussian'``.
+              for ``method_replace='gaussian'``.
+
             - random_state (int): Seed for sampling."""
     executor_obj = Executor(executor)
     if not executor_obj.can_batch:
@@ -305,25 +317,31 @@ def cdr_decorator(
             noisy and data and parameters returning a float. See
             ``cdr.linear_fit_function`` for an example.
         num_fit_parameters: The number of parameters the fit_function takes.
-        scale_noise: scale_noise: Function for scaling the noise of a quantum
-            circuit.
+        scale_noise: Function for scaling the noise of a quantum circuit.
         scale_factors: Factors by which to scale the noise.
+
             - When 1.0 is the only scale factor, the method is known as CDR.
+
             - Note: When scale factors larger than 1.0 are provided, the method
-            is known as "variable-noise CDR."
+              is known as "variable-noise CDR."
+
         kwargs: Available keyword arguments are:
+
             - method_select (string): Specifies the method used to select the
-            non-Clifford gates to replace when constructing the
-            near-Clifford training circuits. Can be 'uniform' or
-            'gaussian'.
-            - method_replace (string): Specifies the method used to replace
-            the selected non-Clifford gates with a Clifford when
-            constructing the near-Clifford training circuits. Can be
-            'uniform', 'gaussian', or 'closest'.
+              non-Clifford gates to replace when constructing the near-Clifford
+              training circuits. Can be 'uniform' or 'gaussian'.
+
+            - method_replace (string): Specifies the method used to replace the
+              selected non-Clifford gates with a Clifford when constructing the
+              near-Clifford training circuits. Can be 'uniform', 'gaussian', or
+              'closest'.
+
             - sigma_select (float): Width of the Gaussian distribution used for
-            ``method_select='gaussian'``.
+              ``method_select='gaussian'``.
+
             - sigma_replace (float): Width of the Gaussian distribution used
-            for ``method_replace='gaussian'``.
+              for ``method_replace='gaussian'``.
+
             - random_state (int): Seed for sampling.
     """
 
