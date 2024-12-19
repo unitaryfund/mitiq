@@ -1,6 +1,0 @@
-{
-    "noise_scaling_factors": [2, 4, 6, 8],
-    "noise_scaling_method": "global",
-    "extrapolation": "richardson",
-    "scale_factor": 2
-    }
