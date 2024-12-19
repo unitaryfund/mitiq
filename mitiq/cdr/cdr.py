@@ -205,8 +205,7 @@ def mitigate_executor(
             noisy and data and parameters returning a float. See
             ``cdr.linear_fit_function`` for an example.
         num_fit_parameters: The number of parameters the fit_function takes.
-        scale_noise: scale_noise: Function for scaling the noise of a quantum
-            circuit.
+        scale_noise: Function for scaling the noise of a quantum circuit.
         scale_factors: Factors by which to scale the noise.
 
             - When 1.0 is the only scale factor, the method is known as CDR.
@@ -319,8 +318,7 @@ def cdr_decorator(
             noisy and data and parameters returning a float. See
             ``cdr.linear_fit_function`` for an example.
         num_fit_parameters: The number of parameters the fit_function takes.
-        scale_noise: scale_noise: Function for scaling the noise of a quantum
-            circuit.
+        scale_noise: Function for scaling the noise of a quantum circuit.
         scale_factors: Factors by which to scale the noise.
 
             - When 1.0 is the only scale factor, the method is known as CDR.
