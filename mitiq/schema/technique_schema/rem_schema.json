@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "REM Schema",
+    "description": "Schema for defining an REM implementation",
+    "type": "object",
+    "properties": {
+        "technique": {
+            "description": "Technique name, this is reuqired when composing techniques",
+            "type": "string",
+            "enum": ["rem"]
+        },
+
+        "observable": {
+            "description": "Observable to compute the expectation value of",
+            "type": "object"
+        },
+
+        "inverse_confusion_matrix": {
+            "description": "The inverse confusion matrix to apply to the probability vector estimated with noisy measurement results.",
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+    "additionalProperties": false
+    }
+}
