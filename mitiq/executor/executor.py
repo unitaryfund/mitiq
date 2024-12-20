@@ -118,7 +118,7 @@ class Executor:
         quantum results are stored in ``self.quantum_results``.
 
         Args:
-            circuits: A single circuit of list of circuits.
+            circuits: A single circuit or list of circuits.
             observable: Observable O in the expression Tr[ρ O]. If None,
                 the ``executor`` must return a float (which corresponds to
                 Tr[ρ O] for a specific, fixed observable O).
