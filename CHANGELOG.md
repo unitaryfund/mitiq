@@ -7,7 +7,7 @@
 
 ### Highlights
 
-🎊 Thanks for a great 2024!
+🎊 Thanks for a great 2024! Our end of the year should be out soon. Subscribe [here](https://forms.gle/6UcUjSawHyweXhQV7s) to get the newsletter in your mailbox.
 
 🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, @sanketsharma and @Shivansh20128!
 
