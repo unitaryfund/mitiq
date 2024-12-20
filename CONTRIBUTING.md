@@ -111,6 +111,7 @@ For any part of the template that you weren't able to complete please mention th
 ### List of accepted RFCs
 This is a list of accepted request-for-comments (RFC) documents by date of creation (reverse chronological order):
 
+- [Probabilistic Error Amplification RFC](https://docs.google.com/document/d/1l-74EFdMA0CSFUpHjqCyQYb3ZKCmY77seB1_mOZo5Co/edit?usp=sharing) by Misty Wahl (@Misty-W) Dec 20, 2024
 - [Layerwise Richardson Extrapolation RFC](https://docs.google.com/document/d/1oFRl4wMGMtn57V0c_1egaHh0WUUAbtgW-U_QxNL9_kY/edit?usp=sharing) by Purva Thakre (@purva-thakre) and Vincent Russo (@vprusso) Apr 24, 2024
 - [Robust Shadow Estimation](https://docs.google.com/document/d/1B5FnqQDvoRYap5fGPqzcbp-RXIrUFjbBcLiWIUrLmuA) by Min Li (@Min-Li) Jun 16, 2023
 - [Error Mitigation by Subspace Expansion](https://docs.google.com/document/d/1JyQAwiw8BRT_oucZ6tQv0id6UhSdd3df1mNSPpOvu1I) by Ammar Jahin, Dariel Mok , Preksha Naik, Abdulrahman Sahmoud (@bubakazouba) Apr 28, 2023

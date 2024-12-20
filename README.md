@@ -99,6 +99,7 @@ mitiq.qem_methods()
 | Quantum Subspace Expansion                  | [QSE](https://mitiq.readthedocs.io/en/stable/guide/qse.html) | [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/qse) | [1903.05786](https://arxiv.org/abs/1903.05786)|
 | Robust Shadow Estimation   🚧           | [RSE](https://mitiq.readthedocs.io/en/stable/guide/shadows.html)| [`mitiq.qse`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/shadows) | [2011.09636](https://arxiv.org/abs/2011.09636) <br> [2002.08953](https://arxiv.org/abs/2002.08953)|
 | Layerwise Richardson Extrapolation  | [LRE](https://mitiq.readthedocs.io/en/stable/guide/lre.html) |  [`mitiq.lre`](https://github.com/unitaryfund/mitiq/tree/main/mitiq/lre) | [2402.04000](https://arxiv.org/abs/2402.04000) |
+| Probabilistic Error Amplification 🚧  | Coming soon |  `mitiq.pea` | [Nature](https://www.nature.com/articles/s41586-023-06096-30) |
 
 
 In addition, we also have a noise tailoring technique currently available with limited functionality:
