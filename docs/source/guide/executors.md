@@ -76,7 +76,7 @@ print("\nExecuted circuits:\n", *executor.executed_circuits, sep="\n")
 print("\nQuantum results:\n", *executor.quantum_results, sep="\n")
 ```
 
-To run a circuit of sequence of circuits, use the `Executor.evaluate` method.
+To run a circuit or sequence of circuits, use the `Executor.evaluate` method.
 
 ```{code-cell} ipython3
 import cirq
