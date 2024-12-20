@@ -7,11 +7,30 @@
 
 ### Highlights
 
-🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, and @sanketsharma @Shivansh20128!
+🎊 Thanks for a great 2024!
 
-💡 A new error-mitigation technique is on its way. Thanks to @Misty-W for the Probabilistic Error Amplification RFC!
+🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, @sanketsharma and @Shivansh20128!
 
-🎏 Modular PEC functions are now available, courtesy of @natestemen!
+- @gluonhiggs added support for some additional Qiskit gates through using gate decomposition for gates that are unavailable
+in Cirq. A similar idea was applied to gates not recognized by QASM. 
+- @Shivansh20128 added a new page in the documentation for benchmarking circuits.
+- @JMuff22 and @sanketsharma corrected typos in the documentation.
+
+💡 A new error-mitigation technique is on its way. Thanks to @Misty-W for the
+[Probabilistic Error Amplification RFC](https://docs.google.com/document/d/1l-74EFdMA0CSFUpHjqCyQYb3ZKCmY77seB1_mOZo5Co/edit?usp=sharing)!
+
+🎏 Modular PEC functions are now available, courtesy of @natestemen! These functions allow a
+user to generate the intermediary sampled circuits and combine the results in a a two step process. E.g.
+
+```py
+from mitiq import pec
+
+circuits = pec.intermediary_sampled_circuits(circuit, representations)
+
+sampled_circuit_results = ...  # execute the circuits on a simulator/hardware/toothbrush/etc
+
+pec_estimate = pec.combine_results(sampled_circuit_results, ...)
+```
 
 #### ✨ Enhancements
 
@@ -20,7 +39,7 @@
 - RFC for Probabilistic Error Amplification technique (#2550) [@Misty-W]
 - Address executor and observable incompatibility (#2514) [@bdg221]
 - Modularize PEC functionality (#2604) [@natestemen]
-- 
+
 
 #### 🧑🏽‍💻 Developer Improvements
 
