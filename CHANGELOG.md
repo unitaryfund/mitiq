@@ -7,7 +7,7 @@
 
 ### Highlights
 
-🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22 and @Shivansh20128!
+🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, and @sanketsharma @Shivansh20128!
 
 💡 A new error-mitigation technique is on its way. Thanks to @Misty-W for the Probabilistic Error Amplification RFC!
 
@@ -37,6 +37,7 @@
 - Update executor and observable docs (#2594) [@bdg221]
 - Add log param to calibration guide (#2568) [@bdg221]
 - Fix constant value in ZNE docs (#2591) [@cosenal]
+- Fixed typo in documentation (##2611) [@sanketsharma]
 
 #### 📦 Dependency Updates
 
