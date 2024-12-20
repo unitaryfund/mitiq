@@ -72,10 +72,7 @@ def execute_with_ddd(
 
     assert len(results) == num_trials
 
-    ddd_value = generate_ddd_value(results, num_trials)
-
-    # Brian test TODO check and remove
-    # check that np.average(results) == np.sum(results) / num_trials
+    ddd_value = generate_ddd_value(results)
 
     if not full_output:
         return ddd_value
@@ -88,18 +85,39 @@ def execute_with_ddd(
     return ddd_value, ddd_data
 
 
-# TODO rename and docstring
 def generate_ddd_value(results: list[float]) -> float:
+    """Averages over the DDD results to get the expectation value from using
+    DDD.
+
+    Args:
+        results: Results as obtained from running circuits.
+
+    Returns:
+        The expectation value estimated with DDD.
+    """
     return np.average(results)
 
 
-# TODO rename and docstring
 def generate_circuits_with_ddd(
     circuit: QPROGRAM,
     rule: Callable[[int], QPROGRAM],
     rule_args: Dict[str, Any] = {},
     num_trials: int = 1,
 ) -> list[QPROGRAM]:
+    """Generates a list of circuits with DDD sequences inserted.
+
+    Args:
+        circuit: The quantum circuit to be modified with DD.
+        rule: A function that takes as main argument a slack length (i.e. the
+            number of idle moments) of a slack window (i.e. a single-qubit idle
+            window in a circuit) and returns the DDD sequence of gates to be
+            applied in that window.
+        rule_args: An optional dictionary of keyword arguments for ``rule``.
+        num_trials: The number of circuits to generate with DDD insertions.
+
+    Returns:
+        A list of circuits with DDD inserted.
+    """
     rule_partial: Callable[[int], QPROGRAM]
     rule_partial = partial(rule, **rule_args)
 
