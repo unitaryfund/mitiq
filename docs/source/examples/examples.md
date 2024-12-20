@@ -29,7 +29,7 @@ ZNE and CDR with Cirq: 1D Ising Simulation <quantum_simulation_1d_ising.md>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.md>
 ZNE with BQSKit compiled circuits <bqskit.md>
 ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits <zne_logical_rb_cirq_stim.md>
-ZNE and PT with Cirq: ZNE with Noise Tailoring <pt_zne.md>
+ZNE and Pauli Twirling with Cirq: ZNE with Noise Tailoring <pt_zne.md>
 LRE vs ZNE: comparing performance and overhead <lre-zne-comparison.md>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.md>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.md>

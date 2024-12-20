@@ -13,34 +13,39 @@ kernelspec:
 
 ```{tags} cirq, zne, pt, basic
 ```
-# ZNE with Noise Tailoring
+# Zero-Noise Extrapolation with Pauli Twirling
 
-This tutorial helps us understand the cases when noise tailoring is helpful for improving the performance of 
-quantum error mitigation techniques. 
+This tutorial explores how noise tailoring can improve the effectiveness of quantum error mitigation techniques.
+Specifically, we analyze how converting coherent noise into incoherent noise through Pauli Twirling impacts the performance of [Zero-Noise Extrapolation](../guide/zne.md) (ZNE).
 
-We will
+In this tutorial, we will:
 
-- compare coherent noise to incoherent noise
-- Pauli twirl coherent noise to be incoherent
-- compare the performance of [Zero-Noise Extrapolation](../guide/zne.md) (ZNE)
-on its own and in combination with [Pauli Twirling](../guide/pt.md) (PT) when the circuit is subjected to coherent noise
+1. Define and compare coherent and incoherent noise
+2. Apply Pauli Twirling to transform coherent noise into incoherent noise
+3. Compare the performance of ZNE
+    1. on its own, and
+    2. in combination with [Pauli Twirling](../guide/pt.md)
+
+By the end of the example, you will understand when and how noise tailoring can enhance quantum error mitigation.
 
 ## Coherent noise vs. Incoherent noise
 
-**Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit, they are easily carried across the circuit such that they scale up quadratically. Dealing with coherent noise requires a large resource overhead.  
+Noise on quantum devices can broadly categorized into two types: Coherent, Incoherent. Each has different properties that can be 
 
-**Incoherent noise** is a process that entangles the quantum system with its environment i.e. this type of noise is irreversible. The system and the environment are in a mixed state. It scales linearly in the small error limit. 
-The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**. 
+**Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$. When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
 
 ```{note}
 If $\mathcal{F}$ is the fidelity defining the success of preparing an arbitrary pure state $\rho$, then
 $1-\mathcal{F}$ is the **average gate infidelity**.
 ```
 
-For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. If $\rho$ is a single qubit state, $p$ is the probabilistic error rate and $\epsilon(\rho)$ is the noise channel:
+**Incoherent noise** is a process that results in the quantum system entangling with its environment i.e. this type of noise is irreversible. The system and the environment end up in a mixed state. It scales linearly in the small error limit. 
+The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**. 
+
+For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. If $\rho$ is a single qubit state, $p$ is the probabilistic error rate and $\mathcal{E}(\rho)$ is the noise channel:
 
 ```{math}
-\epsilon(\rho) = (1-p) \rho + p \frac{I}{2}
+\mathcal{E}(\rho) = (1-p) \rho + p \frac{I}{2}
 ```
 $\frac{I}{2}$ is the maximally mixed state which can be described using Paulis. 
 
@@ -51,33 +56,35 @@ $\frac{I}{2}$ is the maximally mixed state which can be described using Paulis.
 Thus, the depolarizing channel can be redescribed using Paulis as shown below. 
 
 ```{math}
-\epsilon(\rho) = (1-\frac{3p}{4}) \rho + \frac{p}{4} (X \rho X + Y \rho Y + Z \rho Z)
+\mathcal{E}(\rho) = (1-\frac{3p}{4}) \rho + \frac{p}{4} (X \rho X + Y \rho Y + Z \rho Z)
 
 ```
 
 ### Pauli Transfer Matrix
 
-Let $\Lambda(rho)$ be a $n-$qubit noise channel where $K_i$ are the Kraus operators.
+Let $\Lambda(\rho)$ be a $n$-qubit noise channel with $K_i$ being the corresponding Kraus operators.
 
 ```{math}
 
 \Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger
 ```
-If $P_i$ and $P_j$ are $n-$qubit Paulis, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
+If $P_i$ and $P_j$ are $n$-qubit Paulis, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
 $i$ defines the rows while $j$ defines the columns of the PTM. All entries of the PTM are real and in the interval $[-1, 1]$.
 
 
 ```{math}
 (R_{\Lambda})_{ij} = \frac{1}{2^n} \text{Tr} \{ P_i \Lambda(P_j)\}
 ```
-A PTM allows us to distinguish between the two types of noise. The off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. PTM of a circuit is a product of the PTM of each layer in the circuit. Due to these, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. 
+A PTM allows us to distinguish between the two types of noise. The off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. To find the PTM of an entire circuit, we only need to take the product of the PTM of each layer in the circuit. Due to this, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. The latter is due to only focusing on the diagonal terms of the PTM for incoherent noise such that the product of two or more diagonal matrices is also a diagonal matrix.
 
 The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. If we want to not deal with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as the expression above, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
+
+It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise differs
+across the circuit used, noise stength, etc. The higher the number of generated twirled circuits, the better the result. Similarly, we get better results from Pauli twirling when the coherent noise strength is closer to the small error limit.
 
 ## Using Pauli Twirling in Mitiq
 
 ```{code-cell} ipython3
-# Utility functions for Pauli Twirling.
 
 import cirq
 import numpy as np
@@ -95,7 +102,7 @@ pauli_unitary_list = [
 ]
 
 
-def _n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
+def n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Get a list of n-qubit Pauli unitaries."""
     if not num_qubits >= 1:
         raise ValueError("Invalid number of qubits provided.")
@@ -115,16 +122,16 @@ def _n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     return n_qubit_paulis
 
 
-def _pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
+def pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Define a function to create a list of vectorized matrices.
 
     If the density matrix of interest has more than n>1 qubits, the
     Pauli group is used to generate n-fold tensor products before
     vectorizing the unitaries.
     """
-    n_qubit_paulis = _n_qubit_paulis(num_qubits)
+    n_qubit_paulis1 = n_qubit_paulis(num_qubits)
     output_pauli_vec_list = []
-    for i in n_qubit_paulis:
+    for i in n_qubit_paulis1:
         # the matrix_to_vector function stacks rows in vec form
         # transpose is used here to instead stack the columns
         matrix_trans = np.transpose(i)
@@ -137,8 +144,8 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
 
     superop = choi_to_super(_circuit_to_choi(circuit))
 
-    vec_pauli = _pauli_vectorized_list(num_qubits)
-    n_qubit_paulis = _n_qubit_paulis(num_qubits)
+    vec_pauli = pauli_vectorized_list(num_qubits)
+    n_qubit_paulis1 = n_qubit_paulis(num_qubits)
     ptm_matrix = np.zeros([4**num_qubits, 4**num_qubits], dtype=complex)
 
     for i in range(len(vec_pauli)):
@@ -151,9 +158,9 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
         )
 
         # ptm_matrix_row = []
-        for j in range(len(n_qubit_paulis)):
+        for j in range(len(n_qubit_paulis1)):
             pauli_superop_pauli = np.matmul(
-                n_qubit_paulis[j], superop_on_pauli_matrix
+                n_qubit_paulis1[j], superop_on_pauli_matrix
             )
             ptm_matrix[j, i] = (0.5**num_qubits) * np.trace(
                 pauli_superop_pauli
@@ -246,8 +253,7 @@ print(circuit)
 
 We are going to add coherent noise to this circuit and then get the error-mitigated expectation value. For a detailed discussion on this, refer to the [ZNE user guide](../guide/zne-1-intro.md). 
 
-As we are using a simulator, we have to make sure the twirling gates are sandwiching the coherent noise channel in the circuit.
-For this, `get_noise_model` is used to add noise to CZ/CNOT gates. See [PT user guide](../guide/pt-1-intro.md) for more. 
+As we are using a simulator, we have to make sure the noise model adds coherent noise to CZ/CNOT gates in our circuit. For this, `get_noise_model` is used to add noise to CZ/CNOT gates. See [PT user guide](../guide/pt-1-intro.md) for more. 
 
 ```{code-cell} ipython3
 from numpy import pi
@@ -321,14 +327,14 @@ print(f"Error with ideal and twirling: {abs(ideal_value - twirled_result) :.3}")
 print(f"Error with ideal and ZNE + PT: {abs(ideal_value - mitigated_result) :.3}")
 
 ```
-Accordingly, depending on the noise strength, a combination of PT and ZNE do not work that well compared to just PT or ZNE. Thus, it is important to understand when combining a noisy tailoring technique with an error mitigation technique only contributes to the resource overhead without providing a significant advantage. 
+Accordingly, depending on the noise strength, a combination of PT and ZNE do not work that well compared to just PT or ZNE. Thus, it is important to understand when combining a noisy tailoring technique with an error mitigation technique provides a significant advantage. 
 
 ```{code-cell} ipython3
 
 import matplotlib.pyplot as plt
 
 # Plot error vs noise strength
-noise_strength = np.linspace(0.0, 1.0, 200)
+noise_strength = np.linspace(0.0, 1.0, 50)
 error_no_zne_no_twirling = []
 error_with_twirling = []
 error_with_twirling_and_zne = []
@@ -358,7 +364,7 @@ for strength in noise_strength:
     mitigated_twirled_result = np.average(zne_pt_vals)
     error_with_twirling_and_zne.append(abs(ideal_value - mitigated_twirled_result))
 
-plt.plot(noise_strength, ideal_values, "", label="Ideal", color="#17becf")   
+
 plt.plot(noise_strength, error_no_zne_no_twirling,"", label=r"|Ideal - Noisy|", color="#1f77b4")
 plt.plot(noise_strength, zne_vals, "", label=r"|Ideal - ZNE|", color="#bcbd22")
 plt.plot(noise_strength, error_with_twirling,"", label=r"|Ideal - Twirling|", color="#ff7f0e")
@@ -369,6 +375,15 @@ plt.ylabel("Expectation Values Difference")
 plt.title("Comparison of expectation values with ideal as a function of noise strength")
 plt.legend()
 plt.show()
+```
+
+As we are plotting the difference between the ideal expectation value and the noisy, error-mitigated and/or noise-tailored
+expectation values, the closer the curve is to `0.0` on the Y-axis, the technique provides an advantage.
+
+
+```{warning}
+You can get better results if you control the number of samples in `noise_strength` in addition to using a higher number for
+`NUM_TWIRLED_VARIANTS`. We have chosen to not do so as this drastically increase the execution time for this tutorial.
 ```
 
 ## Conclusion
