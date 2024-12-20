@@ -72,7 +72,7 @@ def execute_with_ddd(
 
     assert len(results) == num_trials
 
-    ddd_value = generate_ddd_value(results)
+    ddd_value = combine_results(results)
 
     if not full_output:
         return ddd_value
@@ -85,7 +85,7 @@ def execute_with_ddd(
     return ddd_value, ddd_data
 
 
-def generate_ddd_value(results: list[float]) -> float:
+def combine_results(results: list[float]) -> float:
     """Averages over the DDD results to get the expectation value from using
     DDD.
 
