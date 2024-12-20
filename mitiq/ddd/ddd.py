@@ -95,7 +95,7 @@ def generate_ddd_value(results: list[float]) -> float:
     Returns:
         The expectation value estimated with DDD.
     """
-    return np.average(results)
+    return float(np.average(results))
 
 
 def generate_circuits_with_ddd(
