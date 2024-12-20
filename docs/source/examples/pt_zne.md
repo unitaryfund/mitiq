@@ -212,7 +212,7 @@ print("Pauli Transfer Matrix of noisy CNOT (coherent)")
 plt.show()
 ```
 If we compare the PTM of the ideal CNOT gate to those when the gate was subjected to incoherent noise and coherent noise, 
-there are additional sources of errors to deal with when coherent noise is acting on the CNOT gate. These can be reduced or tailored to be close to how the incohrent noise PTM appears through Pauli Twirling.
+there are additional sources of errors to deal with when coherent noise is acting on the CNOT gate. These can be reduced or tailored to be close to how the incoherent noise PTM appears through Pauli Twirling.
 
 ```{code-cell} ipython3
 from mitiq.pt import generate_pauli_twirl_variants
@@ -221,7 +221,7 @@ from mitiq.pt import generate_pauli_twirl_variants
 NUM_TWIRLED_VARIANTS = 3
 twirled_circuits = generate_pauli_twirl_variants(
     circuit, num_circuits=NUM_TWIRLED_VARIANTS)
-print("Example ideal twirled circuit", twirled_circuits[0], sep="\n")
+print("Example ideal twirled circuit", twirled_circuits[-1], sep="\n")
 ```
 Now, lets add coherent noise to the CNOT gate in each twirled circuit.
 ```{code-cell} ipython3
@@ -232,7 +232,7 @@ for circ in twirled_circuits:
     split_circuit = Circuit(circ[0], circ[1], Ry(rads=np.pi/12)(q0), Ry(rads=np.pi/12)(q1), circ[-1])
     noisy_twirled_circuits.append(split_circuit)
 
-print("Example noisy twirled circuit", noisy_twirled_circuits[0], sep="\n")
+print("Example noisy twirled circuit", noisy_twirled_circuits[-1], sep="\n")
 ```
 
 The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays.
