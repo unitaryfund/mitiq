@@ -233,7 +233,7 @@ def test_ddd_decorator_with_rule_args():
     assert not np.isclose(mitigated_large_spacing, mitigated_small_spacing)
 
 
-@mark.parametrize("num_trials", [1, 3, 5])
+@mark.parametrize("num_trials", [1, 10, 20, 30])
 def test_num_trials_generates_circuits(num_trials: int):
     """Test that the number of generated circuits follows num_trials."""
 
