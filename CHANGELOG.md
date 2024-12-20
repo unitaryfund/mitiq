@@ -3,7 +3,68 @@
 
 ## Version 0.42.0
 
-In Development.
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.41.0...v0.42.0))
+
+### Highlights
+
+🎊 Thanks for a great 2024! Our end of the year recap should be out soon. Subscribe [here](https://forms.gle/6UcUjSawHyweXhQV7s) to get the newsletter in your mailbox.
+
+🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, @sanketsharma and @Shivansh20128!
+
+- @gluonhiggs added support for some additional Qiskit gates through using gate decomposition for gates that are unavailable
+in Cirq. A similar idea was applied to gates not recognized by QASM. 
+- @Shivansh20128 added a new page in the documentation for benchmarking circuits.
+- @JMuff22 and @sanketsharma corrected typos in the documentation.
+
+💡 A new error-mitigation technique is on its way. Thanks to @Misty-W for the
+[Probabilistic Error Amplification RFC](https://docs.google.com/document/d/1l-74EFdMA0CSFUpHjqCyQYb3ZKCmY77seB1_mOZo5Co/edit?usp=sharing)!
+
+🎏 Modular PEC functions are now available, courtesy of @natestemen! These functions allow a
+user to generate the intermediary sampled circuits and combine the results in a a two step process. E.g.
+
+```py
+from mitiq import pec
+
+circuits = pec.intermediary_sampled_circuits(circuit, representations)
+
+sampled_circuit_results = ...  # execute the circuits on a simulator/hardware/toothbrush/etc
+
+pec_estimate = pec.combine_results(sampled_circuit_results, ...)
+```
+
+#### ✨ Enhancements
+
+- Fix converting Rxx and similar Qiskit gates (#2579) [@gluonhiggs]
+- Handle unsupported gates (#2585) [@gluonhiggs]
+- RFC for Probabilistic Error Amplification technique (#2550) [@Misty-W]
+- Address executor and observable incompatibility (#2514) [@bdg221]
+- Modularize PEC functionality (#2604) [@natestemen]
+
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- Fix flaky ZNE factory + observable test (#2602) [@natestemen]
+- Ensure further LRE compatibility with non-Cirq circuits (#2599) [@natestemen]
+- Throw Erorr on Multiple Measurements per Qubit with Observables (#2593) [@bdg221]
+
+#### 📓 Documentation
+
+- Update Calibration run docstring for API-doc (#2516) [@bdg221]
+- Add benchmarking circuits to user guide (#2566) [@Shivansh20128]
+- Correct run-on sentences in the API-doc for CDR function docstrings (#2589) [@Shivansh20128]
+- Quick fix: Fix typo and headings in classical shadows tutorial (#2574) [@JMuff22]
+- Update executor and observable docs (#2594) [@bdg221]
+- Add log param to calibration guide (#2568) [@bdg221]
+- Fix constant value in ZNE docs (#2591) [@cosenal]
+- Fixed typo in documentation (##2611) [@sanketsharma]
+
+#### 📦 Dependency Updates
+
+- Update qiskit requirement from ~=1.2.4 to ~=1.3.1 (#2603) [@dependabot, @cosenal]
+- Update qibo requirement from ~=0.2.7 to ~=0.2.13 (#2559) [@dependabot]
+- Bump pyqrack from 1.32.21 to 1.32.27 (#2582) [@dependabot, @natestemen]
+- Bump codecov/codecov-action from 4 to 5 (#2576) [@dependabot]
+- Bump pyqrack from 1.32.11 to 1.32.21 (#2580) [@dependabot]
 
 ## Version 0.41.0
 
