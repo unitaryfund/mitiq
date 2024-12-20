@@ -5,7 +5,13 @@
 
 from mitiq.pec.types import NoisyOperation, OperationRepresentation, NoisyBasis
 from mitiq.pec.sampling import sample_sequence, sample_circuit
-from mitiq.pec.pec import execute_with_pec, mitigate_executor, pec_decorator
+from mitiq.pec.pec import (
+    execute_with_pec,
+    mitigate_executor,
+    pec_decorator,
+    combine_results,
+    generate_sampled_circuits,
+)
 
 from mitiq.pec.representations import (
     represent_operation_with_global_depolarizing_noise,
