@@ -3,7 +3,48 @@
 
 ## Version 0.42.0
 
-In Development.
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.41.0...v0.42.0))
+
+### Highlights
+
+🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22 and @Shivansh20128!
+
+💡 A new error-mitigation technique is on its way. Thanks to @Misty-W for the Probabilistic Error Amplification RFC!
+
+🎏 Modular PEC functions are now available, courtesy of @natestemen!
+
+#### ✨ Enhancements
+
+- Fix converting Rxx and similar Qiskit gates (#2579) [@gluonhiggs]
+- Handle unsupported gates (#2585) [@gluonhiggs]
+- RFC for Probabilistic Error Amplification technique (#2550) [@Misty-W]
+- Address executor and observable incompatibility (#2514) [@bdg221]
+- Modularize PEC functionality (#2604) [@natestemen]
+- 
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- Fix flaky ZNE factory + observable test (#2602) [@natestemen]
+- Ensure further LRE compatibility with non-Cirq circuits (#2599) [@natestemen]
+- Throw Erorr on Multiple Measurements per Qubit with Observables (#2593) [@bdg221]
+
+#### 📓 Documentation
+
+- Update Calibration run docstring for API-doc (#2516) [@bdg221]
+- Add benchmarking circuits to user guide (#2566) [@Shivansh20128]
+- Correct run-on sentences in the API-doc for CDR function docstrings (#2589) [@Shivansh20128]
+- Quick fix: Fix typo and headings in classical shadows tutorial (#2574) [@JMuff22]
+- Update executor and observable docs (#2594) [@bdg221]
+- Add log param to calibration guide (#2568) [@bdg221]
+- Fix constant value in ZNE docs (#2591) [@cosenal]
+
+#### 📦 Dependency Updates
+
+- Update qiskit requirement from ~=1.2.4 to ~=1.3.1 (#2603) [@dependabot, @cosenal]
+- Update qibo requirement from ~=0.2.7 to ~=0.2.13 (#2559) [@dependabot]
+- Bump pyqrack from 1.32.21 to 1.32.27 (#2582) [@dependabot, @natestemen]
+- Bump codecov/codecov-action from 4 to 5 (#2576) [@dependabot]
+- Bump pyqrack from 1.32.11 to 1.32.21 (#2580) [@dependabot]
 
 ## Version 0.41.0
 
