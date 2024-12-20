@@ -14,4 +14,4 @@ from mitiq.ddd.insertion import (
     insert_ddd_sequences,
 )
 
-from mitiq.ddd.ddd import execute_with_ddd, mitigate_executor, ddd_decorator
+from mitiq.ddd.ddd import execute_with_ddd, mitigate_executor, ddd_decorator, generate_circuits_with_ddd, combine_results

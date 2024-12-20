@@ -59,13 +59,11 @@ def execute_with_ddd(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
-    rule_partial: Callable[[int], QPROGRAM]
-    rule_partial = partial(rule, **rule_args)
-
     # Insert DDD sequences in (a copy of) the input circuit
-    circuits_with_ddd = [
-        insert_ddd_sequences(circuit, rule_partial) for _ in range(num_trials)
-    ]
+    circuits_with_ddd = generate_circuits_with_ddd(
+        circuit, rule, rule_args, num_trials
+    )
+
     results = executor.evaluate(
         circuits_with_ddd,
         observable,
@@ -74,7 +72,8 @@ def execute_with_ddd(
 
     assert len(results) == num_trials
 
-    ddd_value = np.sum(results) / num_trials
+    ddd_value = combine_results(results)
+
     if not full_output:
         return ddd_value
 
@@ -84,6 +83,50 @@ def execute_with_ddd(
         "circuits_with_ddd": circuits_with_ddd,
     }
     return ddd_value, ddd_data
+
+
+def combine_results(results: list[float]) -> float:
+    """Averages over the DDD results to get the expectation value from using
+    DDD.
+
+    Args:
+        results: Results as obtained from running circuits.
+
+    Returns:
+        The expectation value estimated with DDD.
+    """
+    return float(np.average(results))
+
+
+def generate_circuits_with_ddd(
+    circuit: QPROGRAM,
+    rule: Callable[[int], QPROGRAM],
+    rule_args: Dict[str, Any] = {},
+    num_trials: int = 1,
+) -> list[QPROGRAM]:
+    """Generates a list of circuits with DDD sequences inserted.
+
+    Args:
+        circuit: The quantum circuit to be modified with DD.
+        rule: A function that takes as main argument a slack length (i.e. the
+            number of idle moments) of a slack window (i.e. a single-qubit idle
+            window in a circuit) and returns the DDD sequence of gates to be
+            applied in that window.
+        rule_args: An optional dictionary of keyword arguments for ``rule``.
+        num_trials: The number of circuits to generate with DDD insertions.
+
+    Returns:
+        A list of circuits with DDD inserted.
+    """
+    rule_partial: Callable[[int], QPROGRAM]
+    rule_partial = partial(rule, **rule_args)
+
+    # Insert DDD sequences in (a copy of) the input circuit
+    circuits_with_ddd = [
+        insert_ddd_sequences(circuit, rule_partial) for _ in range(num_trials)
+    ]
+
+    return circuits_with_ddd
 
 
 def mitigate_executor(

@@ -12,7 +12,12 @@ import numpy as np
 from pytest import mark
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Executor
-from mitiq.ddd import ddd_decorator, execute_with_ddd, mitigate_executor
+from mitiq.ddd import (
+    ddd_decorator,
+    execute_with_ddd,
+    generate_circuits_with_ddd,
+    mitigate_executor,
+)
 from mitiq.ddd.rules import xx, xyxy, yy
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
@@ -226,3 +231,14 @@ def test_ddd_decorator_with_rule_args():
     # What is important to test is getting different results.
     assert not np.isclose(unmitigated, mitigated_small_spacing)
     assert not np.isclose(mitigated_large_spacing, mitigated_small_spacing)
+
+
+@mark.parametrize("num_trials", [1, 10, 20, 30])
+def test_num_trials_generates_circuits(num_trials: int):
+    """Test that the number of generated circuits follows num_trials."""
+
+    circuits = generate_circuits_with_ddd(
+        circuit_cirq_a, rule=xx, num_trials=num_trials
+    )
+
+    assert num_trials == len(circuits)
