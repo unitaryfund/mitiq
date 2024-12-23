@@ -230,7 +230,7 @@ A list of research articles academic resources on error mitigation:
       {cite}`Endo_2018_PRX`
     - Experiment on trapped ions, S. Zhang *et al.*, *Nature
       Comm.* 2020 {cite}`Zhang_2020_NatComm`
-    - Experiment with gate set tomography on a supeconducting
+    - Experiment with gate set tomography on a superconducting
       circuit device, J. Sun *et al.*, 2019 arXiv
       {cite}`Sun_2021_PRAppl`
 
