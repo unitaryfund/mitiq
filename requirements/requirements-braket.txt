@@ -1,2 +1,2 @@
-amazon-braket-sdk~=1.69.0
+amazon-braket-sdk~=1.88.3
 cirq-ionq>=1.4.0,<1.5.0
