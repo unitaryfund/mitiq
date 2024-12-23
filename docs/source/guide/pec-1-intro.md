@@ -176,3 +176,13 @@ print(f"Error with PEC:    {abs(ideal_value - pec_value) :.5f}")
 ```
 
 As printed above, PEC reduced the error compared to the unmitigated case.
+
+
+### Generate Sample Circuits
+We can now generate a list of sampled circuits based on the given quasi-probability representaions.
+
+```{code-cell} ipython3
+sampled_circuits = pec.generate_sampled_circuits(circuit, representations=reps)
+
+print(sampled_circuits[0])
+```
