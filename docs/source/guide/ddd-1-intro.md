@@ -83,6 +83,13 @@ from mitiq import ddd
 rule = ddd.rules.yy
 ```
 
+## Generate circuits with DDD sequences
+We can now generate a list of circuits which are copy of the original circuit with the DDD sequences inserted.
+```{code-cell} ipython3
+circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule)
+print(circuits_with_ddd[0])
+```
+
 ## Apply DDD
 Digital dynamical decoupling can be easily implemented with the function
 {func}`.execute_with_ddd()`.
