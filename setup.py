@@ -67,7 +67,7 @@ setup(
         "Documentation": "https://mitiq.readthedocs.io/en/stable/",
         "Source": "https://github.com/unitaryfund/mitiq/",
     },
-    python_requires=">=3.10, ~=3.13",
+    python_requires=">=3.10, <3.14",
 )
 
 # restore _version.py to its previous state
