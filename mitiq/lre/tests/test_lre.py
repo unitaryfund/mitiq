@@ -113,7 +113,7 @@ def test_lre_decorator_raised_error():
 
 def test_lre_executor_with_chunking():
     """Verify the executor works as expected for chunking a large circuit into
-    a smaller circuit. Note that this does not verify whether the chunked 
+    a smaller circuit. Note that this does not verify whether the chunked
     circuit gets better results compared to a non-chunked circuit."""
     # define a larger circuit
     test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=12)[
@@ -123,8 +123,7 @@ def test_lre_executor_with_chunking():
         test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=14
     )
     # verify we get an expectation value
-    assert(lre_exp_val_chunking) > 0
-    
+    assert (lre_exp_val_chunking) > 0
 
 
 @pytest.mark.parametrize("input_method", [(fold_global), (fold_all)])
