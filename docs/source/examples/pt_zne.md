@@ -186,7 +186,7 @@ print(circuit)
 ```
 ```{code-cell} ipython3
 ptmcnot = ptm_matrix(circuit, 2)
-ax = sns.heatmap(ptmcnot.real, linewidth=0.5)
+ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1)
 print("Ideal CNOT PTM")
 plt.show()
 ```
@@ -196,7 +196,7 @@ noisy_circuit_incoherent = circuit.with_noise(depolarize(p=0.3))
 print(noisy_circuit_incoherent)
 
 ptmcnot = ptm_matrix(noisy_circuit_incoherent, 2)
-ax = sns.heatmap(ptmcnot.real, linewidth=0.5)
+ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1)
 print("\n Pauli Transfer Matrix of noisy CNOT (incoherent)")
 plt.show()
 ```
@@ -206,7 +206,7 @@ noisy_circuit_coherent = circuit.with_noise(Ry(rads=np.pi/12))
 print(noisy_circuit_coherent)
 
 ptmcnot = ptm_matrix(noisy_circuit_coherent, 2)
-ax = sns.heatmap(ptmcnot.real, linewidth=0.5)
+ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1)
 print("Pauli Transfer Matrix of noisy CNOT (coherent)")
 plt.show()
 ```
@@ -370,7 +370,7 @@ plt.plot(noise_strength, error_with_twirling,"", label=r"|Ideal - Twirling|", co
 plt.plot(noise_strength, error_with_twirling_and_zne, "", label=r"|Ideal - (ZNE + Twirling)|", color="#2ca02c")
 
 plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2} \times \text{noise_strength})$")
-plt.ylabel("Expectation Values Difference")
+plt.ylabel("Absolute Error")
 plt.title("Comparison of expectation values with ideal as a function of noise strength")
 plt.legend()
 plt.show()
