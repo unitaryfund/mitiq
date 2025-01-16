@@ -11,12 +11,12 @@ kernelspec:
   name: python3
 ---
 
-```{tags} cirq, zne, pt, basic
+```{tags} cirq, zne, pt, intermediate
 ```
 # Zero-Noise Extrapolation with Pauli Twirling
 
 This tutorial explores how noise tailoring can improve the effectiveness of quantum error mitigation techniques.
-Specifically, we analyze how converting coherent noise into incoherent noise through Pauli Twirling impacts the performance of [Zero-Noise Extrapolation](../guide/zne.md) (ZNE).
+Specifically, we analyze how converting coherent noise into incoherent noise through Pauli Twirling (PT) impacts the performance of [Zero-Noise Extrapolation](../guide/zne.md) (ZNE).
 
 In this tutorial, we will:
 
@@ -26,7 +26,7 @@ In this tutorial, we will:
     1. on its own, and
     2. in combination with [Pauli Twirling](../guide/pt.md)
 
-By the end of the example, you will understand when and how noise tailoring can enhance quantum error mitigation.
+By the end of the example, you will understand when and how noise tailoring can enhance ZNE.
 
 ## Coherent noise vs. Incoherent noise
 
@@ -65,7 +65,6 @@ Thus, the depolarizing channel can be redescribed using Paulis as shown below.
 Let $\Lambda(\rho)$ be a $n$-qubit noise channel with $K_i$ being the corresponding Kraus operators.
 
 ```{math}
-
 \Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger
 ```
 If $P_i$ and $P_j$ are $n$-qubit Paulis, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
@@ -104,7 +103,7 @@ pauli_unitary_list = [
 
 def n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Get a list of n-qubit Pauli unitaries."""
-    if not num_qubits >= 1:
+    if num_qubits < 1:
         raise ValueError("Invalid number of qubits provided.")
 
     # get the n-qubit paulis from the Pauli group
@@ -383,7 +382,7 @@ expectation values, the closer the curve is to `0.0` on the Y-axis, the techniqu
 
 ```{warning}
 You can get better results if you control the number of samples in `noise_strength` in addition to using a higher number for
-`NUM_TWIRLED_VARIANTS`. We have chosen to not do so as this drastically increase the execution time for this tutorial.
+`NUM_TWIRLED_VARIANTS`. We have chosen to not do so to reduce execution time for this tutorial.
 ```
 
 ## Conclusion
