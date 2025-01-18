@@ -6,13 +6,6 @@ import numpy as np
 M = 2
 
 Z = np.array([[1, 0], [0, -1]])
-X = np.array([[0, 1], [1, 0]])
-Y = np.array([[0, -1j], [1j, 0]])
-I = np.eye(2)
-SWAP = np.array([[1, 0, 0, 0], 
-                 [0, 0, 1, 0], 
-                 [0, 1, 0, 0], 
-                 [0, 0, 0, 1]])
 
 def M_copies_of_rho(rho: cirq.Circuit, M: int=2):
     '''
@@ -34,44 +27,36 @@ def M_copies_of_rho(rho: cirq.Circuit, M: int=2):
 
     return circuit
 
+def diagonalize(U: np.ndarray) -> np.ndarray:
+    """Diagonalize a density matrix rho."""
+    # w, v = np.linalg.eigh(rho)
+    # # print(np.diag(w))
+    # return dagger(v)
+    
+    eigenvalues, eigenvectors = np.linalg.eigh(U)
+    
+    # Sort eigenvalues and eigenvectors by ascending phase
+    phases = np.angle(eigenvalues)
+    sorted_indices = np.argsort(phases)
+    sorted_eigenvalues = eigenvalues[sorted_indices]
+    sorted_eigenvectors = eigenvectors[:, sorted_indices]
+    
+    # Normalize and enforce sign convention (optional)
+    for i in range(sorted_eigenvectors.shape[1]):
+        # Force the first nonzero element of each eigenvector to be positive
+        if np.sign(sorted_eigenvectors[:, i][0]) < 0:
+            sorted_eigenvectors[:, i] *= -1
+    
+    # Compute V† (conjugate transpose of V)
+    V_dagger = np.conjugate(sorted_eigenvectors.T)
+    
+    # check
+    if not np.allclose(U, np.dot(sorted_eigenvectors, np.dot(np.diag(sorted_eigenvalues), V_dagger))):
+        raise ValueError("Diagonalization failed.")
 
-# This algorithm only works for M = 2
-def generate_swaps(l: list) -> list[tuple]:
+    return V_dagger, sorted_eigenvalues
 
-    if len(l) % 2 != 0:
-        raise ValueError("The list must have an even number of elements, since M=2")
-
-    N = len(l) // 2
-
-    if sorted(l) != list(range(0,2*N)):
-        raise ValueError("The list must contain all the integers from 0 to 2*N-1")
-
-    correct_list = []
-    for i in range(N):
-        correct_list.append(i)
-        correct_list.append(i+N)
-
-    swaps = []
-    for index, value in enumerate(correct_list):
-        if l[index] != value:
-            l_index = l.index(value)
-            l[index], l[l_index] = l[l_index], l[index]
-            swaps.append((index, l_index))
-
-
-    return swaps
-
-# applies swaps to check if the generate swaps algorithm works
-def apply_swaps(swaps_list: list[tuple], list_to_permute: list[int]) -> list[int]:
-
-    permuted_list = list_to_permute.copy()
-    for swap in swaps_list:
-        permuted_list[swap[0]], permuted_list[swap[1]] = permuted_list[swap[1]], permuted_list[swap[0]]
-
-    return permuted_list
-
-
-def vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
+def execute_with_vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
     
     # print(f"We run {K} reps which means we need M*K = {M*K} copies of rho")
 
@@ -95,38 +80,32 @@ def vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
         
         circuit = rho.copy()
 
-
-        # 1) apply swaps
-        swaps = generate_swaps(list(range(2*N)))
-        for swap in swaps:
-            circuit.append(cirq.SWAP(cirq.LineQubit(swap[0]), cirq.LineQubit(swap[1])))
-
-
-        # 1.5) apply basis change unitary
-        if observable == Z:
-            # TODO
-            pass
-
+        # 1) apply basis change unitary
+        # for example observable Z -> apply I
+        # for example observable X -> apply H
+        basis_change_unitary = diagonalize(observable)[0]
+        
+        # apply to every single qubit
+        if not np.allclose(basis_change_unitary, Z):
+            gate = cirq.MatrixGate(basis_change_unitary)
+            for i in range(M*N):
+                circuit.append(gate(cirq.LineQubit(i)))
 
         # 2) apply Bi^(2)
         unitary = Bi_gate
         B_gate = cirq.MatrixGate(unitary)
         for i in range(0,N+1,2):
-            circuit.append(B_gate(cirq.LineQubit(i), cirq.LineQubit(i+1)))
+            circuit.append(B_gate(cirq.LineQubit(i), cirq.LineQubit(i+N)))
 
         
         # 3) apply measurements
         for i in range(M*N):
             circuit.append(cirq.measure(cirq.LineQubit(i), key=f"{i}"))
         
-        
-    
-
         # run the circuit
         simulator = cirq.Simulator()
         result = simulator.run(circuit, repetitions=1)
         
-        # print(circuit)
 
         # post processing measurements
         z1 = []
@@ -148,9 +127,6 @@ def vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
             
         z1 = [map_to_eigenvalues(i) for i in z1]
         z2 = [map_to_eigenvalues(i) for i in z2]
-        
-        # print(z1)
-        # print(z2)
 
         for i in range(N):
             
@@ -168,6 +144,6 @@ def vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
         D += 1/2**N * productD 
         
     Z_i_corrected = [Ei[i] / D for i in range(N)]
-    # print('Z_i_corrected: ', Z_i_corrected)
 
     return Z_i_corrected
+
