@@ -28,10 +28,7 @@ def M_copies_of_rho(rho: cirq.Circuit, M: int=2):
     return circuit
 
 def diagonalize(U: np.ndarray) -> np.ndarray:
-    """Diagonalize a density matrix rho."""
-    # w, v = np.linalg.eigh(rho)
-    # # print(np.diag(w))
-    # return dagger(v)
+    """Diagonalize a density matrix rho and return the basis change unitary V†."""
     
     eigenvalues, eigenvectors = np.linalg.eigh(U)
     
@@ -56,15 +53,17 @@ def diagonalize(U: np.ndarray) -> np.ndarray:
 
     return V_dagger, sorted_eigenvalues
 
-def execute_with_vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
-    
-    # print(f"We run {K} reps which means we need M*K = {M*K} copies of rho")
+def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
+    '''
+    Given a circuit rho that acts on N qubits, this function returns the expectation values of a given observable for each qubit i. 
+    The expectation values are corrected using the virtual distillation algorithm. 
+    '''
 
-    # let the circuit be 2 copies of bell state
-    N = len(rho.all_qubits())
-    rho = M_copies_of_rho(rho, M)
+    # input rho is an N qubit circuit
+    N = len(input_rho.all_qubits())
+    rho = M_copies_of_rho(input_rho, M)
 
-    # Bi corresponding to unitary operator O, which in this case is pauli Z
+    # Coupling unitary corresponding to the diagonalization of the SWAP (as seen in the paper) for M = 2:
     Bi_gate = np.array([
             [1, 0, 0, 0],
             [0, np.sqrt(2)/2, np.sqrt(2)/2, 0],
@@ -72,10 +71,9 @@ def execute_with_vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
             [0, 0, 0, 1]
         ])
 
-
     Ei = [0 for _ in range(N)]
     D = 0
-        
+    
     for _ in range(K):
         
         circuit = rho.copy()
@@ -146,4 +144,3 @@ def execute_with_vd(rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
     Z_i_corrected = [Ei[i] / D for i in range(N)]
 
     return Z_i_corrected
-
