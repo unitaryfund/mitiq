@@ -6,6 +6,7 @@ import numpy as np
 M = 2
 
 Z = np.array([[1, 0], [0, -1]])
+X = np.array([[0, 1], [1, 0]])
 
 def M_copies_of_rho(rho: cirq.Circuit, M: int=2):
     '''
@@ -84,32 +85,34 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
         basis_change_unitary = diagonalize(observable)[0]
         
         # apply to every single qubit
-        if not np.allclose(basis_change_unitary, Z):
+        if not np.allclose(observable, Z):
             gate = cirq.MatrixGate(basis_change_unitary)
             for i in range(M*N):
                 circuit.append(gate(cirq.LineQubit(i)))
 
-        # 2) apply Bi^(2)
-        unitary = Bi_gate
-        B_gate = cirq.MatrixGate(unitary)
-        for i in range(0,N+1,2):
+        # 2) apply the diagonalization gate B
+        B_gate = cirq.MatrixGate(Bi_gate)
+        for i in range(N):
             circuit.append(B_gate(cirq.LineQubit(i), cirq.LineQubit(i+N)))
 
         
         # 3) apply measurements
-        for i in range(M*N):
-            circuit.append(cirq.measure(cirq.LineQubit(i), key=f"{i}"))
+        # the measurement keys are applied in accordance with the SWAPS that are applied in the pseudo code in the paper.
+        # The SWAP operations are omitted here since they are hardware specific.
+        # once again this specific code is for M = 2
+        for i in range(N):
+            circuit.append(cirq.measure(cirq.LineQubit(i), key=f"{2*i}"))
+        for i in range(N):
+            circuit.append(cirq.measure(cirq.LineQubit(i+N), key=f"{2*i+1}"))
         
         # run the circuit
         simulator = cirq.Simulator()
         result = simulator.run(circuit, repetitions=1)
-        
-
+                
         # post processing measurements
         z1 = []
         z2 = []
         
-
         for i in range(2*N):
             if i % 2 == 0:
                 z1.append(np.squeeze(result.records[str(i)]))
