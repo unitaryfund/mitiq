@@ -75,6 +75,9 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
     Ei = [0 for _ in range(N)]
     D = 0
     
+    if K%2 == 0:
+        K += 1
+
     for _ in range(K):
         
         circuit = rho.copy()
