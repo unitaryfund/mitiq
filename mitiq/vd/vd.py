@@ -54,7 +54,7 @@ def diagonalize(U: np.ndarray) -> np.ndarray:
 
     return V_dagger, sorted_eigenvalues
 
-def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
+def failed_attempt_to_optimise_execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
     '''
     Given a circuit rho that acts on N qubits, this function returns the expectation values of a given observable for each qubit i. 
     The expectation values are corrected using the virtual distillation algorithm. 
@@ -91,11 +91,12 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
     # prepare gates
     B_gate = cirq.MatrixGate(Bi_gate)
 
-    basis_change_unitary = diagonalize(observable)[0]
-    if not np.allclose(observable, Z):
+    need_basis_change = not np.allclose(observable, Z)
+    if need_basis_change:
+        basis_change_unitary = diagonalize(observable)[0]
         gate = cirq.MatrixGate(basis_change_unitary)
     else: 
-        gate = cirq.I
+        gate = None
     
     for _ in range(K):
         
@@ -103,8 +104,9 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
 
         for i in range(N):
             # 1) apply basis change unitary to all M * N qubits
-            for m in range(M):
-                circuit.append(gate(cirq.LineQubit(i + m*N)))
+            if need_basis_change:
+                for m in range(M):
+                    circuit.append(gate(cirq.LineQubit(i + m*N)))
 
             # 2) apply the diagonalization gate B
             # [implementation works only for the M=2 case]
@@ -156,7 +158,7 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
 
 
 
-def old_execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
+def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
     '''
     Given a circuit rho that acts on N qubits, this function returns the expectation values of a given observable for each qubit i. 
     The expectation values are corrected using the virtual distillation algorithm. 
