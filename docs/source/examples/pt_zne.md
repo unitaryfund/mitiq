@@ -30,7 +30,7 @@ By the end of the example, you will understand when and how noise tailoring can 
 
 ## Coherent noise vs. Incoherent noise
 
-Noise on quantum devices can broadly categorized into two types: Coherent, Incoherent. Each has different properties that can be 
+Noise on quantum devices can broadly categorized into two types: Coherent, Incoherent. Each has different properties that can be unfavorable toward a quantum circuit in different ways.
 
 **Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$. When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
 
@@ -67,14 +67,15 @@ Let $\Lambda(\rho)$ be a $n$-qubit noise channel with $K_i$ being the correspond
 ```{math}
 \Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger
 ```
-If $P_i$ and $P_j$ are $n$-qubit Paulis, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
-$i$ defines the rows while $j$ defines the columns of the PTM. All entries of the PTM are real and in the interval $[-1, 1]$.
+If $P_i$ and $P_j$ are $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
+$i$ defines the rows while $j$ defines the columns of the PTM. 
 
 
 ```{math}
 (R_{\Lambda})_{ij} = \frac{1}{2^n} \text{Tr} \{ P_i \Lambda(P_j)\}
 ```
-A PTM allows us to distinguish between the two types of noise. The off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. To find the PTM of an entire circuit, we only need to take the product of the PTM of each layer in the circuit. Due to this, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. The latter is due to only focusing on the diagonal terms of the PTM for incoherent noise such that the product of two or more diagonal matrices is also a diagonal matrix.
+
+All entries of the PTM are real and in the interval $[-1, 1]$. A PTM allows us to distinguish between the two types of noise. The off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. To find the PTM of an entire circuit, we only need to take the product of the PTM of each layer in the circuit. Due to this, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. The latter is due to only focusing on the diagonal terms of the PTM for incoherent noise such that the product of two or more diagonal matrices is also a diagonal matrix.
 
 The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. If we want to not deal with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as the expression above, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
 
@@ -89,6 +90,8 @@ import cirq
 import numpy as np
 import numpy.typing as npt
 from cirq.circuits import Circuit
+from itertools import product
+from functools import reduce
 
 from mitiq.pec.channels import _circuit_to_choi, choi_to_super
 from mitiq.utils import matrix_to_vector, vector_to_matrix
@@ -109,15 +112,8 @@ def n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     # get the n-qubit paulis from the Pauli group
     # disregard the n-qubit paulis with complex phase
 
-    n_qubit_paulis = pauli_unitary_list
-    for i in range(num_qubits - 1):
-        n_qubit_paulis = n_qubit_paulis
-        empty_pauli_list = []
-        for j in pauli_unitary_list:
-            for k in n_qubit_paulis:
-                new_pauli = np.kron(j, k)
-                empty_pauli_list.append(new_pauli)
-        n_qubit_paulis = empty_pauli_list
+    n_qubit_paulis = [reduce(lambda a, b: np.kron(a, b), combination)
+        for combination in product(pauli_unitary_list, repeat=num_qubits)]
     return n_qubit_paulis
 
 
@@ -156,7 +152,6 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
             superop_on_pauli_matrix_transpose
         )
 
-        # ptm_matrix_row = []
         for j in range(len(n_qubit_paulis1)):
             pauli_superop_pauli = np.matmul(
                 n_qubit_paulis1[j], superop_on_pauli_matrix
