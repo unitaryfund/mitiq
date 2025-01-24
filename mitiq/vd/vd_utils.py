@@ -3,23 +3,24 @@ from typing import List, cast
 import cirq
 
 
-def _copy_circuit_parallel(
-    circuit: cirq.Circuit, num_copies: int = 2
-) -> cirq.Circuit:
-    """Copies a circuit M times in parallel.
+def _copy_circuit_parallel(circuit: cirq.Circuit,
+                           num_copies: int = 2) -> cirq.Circuit:
+    """Copies a circuit num_copies times in parallel.
 
-    Given a circuit rho that acts on N qubits,
-    this function returns a circuit that copies rho M times in parallel.
-    This means the resulting circuit has N * M qubits.
+    Given a circuit that acts on N qubits,
+    this function returns a circuit
+    that copies the circuit num_copies times in parallel.
+    This means the resulting circuit has N * num_copies qubits.
 
     Args:
-        rho:
+        circuit:
             The circuit to be copied.
-        M:
-            The number of copies of rho to be made.
+        num_copies:
+            The number of copies of circuit to be made.
 
     Returns:
-        A cirq circuit that is the parallel composition of M copies of rho.
+        A cirq circuit that is the parallel composition of
+          num_copies copies of circuit.
     """
 
     new_circuit = cirq.Circuit()

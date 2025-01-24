@@ -9,27 +9,27 @@ def test_copy_circuit_parallel_lengths():
         cirq.H(cirq.LineQubit(0)),
         cirq.SWAP(cirq.LineQubit(0), cirq.LineQubit(1)),
     )
-    for M in range(2, 10):
-        new_circuit = _copy_circuit_parallel(circuit, M)
-        assert len(new_circuit.all_qubits()) == 2 * M
+    for num in range(2, 10):
+        new_circuit = _copy_circuit_parallel(circuit, num)
+        assert len(new_circuit.all_qubits()) == 2 * num
 
     circuit = cirq.Circuit(
         cirq.X(cirq.LineQubit(0)),
         cirq.Y(cirq.LineQubit(1)),
         cirq.Z(cirq.LineQubit(2)),
     )
-    for M in range(2, 10):
-        new_circuit = _copy_circuit_parallel(circuit, M)
-        assert len(new_circuit.all_qubits()) == 3 * M
+    for num in range(2, 10):
+        new_circuit = _copy_circuit_parallel(circuit, num)
+        assert len(new_circuit.all_qubits()) == 3 * num
 
 
 def test_copy_circuit_parallel_full():
-    M = 2
+    num = 2
     qubits = cirq.LineQubit.range(2)
     circuit = cirq.Circuit(cirq.H(qubits[0]), cirq.CNOT(qubits[0], qubits[1]))
-    new_circuit = _copy_circuit_parallel(circuit, M)
+    new_circuit = _copy_circuit_parallel(circuit, num)
 
-    expected_qubits = cirq.LineQubit.range(2 * M)
+    expected_qubits = cirq.LineQubit.range(2 * num)
     expected_circuit = cirq.Circuit(
         cirq.H(expected_qubits[0]),
         cirq.CNOT(expected_qubits[0], expected_qubits[1]),
@@ -41,12 +41,12 @@ def test_copy_circuit_parallel_full():
     expected_unitary = cirq.unitary(expected_circuit)
     assert np.allclose(new_unitary, expected_unitary)
 
-    M = 3
+    num = 3
     qubits = cirq.LineQubit.range(1)
     circuit = cirq.Circuit(cirq.X(qubits[0]))
-    new_circuit = _copy_circuit_parallel(circuit, M)
+    new_circuit = _copy_circuit_parallel(circuit, num)
 
-    expected_qubits = cirq.LineQubit.range(1 * M)
+    expected_qubits = cirq.LineQubit.range(1 * num)
     expected_circuit = cirq.Circuit(
         cirq.X(expected_qubits[0]),
         cirq.X(expected_qubits[1]),
@@ -59,7 +59,7 @@ def test_copy_circuit_parallel_full():
 
 
 def test_copy_circuit_parallel_gridqubits():
-    M = 3
+    num = 3
     qubits = cirq.GridQubit.rect(2, 2)
     circuit = cirq.Circuit(
         cirq.H(qubits[0]),
@@ -67,12 +67,12 @@ def test_copy_circuit_parallel_gridqubits():
         cirq.CNOT(qubits[0], qubits[2]),
     )
 
-    new_circuit = _copy_circuit_parallel(circuit, M)
+    new_circuit = _copy_circuit_parallel(circuit, num)
     new_qubits = new_circuit.all_qubits()
 
-    assert len(new_qubits) == len(circuit.all_qubits()) * M
+    assert len(new_qubits) == len(circuit.all_qubits()) * num
 
-    expected_qubits = cirq.GridQubit.rect(2 * M, 2)
+    expected_qubits = cirq.GridQubit.rect(2 * num, 2)
     expected_circuit = cirq.Circuit(
         cirq.H(expected_qubits[0]),
         cirq.CNOT(expected_qubits[0], expected_qubits[1]),
