@@ -1,5 +1,5 @@
 import cirq
-from typing import List, Union
+from typing import cast, List
 
 
 def _copy_circuit_parallel(circuit: cirq.Circuit,
@@ -22,28 +22,28 @@ def _copy_circuit_parallel(circuit: cirq.Circuit,
 
     new_circuit = cirq.Circuit()
     N = len(circuit.all_qubits())
-    qubits: List[Union[
-        cirq.LineQubit, cirq.GridQubit]] = list(circuit.all_qubits())
+    qubits = list(circuit.all_qubits())
 
     # LineQubits
     if isinstance(qubits[0], cirq.LineQubit):
 
-        new_qubits = cirq.LineQubit.range(N * num_copies)
+        def map_for_line_qubits(q: cirq.Qid) -> cirq.Qid:
+            assert isinstance(q, cirq.LineQubit)
+            return cirq.LineQubit(q.x + N * i)
+
         for i in range(num_copies):
-            new_circuit += circuit.transform_qubits(
-                lambda q: new_qubits[qubits.index(q) + i * N]
-            )
+            new_circuit += circuit.transform_qubits(map_for_line_qubits)
 
     # GridQubits
     elif isinstance(qubits[0], cirq.GridQubit):
+        qubits_cast_grid = cast(List[cirq.GridQubit], qubits)
+        grid_rows = max([qu.row + 1 for qu in qubits_cast_grid])
 
-        grid_rows = max([q.row + 1 for q in qubits])
-        grid_cols = max([q.col + 1 for q in qubits])
+        def map_for_grid_qubits(qu: cirq.Qid) -> cirq.Qid:
+            assert isinstance(qu, cirq.GridQubit)
+            return cirq.GridQubit(qu.row + grid_rows * i, qu.col)
 
-        new_qubits = cirq.GridQubit.rect(grid_rows * num_copies, grid_cols)
         for i in range(num_copies):
-            new_circuit += circuit.transform_qubits(
-                lambda q: cirq.GridQubit(q.row + i * grid_rows, q.col)
-            )
+            new_circuit += circuit.transform_qubits(map_for_grid_qubits)
 
     return new_circuit
