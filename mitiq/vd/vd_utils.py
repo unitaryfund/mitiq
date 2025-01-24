@@ -19,12 +19,29 @@ def _copy_circuit_parallel(circuit: cirq.Circuit,
         A cirq circuit that is the parallel composition of M copies of rho.
     """
 
-    N = len(circuit.all_qubits())
     new_circuit = cirq.Circuit()
-    qubits = cirq.LineQubit.range(N * num_copies)
-    for i in range(num_copies):
-        new_circuit += circuit.transform_qubits(
-            lambda q: qubits[q.x + N * i]
-        )  # TODO add compatibility for grid qubits
+    N = len(circuit.all_qubits())
+    qubits = list(circuit.all_qubits())
+
+    # LineQubits
+    if isinstance(qubits[0], cirq.LineQubit):
+
+        new_qubits = cirq.LineQubit.range(N * num_copies)
+        for i in range(num_copies):
+            new_circuit += circuit.transform_qubits(
+                lambda q: new_qubits[qubits.index(q) + i * N]
+            )
+
+    # GridQubits
+    elif isinstance(qubits[0], cirq.GridQubit):
+        
+        grid_rows = max([q.row + 1 for q in qubits])
+        grid_cols = max([q.col + 1 for q in qubits])
+
+        new_qubits = cirq.GridQubit.rect(grid_rows * num_copies, grid_cols)
+        for i in range(num_copies):
+            new_circuit += circuit.transform_qubits(
+                lambda q: cirq.GridQubit(q.row + i * grid_rows, q.col)
+            )
 
     return new_circuit
