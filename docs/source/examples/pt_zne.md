@@ -67,7 +67,7 @@ Let $\Lambda(\rho)$ be a $n$-qubit noise channel with $K_i$ being the correspond
 ```{math}
 \Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger
 ```
-If $P_i$ and $P_j$ are $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
+If $P_i$ and $P_j$ are lexicographically ordered $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, the following expression defines the entries of a Pauli Transfer Matrix (PTM). Here, 
 $i$ defines the rows while $j$ defines the columns of the PTM. 
 
 
