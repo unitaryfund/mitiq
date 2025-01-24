@@ -7,7 +7,7 @@ from mitiq.vd.vd_utils import _copy_circuit_parallel
 def test_copy_circuit_parallel_lengths():
     circuit = cirq.Circuit(
         cirq.H(cirq.LineQubit(0)),
-        cirq.SWAP(cirq.LineQubit(0), cirq.LineQubit(1))
+        cirq.SWAP(cirq.LineQubit(0), cirq.LineQubit(1)),
     )
     for M in range(2, 10):
         new_circuit = _copy_circuit_parallel(circuit, M)
@@ -16,7 +16,7 @@ def test_copy_circuit_parallel_lengths():
     circuit = cirq.Circuit(
         cirq.X(cirq.LineQubit(0)),
         cirq.Y(cirq.LineQubit(1)),
-        cirq.Z(cirq.LineQubit(2))
+        cirq.Z(cirq.LineQubit(2)),
     )
     for M in range(2, 10):
         new_circuit = _copy_circuit_parallel(circuit, M)
@@ -24,7 +24,6 @@ def test_copy_circuit_parallel_lengths():
 
 
 def test_copy_circuit_parallel_full():
-
     M = 2
     qubits = cirq.LineQubit.range(2)
     circuit = cirq.Circuit(cirq.H(qubits[0]), cirq.CNOT(qubits[0], qubits[1]))
