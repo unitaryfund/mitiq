@@ -1,5 +1,6 @@
+from typing import List, cast
+
 import cirq
-from typing import cast, List
 
 
 def _copy_circuit_parallel(circuit: cirq.Circuit,
