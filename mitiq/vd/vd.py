@@ -8,15 +8,18 @@ M = 2
 Z = np.array([[1, 0], [0, -1]])
 X = np.array([[0, 1], [1, 0]])
 
-def M_copies_of_rho(rho: cirq.Circuit, M: int=2):
+def M_copies_of_rho(rho: cirq.Circuit, M: int=2) -> cirq.Circuit:
     '''
     Given a circuit rho that acts on N qubits, this function returns a circuit that copies rho M times in parallel.
     This means the resulting circuit has N * M qubits.
+
+    Args:
+        rho: The input circuit rho acting on N qubits
+        M: The number of copies of rho
+
+    Returns:
+        A circuit that copies rho M times in parallel.
     '''
-    
-    # if M <= 1:
-    #     print("warning: M_copies_of_rho is not needed for M <= 1")
-    #     return rho
 
     N = len(rho.all_qubits())
 
@@ -29,7 +32,15 @@ def M_copies_of_rho(rho: cirq.Circuit, M: int=2):
     return circuit
 
 def diagonalize(U: np.ndarray) -> np.ndarray:
-    """Diagonalize a density matrix rho and return the basis change unitary V†."""
+    """
+    Diagonalize a density matrix rho and return the basis change unitary V†.
+
+    Args:
+        U: The density matrix to be diagonalized.
+    
+    Returns:
+        V†: The basis change unitary.
+    """
     
     eigenvalues, eigenvectors = np.linalg.eigh(U)
     
@@ -54,10 +65,20 @@ def diagonalize(U: np.ndarray) -> np.ndarray:
 
     return V_dagger, sorted_eigenvalues
 
-def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z):
+def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z) -> list[float]:
     '''
     Given a circuit rho that acts on N qubits, this function returns the expectation values of a given observable for each qubit i. 
-    The expectation values are corrected using the virtual distillation algorithm. 
+    The expectation values are corrected using the virtual distillation algorithm.
+
+    Args:
+        input_rho: The input circuit rho acting on N qubits
+        M: The number of copies of rho
+        K: The number of iterations of the algorithm
+        observable: The observable for which the expectation values are computed. 
+                    The default observable is the Pauli Z matrix.
+
+    Returns:
+        A list of expectation values for each qubit i in the circuit.
     '''
 
     # input rho is an N qubit circuit
@@ -85,7 +106,7 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
         basis_change_unitary = diagonalize(observable)[0]
         
         # apply to every single qubit
-        if not np.allclose(observable, Z):
+        if not np.allclose(basis_change_unitary, np.eye(2)):
             gate = cirq.MatrixGate(basis_change_unitary)
             for i in range(M*N):
                 circuit.append(gate(cirq.LineQubit(i)))
