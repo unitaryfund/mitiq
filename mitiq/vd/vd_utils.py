@@ -3,8 +3,9 @@ from typing import List, cast
 import cirq
 
 
-def _copy_circuit_parallel(circuit: cirq.Circuit,
-                           num_copies: int = 2) -> cirq.Circuit:
+def _copy_circuit_parallel(
+    circuit: cirq.Circuit, num_copies: int = 2
+) -> cirq.Circuit:
     """Copies a circuit num_copies times in parallel.
 
     Given a circuit that acts on N qubits,
