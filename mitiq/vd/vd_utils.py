@@ -1,4 +1,5 @@
 import cirq
+from typing import List, Union
 
 
 def _copy_circuit_parallel(circuit: cirq.Circuit,
@@ -21,7 +22,8 @@ def _copy_circuit_parallel(circuit: cirq.Circuit,
 
     new_circuit = cirq.Circuit()
     N = len(circuit.all_qubits())
-    qubits = list(circuit.all_qubits())
+    qubits: List[Union[
+        cirq.LineQubit, cirq.GridQubit]] = list(circuit.all_qubits())
 
     # LineQubits
     if isinstance(qubits[0], cirq.LineQubit):
@@ -34,7 +36,7 @@ def _copy_circuit_parallel(circuit: cirq.Circuit,
 
     # GridQubits
     elif isinstance(qubits[0], cirq.GridQubit):
-        
+
         grid_rows = max([q.row + 1 for q in qubits])
         grid_cols = max([q.col + 1 for q in qubits])
 
