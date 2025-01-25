@@ -166,8 +166,6 @@ def failed_attempt_to_optimise_execute_with_vd(input_rho: cirq.Circuit, M: int=2
     Z_i_corrected = [Ei[i] / D for i in range(N)]
 
     return Z_i_corrected
-
-
   
 def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z) -> list[float]:
     '''
@@ -276,3 +274,85 @@ def execute_with_vd(input_rho: cirq.Circuit, M: int=2, K: int=100, observable=Z)
     Z_i_corrected = [Ei[i] / D for i in range(N)]
 
     return Z_i_corrected
+
+def optimized_execute_with_vd(input_circuit: cirq.Circuit, 
+                              num_copies: int=2, 
+                              K: int=1000, 
+                              observable=None) -> list[float]:
+    
+    """ optimized """
+
+    N = len(input_circuit.all_qubits())
+    circuit_copies = M_copies_of_rho(input_circuit, num_copies)
+
+    Bi_gate = np.array([
+            [1, 0, 0, 0],
+            [0, np.sqrt(2)/2, np.sqrt(2)/2, 0],
+            [0, np.sqrt(2)/2, -np.sqrt(2)/2, 0],
+            [0, 0, 0, 1]
+        ])
+    BGATE = cirq.MatrixGate(Bi_gate)
+
+    Ei = [0 for _ in range(N)]
+    D = 0
+
+    if observable is not None:
+        # TODO
+        pass
+
+    def map_to_eigenvalues(measurement):
+        if measurement == 0:
+            return 1
+        else:
+            return -1
+        
+    vd_circuit = circuit_copies.copy()
+
+    # 1) apply the diagonalization gate B
+    for i in range(N):
+        vd_circuit.append(BGATE(cirq.LineQubit(i), cirq.LineQubit(i+N)))
+
+    # 2) apply measurements
+    for i in range(N):
+        vd_circuit.append(cirq.measure(cirq.LineQubit(i), key=f"{2*i}"))
+    for i in range(N):
+        vd_circuit.append(cirq.measure(cirq.LineQubit(i+N), key=f"{2*i+1}"))
+
+    simulator = cirq.Simulator()
+    result = simulator.run(vd_circuit, repetitions=K)
+
+    for k in range(K):
+        z1 = []
+        z2 = []
+        
+        # Extract measurements for repetition k
+        for i in range(2 * N):
+            measurement = np.squeeze(result.records[str(i)][k])  # Get the k-th repetition
+            if i % 2 == 0:
+                z1.append(measurement)
+            else:
+                z2.append(measurement)
+        
+        z1 = [map_to_eigenvalues(m) for m in z1]
+        z2 = [map_to_eigenvalues(m) for m in z2]
+
+        # Update Ei and D
+        for i in range(N):
+            productE = 1
+            for j in range(N):
+                if i != j:
+                    productE *= (1 + z1[j] - z2[j] + z1[j] * z2[j])
+            Ei[i] += 1 / 2**N * (z1[i] + z2[i]) * productE
+
+        productD = 1
+        for j in range(N):
+            productD *= (1 + z1[j] - z2[j] + z1[j] * z2[j])
+        D += 1 / 2**N * productD
+
+    # Calculate the corrected Z_i
+    Z_i_corrected = [Ei[i] / D for i in range(N)]
+
+    return Z_i_corrected
+
+
+
