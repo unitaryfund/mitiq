@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import List, cast, Optional
 import numpy as np
 
 import cirq
@@ -53,9 +53,9 @@ def _copy_circuit_parallel(
 
     return new_circuit
 
-def apply_Bi_gate(circuit, gate=None):
+def apply_Bi_gate(circuit: cirq.Circuit, gate: Optional[np.ndarray] = None) -> cirq.Circuit:
     """
-    Apply a Bi gate to a circuit.
+    Apply a Bi gate to a circuit. We assume that N is even (from the other functions).
 
     Args:
         circuit:
