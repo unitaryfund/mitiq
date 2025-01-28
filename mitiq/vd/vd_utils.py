@@ -1,4 +1,5 @@
 from typing import List, cast
+import numpy as np
 
 import cirq
 
@@ -51,3 +52,34 @@ def _copy_circuit_parallel(
             new_circuit += circuit.transform_qubits(map_for_grid_qubits)
 
     return new_circuit
+
+def apply_Bi_gate(circuit, gate=None):
+    """
+    Apply a Bi gate to a circuit.
+
+    Args:
+        circuit:
+            The circuit to apply the Bi gate to.
+        gate:
+            The matrix representation of the Bi gate.
+            Default is None, in which case the pre-defined Bi gate will be applied.
+
+    Returns:
+        The circuit with the Bi gate applied.
+    """
+    if gate is None:
+        gate = np.array([
+            [1, 0, 0, 0],
+            [0, np.sqrt(2)/2, np.sqrt(2)/2, 0],
+            [0, np.sqrt(2)/2, -np.sqrt(2)/2, 0],
+            [0, 0, 0, 1]
+        ])
+
+    B_gate = cirq.MatrixGate(gate)
+
+    N = len(circuit.all_qubits())
+
+    for i in N:
+        circuit.append(B_gate(cirq.LineQubit(i), cirq.LineQubit(i+N)))
+
+    return circuit
