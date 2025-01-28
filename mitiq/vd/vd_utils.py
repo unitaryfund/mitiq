@@ -77,9 +77,12 @@ def apply_Bi_gate(circuit: cirq.Circuit, gate: Optional[np.ndarray] = None) -> c
 
     B_gate = cirq.MatrixGate(gate)
 
-    N = len(circuit.all_qubits())
+    N = len(circuit.all_qubits()) // 2
+    # M = B_gate.num_qubits
 
-    for i in N:
-        circuit.append(B_gate(cirq.LineQubit(i), cirq.LineQubit(i+N)))
+    new_circuit = circuit.copy()
 
-    return circuit
+    for i in range(N):
+        new_circuit.append(B_gate(cirq.LineQubit(i), cirq.LineQubit(i+N)))
+
+    return new_circuit

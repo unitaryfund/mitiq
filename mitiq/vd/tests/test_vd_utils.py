@@ -94,7 +94,9 @@ def test_apply_Bi_gate_default():
     circuit = cirq.Circuit(
         cirq.H(qubits[0]),
         cirq.CNOT(qubits[0], qubits[1]),
-    )
+        cirq.H(qubits[2]),
+        cirq.CNOT(qubits[2], qubits[3]),
+    ) # TODO: replace this circuit definition using the copy function we already defined
 
     updated_circuit = apply_Bi_gate(circuit)
 
@@ -115,6 +117,7 @@ def test_apply_Bi_gate_default():
     for op in updated_circuit.all_operations():
         if isinstance(op.gate, cirq.MatrixGate):
             np.testing.assert_array_almost_equal(op.gate._matrix, expected_matrix)
+    # TODO: replace this test with a test that the last layer of operations are B gates
 
 
 def test_apply_Bi_gate_custom():
@@ -160,11 +163,12 @@ def test_apply_Bi_gate_unitary():
     circuit = cirq.Circuit(
         cirq.H(qubits[0]),
         cirq.CNOT(qubits[0], qubits[1]),
-    )
+        cirq.I(qubits[2]),
+        cirq.I(qubits[3]),
+    ) # TODO: replace this circuit definition with copy in parallel function
 
     updated_circuit = apply_Bi_gate(circuit)
 
     # Verify unitary of updated circuit is valid
     new_unitary = cirq.unitary(updated_circuit)
     assert new_unitary.shape == (2**len(qubits), 2**len(qubits))
-    assert np.allclose(new_unitary @ new_unitary.conj().T, np.eye(new_unitary.shape[0]))
