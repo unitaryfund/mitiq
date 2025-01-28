@@ -1,7 +1,7 @@
 import cirq
 import numpy as np
 
-from mitiq.vd.vd_utils import _copy_circuit_parallel
+from mitiq.vd.vd_utils import _copy_circuit_parallel, apply_Bi_gate
 
 
 def test_copy_circuit_parallel_lengths():
@@ -88,3 +88,83 @@ def test_copy_circuit_parallel_gridqubits():
     new_unitary = cirq.unitary(new_circuit)
     expected_unitary = cirq.unitary(expected_circuit)
     assert np.allclose(new_unitary, expected_unitary)
+
+def test_apply_Bi_gate_default():
+    qubits = cirq.LineQubit.range(4)  # Even number of qubits
+    circuit = cirq.Circuit(
+        cirq.H(qubits[0]),
+        cirq.CNOT(qubits[0], qubits[1]),
+    )
+
+    updated_circuit = apply_Bi_gate(circuit)
+
+    # Verify the circuit length increased
+    assert len(updated_circuit) > len(circuit)
+
+    # Verify no extra qubits were added
+    assert set(updated_circuit.all_qubits()) == set(qubits)
+
+    # Validate matrix of default Bi gate
+    expected_matrix = np.array([
+        [1, 0, 0, 0],
+        [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
+        [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
+        [0, 0, 0, 1]
+    ])
+
+    for op in updated_circuit.all_operations():
+        if isinstance(op.gate, cirq.MatrixGate):
+            np.testing.assert_array_almost_equal(op.gate._matrix, expected_matrix)
+
+
+def test_apply_Bi_gate_custom():
+    qubits = cirq.LineQubit.range(4)  # Even number of qubits
+    circuit = cirq.Circuit(
+        cirq.H(qubits[0]),
+        cirq.CNOT(qubits[0], qubits[1]),
+    )
+
+    custom_gate = np.array([
+        [0, 1, 0, 0],
+        [1, 0, 0, 0],
+        [0, 0, 0, 1],
+        [0, 0, 1, 0]
+    ], dtype=np.complex128)
+
+    updated_circuit = apply_Bi_gate(circuit, gate=custom_gate)
+
+    # Verify the circuit length increased
+    assert len(updated_circuit) > len(circuit)
+
+    # Verify no extra qubits were added
+    assert set(updated_circuit.all_qubits()) == set(qubits)
+
+    # Validate matrix of custom Bi gate
+    for op in updated_circuit.all_operations():
+        if isinstance(op.gate, cirq.MatrixGate):
+            np.testing.assert_array_almost_equal(op.gate._matrix, custom_gate)
+
+
+def test_apply_Bi_gate_preserves_qubits():
+    qubits = cirq.LineQubit.range(6)  # Even number of qubits
+    circuit = cirq.Circuit()
+
+    updated_circuit = apply_Bi_gate(circuit)
+
+    # Verify no extra qubits are added
+    assert set(updated_circuit.all_qubits()) == set(qubits)
+
+
+def test_apply_Bi_gate_unitary():
+    qubits = cirq.LineQubit.range(4)
+    circuit = cirq.Circuit(
+        cirq.H(qubits[0]),
+        cirq.CNOT(qubits[0], qubits[1]),
+    )
+
+    updated_circuit = apply_Bi_gate(circuit)
+
+    # Verify unitary of updated circuit is valid
+    new_unitary = cirq.unitary(updated_circuit)
+    assert new_unitary.shape == (2**len(qubits), 2**len(qubits))
+    assert np.allclose(new_unitary @ new_unitary.conj().T, np.eye(new_unitary.shape[0]))
