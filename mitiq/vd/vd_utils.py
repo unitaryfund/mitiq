@@ -4,8 +4,9 @@ import cirq
 import numpy as np
 
 
-def _copy_circuit_parallel(circuit: cirq.Circuit,
-                           num_copies: int = 2) -> cirq.Circuit:
+def _copy_circuit_parallel(
+    circuit: cirq.Circuit, num_copies: int = 2
+) -> cirq.Circuit:
     """Copies a circuit num_copies times in parallel.
 
     Given a circuit that acts on N qubits,
@@ -53,8 +54,9 @@ def _copy_circuit_parallel(circuit: cirq.Circuit,
     return new_circuit
 
 
-def _apply_diagonalizing_gate(circuit: cirq.Circuit,
-                              num_copies: int) -> cirq.Circuit:
+def _apply_diagonalizing_gate(
+    circuit: cirq.Circuit, num_copies: int
+) -> cirq.Circuit:
     """
     Apply the VD diagonalizing gate to a circuit.
     The gate has to be applied in a specific way.
@@ -124,6 +126,6 @@ def _generate_diagonalizing_gate(num_copies: int = 2) -> cirq.Gate:
     else:
         raise NotImplementedError(
             "Only num_copies = 2 is currently supported."
-            )
+        )
 
     return cirq.MatrixGate(diagonalizing_matrix)

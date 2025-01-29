@@ -148,4 +148,5 @@ def test_generate_diagonalizing_gate():
     )
 
     assert np.allclose(
-        _generate_diagonalizing_gate(2)._matrix, expected_matrix)
+        _generate_diagonalizing_gate(2)._matrix, expected_matrix
+    )
