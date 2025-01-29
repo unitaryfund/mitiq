@@ -1,7 +1,10 @@
 import cirq
 import numpy as np
 
-from mitiq.vd.vd_utils import _copy_circuit_parallel, apply_Bi_gate
+from mitiq.vd.vd_utils import (
+    _copy_circuit_parallel,
+    _generate_diagonalizing_gate,
+)
 
 
 def test_copy_circuit_parallel_lengths():
@@ -172,3 +175,13 @@ def test_apply_Bi_gate_unitary():
     # Verify unitary of updated circuit is valid
     new_unitary = cirq.unitary(updated_circuit)
     assert new_unitary.shape == (2**len(qubits), 2**len(qubits))
+
+def test_generate_diagonalizing_gate():
+    expected_matrix = np.array([
+        [1, 0, 0, 0],
+        [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
+        [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
+        [0, 0, 0, 1]
+    ])
+
+    assert np.allclose(_generate_diagonalizing_gate(2)._matrix, expected_matrix)
