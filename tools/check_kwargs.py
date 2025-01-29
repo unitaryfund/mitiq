@@ -1,8 +1,7 @@
 import os
-import re
-import sys
 
 ROOT_DIR = "mitiq"
+
 
 def find_manual_kwargs(filepath: str):
     with open(filepath, "r") as f:
@@ -21,6 +20,7 @@ def find_manual_kwargs(filepath: str):
                 results.append((i, block))
     return results
 
+
 def main():
     for subdir, _, files in os.walk(ROOT_DIR):
         for file in files:
@@ -31,6 +31,7 @@ def main():
                     print(f"File: {filepath}")
                     for match in matches:
                         print(f"Line {match[0]}: {match[1]}")
+
 
 if __name__ == "__main__":
     main()
