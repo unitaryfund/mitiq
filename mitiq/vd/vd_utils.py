@@ -4,7 +4,7 @@ import cirq
 import numpy as np
 
 
-def _copy_circuit_parallel(circuit: cirq.Circuit, 
+def _copy_circuit_parallel(circuit: cirq.Circuit,
                            num_copies: int = 2) -> cirq.Circuit:
     """Copies a circuit num_copies times in parallel.
 
@@ -53,28 +53,28 @@ def _copy_circuit_parallel(circuit: cirq.Circuit,
     return new_circuit
 
 
-def _apply_diagonalizing_gate(circuit: cirq.Circuit, 
+def _apply_diagonalizing_gate(circuit: cirq.Circuit,
                               num_copies: int) -> cirq.Circuit:
     """
-    Apply the VD diagonalizing gate to a circuit. 
+    Apply the VD diagonalizing gate to a circuit.
     The gate has to be applied in a specific way.
-    Based on the number of copies of the original circuit, 
+    Based on the number of copies of the original circuit,
     the diagonalizing gate is a num_copies-qubit gate
-    that is applied N times where N is the amount of 
+    that is applied N times where N is the amount of
     qubits in the original circuit.
     The diagonalizing gate is applied as follows:
-    first apply the gate to qubit 1 of copy 1, 
+    first apply the gate to qubit 1 of copy 1,
         qubit 1 of copy 2, ..., qubit 1 of copy num_copies.
-    second apply the gate to qubit 2 of copy 1, 
+    second apply the gate to qubit 2 of copy 1,
         qubit 2 of copy 2, ..., qubit 2 of copy num_copies, and so on.
 
     Args:
         circuit:
             The circuit to apply the diagonalizing gate to.
         num_copies:
-            The number of copies of the original 
+            The number of copies of the original
             circuit that this circuit consists of.
-            The diagonalizing matrix depends on 
+            The diagonalizing matrix depends on
             num_copies and it is a 'num_copies'-qubit gate.
 
     Returns:
@@ -92,6 +92,9 @@ def _apply_diagonalizing_gate(circuit: cirq.Circuit,
         qubits = [
             cirq.LineQubit(i + N * j) for j in range(num_copies)
         ]  # select qubit i of each copy
+
+        print(qubits)
+
         new_circuit.append(diag_gate(*qubits))
 
     return new_circuit
@@ -120,6 +123,7 @@ def _generate_diagonalizing_gate(num_copies: int = 2) -> cirq.Gate:
         )
     else:
         raise NotImplementedError(
-            "Only num_copies = 2 is currently supported.")
+            "Only num_copies = 2 is currently supported."
+            )
 
     return cirq.MatrixGate(diagonalizing_matrix)

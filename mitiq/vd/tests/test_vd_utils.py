@@ -2,6 +2,7 @@ import cirq
 import numpy as np
 
 from mitiq.vd.vd_utils import (
+    _apply_diagonalizing_gate,
     _copy_circuit_parallel,
     _generate_diagonalizing_gate,
 )
@@ -92,96 +93,59 @@ def test_copy_circuit_parallel_gridqubits():
     expected_unitary = cirq.unitary(expected_circuit)
     assert np.allclose(new_unitary, expected_unitary)
 
-def test_apply_Bi_gate_default():
-    qubits = cirq.LineQubit.range(4)  # Even number of qubits
-    circuit = cirq.Circuit(
-        cirq.H(qubits[0]),
-        cirq.CNOT(qubits[0], qubits[1]),
-        cirq.H(qubits[2]),
-        cirq.CNOT(qubits[2], qubits[3]),
-    ) # TODO: replace this circuit definition using the copy function we already defined
 
-    updated_circuit = apply_Bi_gate(circuit)
-
-    # Verify the circuit length increased
-    assert len(updated_circuit) > len(circuit)
-
-    # Verify no extra qubits were added
-    assert set(updated_circuit.all_qubits()) == set(qubits)
-
-    # Validate matrix of default Bi gate
-    expected_matrix = np.array([
-        [1, 0, 0, 0],
-        [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
-        [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
-        [0, 0, 0, 1]
-    ])
-
-    for op in updated_circuit.all_operations():
-        if isinstance(op.gate, cirq.MatrixGate):
-            np.testing.assert_array_almost_equal(op.gate._matrix, expected_matrix)
-    # TODO: replace this test with a test that the last layer of operations are B gates
-
-
-def test_apply_Bi_gate_custom():
-    qubits = cirq.LineQubit.range(4)  # Even number of qubits
-    circuit = cirq.Circuit(
+def test_apply_diagonalizing_gate():
+    num_copies = 2
+    qubits = cirq.LineQubit.range(2)
+    original_circuit = cirq.Circuit(
         cirq.H(qubits[0]),
         cirq.CNOT(qubits[0], qubits[1]),
     )
+    N = len(original_circuit.all_qubits())
 
-    custom_gate = np.array([
-        [0, 1, 0, 0],
-        [1, 0, 0, 0],
-        [0, 0, 0, 1],
-        [0, 0, 1, 0]
-    ], dtype=np.complex128)
+    circuit = _copy_circuit_parallel(original_circuit, num_copies)
 
-    updated_circuit = apply_Bi_gate(circuit, gate=custom_gate)
+    new_circuit = _apply_diagonalizing_gate(circuit, num_copies)
 
-    # Verify the circuit length increased
-    assert len(updated_circuit) > len(circuit)
+    # Verify the amount of added operators is N since
+    # that is how many diagonalizing gates should be applied
+    operations_circuit = sum(1 for _ in circuit.all_operations())
+    operations_new_circuit = sum(1 for _ in new_circuit.all_operations())
+    assert operations_new_circuit == operations_circuit + N
 
     # Verify no extra qubits were added
-    assert set(updated_circuit.all_qubits()) == set(qubits)
+    assert set(new_circuit.all_qubits()) == set(circuit.all_qubits())
 
-    # Validate matrix of custom Bi gate
-    for op in updated_circuit.all_operations():
-        if isinstance(op.gate, cirq.MatrixGate):
-            np.testing.assert_array_almost_equal(op.gate._matrix, custom_gate)
+    # default diagonalizing matrix for 2 copies
+    expected_matrix = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
+            [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
+            [0, 0, 0, 1],
+        ]
+    )
 
+    # fetch the operations in the last moment of the circuit
+    last_moment = new_circuit[-1]
+    last_moment_ops = list(last_moment.operations)
 
-def test_apply_Bi_gate_preserves_qubits():
-    qubits = cirq.LineQubit.range(6)  # Even number of qubits
-    circuit = cirq.Circuit()
+    # check that the last moment consists of
+    # the right amount of diagonalizing gates
+    assert len(last_moment_ops) == len(original_circuit.all_qubits())
+    for op in last_moment_ops:
+        assert op.gate == cirq.MatrixGate(expected_matrix)
 
-    updated_circuit = apply_Bi_gate(circuit)
-
-    # Verify no extra qubits are added
-    assert set(updated_circuit.all_qubits()) == set(qubits)
-
-
-def test_apply_Bi_gate_unitary():
-    qubits = cirq.LineQubit.range(4)
-    circuit = cirq.Circuit(
-        cirq.H(qubits[0]),
-        cirq.CNOT(qubits[0], qubits[1]),
-        cirq.I(qubits[2]),
-        cirq.I(qubits[3]),
-    ) # TODO: replace this circuit definition with copy in parallel function
-
-    updated_circuit = apply_Bi_gate(circuit)
-
-    # Verify unitary of updated circuit is valid
-    new_unitary = cirq.unitary(updated_circuit)
-    assert new_unitary.shape == (2**len(qubits), 2**len(qubits))
 
 def test_generate_diagonalizing_gate():
-    expected_matrix = np.array([
-        [1, 0, 0, 0],
-        [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
-        [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
-        [0, 0, 0, 1]
-    ])
+    expected_matrix = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
+            [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
+            [0, 0, 0, 1],
+        ]
+    )
 
-    assert np.allclose(_generate_diagonalizing_gate(2)._matrix, expected_matrix)
+    assert np.allclose(
+        _generate_diagonalizing_gate(2)._matrix, expected_matrix)
