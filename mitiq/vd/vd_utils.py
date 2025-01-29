@@ -95,8 +95,6 @@ def _apply_diagonalizing_gate(
             cirq.LineQubit(i + N * j) for j in range(num_copies)
         ]  # select qubit i of each copy
 
-        print(qubits)
-
         new_circuit.append(diag_gate(*qubits))
 
     return new_circuit
@@ -105,7 +103,7 @@ def _apply_diagonalizing_gate(
 def _generate_diagonalizing_gate(num_copies: int = 2) -> cirq.Gate:
     """
     Generate the diagonalizing gate for the VD algorithm.
-    Currently only num_copies
+    Currently only num_copies=2 is supported.
 
     Args:
         num_qubits:
