@@ -19,7 +19,7 @@ format:
 
 .PHONY: check-types
 check-types:
-	mypy mitiq --show-error-codes
+	mypy mitiq --show-error-codes --enable-incomplete-feature=Unpack
 
 .PHONY: clean
 clean:
