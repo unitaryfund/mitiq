@@ -31,9 +31,9 @@ To better explain the exact mechanics of the VD protocol, a specific of example 
 The method begins by preparing M independent noisy copies of the quantum state ⍴, with M = 2 being a common starting point for balancing resource requirements with error suppression. The copies are assumed to experience similar noise characteristics.
 
 ### Diagonalizing Gate
- First a symetrized version of the observable is defined as $O^{(M)} = \frac{1}{M} \sum_{i=0}^{M} O^i$. 
+ First a symmetrized version of the observable is defined as $O^{(M)} = \frac{1}{M} \sum_{i=0}^{M} O^i$. 
  
- For the example of $M=2$ and $O=Z$, this equalities cqan be rewritten as: $Z^{(2)}=\frac{1}{2}(Z^1+Z^2)$. This can be used to rewrite the corrected observable as:
+ For the example of $M=2$ and $O=Z$, this equalities can be rewritten as: $Z^{(2)}=\frac{1}{2}(Z^1+Z^2)$. This can be used to rewrite the corrected observable as:
  
  $$\langle O\rangle_{\text{corrected}} = \frac{\text{Tr}(Z^{(2)} S^{(2)} \rho^{\otimes 2})}{\text{Tr}(S^{(2)} \rho^{\otimes 2})}$$
 
