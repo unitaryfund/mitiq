@@ -7,7 +7,7 @@
 
 import warnings
 from copy import deepcopy
-from typing import Any, Dict, FrozenSet, List, Optional, cast
+from typing import Any, Dict, FrozenSet, List, Optional, cast, TypedDict, Annotated, Unpack
 
 import numpy as np
 from cirq import Circuit, InsertStrategy, Moment, has_unitary, inverse, ops
@@ -19,6 +19,50 @@ from mitiq.utils import (
     _pop_measurements,
 )
 
+class FoldGatesAtRandomKwargs(TypedDict):
+    fidelities: Annotated[Dict[str, float], (
+            "Dictionary of gate fidelities. Each key is a string specifying the gate, "
+        "and each value is the fidelity of that gate. When this argument is provided, "
+        "folded gates contribute an amount proportional to their infidelity (1 - fidelity) "
+        "to the total noise scaling. Fidelity values must be in the interval (0, 1]. "
+        "Gates not specified have a default fidelity of 0.99**n where n is the number "
+        "of qubits the gates act on.\n\n"
+        "Supported gate keys are listed in the following table::\n\n"
+        "Gate key    | Gate\n"
+        "-------------------------\n"
+        '"H"         | Hadamard\n'
+        '"X"         | Pauli X\n'
+        '"Y"         | Pauli Y\n'
+        '"Z"         | Pauli Z\n'
+        '"I"         | Identity\n'
+        '"S"         | Phase gate\n'
+        '"T"         | T gate\n'
+        '"rx"        | X-rotation\n'
+        '"ry"        | Y-rotation\n'
+        '"rz"        | Z-rotation\n'
+        '"CNOT"      | CNOT\n'
+        '"CZ"        | CZ gate\n'
+        '"SWAP"      | Swap\n'
+        '"ISWAP"     | Imaginary swap\n'
+        '"CSWAP"     | CSWAP\n'
+        '"TOFFOLI"   | Toffoli gate\n'
+        '"single"    | All single-qubit gates\n'
+        '"double"    | All two-qubit gates\n'
+        '"triple"    | All three-qubit gates\n\n'
+        "Keys for specific gates override values set by 'single', 'double', and 'triple'.\n\n"
+        'For example, `fidelities = {"single": 1.0, "H": 0.99}` sets all single-qubit '
+        "gates except Hadamard to have fidelity one."
+    )]
+    squash_moments: Annotated[bool, (
+        "If True, all gates (including folded gates) are placed as early as possible "
+        "in the circuit. If False, new moments are created for folded gates. This option "
+        "only applies to QPROGRAM types which have a 'moment' or 'time' structure."
+        "Default is True."
+    )]
+    return_mitiq: Annotated[bool, (
+        "If True, returns a Mitiq circuit instead of the input circuit type (if different)."
+        "Default is False."
+    )]
 
 class UnfoldableCircuitError(Exception):
     pass
@@ -531,7 +575,7 @@ def fold_gates_at_random(
     circuit: Circuit,
     scale_factor: float,
     seed: Optional[int] = None,
-    **kwargs: Any,
+    **kwargs: Unpack[FoldGatesAtRandomKwargs],
 ) -> Circuit:
     r"""
     Returns a new folded circuit by applying the map G -> G G^dag G to a
@@ -549,54 +593,6 @@ def fold_gates_at_random(
         circuit: Circuit to fold.
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
         seed: Seed for random number generator.
-
-    Keyword Args:
-        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-            is a string which specifies the gate and each value is the
-            fidelity of that gate. When this argument is provided, folded
-            gates contribute an amount proportional to their infidelity
-            (1 - fidelity) to the total noise scaling. Fidelity values must be
-            in the interval (0, 1]. Gates not specified have a default
-            fidelity of 0.99**n where n is the number of qubits the gates act
-            on.
-
-            Supported gate keys are listed in the following table.::
-
-                Gate key    | Gate
-                -------------------------
-                "H"         | Hadamard
-                "X"         | Pauli X
-                "Y"         | Pauli Y
-                "Z"         | Pauli Z
-                "I"         | Identity
-                "S"         | Phase gate
-                "T"         | T gate
-                "rx"        | X-rotation
-                "ry"        | Y-rotation
-                "rz"        | Z-rotation
-                "CNOT"      | CNOT
-                "CZ"        | CZ gate
-                "SWAP"      | Swap
-                "ISWAP"     | Imaginary swap
-                "CSWAP"     | CSWAP
-                "TOFFOLI"   | Toffoli gate
-                "single"    | All single qubit gates
-                "double"    | All two-qubit gates
-                "triple"    | All three-qubit gates
-
-            Keys for specific gates override values set by "single", "double",
-            and "triple".
-
-            For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
-            single-qubit gates except Hadamard to have fidelity one.
-
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-        return_mitiq (bool): If True, returns a Mitiq circuit instead of
-            the input circuit type (if different). Default is False.
 
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
