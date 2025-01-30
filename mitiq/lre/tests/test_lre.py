@@ -10,6 +10,7 @@ from cirq import DensityMatrixSimulator, depolarize
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, benchmarks
 from mitiq.lre import execute_with_lre, lre_decorator, mitigate_executor
+from mitiq.lre.multivariate_scaling.layerwise_folding import _get_chunks
 from mitiq.zne.scaling import fold_all, fold_global
 
 # default circuit for all unit tests
@@ -111,21 +112,6 @@ def test_lre_decorator_raised_error():
         )
 
 
-def test_lre_executor_with_chunking():
-    """Verify the executor works as expected for chunking a large circuit into
-    a smaller circuit. Note that this does not verify whether the chunked
-    circuit gets better results compared to a non-chunked circuit."""
-    # define a larger circuit
-    test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=12)[
-        0
-    ]
-    lre_exp_val_chunking = execute_with_lre(
-        test_cirq, execute, degree=2, fold_multiplier=2, num_chunks=14
-    )
-    # verify we get an expectation value
-    assert (lre_exp_val_chunking) > 0
-
-
 @pytest.mark.parametrize("input_method", [(fold_global), (fold_all)])
 def test_lre_executor_with_different_folding_methods(input_method):
     """Verify the executor works as expected for using non-default unitary
@@ -138,3 +124,30 @@ def test_lre_executor_with_different_folding_methods(input_method):
         folding_method=input_method,
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+
+
+def test_lre_with_chunking():
+    """Verify the executor works as expected for chunking a large circuit into
+    a smaller circuit. Note that this does not verify whether the chunked
+    circuit gets better results compared to a non-chunked circuit."""
+    mock_executor = Mock(side_effect=lambda _: random.random())
+    # define a larger circuit
+    test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=12)[
+        0
+    ]
+
+    degree, fold_multiplier, num_chunks = 2, 2, 10
+
+    lre_exp_val_chunking = execute_with_lre(
+        test_cirq,
+        mock_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+        num_chunks=num_chunks,
+    )
+
+    chunked_circ = _get_chunks(test_cirq, num_chunks=num_chunks)
+    assert isinstance(lre_exp_val_chunking, float)
+    assert mock_executor.call_count == math.comb(
+        degree + len(chunked_circ), degree
+    )
