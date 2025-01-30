@@ -21,26 +21,25 @@ Specifically, we analyze how converting coherent noise into incoherent noise thr
 In this tutorial, we will:
 
 1. Define and compare coherent and incoherent noise
-2. Apply Pauli Twirling to transform coherent noise into incoherent noise
+2. Apply [Pauli Twirling](../guide/pt.md) to transform coherent noise into incoherent noise
 3. Compare the performance of ZNE
     1. on its own, and
-    2. in combination with [Pauli Twirling](../guide/pt.md)
+    2. in combination with Pauli Twirling
 
 By the end of the example, you will understand when and how noise tailoring can enhance ZNE.
 
 ## Coherent noise vs. Incoherent noise
 
-Noise on quantum devices can broadly categorized into two types: Coherent, Incoherent. Each has different properties that can be unfavorable toward a quantum circuit in different ways.
+Noise on quantum devices can be broadly categorized into two types: _coherent_ and _incoherent_. Each has different properties that can be unfavorable toward a quantum circuit in different ways.
 
-**Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$. When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
+**Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$ . When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
 
 ```{note}
-If $\mathcal{F}$ is the fidelity defining the success of preparing an arbitrary pure state $\rho$, then
+If $\mathcal{F}$ is the average noisy gate fidelity defining the success of preparing an arbitrary pure state $\rho$, then
 $1-\mathcal{F}$ is the **average gate infidelity**.
 ```
 
-**Incoherent noise** is a process that results in the quantum system entangling with its environment i.e. this type of noise is irreversible. The system and the environment end up in a mixed state. It scales linearly in the small error limit. 
-The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**. 
+**Incoherent noise** is a process that results in the quantum system entangling with its environment i.e. this type of noise is irreversible. The system and the environment end up in a mixed state. This type of noise scales linearly in the small error limit. The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**. 
 
 For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. If $\rho$ is a single qubit state, $p$ is the probabilistic error rate and $\mathcal{E}(\rho)$ is the noise channel:
 
@@ -181,7 +180,7 @@ print(circuit)
 ```
 ```{code-cell} ipython3
 ptmcnot = ptm_matrix(circuit, 2)
-ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1)
+ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1, cmap="PiYG")
 print("Ideal CNOT PTM")
 plt.show()
 ```
@@ -191,7 +190,7 @@ noisy_circuit_incoherent = circuit.with_noise(depolarize(p=0.3))
 print(noisy_circuit_incoherent)
 
 ptmcnot = ptm_matrix(noisy_circuit_incoherent, 2)
-ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1)
+ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1, cmap="PiYG")
 print("\n Pauli Transfer Matrix of noisy CNOT (incoherent)")
 plt.show()
 ```
@@ -201,7 +200,7 @@ noisy_circuit_coherent = circuit.with_noise(Ry(rads=np.pi/12))
 print(noisy_circuit_coherent)
 
 ptmcnot = ptm_matrix(noisy_circuit_coherent, 2)
-ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1)
+ax = sns.heatmap(ptmcnot.real, linewidth=0.5, vmin=-1, vmax=1, cmap="PiYG")
 print("Pauli Transfer Matrix of noisy CNOT (coherent)")
 plt.show()
 ```
@@ -229,11 +228,19 @@ for circ in twirled_circuits:
 print("Example noisy twirled circuit", noisy_twirled_circuits[-1], sep="\n")
 ```
 
-The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays.
+The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays. The variations in pauli twirled PTMs are shown below when averaged over a different number of pauli twirled circuits.
+
+```{figure} ../img/pt_zne_3_circuits.png
+```
+```{figure} ../img/pt_zne_5_circuits.png
+```
+```{figure} ../img/pt_zne_30_circuits.png
+```
+
 
 ## Noisy ZNE
 
-Lets define a larger circuit of CNOT, CZ and H gates. 
+Lets define a larger circuit of CNOT and H gates. 
 
 ```{code-cell} ipython3
 
