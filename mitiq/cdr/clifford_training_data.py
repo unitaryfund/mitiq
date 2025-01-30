@@ -32,26 +32,34 @@ from mitiq.interface import atomic_one_to_many_converter
 class GenerateTrainingCircuitsKwargs(TypedDict):
     sigma_select: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_select='gaussian'",
+        """
+        Width of the Gaussian distribution used for
+        method_select='gaussian'
+        """,
     ]
     sigma_replace: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_replace='gaussian'",
+        """
+        Width of the Gaussian distribution used for
+        method_replace='gaussian'
+        """,
     ]
 
 
 class _MapToNearCliffordKwargs(TypedDict):
     sigma_select: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_select='gaussian'",
+        """
+        Width of the Gaussian distribution used for 
+        method_select='gaussian'
+        """,
     ]
     sigma_replace: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_replace='gaussian'",
+        """
+        Width of the Gaussian distribution used for
+        method_replace='gaussian'
+        """,
     ]
 
 

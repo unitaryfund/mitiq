@@ -34,26 +34,34 @@ from mitiq.zne.scaling import fold_gates_at_random
 class ExecuteWithCdrKwargs(TypedDict):
     method_select: Annotated[
         str,
-        "Specifies the method used to select the \
-        non-Clifford gates to replace when constructing the near-Clifford \
-        training circuits. Can be 'uniform' or 'gaussian'.",
+        """
+        Specifies the method used to select the
+        non-Clifford gates to replace when constructing the near-Clifford
+        training circuits. Can be 'uniform' or 'gaussian'.
+        """,
     ]
     method_replace: Annotated[
         str,
-        "Specifies the method used to replace the \
-        selected non-Clifford gates with a Clifford when constructing the \
-        near-Clifford training circuits. Can be 'uniform', 'gaussian', or \
-        'closest'.",
+        """
+        Specifies the method used to replace the
+        selected non-Clifford gates with a Clifford when constructing the
+        near-Clifford training circuits. Can be 'uniform', 'gaussian', or
+        'closest'.
+        """,
     ]
     sigma_select: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_select='gaussian'.",
+        """
+        Width of the Gaussian distribution used for
+        ``method_select='gaussian'``.
+        """,
     ]
     sigma_replace: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_replace='gaussian'.",
+        """
+        Width of the Gaussian distribution used
+        for ``method_replace='gaussian'``.
+        """,
     ]
     random_state: Annotated[int, "Seed for sampling."]
 
@@ -61,26 +69,34 @@ class ExecuteWithCdrKwargs(TypedDict):
 class MitigateExecutorKwargs(TypedDict):
     method_select: Annotated[
         str,
-        "Specifies the method used to select the \
-        non-Clifford gates to replace when constructing the near-Clifford \
-        training circuits. Can be 'uniform' or 'gaussian'.",
+        """
+        Specifies the method used to select the
+        non-Clifford gates to replace when constructing the near-Clifford
+        training circuits. Can be 'uniform' or 'gaussian'.
+        """,
     ]
     method_replace: Annotated[
         str,
-        "Specifies the method used to replace the \
-        selected non-Clifford gates with a Clifford when constructing the \
-        near-Clifford training circuits. Can be 'uniform', 'gaussian', or \
-        'closest'.",
+        """
+        Specifies the method used to replace the
+        selected non-Clifford gates with a Clifford when constructing the
+        near-Clifford training circuits. Can be 'uniform', 'gaussian', or
+        'closest'.
+        """,
     ]
     sigma_select: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_select='gaussian'.",
+        """
+        Width of the Gaussian distribution used for
+        method_select='gaussian'.
+        """,
     ]
     sigma_replace: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_replace='gaussian'.",
+        """
+        Width of the Gaussian distribution used for
+        method_replace='gaussian'.
+        """,
     ]
     random_state: Annotated[int, "Seed for sampling."]
 
@@ -88,9 +104,11 @@ class MitigateExecutorKwargs(TypedDict):
 class CdrDecoratorKwargs(TypedDict):
     method_select: Annotated[
         str,
-        "Specifies the method used to select the \
-        non-Clifford gates to replace when constructing the near-Clifford \
-        training circuits. Can be 'uniform' or 'gaussian'.",
+        """
+        Specifies the method used to select the
+        non-Clifford gates to replace when constructing the near-Clifford
+        training circuits. Can be 'uniform' or 'gaussian'.
+        """,
     ]
     method_replace: Annotated[
         str,
@@ -101,13 +119,17 @@ class CdrDecoratorKwargs(TypedDict):
     ]
     sigma_select: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_select='gaussian'.",
+        """
+        Width of the Gaussian distribution used for
+        ``method_select='gaussian'``.
+        """,
     ]
     sigma_replace: Annotated[
         float,
-        "Width of the Gaussian distribution used for \
-        method_replace='gaussian'.",
+        """
+        Width of the Gaussian distribution used
+        for ``method_replace='gaussian'``.
+        """,
     ]
     random_state: Annotated[int, "Seed for sampling."]
 
