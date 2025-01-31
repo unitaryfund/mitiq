@@ -90,7 +90,7 @@ def _apply_diagonalizing_gate(
 
     diag_gate = _generate_diagonalizing_gate(num_copies)
 
-    for i in range(num_copies):
+    for i in range(N):
         qubits = [
             cirq.LineQubit(i + N * j) for j in range(num_copies)
         ]  # select qubit i of each copy

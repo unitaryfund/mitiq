@@ -96,10 +96,11 @@ def test_copy_circuit_parallel_gridqubits():
 
 def test_apply_diagonalizing_gate():
     num_copies = 2
-    qubits = cirq.LineQubit.range(2)
+    qubits = cirq.LineQubit.range(3)
     original_circuit = cirq.Circuit(
         cirq.H(qubits[0]),
         cirq.CNOT(qubits[0], qubits[1]),
+        cirq.X(qubits[2]),
     )
     N = len(original_circuit.all_qubits())
 
@@ -126,14 +127,13 @@ def test_apply_diagonalizing_gate():
         ]
     )
 
-    # fetch the operations in the last moment of the circuit
-    last_moment = new_circuit[-1]
-    last_moment_ops = list(last_moment.operations)
+    # fetch the last N operations of the new circuit
+    last_N_ops = list(new_circuit.all_operations())[-N:]
 
     # check that the last moment consists of
     # the right amount of diagonalizing gates
-    assert len(last_moment_ops) == len(original_circuit.all_qubits())
-    for op in last_moment_ops:
+    assert len(last_N_ops) == len(original_circuit.all_qubits())
+    for op in last_N_ops:
         assert op.gate == cirq.MatrixGate(expected_matrix)
 
 
