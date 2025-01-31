@@ -339,4 +339,3 @@ def amplify_operations_in_circuit_with_local_depolarizing_noise(
             )
         )
     return amplifications
-
