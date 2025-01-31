@@ -6,7 +6,7 @@ import cirq
 import numpy as np
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult, MeasurementResult
 from mitiq.executor.executor import DensityMatrixLike, MeasurementResultLike
-from typing import Callable, Optional, Union, Sequence, List
+from typing import Callable, Optional, Union, Sequence, List, Iterable
 
 
 def execute_with_vd(
@@ -130,3 +130,48 @@ def execute_with_vd(
         return Z_i_corrected
     else:
         return Z_i_corrected.real
+
+
+def measurement_simulation_executor(circuit: QPROGRAM, reps = 10) -> List[MeasurementResult]:
+
+    if isinstance(circuit, Iterable) and not isinstance(circuit, cirq.Circuit):
+        circuit = circuit[0]
+
+    # T0 = time.time()
+    cirq_result = cirq.sample(circuit,repetitions=reps)
+    # print(cirq_result)
+
+    # T1 = time.time()
+    result = cirq_result.measurements
+    measurements = []
+    
+    sorted_keys = []
+    for key in result:
+        sorted_keys.append(int(key))
+    sorted_keys.sort()
+
+    for key in sorted_keys:
+        measurements.append(result[str(key)])
+    
+    measurements = np.squeeze(measurements, axis=2).T
+    # T2 =time.time()
+
+    # print(f"{'> Sampling step':30s} ~ {T1-T0:8.3f} s     {(T1-T0)/(T2-T0):8.4%}")
+    # print(f"{'> Reordering step':30s} ~ {T2-T1:8.3f} s     {(T2-T1)/(T2-T0):8.4%}")
+
+
+    # print(measurements.tolist())
+
+
+
+    return measurements.tolist()
+
+
+def main():
+    circuit = cirq.Circuit(cirq.X(cirq.LineQubit(0)))
+    executor = Executor(measurement_simulation_executor)
+    res = execute_with_vd(circuit, executor, M=2, K=100)
+    print(res)
+
+if __name__ == '__main__':
+    main()
