@@ -235,17 +235,11 @@ for circ in twirled_circuits:
 print("Example noisy twirled circuit", noisy_twirled_circuits[-1], sep="\n")
 ```
 
-The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays. The variations in pauli twirled PTMs are shown below when averaged over a different number of pauli twirled circuits.  
+The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays. The variations in pauli twirled PTMs are shown below when averaged over a different number of pauli twirled circuits: [3](../img/pt_zne_3_circuits.png), [5](../img/pt_zne_5_circuits.png), [30](../img/pt_zne_30_circuits.png) and [300](../img/pt_zne_100_circuits.png).  
 
-```{figure} ../img/pt_zne_3_circuits.png
-```
-```{figure} ../img/pt_zne_5_circuits.png
-```
-```{figure} ../img/pt_zne_30_circuits.png
-```
-```{figure} ../img/pt_zne_100_circuits.png
-```
-You can also see the off-diagonal values in the heatmap fade steadily as the number of twirled circuits averaged over is increased. In particular, for the last plot, the PTM of 100 Pauli twirled circuits is equivalent to the ideal CNOT PTM. 
+![](../img/pt_zne.gif)
+
+The off-diagonal values in the heatmap fade steadily as the number of twirled circuits averaged over is increased. In particular, for the last plot, the PTM of 100 Pauli twirled circuits is equivalent to the ideal CNOT PTM. 
 
 ## Noisy ZNE
 
