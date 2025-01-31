@@ -1,12 +1,11 @@
-from typing import List
+from typing import List, Sequence
 
 from cirq import Circuit
 
-from mitiq import QPROGRAM
 from mitiq.pea.amplifications.depolarizing import (
     amplify_operations_in_circuit_with_global_depolarizing_noise,
-    amplify_operations_in_circuit_with_local_depolarizing_noise,
-)
+    amplify_operations_in_circuit_with_local_depolarizing_noise)
+from mitiq.pec import OperationRepresentation
 from mitiq.pec.sampling import sample_circuit
 
 
@@ -15,7 +14,7 @@ def scale_circuit_amplifications(
     scale_factors: List[float],
     noise_model: str,
     epsilon: float,
-) -> List[QPROGRAM]:
+) -> List[Sequence[OperationRepresentation]]:
     """Returns a list of noise-amplified circuits, corrsponding to each scale
     factor multiplied by the baseline noise level."""
 
@@ -28,17 +27,19 @@ def scale_circuit_amplifications(
         raise ValueError("Must specify supported noise model")
         # TODO allow use of custom noise model
 
-    scaled_circuits = []
+    amplified_circuits = []
     for s in scale_factors:
         if s == 1:
-            scaled_circuits.append(ideal_circuit)
+            amplified_circuits.append(ideal_circuit)
         else:
-            scaled_circuits.append(ideal_circuit.with_noise(amp_fn((s - 1) * epsilon)))
-    return scaled_circuits
+            amplified_circuits.append(
+                (amp_fn(ideal_circuit, (s - 1) * epsilon))
+        )
+    return amplified_circuits
 
 
 def sample_circuit_amplifications(
-    ideal_circuit: QPROGRAM,
+    ideal_circuit: Circuit,
     scale_factors: List[float],
     noise_model: str,
     epsilon: float,
@@ -47,8 +48,8 @@ def sample_circuit_amplifications(
     factor times the baseline noise level."""
 
     return [
-        sample_circuit(circuit)
-        for circuit in scale_circuit_amplifications(
+        sample_circuit(ideal_circuit, amplifications)
+        for amplifications in scale_circuit_amplifications(
             ideal_circuit, scale_factors, noise_model, epsilon
         )
     ]
