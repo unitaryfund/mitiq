@@ -324,8 +324,8 @@ for i in twirled_circuits:
 mitigated_result = np.average(zne_pt_vals)
 
 print(f"Error without twirling: {abs(ideal_value - noisy_value) :.3}")
-print(f"Error with ideal and twirling: {abs(ideal_value - twirled_result) :.3}")
-print(f"Error with ideal and ZNE + PT: {abs(ideal_value - mitigated_result) :.3}")
+print(f"Error with twirling: {abs(ideal_value - twirled_result) :.3}")
+print(f"Error with ZNE + PT: {abs(ideal_value - mitigated_result) :.3}")
 
 ```
 Accordingly, depending on the noise strength, a combination of PT and ZNE do not work that well compared to just PT or ZNE. Thus, it is important to understand when combining a noisy tailoring technique with an error mitigation technique provides a significant advantage. 
