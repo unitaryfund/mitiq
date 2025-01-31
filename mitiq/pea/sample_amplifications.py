@@ -5,7 +5,8 @@ from cirq import Circuit
 from mitiq import QPROGRAM
 from mitiq.pea.amplifications.depolarizing import (
     amplify_operations_in_circuit_with_global_depolarizing_noise,
-    amplify_operations_in_circuit_with_local_depolarizing_noise)
+    amplify_operations_in_circuit_with_local_depolarizing_noise,
+)
 from mitiq.pec.sampling import sample_circuit
 
 
@@ -32,9 +33,7 @@ def scale_circuit_amplifications(
         if s == 1:
             scaled_circuits.append(ideal_circuit)
         else:
-            scaled_circuits.append(
-                ideal_circuit.with_noise(amp_fn((s - 1) * epsilon))
-            )
+            scaled_circuits.append(ideal_circuit.with_noise(amp_fn((s - 1) * epsilon)))
     return scaled_circuits
 
 
@@ -42,7 +41,7 @@ def sample_circuit_amplifications(
     ideal_circuit: QPROGRAM,
     scale_factors: List[float],
     noise_model: str,
-    epsilon: float
+    epsilon: float,
 ) -> List[QPROGRAM]:
     """Returns a list of expectation values, evaluated at each noise scale
     factor times the baseline noise level."""
