@@ -1,67 +1,13 @@
 import sys
 sys.path.insert(0, '/home/chris/Desktop/cpython/mitiq')
 
-from mitiq.vd.vd_utils import _copy_circuit_parallel, _apply_diagonalizing_gate
+from mitiq.vd.vd_utils import _copy_circuit_parallel, _apply_diagonalizing_gate, _apply_cyclic_system_permutation, _apply_symmetric_observable
 import cirq
 import numpy as np
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult, MeasurementResult
 from mitiq.executor.executor import DensityMatrixLike, MeasurementResultLike
 from typing import Callable, Optional, Union, Sequence, List
 
-def apply_cyclic_system_permutation(matrix: np.array, N_qubits: int, M: int=2) -> np.array:
-    """
-        Function that shifts the rows of a matrix or vector in such a way, 
-        that each of the M registers of N_qubit qubits are shifted cyclically.
-        The implementation is identical to left multiplication with repeated swap gates,
-        however this optimisation in considerably faster. 
-    """
-    matrix = np.array(matrix)
-    
-    # determine the row permutation for the cyclic shift operation
-    permutation = [j+i for j in range(2**N_qubits) for i in range(0, 2**(M*N_qubits), 2**N_qubits)]
-    
-    # Some fancy index magic to permute the rows in O(n) time and space (n=2**(M*N_qubits))
-    idx = np.empty_like(permutation)
-    idx[permutation] = np.arange(len(permutation))
-
-    # allow to work with lists or arrays of np.ndarrays
-    if matrix.ndim == 2:
-        matrix = matrix[idx] 
-    elif matrix.ndim == 3:
-        matrix[:] = matrix[:, idx]
-    else:
-        raise TypeError("matrix must be a 2 dimensional array or a listor array of 2 dimensional arrays") 
-    return matrix
-
-def apply_symmetric_observable(matrix: np.array, N_qubits: int, observable: Optional[Observable] = None, M: int=2) -> np.array:
-    if observable == None or np.allclose(observable, np.array([[1., 0.], [0.,-1.]])):
-        # use the default Z observable
-        sym_observable_diagonals = []
-        for i in range(N_qubits):
-            observable_i_diagonal = np.array([ j for k in range(2**(i)) for j in [1., -1.] for l in range(2**(N_qubits-i-1))])
-            
-            # turn [a, b, c] into [a,a,a,b,b,b,c,c,c]. This is the same as tensoring the N_qubit identity on the right
-            observable_i_diagonal_system1 = np.array([observable_i_diagonal for _ in range(2**N_qubits) ]).flatten('F')
-            # turn [a,b,c] into [a,b,c,a,b,c,a,b,c]. This is the same as tensoring the N_qubit identity on the left
-            observable_i_diagonal_system2 = np.array([observable_i_diagonal for _ in range(2**N_qubits) ]).flatten('C')
-            # add the symmetric observable
-            sym_observable_diagonals.append(0.5 * (observable_i_diagonal_system1 + observable_i_diagonal_system2))
-        
-        if matrix.ndim == 2:
-            return np.array([sod * matrix for sod in sym_observable_diagonals])
-        elif matrix.ndim == 3:
-            return np.array([sod * mat for sod in sym_observable_diagonals for mat in matrix])
-        else:
-            raise ValueError("matrix should be a 2D or 3D ndarray")
-
-    else:
-        sym_observable_matrices = []
-        for i in range(N_qubits):
-            observable_i_matrix = np.kron(np.kron(np.eye(2**i), observable), np.eye(2**(N_qubits-i-1)))
-            sym_observable_matrix = 0.5 * (np.kron(observable_i_matrix, np.eye(2**N_qubits)) + np.kron(np.eye(2**N_qubits), observable_i_matrix))
-            sym_observable_matrices.append(sym_observable_matrix)
-
-    return np.array(sym_observable_matrices) @ matrix
 
 def execute_with_vd(
         circuit: QPROGRAM, 
@@ -109,9 +55,9 @@ def execute_with_vd(
         rho_tensorM = executor.run(rho)
        
         # two_system_swap = create_S2_N_matrix(N)
-        rho_tensorM_swapped = apply_cyclic_system_permutation(rho_tensorM, N)
+        rho_tensorM_swapped = _apply_cyclic_system_permutation(rho_tensorM, N)
 
-        rho_tensorM_swapped_observabled = apply_symmetric_observable(rho_tensorM_swapped, N, observable)
+        rho_tensorM_swapped_observabled = _apply_symmetric_observable(rho_tensorM_swapped, N, observable)
 
         Z_i_corrected = np.trace(rho_tensorM_swapped_observabled, axis1=1, axis2=2) / np.trace(rho_tensorM_swapped, axis1=1, axis2=2)
         
