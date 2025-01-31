@@ -8,14 +8,7 @@ import copy
 from itertools import product
 from typing import List
 
-from cirq import (
-    Circuit,
-    Operation,
-    X,
-    Y,
-    Z,
-    is_measurement,
-)
+from cirq import Circuit, Operation, X, Y, Z, is_measurement
 
 from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
