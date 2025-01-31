@@ -102,7 +102,7 @@ We now show how to use PEC to reduce this error.
 
 +++
 
-## Appling probabilistic error cancellation (PEC)
+## Applying probabilistic error cancellation (PEC)
 
 +++
 
