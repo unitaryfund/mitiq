@@ -249,7 +249,7 @@ You can also see the off-diagonal values in the heatmap fade steadily as the num
 
 ## Noisy ZNE
 
-Lets define a larger circuit of CNOT and H gates. 
+Let's define a larger circuit of CNOT and H gates. 
 
 ```{code-cell} ipython3
 
