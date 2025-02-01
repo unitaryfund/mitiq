@@ -58,7 +58,7 @@ def execute_with_vd(
 
     # input rho is an N qubit circuit
     N = len(circuit.all_qubits())
-    rho = _copy_circuit_parallel(circuit, M)
+    new_circuit = _copy_circuit_parallel(circuit, M)
 
     Ei = np.array(list(0 for _ in range(N)))
     D = 0
@@ -70,33 +70,29 @@ def execute_with_vd(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
     
+    # TODO allow other executor return types
+    # this only handles executors that return a density matrix or a measurement result
+
+    # Density matrix return type
     if executor._executor_return_type in DensityMatrixLike:
-        # do density matrix treatment
-        rho_tensorM = executor.run(rho)
-       
-        # two_system_swap = create_S2_N_matrix(N)
-        rho_tensorM_swapped = _apply_cyclic_system_permutation(rho_tensorM, N)
-
-        rho_tensorM_swapped_observabled = _apply_symmetric_observable(rho_tensorM_swapped, N, observable)
-
-        Z_i_corrected = np.trace(rho_tensorM_swapped_observabled, axis1=1, axis2=2) / np.trace(rho_tensorM_swapped, axis1=1, axis2=2)
         
+        circuit_dm = executor.run(new_circuit) 
+        circuit_swaps = _apply_cyclic_system_permutation(circuit_dm, N)
+        resulting_dm = _apply_symmetric_observable(circuit_swaps, N, observable)
+        exp_values = np.trace(resulting_dm, axis1=1, axis2=2) / np.trace(resulting_dm, axis1=1, axis2=2)
+        
+
+    # Measurement result return type
     elif executor._executor_return_type in MeasurementResultLike:
 
-        rho = _apply_diagonalizing_gate(rho, M)
+        new_circuit = _apply_diagonalizing_gate(circuit, M)
     
 
-        #  3) apply measurements
-        # The measurements are only added when the executor returns measurement values
-        # the measurement keys are applied in accordance with the SWAPS that are applied in the pseudo code in the paper.
-        # The SWAP operations are omitted here since they are hardware specific.
+        # apply measurements
         for i in range(M*N):
-            rho.append(cirq.measure(cirq.LineQubit(i), key=f"{i}"))
+            new_circuit.append(cirq.measure(cirq.LineQubit(i), key=f"{i}"))
 
-        # this comment we should keep in!
-        # if executor._executor_return_type ==  MeasurementResult: # !!!!!!!!!!!!! aaaaaaaaaasagagahgahghaaagaagahaahahgahggggggghghgghghggh
-        
-        res = executor.run(rho, force_run_all=True, reps=K) # TODO make this reps a **kwargs to allow any executor
+        res = executor.run(new_circuit, force_run_all=True, reps=K) # TODO make this reps a **kwargs to allow any executor
 
         self_packed = True
         if isinstance(res, str):
@@ -110,22 +106,21 @@ def execute_with_vd(
         if len(res) == 1: # if the executor only returns a single measurement
             for _ in range(K-1): # then we measure K times in total
                 if not self_packed:                    
-                    res.append( executor.run(rho, force_run_all=True))
+                    res.append( executor.run(new_circuit, force_run_all=True))
                 else:
-                    res.append( executor.run(rho, force_run_all=True)[0] )
+                    res.append( executor.run(new_circuit, force_run_all=True)[0] )
 
         # post processing measurements
         for bitStr in res:
             
             # This maps 0/1 measurements to 1/-1 measurements, the eigenvalues of the Z observable
-            Z_base_mesurement = 1 - 2* np.array(list(bitStr))
+            Z_base_measurement = np.array(1 if i==0 else -1 for i in list(bitStr))
 
             # Separate the two systems
-            z1 = Z_base_mesurement[:N]
-            z2 = Z_base_mesurement[N:]
+            z1 = Z_base_measurement[:N]
+            z2 = Z_base_measurement[N:]
 
             # Implementing the sum and product from the paper
-            # Note that integer division prevents floating point errors here, 
             # since each factor in the product or the Ei sum will be either +1 or -1.
             # only in case of pauli Z
             product_term = 1
@@ -137,16 +132,14 @@ def execute_with_vd(
             for i in range(N):
                 Ei[i] += (z1[i] + z2[i])//2 * product_term // (( 1 + z1[i] - z2[i] + z1[i]*z2[i] )//2) # undo the j=i term in the product
 
-
-        # Elementwise division by D, since we are working with numpy arrays
-        Z_i_corrected = Ei / D
+        exp_values = Ei / D
     
 
     else:
         raise ValueError("Executor must have a return type of DensityMatrixLike or MeasurementResultLike")
 
-    if not np.allclose(Z_i_corrected.real, Z_i_corrected, atol=1e-6):
+    if not np.allclose(exp_values.real, exp_values, atol=1e-6):
         print("Warning: The expectation value contains a significant imaginary part. This should never happen.")
-        return Z_i_corrected
+        return exp_values
     else:
-        return Z_i_corrected.real
+        return exp_values.real
