@@ -7,7 +7,8 @@ from mitiq import QPROGRAM, Executor, QuantumResult
 from mitiq.observable.observable import Observable
 from mitiq.pea.amplifications.depolarizing import (
     amplify_operations_in_circuit_with_global_depolarizing_noise,
-    amplify_operations_in_circuit_with_local_depolarizing_noise)
+    amplify_operations_in_circuit_with_local_depolarizing_noise,
+)
 from mitiq.pec import OperationRepresentation
 from mitiq.pec.sampling import sample_circuit
 
