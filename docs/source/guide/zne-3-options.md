@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.16.6
 kernelspec:
-  display_name: Python 3
+  display_name: .venv
   language: python
   name: python3
 ---
@@ -530,3 +530,79 @@ _ = factory.plot_fit()
 
 In this section we have shown how to run ZNE with non-default options.
 A lower-level usage of noise scaling methods and {class}`.Factory` objects is presented the next section ([What happens when I use ZNE?](zne-4-low-level.md)).
+
++++
+
+## ZNE modularized
+
++++
+
+In case you want to have more insight in how you run ZNE, there are a few modular functions that one can use to run ZNE. Let's go over an example. First define the circuit we want to apply ZNE on.
+
+```{code-cell} ipython3
+from mitiq import benchmarks
+
+circuit = benchmarks.generate_rb_circuits(
+  n_qubits=1, num_cliffords=2, return_type = "cirq",
+)[0]
+
+print(circuit)
+```
+
+Next we define the executor.
+
+```{code-cell} ipython3
+import numpy as np
+from cirq import DensityMatrixSimulator, depolarize
+from mitiq.interface import convert_to_mitiq
+
+def execute(circuit, noise_level=0.01):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with depolarizing noise.
+    """
+    # Replace with code based on your frontend and backend.
+    mitiq_circuit, _ = convert_to_mitiq(circuit)
+    noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+    return rho[0, 0].real
+```
+
+We import the functions that modularize ZNE from `mitiq.zne.zne`:  `scaled_circuits` and `combine_results`. Then using a scaling method, we can directly obtain the scaled circuits that we will use to do ZNE.
+
+```{code-cell} ipython3
+from mitiq.zne.scaling import fold_gates_at_random
+from mitiq.zne.zne import scaled_circuits, combine_results
+
+scale_factors = [1.0, 2.0, 3.0]
+
+scaled_circuits_random = scaled_circuits(
+    circuit=circuit,
+    scale_factors=[1.0, 2.0, 3.0],
+    scale_method=fold_gates_at_random,
+)
+
+scaled_circuits_random
+```
+
+Next we define an extrapolation method.
+
+```{code-cell} ipython3
+from mitiq.zne.inference import RichardsonFactory
+
+extrapolation_factory = RichardsonFactory(scale_factors=scale_factors)
+
+extrapolation_method = extrapolation_factory.extrapolate
+```
+
+Then we execute the circuits using our executor function and give it to the `combine_results` function.
+
+```{code-cell} ipython3
+results = [execute(circuit) for circuit in scaled_circuits_random]
+
+two_stage_zne_res = combine_results(
+        scale_factors, results, extrapolation_method
+    )
+
+print(f'Unmitigated value: {execute(circuit)}')
+print(f'Mitigated value: {two_stage_zne_res}')
+```
