@@ -110,7 +110,7 @@ Pauli_unitary_list = [
 ]
 
 
-def n_qubit_Paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
+def n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Get a list of n-qubit Pauli unitaries."""
     if num_qubits < 1:
         raise ValueError("Invalid number of qubits provided.")
@@ -118,21 +118,21 @@ def n_qubit_Paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     # get the n-qubit Paulis from the Pauli group
     # disregard the n-qubit Paulis with complex phase
 
-    n_qubit_Paulis = [reduce(lambda a, b: np.kron(a, b), combination)
+    n_qubit_paulis = [reduce(lambda a, b: np.kron(a, b), combination)
         for combination in product(Pauli_unitary_list, repeat=num_qubits)]
-    return n_qubit_Paulis
+    return n_qubit_paulis
 
 
-def Pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
+def pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Define a function to create a list of vectorized matrices.
 
     If the density matrix of interest has more than n>1 qubits, the
     Pauli group is used to generate n-fold tensor products before
     vectorizing the unitaries.
     """
-    n_qubit_Paulis1 = n_qubit_Paulis(num_qubits)
+    n_qubit_paulis1 = n_qubit_paulis(num_qubits)
     output_Pauli_vec_list = []
-    for i in n_qubit_Paulis1:
+    for i in n_qubit_paulis1:
         # the matrix_to_vector function stacks rows in vec form
         # transpose is used here to instead stack the columns
         matrix_trans = np.transpose(i)
@@ -145,8 +145,8 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
 
     superop = choi_to_super(_circuit_to_choi(circuit))
 
-    vec_Pauli = Pauli_vectorized_list(num_qubits)
-    n_qubit_Paulis1 = n_qubit_Paulis(num_qubits)
+    vec_Pauli = pauli_vectorized_list(num_qubits)
+    n_qubit_paulis1 = n_qubit_paulis(num_qubits)
     ptm_matrix = np.zeros([4**num_qubits, 4**num_qubits], dtype=complex)
 
     for i in range(len(vec_Pauli)):
@@ -158,9 +158,9 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
             superop_on_Pauli_matrix_transpose
         )
 
-        for j in range(len(n_qubit_Paulis1)):
+        for j in range(len(n_qubit_paulis1)):
             Pauli_superop_Pauli = np.matmul(
-                n_qubit_Paulis1[j], superop_on_Pauli_matrix
+                n_qubit_paulis1[j], superop_on_Pauli_matrix
             )
             ptm_matrix[j, i] = (0.5**num_qubits) * np.trace(
                 Pauli_superop_Pauli
