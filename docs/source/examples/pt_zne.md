@@ -16,7 +16,7 @@ kernelspec:
 # Zero-Noise Extrapolation with Pauli Twirling
 
 This tutorial explores how noise tailoring can improve the effectiveness of quantum error mitigation techniques.
-Specifically, we analyze how converting coherent noise into incoherent noise through [Pauli Twirling (PT)](../guide/pt.md) 
+Specifically, we analyze how converting coherent noise into incoherent noise through [Pauli Twirling](../guide/pt.md) (PT)
  impacts the performance of [Zero-Noise Extrapolation](../guide/zne.md) (ZNE).
 
 In this tutorial, we will:
@@ -37,7 +37,7 @@ Noise on quantum devices can be broadly categorized into two types: _coherent_ a
 
 ```{note}
 If $\mathcal{F}$ is the average noisy gate fidelity defining the success of preparing an arbitrary pure state $\rho$, then
-$1-\mathcal{F}$ is the **average gate infidelity**. 
+$r(\mathcal{E}) := 1 - \mathcal{F}$ is called the **average gate infidelity**. 
 
 $\mathcal{F}$ is associated with evolving a pure state through a noisy channel and then returning it to the original state {cite}`Nielsen_2002`.
 ```
@@ -67,12 +67,14 @@ $$(depolarizing_noise_paulis)
 
 ### Pauli Transfer Matrix (PTM)
 
-Let $\Lambda(\rho)$ be a $n$-qubit noise channel with $K_i$ being the corresponding Kraus operators. For a Pauli channel,
-we can use $P_i$ and $P_j$ to be the Kraus operators in Eq.{math:numref}`CPTP_map`.
+Let $\Lambda(\rho)$ be an $n$-qubit noise channel with corresponding Kraus operators $K_i$.
 
 $$
 \Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger 
 $$(CPTP_map)
+
+When all $K_i$ are Pauli operators, the channel is called a **Pauli channel**.
+
 
 If $P_i$ and $P_j$ are lexicographically ordered $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, Eq. {math:numref}`PTM_expression` defines the entries of a Pauli Transfer Matrix (PTM). Here, 
 $i$ defines the rows while $j$ defines the columns of the PTM.
@@ -81,12 +83,13 @@ $$
 (R_{\Lambda})_{ij} = \frac{1}{2^n} \text{Tr} \{ P_i \Lambda(P_j)\}
 $$(PTM_expression)
 
-All entries of the PTM are real and in the interval $[-1, 1]$. A PTM allows us to distinguish between the two types of noise. The off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. To find the PTM of an entire circuit, we only need to take the product of the PTM of each layer in the circuit. Due to this, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. The latter is due to only focusing on the diagonal terms of the PTM for incoherent noise such that the product of two or more diagonal matrices is also a diagonal matrix.
+All entries of the PTM are real and in the interval $[-1, 1]$. A PTM allows us to distinguish between the two types of noise since the off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. To find the PTM of an entire circuit, we only need to take the product of the PTM of each layer in the circuit. Due to this, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. The latter is due to only focusing on the diagonal terms of the PTM for incoherent noise such that the product of two or more diagonal matrices is also a diagonal matrix.
 
 The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. To avoid dealing with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as Eq {math:numref}`depolarizing_noise_paulis`, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
 
-It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise differs
-across the circuit used, noise stength, etc. The higher the number of generated twirled circuits, the better the result. Similarly, we get better results from Pauli twirling when the coherent noise strength is closer to the small error limit.
+It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise depends on the circuit used, noise stength, etc.
+Generally, the higher the number of generated twirled circuits, the better the result.
+Similarly, better results are obtained more quickly when the coherent noise strength is low.
 
 ## Using Pauli Twirling in Mitiq
 
@@ -217,10 +220,13 @@ there are additional sources of errors to deal with when coherent noise is actin
 ```{code-cell} ipython3
 from mitiq.pt import generate_pauli_twirl_variants
 
-# Generate twirled circuits
+
 NUM_TWIRLED_VARIANTS = 3
+
 twirled_circuits = generate_pauli_twirl_variants(
-    circuit, num_circuits=NUM_TWIRLED_VARIANTS)
+    circuit,
+    num_circuits=NUM_TWIRLED_VARIANTS,
+)
 print("Example ideal twirled circuit", twirled_circuits[-1], sep="\n")
 ```
 Now, lets add coherent noise to the CNOT gate in each twirled circuit.
@@ -325,8 +331,8 @@ from mitiq.zne import execute_with_zne
 executor=partial(execute, noise_level=NOISE_LEVEL)
 zne_pt_vals = []
 
-for i in twirled_circuits:
-    zne_pt_vals.append(execute_with_zne(i, executor))
+for twirled_circuit in twirled_circuits:
+    zne_pt_vals.append(execute_with_zne(twirled_circuit, executor))
 
 mitigated_result = np.average(zne_pt_vals)
 
@@ -397,4 +403,5 @@ You can get better results if you control the number of samples in `noise_streng
 ## Conclusion
 
 In this tutorial, we've shown how to use a noise tailoring method with Zero-Noise Extrapolation.
-If you're interested in finding out more about these techniques, check out their respective sections of the users guide: [ZNE](../guide/zne.md), [Pauli Twilring](../guide/pt.md).
+If you're interested in finding out more about these techniques, check out their respective sections of the users guide: [ZNE](../guide/zne.md), [Pauli Twirling](../guide/pt.md).
+
