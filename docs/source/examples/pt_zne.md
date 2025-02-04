@@ -36,15 +36,12 @@ Noise on quantum devices can be broadly categorized into two types: _coherent_ a
 **Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$ . When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
 
 ```{note}
-If $\mathcal{F}$ is the average noisy gate fidelity defining the success of preparing an arbitrary pure state $\rho$, then
-$r(\mathcal{E}) := 1 - \mathcal{F}$ is called the **average gate infidelity**. 
-
-$\mathcal{F}$ is associated with evolving a pure state through a noisy channel and then returning it to the original state {cite}`Nielsen_2002`.
+If $\mathcal{F}$ is the average noisy gate fidelity {cite}`Nielsen_2002` defining the success of preparing an arbitrary pure state $\rho$, then $r(\mathcal{E}) := 1 - \mathcal{F}$ is called the **average gate infidelity**.
 ```
 
 **Incoherent noise** is a process that results in the quantum system entangling with its environment i.e. this type of noise is irreversible. The system and the environment end up in a mixed state. This type of noise scales linearly in the small error limit. The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**. 
 
-For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. Pauli twirling strives to convert some noise channel into a Pauli noise channel. As shown in Eq.{math:numref}`depolarizing_noise` and {math:numref}`depolarizing_noise_paulis`, a local depolarizing noise channel can be described using Paulis i.e. it can be said that Pauli twirling tailors a noise channel into a local depolarizing noise channel {cite}`Garc_a_Mart_n_2024`.  
+For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. Pauli twirling strives to convert some noise channel into a Pauli noise channel or approximately close to a Pauli noise channel. This conversion is determined by the depth of the circuit, coherent noise strength and the total number of Pauli twirled circuits used. As shown in Eq.{math:numref}`depolarizing_noise` and {math:numref}`depolarizing_noise_Paulis`, a local depolarizing noise channel can be described using Paulis i.e. it can be said that Pauli twirling tailors a noise channel into a local depolarizing noise channel {cite}`Garc_a_Mart_n_2024`.  
 
 If $\rho$ is a single qubit state, $p$ is the probabilistic error rate and $\mathcal{E}(\rho)$ is the noise channel:
 
@@ -63,7 +60,7 @@ Thus, the depolarizing channel can be redescribed using Paulis as shown below.
 $$
 \mathcal{E}(\rho) = (1-\frac{3p}{4}) \rho + \frac{p}{4} (X \rho X + Y \rho Y + Z \rho Z)
 
-$$(depolarizing_noise_paulis)
+$$(depolarizing_noise_Paulis)
 
 ### Pauli Transfer Matrix (PTM)
 
@@ -73,7 +70,7 @@ $$
 \Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger 
 $$(CPTP_map)
 
-When all $K_i$ are Pauli operators, the channel is called a **Pauli channel**.
+When all $K_i$ are $n$-qubit Pauli operators, the channel is called a **Pauli channel**.
 
 
 If $P_i$ and $P_j$ are lexicographically ordered $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, Eq. {math:numref}`PTM_expression` defines the entries of a Pauli Transfer Matrix (PTM). Here, 
@@ -85,7 +82,7 @@ $$(PTM_expression)
 
 All entries of the PTM are real and in the interval $[-1, 1]$. A PTM allows us to distinguish between the two types of noise since the off-diagonal terms of the PTM are due to the effect of coherent noise while the diagonal terms are due to incoherent noise. To find the PTM of an entire circuit, we only need to take the product of the PTM of each layer in the circuit. Due to this, it is straightforward to see how coherent noise carries across different layers in the circuit and how incoherent errors are easier to deal with in the small error limit. The latter is due to only focusing on the diagonal terms of the PTM for incoherent noise such that the product of two or more diagonal matrices is also a diagonal matrix.
 
-The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. To avoid dealing with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as Eq {math:numref}`depolarizing_noise_paulis`, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
+The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. To avoid dealing with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as Eq {math:numref}`depolarizing_noise_Paulis`, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
 
 It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise depends on the circuit used, noise stength, etc.
 Generally, the higher the number of generated twirled circuits, the better the result.
@@ -105,7 +102,7 @@ from functools import reduce
 from mitiq.pec.channels import _circuit_to_choi, choi_to_super
 from mitiq.utils import matrix_to_vector, vector_to_matrix
 
-pauli_unitary_list = [
+Pauli_unitary_list = [
     cirq.unitary((cirq.I)),
     cirq.unitary((cirq.X)),
     cirq.unitary((cirq.Y)),
@@ -113,34 +110,34 @@ pauli_unitary_list = [
 ]
 
 
-def n_qubit_paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
+def n_qubit_Paulis(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Get a list of n-qubit Pauli unitaries."""
     if num_qubits < 1:
         raise ValueError("Invalid number of qubits provided.")
 
-    # get the n-qubit paulis from the Pauli group
-    # disregard the n-qubit paulis with complex phase
+    # get the n-qubit Paulis from the Pauli group
+    # disregard the n-qubit Paulis with complex phase
 
-    n_qubit_paulis = [reduce(lambda a, b: np.kron(a, b), combination)
-        for combination in product(pauli_unitary_list, repeat=num_qubits)]
-    return n_qubit_paulis
+    n_qubit_Paulis = [reduce(lambda a, b: np.kron(a, b), combination)
+        for combination in product(Pauli_unitary_list, repeat=num_qubits)]
+    return n_qubit_Paulis
 
 
-def pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
+def Pauli_vectorized_list(num_qubits: int) -> list[npt.NDArray[np.complex64]]:
     """Define a function to create a list of vectorized matrices.
 
     If the density matrix of interest has more than n>1 qubits, the
     Pauli group is used to generate n-fold tensor products before
     vectorizing the unitaries.
     """
-    n_qubit_paulis1 = n_qubit_paulis(num_qubits)
-    output_pauli_vec_list = []
-    for i in n_qubit_paulis1:
+    n_qubit_Paulis1 = n_qubit_Paulis(num_qubits)
+    output_Pauli_vec_list = []
+    for i in n_qubit_Paulis1:
         # the matrix_to_vector function stacks rows in vec form
         # transpose is used here to instead stack the columns
         matrix_trans = np.transpose(i)
-        output_pauli_vec_list.append(matrix_to_vector(matrix_trans))
-    return output_pauli_vec_list
+        output_Pauli_vec_list.append(matrix_to_vector(matrix_trans))
+    return output_Pauli_vec_list
 
 
 def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
@@ -148,25 +145,25 @@ def ptm_matrix(circuit: Circuit, num_qubits: int) -> npt.NDArray[np.complex64]:
 
     superop = choi_to_super(_circuit_to_choi(circuit))
 
-    vec_pauli = pauli_vectorized_list(num_qubits)
-    n_qubit_paulis1 = n_qubit_paulis(num_qubits)
+    vec_Pauli = Pauli_vectorized_list(num_qubits)
+    n_qubit_Paulis1 = n_qubit_Paulis(num_qubits)
     ptm_matrix = np.zeros([4**num_qubits, 4**num_qubits], dtype=complex)
 
-    for i in range(len(vec_pauli)):
-        superop_on_pauli_vec = np.matmul(superop, vec_pauli[i])
-        superop_on_pauli_matrix_transpose = vector_to_matrix(
-            superop_on_pauli_vec
+    for i in range(len(vec_Pauli)):
+        superop_on_Pauli_vec = np.matmul(superop, vec_Pauli[i])
+        superop_on_Pauli_matrix_transpose = vector_to_matrix(
+            superop_on_Pauli_vec
         )
-        superop_on_pauli_matrix = np.transpose(
-            superop_on_pauli_matrix_transpose
+        superop_on_Pauli_matrix = np.transpose(
+            superop_on_Pauli_matrix_transpose
         )
 
-        for j in range(len(n_qubit_paulis1)):
-            pauli_superop_pauli = np.matmul(
-                n_qubit_paulis1[j], superop_on_pauli_matrix
+        for j in range(len(n_qubit_Paulis1)):
+            Pauli_superop_Pauli = np.matmul(
+                n_qubit_Paulis1[j], superop_on_Pauli_matrix
             )
             ptm_matrix[j, i] = (0.5**num_qubits) * np.trace(
-                pauli_superop_pauli
+                Pauli_superop_Pauli
             )
 
     return ptm_matrix
@@ -241,7 +238,7 @@ for circ in twirled_circuits:
 print("Example noisy twirled circuit", noisy_twirled_circuits[-1], sep="\n")
 ```
 
-The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays. The variations in pauli twirled PTMs are shown below when averaged over a different number of pauli twirled circuits: [3](../img/pt_zne_3_circuits.png), [5](../img/pt_zne_5_circuits.png), [30](../img/pt_zne_30_circuits.png) and [100](../img/pt_zne_100_circuits.png).  
+The twirled PTM is averaged over each noisy twirled circuit such that the new PTM is close to that of the PTM of incoherent noise. We skip the step in this section as we require a very large number of twirled circuits to demonstrate the desired effect of averaging over multiple numpy arrays. The variations in Pauli twirled PTMs are shown below when averaged over a different number of Pauli twirled circuits.  
 
 ![](../img/pt_zne.gif)
 
@@ -320,7 +317,9 @@ print(f"Error with twirling: {abs(ideal_value - twirled_result) :.3}")
 ```
 
 ```{caution}
-It is worth noting that Pauli twirling's goal is to tailor the noise from coherent to incoherent. Depending on the noise strength, type of coherent noise etc. this transformation might not give better results after the Pauli twirled circuit is executed. See the plot in the next section for more information.
+It is worth noting that Pauli twirling's goal is to tailor the noise from coherent to incoherent. 
+
+Depending on the noise strength, type of coherent noise etc. this transformation might not give better results after the Pauli twirled circuit is executed. See the plot in the next section for an example.
 ```
 
 ## Combining Pauli Twirling with ZNE
