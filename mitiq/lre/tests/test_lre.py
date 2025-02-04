@@ -126,12 +126,12 @@ def test_lre_executor_with_different_folding_methods(input_method):
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 
-def test_lre_with_chunking():
-    """Verify the executor works as expected for chunking a large circuit into
-    a smaller circuit. Note that this does not verify whether the chunked
-    circuit gets better results compared to a non-chunked circuit."""
+def test_lre_runs_correct_number_of_circuits_when_chunking():
+    """Verify execute_with_lre works as expected when chunking is used.
+    Note that this does not validate performance of chunking."""
+
     mock_executor = Mock(side_effect=lambda _: random.random())
-    # define a larger circuit
+
     test_cirq = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=12)[
         0
     ]
