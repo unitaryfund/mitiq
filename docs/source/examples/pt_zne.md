@@ -33,7 +33,7 @@ By the end of the example, you will understand when and how noise tailoring can 
 
 Noise on quantum devices can be broadly categorized into two types: _coherent_ and _incoherent_. Each has different properties that can be unfavorable toward a quantum circuit in different ways.
 
-**Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$ . When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
+**Coherent noise** is a reversible process as long as the noisy unitary transformation is known beforehand which is not always the case. These types of noise maintain the purity of the state. But in a quantum circuit subjected to coherent noise, the errors are easily carried across the circuit. This can be discerned through the **average gate infidelity** $r(\mathcal{E})$ where $\mathcal{E}$ is some noise channel. When coherent errors contribute to a portion of the total error-rate, the worst case infidelity can scale as $\sqrt{r(\mathcal{E})}$ {cite}`Wallman_2014` which in turn reduces the performance of a quantum device by orders of magnitude. Thus, dealing with coherent noise requires a large resource overhead to acquire inferred knowledge of the noise unitaries which can then be used to reverse the effects.
 
 ```{note}
 If $\mathcal{F}$ is the average noisy gate fidelity {cite}`Nielsen_2002` defining the success of preparing an arbitrary pure state $\rho$, then $r(\mathcal{E}) := 1 - \mathcal{F}$ is called the **average gate infidelity**.
@@ -41,7 +41,7 @@ If $\mathcal{F}$ is the average noisy gate fidelity {cite}`Nielsen_2002` definin
 
 **Incoherent noise** is a process that results in the quantum system entangling with its environment i.e. this type of noise is irreversible. The system and the environment end up in a mixed state. This type of noise scales linearly in the small error limit. The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**. 
 
-For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. Pauli twirling strives to convert some noise channel into a Pauli noise channel or approximately close to a Pauli noise channel. This conversion is determined by the depth of the circuit, coherent noise strength and the total number of Pauli twirled circuits used. As shown in Eq.{math:numref}`depolarizing_noise` and {math:numref}`depolarizing_noise_Paulis`, a local depolarizing noise channel can be described using Paulis i.e. it can be said that Pauli twirling tailors a noise channel into a local depolarizing noise channel {cite}`Garc_a_Mart_n_2024`.  
+For example, a depolarizing noise channel is a stochastic noise channel where a noiseless process is probabilistically mixed with orthogonal errors. Pauli twirling strives to convert some noise channel into a Pauli noise channel or approximately close to a Pauli noise channel. This conversion is determined by the depth of the circuit, coherent noise strength and the total number of Pauli twirled circuits used. As shown in Eqs.{math:numref}`depolarizing_noise` and {math:numref}`depolarizing_noise_Paulis` below, a local depolarizing noise channel can be described using Paulis i.e. it can be said that Pauli twirling tailors a noise channel into a local depolarizing noise channel {cite}`Garc_a_Mart_n_2024`.  
 
 If $\rho$ is a single qubit state, $p$ is the probabilistic error rate and $\mathcal{E}(\rho)$ is the noise channel:
 
@@ -64,16 +64,16 @@ $$(depolarizing_noise_Paulis)
 
 ### Pauli Transfer Matrix (PTM)
 
-Let $\Lambda(\rho)$ be an $n$-qubit noise channel with corresponding Kraus operators $K_i$.
+Let $\Lambda(\rho)$ be an $n$-qubit noise channel with corresponding $N$ Kraus operators $K_i$.
 
 $$
-\Lambda(\rho) = \sum_{i=1} K_i \rho {K_i}^\dagger 
+\Lambda(\rho) = \sum_{i=1}^{N} K_i \rho {K_i}^\dagger 
 $$(CPTP_map)
 
 When all $K_i$ are $n$-qubit Pauli operators, the channel is called a **Pauli channel**.
 
 
-If $P_i$ and $P_j$ are lexicographically ordered $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, Eq. {math:numref}`PTM_expression` defines the entries of a Pauli Transfer Matrix (PTM). Here, 
+If $P_i$ and $P_j$ are lexicographically ordered $n$-qubit Paulis $\forall P_i, P_j \in \{I, X, Y, Z \}^{\otimes n}$, the following Eq. {math:numref}`PTM_expression` defines the entries of a Pauli Transfer Matrix (PTM). Here, 
 $i$ defines the rows while $j$ defines the columns of the PTM.
 
 $$
@@ -85,10 +85,12 @@ All entries of the PTM are real and in the interval $[-1, 1]$. A PTM allows us t
 The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. To avoid dealing with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as Eq {math:numref}`depolarizing_noise_Paulis`, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
 
 It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise depends on the circuit used, noise stength, etc.
-Generally, the higher the number of generated twirled circuits, the better the result.
-Similarly, better results are obtained more quickly when the coherent noise strength is low.
+
+Generally, the higher the number of generated twirled circuits, the better the result. Similarly, better results are obtained more quickly when the coherent noise strength is low.
 
 ## Using Pauli Twirling in Mitiq
+
+To demonstrate the differences in the two types of noise discussed in the previous section, we utilize ideal and noisy variations to a circuit comprising a CNOT gate and the functions available in the Pauli twirling module {mod}`.pt`.
 
 ```{code-cell} ipython3
 
@@ -352,25 +354,29 @@ error_no_zne_no_twirling = []
 error_with_twirling = []
 error_with_twirling_and_zne = []
 zne_vals = []
-ideal_values = []
 NUM_TWIRLED_VARIANTS = 30
 
+ideal_value = execute(circuit, noise_level=0.0)
+
 for strength in noise_strength:
-    ideal_value = execute(circuit, noise_level=0.0)
-    ideal_values.append(ideal_value)
+
+    # get noisy expectation values and compare to ideal
     noisy_value = execute(circuit, noise_level=strength)
     id_noisy_diff = abs(ideal_value-noisy_value)
     error_no_zne_no_twirling.append(id_noisy_diff)
 
+    # get expectation values after pauli twirling and compare to ideal
     twirled_circuits = generate_pauli_twirl_variants(circuit, num_circuits=NUM_TWIRLED_VARIANTS)
     pt_vals = Executor(partial(execute, noise_level=strength)).evaluate(twirled_circuits)
     twirled_result = np.average(pt_vals)
     twirled_noisy_diff = abs(ideal_value-twirled_result)
     error_with_twirling.append(twirled_noisy_diff)
 
+    # get expectation values after ZNE and compare to ideal
     executor=partial(execute, noise_level=strength)
     zne_vals.append(abs(ideal_value - execute_with_zne(circuit, executor)))
-    
+
+    # get expectation values after combining pauli twirling and ZNE then compare to ideal
     zne_pt_vals = []
     for i in twirled_circuits:
         zne_pt_vals.append(execute_with_zne(i, executor))
@@ -383,7 +389,7 @@ plt.plot(noise_strength, zne_vals, "", label=r"|Ideal - ZNE|", color="#bcbd22")
 plt.plot(noise_strength, error_with_twirling,"", label=r"|Ideal - Twirling|", color="#ff7f0e")
 plt.plot(noise_strength, error_with_twirling_and_zne, "", label=r"|Ideal - (ZNE + Twirling)|", color="#2ca02c")
 
-plt.xlabel(r"Noise strength, Coherent noise:$R_y(\frac{\pi}{2} \times \text{noise_strength})$")
+plt.xlabel(r"noise_strength, Coherent noise: $R_y(\frac{\pi}{2} \times \text{noise_strength})$")
 plt.ylabel("Absolute Error")
 plt.title("Comparison of expectation values with ideal as a function of noise strength")
 plt.legend()
