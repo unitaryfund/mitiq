@@ -74,9 +74,8 @@ def generate_pauli_twirl_variants(
 ) -> List[QPROGRAM]:
     r"""Return the Pauli twirled versions of the input circuit.
 
-    Only the $\mathrm{CZ}$ and $\mathrm{CNOT}$ gates in an
-    input circuit are Pauli twirled as specified in
-    :cite:`Saki_2023_arxiv`.
+    Only the CNOT and CZ gates in an input circuit are Pauli twirled
+    as specified in :cite:`Saki_2023_arxiv`.
 
     Args:
         circuit: The input circuit on which twirling is applied.
