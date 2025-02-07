@@ -97,10 +97,10 @@ Generally, the higher the number of generated twirled circuits, the better the r
 
 ### PTM and Average Gate Infidelity
 
-With the PTM introduced, it is straightforward to show that coherent noise scales quadratically while incoherent noise scales linearly. Eq. {math:numref}`PTM_y_rotation` shows the PTM of a single-qubit noisy rotation about the Y-axis. 
+With the PTM introduced, it is straightforward to show that coherent noise scales quadratically while incoherent noise scales linearly. Eq. {math:numref}`PTM_y_rotation` shows the PTM of a single-qubit noisy rotation about the Y-axis $R_{Y_{\theta}}$. 
 
 $$
-R_{Y_{\theta}}=\begin{pmatrix}
+R_{R_{Y_{\theta}}}=\begin{pmatrix}
 1 & 0 & 0 & 0\\
 0 & \cos(\theta) & 0 & \sin(\theta)\\
 0 & -\sin(\theta) & 0 & \cos(\theta)\\
