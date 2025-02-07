@@ -41,7 +41,7 @@ If $\mathcal{F}$ is the average noisy gate fidelity {cite}`Nielsen_2002` definin
 
 **Incoherent noise** is a process that results in the quantum system entangling with its environment i.e. this type of noise is irreversible. The system and the environment end up in a mixed state. This type of noise scales linearly in the small error limit. The noise channel can be described using Pauli operators which makes it easy to analyze and simulate. Worst case error rate is directly proportional to the **average gate infidelity**.
 
-See the example in the [PTM and Average Gate Infideltiy](#ptm-and-average-gate-infideltiy) section for more information on how
+See the example in the [PTM and Average Gate Infideltiy](#ptm-and-average-gate-infidelity) section for more information on how
 the error-rate scales for coherent and incoherent noise.
 
 In scenarios where we want to reduce the effect of coherent noise, noise tailoring techniques like Pauli twirling are utilized
@@ -91,27 +91,27 @@ To find the PTM of an entire circuit, we only need to take the product of the PT
 
 The known fault tolerant thresholds for stochastic noise are higher than coherent noise which makes the former a 'preferable' type of noise compared to the latter. To avoid dealing with coherent noise, Pauli twirling can be used to tailor coherent noise to incoherent noise. Same as Eq {math:numref}`depolarizing_noise_Paulis`, when a coherent noise channel is Pauli twirled, the noise channel can be described using Paulis after averaging over multiple Pauli twirled circuits. Refer to the [Pauli Twirling user guide](../guide/pt.md) for additional information. 
 
-It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise depends on the circuit used, noise stength, etc.
+It is worth noting that the number of Pauli twirled circuits required to transform coherent noise to incoherent noise depends on the circuit used, noise strength, etc.
 
 Generally, the higher the number of generated twirled circuits, the better the result. Similarly, better results are obtained more quickly when the coherent noise strength is low.
 
-### PTM and Average Gate Infideltiy
+### PTM and Average Gate Infidelity
 
-With the PTM introduced, it is straightforward to show that coherent noise scales quadratically while incoherent noise scales linearly. Eq. {math:numref}`PTM_y_rotation` shows the PTM of a noisy rotation about the Y-axis. 
+With the PTM introduced, it is straightforward to show that coherent noise scales quadratically while incoherent noise scales linearly. Eq. {math:numref}`PTM_y_rotation` shows the PTM of a single-qubit noisy rotation about the Y-axis. 
 
 $$
-R_{Y_{\theta}}=\begin{bmatrix}
+R_{Y_{\theta}}=\begin{pmatrix}
 1 & 0 & 0 & 0\\
 0 & \cos(\theta) & 0 & \sin(\theta)\\
 0 & -\sin(\theta) & 0 & \cos(\theta)\\
 0 & 0 & 0 & 1\\
-\end{bmatrix}
+\end{pmatrix}
 $$(PTM_y_rotation)
 
 The Taylor series expansions of $\cos(\theta)$ and $\sin(\theta)$ can be approximated as shown in Eq. {math:numref}`taylor_approx` in the small error limit.
 
 $$
-\cos(\theta) \approx 1 - {\theta}^2,\quad \sin(\theta) \approx \theta \\
+\cos(\theta) \approx 1 - \frac{{\theta}^2}{2!},\quad \sin(\theta) \approx \theta \\
 \text{i.e. } \cos(\theta) \propto {\theta}^2,\quad \sin(\theta) \propto \theta
 $$(taylor_approx)
 
