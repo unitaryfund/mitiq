@@ -609,6 +609,12 @@ def test_two_stage_zne(
 
     assert len(circs) == len(scale_factors)
 
+    circs_default_scaling_method = scaled_circuits(
+        frontend_circuit, scale_factors
+    )
+
+    assert len(circs_default_scaling_method) == len(scale_factors)
+
     np.random.seed(42)
 
     def executor(circuit):
@@ -628,52 +634,5 @@ def test_two_stage_zne(
         executor,
         factory=extrapolation_factory(scale_factors),
         scale_noise=noise_scaling_method,
-    )
-    assert np.isclose(zne_res, two_stage_zne_res)
-
-
-@pytest.mark.parametrize(
-    "extrapolation_factory", [RichardsonFactory, LinearFactory]
-)
-@pytest.mark.parametrize(
-    "to_frontend",
-    [None, to_qiskit, to_braket, to_pennylane, to_pyquil, to_qibo],
-)
-def test_two_stage_zne_default_scaling(extrapolation_factory, to_frontend):
-    qreg = cirq.LineQubit.range(2)
-    cirq_circuit = cirq.Circuit(
-        cirq.H.on_each(qreg),
-        cirq.CNOT(*qreg),
-        cirq.CNOT(*qreg),
-        cirq.H.on_each(qreg),
-    )
-    if to_frontend is not None:
-        frontend_circuit = to_frontend(cirq_circuit)
-    else:
-        frontend_circuit = cirq_circuit
-
-    scale_factors = [1, 3, 5]
-    circs = scaled_circuits(frontend_circuit, scale_factors)
-
-    assert len(circs) == len(scale_factors)
-
-    np.random.seed(42)
-
-    def executor(circuit):
-        return np.random.random()
-
-    results = [executor(cirq_circuit) for _ in range(3)]
-    extrapolation_method = extrapolation_factory.extrapolate
-    two_stage_zne_res = combine_results(
-        scale_factors, results, extrapolation_method
-    )
-
-    assert isinstance(two_stage_zne_res, float)
-
-    np.random.seed(42)
-    zne_res = execute_with_zne(
-        cirq_circuit,
-        executor,
-        factory=extrapolation_factory(scale_factors),
     )
     assert np.isclose(zne_res, two_stage_zne_res)
