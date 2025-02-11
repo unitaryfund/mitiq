@@ -16,7 +16,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 def scaled_circuits(
     circuit: QPROGRAM,
     scale_factors: list[float],
-    scale_method: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+    scale_method: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,  # type:ignore [has-type]
 ) -> list[QPROGRAM]:
     """Given a circuit, scale_factors and a scale_method, outputs a list
        of circuits that will be used in ZNE.
