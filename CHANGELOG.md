@@ -8,7 +8,7 @@
 
 This release marks the first step toward Virtual Distillation (VD) in Mitiq, with an initial helper function that vertically copies a circuit _M_ times.
 A team of students at the University of Amsterdam worked for the month of January on implementing the technique that will be integrated into Mitiq over the coming releases.
-We also have a new tutorial thanks to @purva-thakre on combining Paulit Twirling and Zero-Noise Extrapolation!
+We also have a new tutorial thanks to @purva-thakre on combining Pauli Twirling and Zero-Noise Extrapolation!
 
 We are currently testing Layerwise Richardson Extrapolation (LRE) on hardware, and work has begun on Probabilistic Error Amplification (PEA)---stay tuned for more updates in future releases!
 
@@ -23,6 +23,7 @@ We are currently testing Layerwise Richardson Extrapolation (LRE) on hardware, a
 - Changed the badge to Unitary Foundation (#2645) [@muddi900]
 - Typos in PEC User Guide (#2637) [@purva-thakre]
 - typo corrected from supeconducting to superconducting (#2617) [@vrajan1996]
+- Small fixes in docstrings (#2663) [@cosenal]
 
 #### 🧑🏽‍💻 Developer Improvements
 
