@@ -41,7 +41,7 @@ We are currently testing Layerwise Richardson Extrapolation (LRE) on hardware, a
 
 ### Highlights
 
-🎊 Thanks for a great 2024! Our end of the year recap should be out soon. Subscribe [here](https://forms.gle/6UcUjSawHyweXhQV7s) to get the newsletter in your mailbox.
+🎊 Thanks for a great 2024! Our end of the year recap should be out soon. Subscribe [here](https://forms.gle/wVBki9n9ywA4c1Dj6) to get the newsletter in your mailbox.
 
 🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, @sanketsharma and @Shivansh20128!
 
