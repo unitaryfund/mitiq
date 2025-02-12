@@ -2,8 +2,38 @@
 
 ## Version 0.43.0
 
-In Development.
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.42.0...v0.43.0))
 
+### Highlights
+
+This release marks the first step toward Virtual Distillation (VD) in Mitiq, with an initial helper function that vertically copies a circuit _M_ times.
+A team of students at the University of Amsterdam worked for the month of January on implementing the technique that will be integrated into Mitiq over the coming releases.
+We also have a new tutorial thanks to @purva-thakre on combining Pauli Twirling and Zero-Noise Extrapolation!
+
+We are currently testing Layerwise Richardson Extrapolation (LRE) on hardware, and work has begun on Probabilistic Error Amplification (PEA)---stay tuned for more updates in future releases!
+
+#### ✨ Enhancements
+
+- First PR for VD, helper function that copies a circuit M times (#2649) [@chrispy-chicken]
+
+#### 📓 Documentation
+
+- added section on modular functions for ZNE (#2657) [@FarLab + @natestemen]
+- PT + ZNE tutorial (#2601) [@purva-thakre]
+- Changed the badge to Unitary Foundation (#2645) [@muddi900]
+- Typos in PEC User Guide (#2637) [@purva-thakre]
+- typo corrected from supeconducting to superconducting (#2617) [@vrajan1996]
+- Small fixes in docstrings (#2663) [@cosenal]
+
+#### 🧑🏽‍💻 Developer Improvements
+
+- LRE failure for chunking (#2608) [@purva-thakre]
+- update version, changelog (#2613) [@purva-thakre]
+
+#### 📦 Dependency Updates
+
+- Bump pyscf from 2.7.0 to 2.8.0 (#2633) [@dependabot]
+- Update qibo requirement from ~=0.2.13 to ~=0.2.15 (#2643) [@dependabot]
 
 ## Version 0.42.0
 
@@ -11,7 +41,7 @@ In Development.
 
 ### Highlights
 
-🎊 Thanks for a great 2024! Our end of the year recap should be out soon. Subscribe [here](https://forms.gle/6UcUjSawHyweXhQV7s) to get the newsletter in your mailbox.
+🎊 Thanks for a great 2024! Our end of the year recap should be out soon. Subscribe [here](https://forms.gle/wVBki9n9ywA4c1Dj6) to get the newsletter in your mailbox.
 
 🚀 Many thanks to **first time contributors** @gluonhiggs, @JMuff22, @sanketsharma and @Shivansh20128!
 
