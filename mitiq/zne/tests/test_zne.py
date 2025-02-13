@@ -609,12 +609,6 @@ def test_two_stage_zne(
 
     assert len(circs) == len(scale_factors)
 
-    circs_default_scaling_method = scaled_circuits(
-        frontend_circuit, scale_factors
-    )
-
-    assert len(circs_default_scaling_method) == len(scale_factors)
-
     np.random.seed(42)
 
     def executor(circuit):
@@ -636,3 +630,20 @@ def test_two_stage_zne(
         scale_noise=noise_scaling_method,
     )
     assert np.isclose(zne_res, two_stage_zne_res)
+
+
+def test_default_scaling_option_two_stage_zne():
+    qreg = cirq.LineQubit.range(2)
+    cirq_circuit = cirq.Circuit(
+        cirq.H.on_each(qreg),
+        cirq.CNOT(*qreg),
+        cirq.CNOT(*qreg),
+        cirq.H.on_each(qreg),
+    )
+
+    scale_factors = [3, 5, 6, 8]
+
+    circs_default_scaling_method = scaled_circuits(cirq_circuit, scale_factors)
+
+    for i in range(len(scale_factors)):
+        assert len(circs_default_scaling_method[i]) > len(cirq_circuit)
