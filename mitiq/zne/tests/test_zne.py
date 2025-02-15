@@ -584,11 +584,11 @@ def test_execute_zne_on_qiskit_circuit_with_QFT():
     "extrapolation_factory", [RichardsonFactory, LinearFactory]
 )
 @pytest.mark.parametrize(
-    "to_frontend",
+    "conversion_func",
     [None, to_qiskit, to_braket, to_pennylane, to_pyquil, to_qibo],
 )
 def test_two_stage_zne(
-    noise_scaling_method, extrapolation_factory, to_frontend
+    noise_scaling_method, extrapolation_factory, conversion_func
 ):
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
@@ -597,8 +597,8 @@ def test_two_stage_zne(
         cirq.CNOT(*qreg),
         cirq.H.on_each(qreg),
     )
-    if to_frontend is not None:
-        frontend_circuit = to_frontend(cirq_circuit)
+    if conversion_func is not None:
+        frontend_circuit = conversion_func(cirq_circuit)
     else:
         frontend_circuit = cirq_circuit
 
@@ -630,3 +630,20 @@ def test_two_stage_zne(
         scale_noise=noise_scaling_method,
     )
     assert np.isclose(zne_res, two_stage_zne_res)
+
+
+def test_default_scaling_option_two_stage_zne():
+    qreg = cirq.LineQubit.range(2)
+    cirq_circuit = cirq.Circuit(
+        cirq.H.on_each(qreg),
+        cirq.CNOT(*qreg),
+        cirq.CNOT(*qreg),
+        cirq.H.on_each(qreg),
+    )
+
+    scale_factors = [3, 5, 6, 8]
+
+    circs_default_scaling_method = scaled_circuits(cirq_circuit, scale_factors)
+
+    for i in range(len(scale_factors)):
+        assert len(circs_default_scaling_method[i]) > len(cirq_circuit)
