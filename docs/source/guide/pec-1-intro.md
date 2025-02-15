@@ -177,12 +177,36 @@ print(f"Error with PEC:    {abs(ideal_value - pec_value) :.5f}")
 
 As printed above, PEC reduced the error compared to the unmitigated case.
 
+## Step by step application of PEC
+
+This section demonstrates the use of the {func}`.generate_sampled_circuits` for those who want to generate and see a list of sampled circuits based on the given quasi-probability representaions.
 
 ### Generate Sample Circuits
-We can now generate a list of sampled circuits based on the given quasi-probability representaions.
+We will now generate a list of sampled circuits. Note that the number of sampled circuits generated depends on the input provided.
 
 ```{code-cell} ipython3
 sampled_circuits = pec.generate_sampled_circuits(circuit, representations=reps)
 
 print(sampled_circuits[0])
 ```
+
+Now that we have many circuits, we can inspect them (or even change them if desired).
+We can then execute the circuits and store the results in a list, which can be used by the {func}`.pec.combine_results` to get a combined result.
+
+### Combine the results
+
+We will now get the combined result of the list of circuits generated.
+
+```{code-cell} ipython3
+pec_value_1 = pec.execute_with_pec(sampled_circuits[0], execute, representations=reps)
+pec_value_2 = pec.execute_with_pec(sampled_circuits[1], execute, representations=reps)
+pec_value_3 = pec.execute_with_pec(sampled_circuits[2], execute, representations=reps)
+pec_values = [pec_value_1, pec_value_2, pec_value_3]
+
+combined_result = pec.combine_results([pec_values], 1 , [1,1,1])
+
+print(f"Error without PEC: {abs(ideal_value - noisy_value) :.5f}")
+print(f"Error with PEC:    {abs(ideal_value - combined_result) :.5f}")
+```
+
+As you can see above, PEC reduced the error compared to the unmitigated case and it also depends on the sampled circuits.
