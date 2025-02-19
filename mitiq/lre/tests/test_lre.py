@@ -3,12 +3,13 @@
 import math
 import random
 import re
+from typing import List
 from unittest.mock import Mock
 
 import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
-from mitiq import SUPPORTED_PROGRAM_TYPES, benchmarks
+from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
 from mitiq.lre import execute_with_lre, lre_decorator, mitigate_executor
 from mitiq.lre.multivariate_scaling.layerwise_folding import _get_chunks
 from mitiq.zne.scaling import fold_all, fold_global
@@ -28,6 +29,10 @@ def execute(circuit, noise_level=0.025):
     return rho[0, 0].real
 
 
+def batched_executor(circuits) -> List[float]:
+    return [execute(circuit) for circuit in circuits]
+
+
 noisy_val = execute(test_cirq)
 ideal_val = execute(test_cirq, noise_level=0)
 
@@ -42,6 +47,20 @@ def test_lre_exp_value(degree, fold_multiplier):
         fold_multiplier=fold_multiplier,
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+
+
+@pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
+def test_batch_lre_exp_value(degree, fold_multiplier):
+    """Verify LRE batch executor works as expected."""
+    test_executor = Executor(batched_executor)
+    lre_exp_val = execute_with_lre(
+        test_cirq,
+        test_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+    )
+    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+    assert test_executor.calls_to_executor == 1
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
