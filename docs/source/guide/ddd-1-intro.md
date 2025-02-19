@@ -117,6 +117,35 @@ For example, one can check that by changing the parameters of the input circuit,
 the error with DDD is sometimes larger than the unmitigated error.
 ```
 
+## Step by step application of DDD
+
+In this section we demonstrate the use of {func}`.generate_circuits_with_ddd` for those who might want to generate circuits with DDD sequences inserted, and have more control over the protocol.
+
+### Generating circuits with DDD sequences
+
+Here we will generate a list of circuits with DDD sequences inserted, which will later be passed to the executor.
+
+```{code-cell} ipython3
+circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule)
+print(circuits_with_ddd[0])
+```
+
+Now that we have many circuits, we can inspect them (or even change them if desired).
+We can then execute the circuits and store the results in a list, which can be used by the {func}`.ddd.combine_results` to get a combined result.
+
+### Combine the results
+
+We will now get the combined result of the list of circuits generated.
+
+```{code-cell} ipython3
+results = [execute(circuit) for circuit in circuits_with_ddd]
+combined_result = ddd.combine_results(results)
+
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
+print(f"Error with mitigation (DDD): {abs(ideal_value - combined_result) :.3}")
+```
+
+As you can see above, DDD reduced the error compared to the unmitigated case and it also depends on the sampled circuits.
 +++
 
 The section
