@@ -5,9 +5,9 @@ from cirq import Circuit
 
 from mitiq import QPROGRAM, Executor, QuantumResult
 from mitiq.observable.observable import Observable
-from mitiq.pea.amplifications.depolarizing import (
-    amplify_operations_in_circuit_with_global_depolarizing_noise,
-    amplify_operations_in_circuit_with_local_depolarizing_noise,
+from mitiq.pea.amplifications.amplify_depolarizing import (
+    amplify_noisy_ops_in_circuit_with_global_depolarizing_noise,
+    amplify_noisy_ops_in_circuit_with_local_depolarizing_noise,
 )
 from mitiq.pec import OperationRepresentation
 from mitiq.pec.sampling import sample_circuit
@@ -23,10 +23,10 @@ def scale_circuit_amplifications(
     factor multiplied by the baseline noise level."""
 
     if noise_model == "local-depolarizing":
-        amp_fn = amplify_operations_in_circuit_with_local_depolarizing_noise
+        amp_fn = amplify_noisy_ops_in_circuit_with_local_depolarizing_noise
         # TODO add other existing noise models from Mitiq
     elif noise_model == "global-depolarizing":
-        amp_fn = amplify_operations_in_circuit_with_global_depolarizing_noise
+        amp_fn = amplify_noisy_ops_in_circuit_with_global_depolarizing_noise
     else:
         raise ValueError("Must specify supported noise model")
         # TODO allow use of custom noise model

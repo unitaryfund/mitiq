@@ -18,7 +18,7 @@ from mitiq.interface.conversions import (
 from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 
-def amplify_operation_with_global_depolarizing_noise(
+def amplify_noisy_op_with_global_depolarizing_noise(
     ideal_operation: QPROGRAM,
     noise_level: float,
     is_qubit_dependent: bool = True,
@@ -95,7 +95,7 @@ def amplify_operation_with_global_depolarizing_noise(
     if len(qubits) == 1:
         q = tuple(qubits)[0]
 
-        alpha_pos = 1 - noise_level
+        alpha_pos = 1.0 - noise_level
         alpha_neg = noise_level / 3
 
         alphas = [alpha_pos] + 3 * [alpha_neg]
@@ -106,7 +106,7 @@ def amplify_operation_with_global_depolarizing_noise(
     elif len(qubits) == 2:
         q0, q1 = qubits
 
-        alpha_pos = 1 - noise_level
+        alpha_pos = 1.0 - noise_level
         alpha_neg = noise_level / 15
 
         alphas = [alpha_pos] + 15 * [alpha_neg]
@@ -140,7 +140,7 @@ def amplify_operation_with_global_depolarizing_noise(
     )
 
 
-def amplify_operation_with_local_depolarizing_noise(
+def amplify_noisy_op_with_local_depolarizing_noise(
     ideal_operation: QPROGRAM,
     noise_level: float,
     is_qubit_dependent: bool = True,
@@ -189,7 +189,7 @@ def amplify_operation_with_local_depolarizing_noise(
     qubits = converted_circ.all_qubits()
 
     if len(qubits) == 1:
-        return amplify_operation_with_global_depolarizing_noise(
+        return amplify_noisy_op_with_global_depolarizing_noise(
             ideal_operation,
             noise_level,
         )
@@ -200,7 +200,7 @@ def amplify_operation_with_local_depolarizing_noise(
 
         # Single-qubit amplification coefficients.
         c_neg = noise_level / 3
-        c_pos = 1 - noise_level
+        c_pos = 1.0 - noise_level
 
         imp_op_circuits = []
         alphas = []
@@ -242,7 +242,7 @@ def amplify_operation_with_local_depolarizing_noise(
     )
 
 
-def amplify_operations_in_circuit_with_global_depolarizing_noise(
+def amplify_noisy_ops_in_circuit_with_global_depolarizing_noise(
     ideal_circuit: QPROGRAM, noise_level: float
 ) -> List[OperationRepresentation]:
     """Iterates over all unique operations of the input ``ideal_circuit`` and,
@@ -280,7 +280,7 @@ def amplify_operations_in_circuit_with_global_depolarizing_noise(
         if is_measurement(op):
             continue
         amplifications.append(
-            amplify_operation_with_global_depolarizing_noise(
+            amplify_noisy_op_with_global_depolarizing_noise(
                 Circuit(op),
                 noise_level,
             )
@@ -288,7 +288,7 @@ def amplify_operations_in_circuit_with_global_depolarizing_noise(
     return amplifications
 
 
-def amplify_operations_in_circuit_with_local_depolarizing_noise(
+def amplify_noisy_ops_in_circuit_with_local_depolarizing_noise(
     ideal_circuit: QPROGRAM, noise_level: float
 ) -> List[OperationRepresentation]:
     """Iterates over all unique operations of the input ``ideal_circuit`` and,
@@ -326,7 +326,7 @@ def amplify_operations_in_circuit_with_local_depolarizing_noise(
         if is_measurement(op):
             continue
         amplifications.append(
-            amplify_operation_with_local_depolarizing_noise(
+            amplify_noisy_op_with_local_depolarizing_noise(
                 Circuit(op),
                 noise_level,
             )
