@@ -198,12 +198,9 @@ We can then execute the circuits and store the results in a list, which can be u
 We will now get the combined result of the list of circuits generated.
 
 ```{code-cell} ipython3
-pec_value_1 = pec.execute_with_pec(sampled_circuits[0], execute, representations=reps)
-pec_value_2 = pec.execute_with_pec(sampled_circuits[1], execute, representations=reps)
-pec_value_3 = pec.execute_with_pec(sampled_circuits[2], execute, representations=reps)
-pec_values = [pec_value_1, pec_value_2, pec_value_3]
+results = [execute(circuit) for circuit in sampled_circuits]
 
-combined_result = pec.combine_results([pec_values], 1 , [1,1,1])
+combined_result = pec.combine_results([results], 1 , [1,1,1])
 
 print(f"Error without PEC: {abs(ideal_value - noisy_value) :.5f}")
 print(f"Error with PEC:    {abs(ideal_value - combined_result) :.5f}")
