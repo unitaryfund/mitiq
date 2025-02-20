@@ -10,7 +10,11 @@ import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
-from mitiq.lre import execute_with_lre, lre_decorator, mitigate_executor
+from mitiq.lre import (
+    execute_with_lre,
+    lre_decorator,
+    mitigate_executor,
+)
 from mitiq.lre.multivariate_scaling.layerwise_folding import _get_chunks
 from mitiq.zne.scaling import fold_all, fold_global
 
@@ -93,6 +97,14 @@ def test_lre_mitigate_executor(degree, fold_multiplier):
     assert abs(exp_val_from_mitigate_executor - ideal_val) <= abs(
         noisy_val - ideal_val
     )
+    batched_mitigated_executor = mitigate_executor(
+        batched_executor, degree=2, fold_multiplier=2
+    )
+    batched_exp_vals = batched_mitigated_executor([test_cirq] * 3)
+    assert [
+        abs(batched_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+        for batched_exp_val in batched_exp_vals
+    ]
 
 
 def test_lre_decorator():
