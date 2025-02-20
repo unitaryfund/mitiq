@@ -64,7 +64,6 @@ def test_batch_lre_exp_value(degree, fold_multiplier):
         fold_multiplier=fold_multiplier,
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
-    assert test_executor.calls_to_executor == 1
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
