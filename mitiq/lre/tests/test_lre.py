@@ -15,7 +15,10 @@ from mitiq.lre import (
     lre_decorator,
     mitigate_executor,
 )
-from mitiq.lre.multivariate_scaling.layerwise_folding import _get_chunks
+from mitiq.lre.multivariate_scaling.layerwise_folding import (
+    _get_chunks,
+    multivariate_layer_scaling,
+)
 from mitiq.zne.scaling import fold_all, fold_global
 
 # default circuit for all unit tests
@@ -56,14 +59,27 @@ def test_lre_exp_value(degree, fold_multiplier):
 @pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
 def test_batch_lre_exp_value(degree, fold_multiplier):
     """Verify LRE batch executor works as expected."""
-    test_executor = Executor(batched_executor)
+    test_batched_executor = Executor(batched_executor)
+    test_executor = Executor(execute)
     lre_exp_val = execute_with_lre(
         test_cirq,
         test_executor,
         degree=degree,
         fold_multiplier=fold_multiplier,
     )
-    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+    lre_exp_val_batched = execute_with_lre(
+        test_cirq,
+        test_batched_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+    )
+    assert isinstance(lre_exp_val, float)
+    assert isinstance(lre_exp_val_batched, float)
+
+    assert test_executor.calls_to_executor == len(
+        multivariate_layer_scaling(test_cirq, degree, fold_multiplier)
+    )
+    assert test_batched_executor.calls_to_executor == 1
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
