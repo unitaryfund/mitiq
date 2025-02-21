@@ -6,7 +6,6 @@
 """Functions for mapping circuits to (near) Clifford circuits."""
 
 from typing import (
-    Annotated,
     List,
     Optional,
     Sequence,
@@ -30,37 +29,29 @@ from mitiq.interface import atomic_one_to_many_converter
 
 
 class GenerateTrainingCircuitsKwargs(TypedDict):
-    sigma_select: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        method_select='gaussian'
-        """,
-    ]
-    sigma_replace: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        method_replace='gaussian'
-        """,
-    ]
+    """Keyword arguments for `generate_training_circuits`.
+    
+    Attributes:
+        sigma_select: Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+        sigma_replace: Width of the Gaussian distribution used for
+            ``method_replace='gaussian'``.
+    """
+    sigma_select: float
+    sigma_replace: float
 
 
 class _MapToNearCliffordKwargs(TypedDict):
-    sigma_select: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for 
-        method_select='gaussian'
-        """,
-    ]
-    sigma_replace: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        method_replace='gaussian'
-        """,
-    ]
+    """Keyword arguments for `_map_to_near_clifford`.
+    
+    Attributes:
+        sigma_select: Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+        sigma_replace: Width of the Gaussian distribution used for
+            ``method_replace='gaussian'``.
+    """
+    sigma_select: float
+    sigma_replace: float
 
 
 @atomic_one_to_many_converter
@@ -152,13 +143,6 @@ def _map_to_near_clifford(
             replaced by Clifford gates. Options are 'uniform', 'gaussian' or
             'closest'.
         random_state: Seed for sampling.
-        kwargs: Additional options for selection / replacement methods.
-
-            - sigma_select (float): Width of the Gaussian distribution used for
-            ``method_select='gaussian'``.
-
-            - sigma_replace (float): Width of the Gaussian distribution used
-            for ``method_replace='gaussian'``.
     """
     sigma_select: float = kwargs.get("sigma_select", 0.5)
     sigma_replace: float = kwargs.get("sigma_replace", 0.5)

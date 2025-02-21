@@ -8,7 +8,6 @@
 import warnings
 from copy import deepcopy
 from typing import (
-    Annotated,
     Any,
     Dict,
     FrozenSet,
@@ -31,11 +30,10 @@ from mitiq.utils import (
 
 
 class FoldGatesAtRandomKwargs(TypedDict):
-    fidelities: Annotated[
-        Dict[str, float],
-        (
-            """
-            Dictionary of gate fidelities. Each key
+    """Keyword arguments for `fold_gates_at_random`.
+    
+    Attributes:
+        fidelities: Dictionary of gate fidelities. Each key
             is a string which specifies the gate and each value is the
             fidelity of that gate. When this argument is provided, folded
             gates contribute an amount proportional to their infidelity
@@ -73,29 +71,19 @@ class FoldGatesAtRandomKwargs(TypedDict):
 
             For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
             single-qubit gates except Hadamard to have fidelity one.
-            """
-        ),
-    ]
-    squash_moments: Annotated[
-        bool,
-        (
-            """
-            If True, all gates (including folded gates) are
+            
+        squash_moments: If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
-            """
-        ),
-    ]
-    return_mitiq: Annotated[
-        bool,
-        (
-            """
-            If True, returns a Mitiq circuit instead of
+
+        return_mitiq: If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
-            """
-        ),
-    ]
+    """
+    
+    fidelities: Dict[str, float]
+    squash_moments: bool
+    return_mitiq: bool
 
 
 class UnfoldableCircuitError(Exception):

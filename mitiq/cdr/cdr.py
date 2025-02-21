@@ -7,7 +7,6 @@
 
 from functools import wraps
 from typing import (
-    Annotated,
     Any,
     Callable,
     List,
@@ -32,107 +31,86 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 
 class ExecuteWithCdrKwargs(TypedDict):
-    method_select: Annotated[
-        str,
-        """
-        Specifies the method used to select the
-        non-Clifford gates to replace when constructing the near-Clifford
-        training circuits. Can be 'uniform' or 'gaussian'.
-        """,
-    ]
-    method_replace: Annotated[
-        str,
-        """
-        Specifies the method used to replace the
-        selected non-Clifford gates with a Clifford when constructing the
-        near-Clifford training circuits. Can be 'uniform', 'gaussian', or
-        'closest'.
-        """,
-    ]
-    sigma_select: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        ``method_select='gaussian'``.
-        """,
-    ]
-    sigma_replace: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used
-        for ``method_replace='gaussian'``.
-        """,
-    ]
-    random_state: Annotated[int, "Seed for sampling."]
-
+    """Keyword arguments for `execute_with_cdr`.
+    
+    Attributes:
+        method_select (str): Specifies the method used to select the
+            non-Clifford gates to replace when constructing the near-Clifford
+            training circuits. Can be 'uniform' or 'gaussian'.
+            
+        method_replace (str): Specifies the method used to replace
+            the selected non-Clifford gates with a Clifford when constructing
+            the near-Clifford training circuits. Can be 'uniform', 'gaussian'
+            , or 'closest'.
+            
+        sigma_select (float): Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+            
+        sigma_replace (float): Width of the Gaussian distribution used
+            for ``method_replace='gaussian'``.
+            
+        random_state (int): Seed for sampling.
+    """
+    method_select: str
+    method_replace: str
+    sigma_select: float
+    sigma_replace: float
+    random_state: int
 
 class MitigateExecutorKwargs(TypedDict):
-    method_select: Annotated[
-        str,
-        """
-        Specifies the method used to select the
-        non-Clifford gates to replace when constructing the near-Clifford
-        training circuits. Can be 'uniform' or 'gaussian'.
-        """,
-    ]
-    method_replace: Annotated[
-        str,
-        """
-        Specifies the method used to replace the
-        selected non-Clifford gates with a Clifford when constructing the
-        near-Clifford training circuits. Can be 'uniform', 'gaussian', or
-        'closest'.
-        """,
-    ]
-    sigma_select: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        method_select='gaussian'.
-        """,
-    ]
-    sigma_replace: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        method_replace='gaussian'.
-        """,
-    ]
-    random_state: Annotated[int, "Seed for sampling."]
-
-
+    """Keyword arguments for `mitigate_executor`.
+    
+    Attributes:
+        method_select (str): Specifies the method used to select the
+            non-Clifford gates to replace when constructing the near-Clifford
+            training circuits. Can be 'uniform' or 'gaussian'.
+            
+        method_replace (str): Specifies the method used to replace
+            the selected non-Clifford gates with a Clifford when constructing
+            the near-Clifford training circuits. Can be 'uniform', 'gaussian'
+            , or 'closest'.
+            
+        sigma_select (float): Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+            
+        sigma_replace (float): Width of the Gaussian distribution used
+            for ``method_replace='gaussian'``.
+            
+        random_state (int): Seed for sampling.
+    """
+    method_select: str
+    method_replace: str
+    sigma_select: float
+    sigma_replace: float
+    random_state: int
+    
 class CdrDecoratorKwargs(TypedDict):
-    method_select: Annotated[
-        str,
-        """
-        Specifies the method used to select the
-        non-Clifford gates to replace when constructing the near-Clifford
-        training circuits. Can be 'uniform' or 'gaussian'.
-        """,
-    ]
-    method_replace: Annotated[
-        str,
-        "Specifies the method used to replace the \
-        selected non-Clifford gates with a Clifford when constructing the \
-        near-Clifford training circuits. Can be 'uniform', 'gaussian', or \
-        'closest'.",
-    ]
-    sigma_select: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used for
-        ``method_select='gaussian'``.
-        """,
-    ]
-    sigma_replace: Annotated[
-        float,
-        """
-        Width of the Gaussian distribution used
-        for ``method_replace='gaussian'``.
-        """,
-    ]
-    random_state: Annotated[int, "Seed for sampling."]
-
+    """Keyword arguments for `cdr_decorator`.
+    
+    Attributes:
+        method_select (str): Specifies the method used to select the
+            non-Clifford gates to replace when constructing the near-Clifford
+            training circuits. Can be 'uniform' or 'gaussian'.
+            
+        method_replace (str): Specifies the method used to replace
+            the selected non-Clifford gates with a Clifford when constructing
+            the near-Clifford training circuits. Can be 'uniform', 'gaussian'
+            , or 'closest'.
+            
+        sigma_select (float): Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+            
+        sigma_replace (float): Width of the Gaussian distribution used
+            for ``method_replace='gaussian'``.
+            
+        random_state (int): Seed for sampling.
+    """
+    method_select: str
+    method_replace: str
+    sigma_select: float
+    sigma_replace: float
+    random_state: int
+    
 
 def execute_with_cdr(
     circuit: QPROGRAM,
@@ -305,7 +283,9 @@ def mitigate_executor(
 
             - Note: When scale factors larger than 1.0 are provided, the method
               is known as "variable-noise CDR."
+
     """
+
     executor_obj = Executor(executor)
     if not executor_obj.can_batch:
 
@@ -400,6 +380,7 @@ def cdr_decorator(
 
             - Note: When scale factors larger than 1.0 are provided, the method
               is known as "variable-noise CDR."
+
     """
 
     def decorator(
