@@ -56,10 +56,13 @@ def test_lre_exp_value(degree, fold_multiplier):
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 
-@pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
+@pytest.mark.parametrize(
+    "degree, fold_multiplier",
+    [(2, 2), (2, 3), (3, 4)],
+)
 def test_batch_lre_exp_value(degree, fold_multiplier):
     """Verify LRE batch executor works as expected."""
-    test_batched_executor = Executor(batched_executor)
+    test_batched_executor = Executor(batched_executor, max_batch_size=200)
     test_executor = Executor(execute)
     lre_exp_val = execute_with_lre(
         test_cirq,
