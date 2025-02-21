@@ -5,7 +5,15 @@
 
 """Functions for mapping circuits to (near) Clifford circuits."""
 
-from typing import Any, List, Optional, Sequence, Union, cast
+from typing import (
+    List,
+    Optional,
+    Sequence,
+    TypedDict,
+    Union,
+    Unpack,
+    cast,
+)
 
 import cirq
 import numpy as np
@@ -20,6 +28,32 @@ from mitiq.cdr.clifford_utils import (
 from mitiq.interface import atomic_one_to_many_converter
 
 
+class GenerateTrainingCircuitsKwargs(TypedDict):
+    """Keyword arguments for `generate_training_circuits`.
+    
+    Attributes:
+        sigma_select: Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+        sigma_replace: Width of the Gaussian distribution used for
+            ``method_replace='gaussian'``.
+    """
+    sigma_select: float
+    sigma_replace: float
+
+
+class _MapToNearCliffordKwargs(TypedDict):
+    """Keyword arguments for `_map_to_near_clifford`.
+    
+    Attributes:
+        sigma_select: Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+        sigma_replace: Width of the Gaussian distribution used for
+            ``method_replace='gaussian'``.
+    """
+    sigma_select: float
+    sigma_replace: float
+
+
 @atomic_one_to_many_converter
 def generate_training_circuits(
     circuit: Circuit,
@@ -28,7 +62,7 @@ def generate_training_circuits(
     method_select: str = "uniform",
     method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    **kwargs: Any,
+    **kwargs: Unpack[GenerateTrainingCircuitsKwargs],
 ) -> List[Circuit]:
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
@@ -51,13 +85,6 @@ def generate_training_circuits(
             replaced by Clifford gates. Options are 'uniform', 'gaussian' or
             'closest'.
         random_state: Seed for sampling.
-        kwargs: Available keyword arguments are:
-
-            - sigma_select (float): Width of the Gaussian distribution used for
-              ``method_select='gaussian'``.
-
-            - sigma_replace (float): Width of the Gaussian distribution used
-              for ``method_replace='gaussian'``.
     """
     if random_state is None or isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
@@ -101,7 +128,7 @@ def _map_to_near_clifford(
     method_select: str = "uniform",
     method_replace: str = "closest",
     random_state: Optional[np.random.RandomState] = None,
-    **kwargs: Any,
+    **kwargs: Unpack[_MapToNearCliffordKwargs],
 ) -> Sequence[cirq.ops.Operation]:
     """Returns the list of non-Clifford operations with some of these replaced
     by Clifford operations.
@@ -116,13 +143,6 @@ def _map_to_near_clifford(
             replaced by Clifford gates. Options are 'uniform', 'gaussian' or
             'closest'.
         random_state: Seed for sampling.
-        kwargs: Additional options for selection / replacement methods.
-
-            - sigma_select (float): Width of the Gaussian distribution used for
-            ``method_select='gaussian'``.
-
-            - sigma_replace (float): Width of the Gaussian distribution used
-            for ``method_replace='gaussian'``.
     """
     sigma_select: float = kwargs.get("sigma_select", 0.5)
     sigma_replace: float = kwargs.get("sigma_replace", 0.5)
