@@ -10,7 +10,7 @@ from typing import Any, Callable, Optional, Union
 
 import numpy as np
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, Executor
 from mitiq.lre.inference import (
     multivariate_richardson_coefficients,
 )
@@ -22,7 +22,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 def execute_with_lre(
     input_circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
+    executor: Union[Executor, Callable[[QPROGRAM], float]],
     degree: int,
     fold_multiplier: int,
     folding_method: Callable[
@@ -61,6 +61,9 @@ def execute_with_lre(
         Error-mitigated expectation value
 
     """
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
     noise_scaled_circuits = multivariate_layer_scaling(
         input_circuit, degree, fold_multiplier, num_chunks, folding_method
     )
@@ -80,10 +83,7 @@ def execute_with_lre(
             + "multivariate extrapolation."
         )
 
-    lre_exp_values = []
-    for scaled_circuit in noise_scaled_circuits:
-        circ_exp_val = executor(scaled_circuit)
-        lre_exp_values.append(circ_exp_val)
+    lre_exp_values = executor.evaluate(noise_scaled_circuits)
 
     return np.dot(lre_exp_values, linear_combination_coeffs)
 
@@ -117,16 +117,34 @@ def mitigate_executor(
         Error-mitigated version of the circuit executor.
     """
 
-    @wraps(executor)
-    def new_executor(input_circuit: QPROGRAM) -> float:
-        return execute_with_lre(
-            input_circuit,
-            executor,
-            degree,
-            fold_multiplier,
-            folding_method,
-            num_chunks,
-        )
+    executor_obj = Executor(executor)
+    if not executor_obj.can_batch:
+
+        @wraps(executor)
+        def new_executor(input_circuit: QPROGRAM) -> float:
+            return execute_with_lre(
+                input_circuit,
+                executor,
+                degree,
+                fold_multiplier,
+                folding_method,
+                num_chunks,
+            )
+    else:
+
+        @wraps(executor)
+        def new_executor(input_circuits: list[QPROGRAM]) -> list[float]:
+            return [
+                execute_with_lre(
+                    input_circuit,
+                    executor,
+                    degree,
+                    fold_multiplier,
+                    folding_method,
+                    num_chunks,
+                )
+                for input_circuit in input_circuits
+            ]
 
     return new_executor
 
