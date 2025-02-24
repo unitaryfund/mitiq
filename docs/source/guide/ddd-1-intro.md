@@ -12,6 +12,10 @@ kernelspec:
 ---
 
 # How do I use DDD?
+DDD works in two main stages: generate noise-scaled circuits by inserting DDD sequences, and combining the resulting measurements post-execution.
+
+This workflow can be executed by a single call to {func}`.execute_with_ddd`.
+If more control is needed over the protocol, Mitiq provides {func}`.generate_circuits_with_ddd` and {func}`.ddd.combine_results` to handle the first and second steps respectively.
 
 As with all techniques, DDD is compatible with any frontend supported by Mitiq:
 
