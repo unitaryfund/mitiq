@@ -28,6 +28,11 @@ operation.
 
 +++
 
+PEC works in two main stages: generate noise-scaled circuits via inserting quasi-probability representations of noisy gates, and combining the resulting measurements post-execution.
+
+This workflow can be executed by a single call to {func}`.execute_with_pec`.
+If more control is needed over the protocol, Mitiq provides {func}`.generate_sampled_circuits` and {func}`.pec.combine_results` to handle the first and second steps respectively.
+
 As with all techniques, PEC is compatible with any frontend supported by Mitiq:
 
 ```{code-cell} ipython3
