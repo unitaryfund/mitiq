@@ -14,6 +14,8 @@ kernelspec:
 # How do I use DDD?
 DDD works in two main stages: generate noise-scaled circuits by inserting DDD sequences, and combining the resulting measurements post-execution.
 
+The section [Apply DDD](#apply-ddd) applies the protocol in a single step, and then in the section [Step by step application of DDD](#step-by-step-application-of-ddd), we’ll show how you can apply the technique stepwise.
+
 This workflow can be executed by a single call to {func}`.execute_with_ddd`.
 If more control is needed over the protocol, Mitiq provides {func}`.generate_circuits_with_ddd` and {func}`.ddd.combine_results` to handle the first and second steps respectively.
 
@@ -127,10 +129,12 @@ In this section we demonstrate the use of {func}`.generate_circuits_with_ddd` fo
 
 ### Generating circuits with DDD sequences
 
-Here we will generate a list of circuits with DDD sequences inserted, which will later be passed to the executor.
+Here we will generate a list of circuits with DDD sequences inserted, which will later be passed to the executor. The number of circuits generated can be checked using the `len` function.
 
 ```{code-cell} ipython3
 circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule)
+
+print(f"Number of sample circuits:    {len(circuits_with_ddd)}")
 print(circuits_with_ddd[0])
 ```
 
@@ -145,11 +149,12 @@ We will now get the combined result of the list of circuits generated.
 results = [execute(circuit) for circuit in circuits_with_ddd]
 combined_result = ddd.combine_results(results)
 
-print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
-print(f"Error with mitigation (DDD): {abs(ideal_value - combined_result) :.3}")
+print(f"Error with single-step DDD: {abs(ideal_value - mitigated_result) :.5f}")
+print(f"Error with multi-step DDD:    {abs(ideal_value - combined_result) :.5f}")
 ```
 
-As you can see above, DDD reduced the error compared to the unmitigated case and it also depends on the sampled circuits.
+As you can see above, the multi-step DDD gives the same the error as the single step DDD error using the function {func}`.execute_with_ddd`.
+
 +++
 
 The section
