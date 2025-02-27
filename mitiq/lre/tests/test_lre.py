@@ -91,6 +91,10 @@ def test_lre_batched_executor(degree, fold_multiplier):
     assert isinstance(lre_exp_val_batched, float)
 
     assert test_batched_executor.calls_to_executor == 1
+    assert (
+        test_batched_executor.executed_circuits
+        == multivariate_layer_scaling(test_cirq, degree, fold_multiplier)
+    )
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
