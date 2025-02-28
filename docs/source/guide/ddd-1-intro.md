@@ -150,7 +150,7 @@ results = [execute(circuit) for circuit in circuits_with_ddd]
 combined_result = ddd.combine_results(results)
 
 print(f"Error with single-step DDD: {abs(ideal_value - mitigated_result) :.5f}")
-print(f"Error with multi-step DDD:    {abs(ideal_value - combined_result) :.5f}")
+print(f"Error with multi-step DDD:  {abs(ideal_value - combined_result) :.5f}")
 ```
 
 As you can see above, the multi-step DDD gives the same the error as the single step DDD error using the function {func}`.execute_with_ddd`.
