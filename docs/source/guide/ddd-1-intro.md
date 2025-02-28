@@ -125,7 +125,7 @@ In this section we demonstrate the use of {func}`.generate_circuits_with_ddd` fo
 Here we will generate a list of circuits with DDD sequences inserted, which will later be passed to the executor. The number of circuits generated can be checked using the `len` function.
 
 ```{code-cell} ipython3
-circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule)
+circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule, num_trials=10)
 
 print(f"Number of sample circuits:    {len(circuits_with_ddd)}")
 print(circuits_with_ddd[0])
@@ -143,7 +143,7 @@ results = [execute(circuit) for circuit in circuits_with_ddd]
 combined_result = ddd.combine_results(results)
 
 print(f"Error with single-step DDD: {abs(ideal_value - mitigated_result) :.5f}")
-print(f"Error with multi-step DDD:    {abs(ideal_value - combined_result) :.5f}")
+print(f"Error with multi-step DDD:  {abs(ideal_value - combined_result) :.5f}")
 ```
 
 As you can see above, the multi-step DDD gives the same the error as the single step DDD error using the function {func}`.execute_with_ddd`.
