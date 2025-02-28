@@ -132,7 +132,7 @@ In this section we demonstrate the use of {func}`.generate_circuits_with_ddd` fo
 Here we will generate a list of circuits with DDD sequences inserted, which will later be passed to the executor. The number of circuits generated can be checked using the `len` function.
 
 ```{code-cell} ipython3
-circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule)
+circuits_with_ddd = ddd.generate_circuits_with_ddd(circuit=circuit, rule=rule, num_trials=10)
 
 print(f"Number of sample circuits:    {len(circuits_with_ddd)}")
 print(circuits_with_ddd[0])
