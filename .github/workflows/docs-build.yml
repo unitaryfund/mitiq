@@ -30,10 +30,10 @@ jobs:
           python -m pip install --upgrade pip
           make install
 
-      - name: Run the quilc & qvm Docker images
-        run: |
-          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
-          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+      # - name: Run the quilc & qvm Docker images
+      #   run: |
+      #     docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+      #     docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 
       - name: Generate hash from all files excluding example notebooks
         id: gen_hash
@@ -53,6 +53,7 @@ jobs:
           sudo apt install ocl-icd-opencl-dev
           export BQSKIT_DOC_CHECK_OVERRIDE=1
           export PYDEVD_DISABLE_FILE_VALIDATION=1
+          export SKIP_PYQUIL=1
           make docs
 
       - name: Run linkcheck on 'release' PRs
