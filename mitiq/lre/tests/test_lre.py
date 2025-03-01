@@ -9,10 +9,8 @@ from unittest.mock import Mock
 import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
-from mitiq.observable import Observable, PauliString
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
 from mitiq.interface import mitiq_cirq
-
 from mitiq.lre import (
     execute_with_lre,
     lre_decorator,
@@ -21,6 +19,7 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_chunks,
     multivariate_layer_scaling,
 )
+from mitiq.observable import Observable, PauliString
 from mitiq.zne.scaling import fold_all, fold_global
 
 # default circuit for all unit tests
@@ -60,7 +59,8 @@ def test_lre_exp_value(degree, fold_multiplier):
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
-@pytest.mark.parametrize("degree, fold_multiplier, observable", [(2, 2, obs_z), (2, 3, obs_z), (3, 4, obs_z)])
+@pytest.mark.parametrize("degree, fold_multiplier, observable", 
+                         [(2, 2, obs_z), (2, 3, obs_z), (3, 4, obs_z)])
 def test_lre_exp_value_with_observable(degree, fold_multiplier, observable):
     """Verify LRE expectation value with observables work as expected."""
     test_executor = Executor(mitiq_cirq.compute_density_matrix)
