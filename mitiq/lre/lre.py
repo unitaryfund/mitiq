@@ -186,7 +186,7 @@ def lre_decorator(
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
-        
+
 
 
     Returns:
