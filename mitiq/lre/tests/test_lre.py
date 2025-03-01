@@ -9,7 +9,10 @@ from unittest.mock import Mock
 import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
+from mitiq.observable import Observable, PauliString
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
+from mitiq.interface import mitiq_cirq
+
 from mitiq.lre import (
     execute_with_lre,
     lre_decorator,
@@ -26,9 +29,12 @@ test_cirq = benchmarks.generate_rb_circuits(
     num_cliffords=2,
 )[0]
 
+obs_x = Observable(PauliString(spec="X"))
+obs_y = Observable(PauliString(spec="Y"))
+obs_z = Observable(PauliString(spec="Z"))
 
 # default execute function for all unit tests
-def execute(circuit, noise_level=0.025):
+def execute(circuit, noise_level=0.025) -> float:
     """Default executor for all unit tests."""
     noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
@@ -45,7 +51,7 @@ ideal_val = execute(test_cirq, noise_level=0)
 
 @pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
 def test_lre_exp_value(degree, fold_multiplier):
-    """Verify LRE executors work as expected."""
+    """Verify LRE expectation value works as expected."""
     lre_exp_val = execute_with_lre(
         test_cirq,
         execute,
@@ -54,6 +60,18 @@ def test_lre_exp_value(degree, fold_multiplier):
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
+@pytest.mark.parametrize("degree, fold_multiplier, observable", [(2, 2, obs_z), (2, 3, obs_z), (3, 4, obs_z)])
+def test_lre_exp_value_with_observable(degree, fold_multiplier, observable):
+    """Verify LRE expectation value with observables work as expected."""
+    test_executor = Executor(mitiq_cirq.compute_density_matrix)
+    lre_exp_val = execute_with_lre(
+        test_cirq,
+        test_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+        observable = observable,
+    )
+    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
 @pytest.mark.parametrize(
     "degree, fold_multiplier",
@@ -67,6 +85,26 @@ def test_lre_executor(degree, fold_multiplier):
         test_executor,
         degree=degree,
         fold_multiplier=fold_multiplier,
+    )
+    assert isinstance(lre_exp_val, float)
+
+    assert test_executor.calls_to_executor == len(
+        multivariate_layer_scaling(test_cirq, degree, fold_multiplier)
+    )
+
+@pytest.mark.parametrize(
+    "degree, fold_multiplier, observable",
+    [(2, 2, obs_z), (2, 3, obs_y), (3, 4, obs_x)],
+)
+def test_lre_executor_with_observables(degree, fold_multiplier, observable):
+    """Verify LRE executor with observable works as expected."""
+    test_executor = Executor(mitiq_cirq.compute_density_matrix)
+    lre_exp_val = execute_with_lre(
+        test_cirq,
+        test_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+        observable=observable,
     )
     assert isinstance(lre_exp_val, float)
 
