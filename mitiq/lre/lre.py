@@ -192,12 +192,6 @@ def lre_decorator(
     Returns:
         Error-mitigated decorator.
     """
-    # Raise an error if the decorator is used without parenthesis
-    if callable(observable):
-        raise TypeError(
-            "Decorator must be used with parentheses (i.e., @lre_decorator()) "
-            "even if no explicit arguments are passed."
-        )
 
     def decorator(
         executor: Callable[[QPROGRAM], float],
