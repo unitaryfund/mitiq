@@ -204,7 +204,7 @@ nb_execution_mode = "cache"
 
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
-    print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
+    print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is set.")
     nb_execution_excludepatterns = ["*pyquil*.ipynb"]
 
 # -- Options for autodoc -----------------------------------------------------
