@@ -7,18 +7,13 @@ import numpy as np
 def _copy_circuit_parallel(
     circuit: cirq.Circuit, num_copies: int = 2
 ) -> cirq.Circuit:
-    """Copies a circuit num_copies times in parallel.
-
-    Given a circuit that acts on N qubits,
-    this function returns a circuit
-    that copies the circuit num_copies times in parallel.
-    This means the resulting circuit has N * num_copies qubits.
+    """Given a circuit that acts on N qubits, this function returns a circuit
+    that copies the circuit num_copies times in parallel. This means the
+    resulting circuit has N * num_copies qubits.
 
     Args:
-        circuit:
-            The circuit to be copied.
-        num_copies:
-            The number of copies of circuit to be made.
+        circuit: The circuit to be copied.
+        num_copies: The number of copies of circuit to be made.
 
     Returns:
         A cirq circuit that is the parallel composition of
@@ -57,27 +52,16 @@ def _copy_circuit_parallel(
 def _apply_diagonalizing_gate(
     circuit: cirq.Circuit, num_copies: int
 ) -> cirq.Circuit:
-    """
-    Apply the VD diagonalizing gate to a circuit.
-    The gate has to be applied in a specific way.
-    Based on the number of copies of the original circuit,
-    the diagonalizing gate is a num_copies-qubit gate
-    that is applied N times where N is the amount of
-    qubits in the original circuit.
-    The diagonalizing gate is applied as follows:
-    first apply the gate to qubit 1 of copy 1,
-        qubit 1 of copy 2, ..., qubit 1 of copy num_copies.
-    second apply the gate to qubit 2 of copy 1,
-        qubit 2 of copy 2, ..., qubit 2 of copy num_copies, and so on.
+    """Apply the diagonalizing gate to a circuit, assuming the circuit has been
+    copied in parallel ``num_copies`` times.
+
+    The diagonalizing gate is applied to the first qubit of all copies, to the
+    second qubit of all copies, etc.
 
     Args:
-        circuit:
-            The circuit to apply the diagonalizing gate to.
-        num_copies:
-            The number of copies of the original
-            circuit that this circuit consists of.
-            The diagonalizing matrix depends on
-            num_copies and it is a 'num_copies'-qubit gate.
+        circuit: The circuit to apply the diagonalizing gate to.
+        num_copies: The number of copies of the original circuit that the input
+            circuit consists of.
 
     Returns:
         The circuit with the diagonalizing gate applied.
@@ -101,16 +85,13 @@ def _apply_diagonalizing_gate(
 
 
 def _generate_diagonalizing_gate(num_copies: int = 2) -> cirq.Gate:
-    """
-    Generate the diagonalizing gate for the VD algorithm.
-    Currently only num_copies=2 is supported.
+    """Generate the diagonalizing gate for the VD algorithm. Currently only
+    ``num_copies=2`` is supported.
 
     Args:
-        num_qubits:
-            The number of qubits that the gate acts on.
+        num_qubits: The number of qubits that the gate acts on.
 
-    Returns:
-        The diagonalizing gate.
+    Returns: The diagonalizing gate.
     """
     if num_copies == 2:
         diagonalizing_matrix = np.array(
