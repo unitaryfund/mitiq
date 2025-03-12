@@ -531,9 +531,9 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     """Tests ZNE when transpiling to a Qiskit device. Note transpiling can
     introduce idle (unused) qubits to the circuit.
     """
-    from qiskit_ibm_runtime.fake_provider import FakeSantiago
+    from qiskit_ibm_runtime.fake_provider import FakeSantiagoV2
 
-    santiago = FakeSantiago()
+    santiago = FakeSantiagoV2()
     backend = AerSimulator.from_backend(santiago)
 
     def execute(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
