@@ -5,13 +5,14 @@ import random
 import re
 from typing import List
 from unittest.mock import Mock
-import numpy as np
 
+import numpy as np
 import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
 from mitiq.interface import mitiq_cirq
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.lre import (
     execute_with_lre,
     lre_decorator,
@@ -22,7 +23,6 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
 )
 from mitiq.observable import Observable, PauliString
 from mitiq.zne.scaling import fold_all, fold_global
-from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 # default circuit for all unit tests
 test_cirq = benchmarks.generate_rb_circuits(
