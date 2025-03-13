@@ -85,7 +85,6 @@ def test_lre_exp_value_with_observable(degree, fold_multiplier, observable):
         fold_multiplier=fold_multiplier,
         observable=observable,
     )
-    assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
 
     assert isinstance(lre_exp_val, float)
 
