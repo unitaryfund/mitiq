@@ -10,7 +10,7 @@ from mitiq.pec.pec import (
     mitigate_executor,
     pec_decorator,
     combine_results,
-    generate_sampled_circuits,
+    construct_circuits,
 )
 
 from mitiq.pec.representations import (
