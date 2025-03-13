@@ -60,7 +60,7 @@ def execute_with_ddd(
         executor = Executor(executor)
 
     # Insert DDD sequences in (a copy of) the input circuit
-    circuits_with_ddd = generate_circuits_with_ddd(
+    circuits_with_ddd = construct_circuits(
         circuit, rule, rule_args, num_trials
     )
 
@@ -98,7 +98,7 @@ def combine_results(results: list[float]) -> float:
     return float(np.average(results))
 
 
-def generate_circuits_with_ddd(
+def construct_circuits(
     circuit: QPROGRAM,
     rule: Callable[[int], QPROGRAM],
     rule_args: Dict[str, Any] = {},
