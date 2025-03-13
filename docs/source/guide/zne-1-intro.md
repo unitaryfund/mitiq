@@ -163,7 +163,7 @@ contains more information on both noise scaling and noise extrapolation methods 
 
 ## Two-stage application of ZNE
 
-If you want to have more control and insight into how ZNE works, there are two functions available within `mitiq.zne` that allow circuit generation {func}`.zne.scaled_circuits`, and expectation value calculation {func}`.zne.combine_results` respectively.
+If you want to have more control and insight into how ZNE works, there are two functions available within `mitiq.zne` that allow circuit generation {func}`.zne.construct_circuits`, and expectation value calculation {func}`.zne.combine_results` respectively.
 The high-level workflow is as follows.
 
 1. Circuit definition
@@ -176,12 +176,12 @@ For step 2, we'll generate the noise scaled circuits as follows.
 
 
 ```{code-cell} ipython3
-from mitiq.zne import scaled_circuits, combine_results
+from mitiq.zne import construct_circuits, combine_results
 from mitiq.zne.scaling import fold_gates_at_random
 
 scale_factors = [1.0, 2.0, 3.0]
 
-folded_circuits = scaled_circuits(
+folded_circuits = construct_circuits(
     circuit=circuit,
     scale_factors=[1.0, 2.0, 3.0],
     scale_method=fold_gates_at_random,

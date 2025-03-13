@@ -54,7 +54,7 @@ from mitiq.zne.scaling import (
     get_layer_folding,
     insert_id_layers,
 )
-from mitiq.zne.zne import combine_results, scaled_circuits
+from mitiq.zne.zne import combine_results, construct_circuits
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -603,7 +603,7 @@ def test_two_stage_zne(
         frontend_circuit = cirq_circuit
 
     scale_factors = [1, 3, 5]
-    circs = scaled_circuits(
+    circs = construct_circuits(
         frontend_circuit, scale_factors, noise_scaling_method
     )
 
@@ -643,7 +643,9 @@ def test_default_scaling_option_two_stage_zne():
 
     scale_factors = [3, 5, 6, 8]
 
-    circs_default_scaling_method = scaled_circuits(cirq_circuit, scale_factors)
+    circs_default_scaling_method = construct_circuits(
+        cirq_circuit, scale_factors
+    )
 
     for i in range(len(scale_factors)):
         assert len(circs_default_scaling_method[i]) > len(cirq_circuit)
