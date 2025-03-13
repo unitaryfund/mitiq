@@ -53,7 +53,7 @@ def execute_with_lre(
             is used to generate the scale factor vectors.
         observable: Observable to compute the expectation value of. If
             ``None``, the ``executor`` must return an expectation value.
-            Otherwise, the ``float`` returned by ``executor`` is used
+            Otherwise, the ``DensityMatrix`` returned by ``executor`` is used
             to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
@@ -114,7 +114,7 @@ def mitigate_executor(
             is used to generate the scale factor vectors.
         observable: Observable to compute the expectation value of. If
             ``None``, the ``executor`` must return an expectation value.
-            Otherwise, the ``float`` returned by ``executor`` is used
+            Otherwise, the ``DensityMatrix`` returned by ``executor`` is used
             to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
@@ -179,7 +179,7 @@ def lre_decorator(
             is used to generate the scale factor vectors.
         observable: Observable to compute the expectation value of. If
             ``None``, the ``executor`` must return an expectation value.
-            Otherwise, the ``float`` returned by ``executor`` is used
+            Otherwise, the ``DensityMatrix`` returned by ``executor`` is used
             to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
