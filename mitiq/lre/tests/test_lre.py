@@ -30,9 +30,15 @@ test_cirq = benchmarks.generate_rb_circuits(
     num_cliffords=2,
 )[0]
 
+test_cirq_two_qubits = benchmarks.generate_rb_circuits(
+    n_qubits=2,
+    num_cliffords=2,
+)[0]
+
 obs_x = Observable(PauliString(spec="X"))
 obs_y = Observable(PauliString(spec="Y"))
 obs_z = Observable(PauliString(spec="Z"))
+obs_zz = Observable(PauliString(spec="ZZ"))
 
 
 # default execute function for all unit tests
@@ -72,14 +78,21 @@ def test_lre_exp_value(degree, fold_multiplier):
 
 
 @pytest.mark.parametrize(
-    "degree, fold_multiplier, observable",
-    [(2, 2, obs_z), (2, 3, obs_z), (3, 4, obs_z)],
+    "circuit, degree, fold_multiplier, observable",
+    [
+        (test_cirq, 2, 2, obs_z),
+        (test_cirq, 2, 3, obs_z),
+        (test_cirq, 3, 4, obs_z),
+        (test_cirq_two_qubits, 2, 2, obs_zz),
+    ],
 )
-def test_lre_exp_value_with_observable(degree, fold_multiplier, observable):
+def test_lre_exp_value_with_observable(
+    circuit, degree, fold_multiplier, observable
+):
     """Verify LRE executors with observables work as expected."""
     test_executor = Executor(mitiq_cirq.compute_density_matrix)
     lre_exp_val = execute_with_lre(
-        test_cirq,
+        circuit,
         test_executor,
         degree=degree,
         fold_multiplier=fold_multiplier,
@@ -89,8 +102,28 @@ def test_lre_exp_value_with_observable(degree, fold_multiplier, observable):
     assert isinstance(lre_exp_val, float)
 
     assert test_executor.calls_to_executor == len(
-        multivariate_layer_scaling(test_cirq, degree, fold_multiplier)
+        multivariate_layer_scaling(circuit, degree, fold_multiplier)
     )
+
+
+# @pytest.mark.parametrize(
+#     "degree, fold_multiplier, observable",
+#     [(2, 2, obs_zz)],
+# )
+# def test_lre_exp_value_with_observable(degree, fold_multiplier, observable):
+#     """Verify LRE executors with observables work as expected."""
+#     test_executor = Executor(mitiq_cirq.compute_density_matrix)
+#     true_value = 1.0
+#     lre_exp_val = execute_with_lre(
+#         test_cirq_two_qubits,
+#         test_executor,
+#         degree=degree,
+#         fold_multiplier=fold_multiplier,
+#         observable=observable,
+#     )
+
+#     assert np.isclose(lre_exp_val, true_value, atol=0.1)
+#     assert isinstance(lre_exp_val, float)
 
 
 @pytest.mark.parametrize(

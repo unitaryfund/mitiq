@@ -53,8 +53,8 @@ def execute_with_lre(
             is used to generate the scale factor vectors.
         observable: Observable to compute the expectation value of. If
             ``None``, the ``executor`` must return an expectation value.
-            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by ``executor`` is used
-            to compute the expectation of the observable.
+            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
+            ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
@@ -114,8 +114,8 @@ def mitigate_executor(
             is used to generate the scale factor vectors.
         observable: Observable to compute the expectation value of. If
             ``None``, the ``executor`` must return an expectation value.
-            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by ``executor`` is used
-            to compute the expectation of the observable.
+            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
+            ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
@@ -179,8 +179,8 @@ def lre_decorator(
             is used to generate the scale factor vectors.
         observable: Observable to compute the expectation value of. If
             ``None``, the ``executor`` must return an expectation value.
-            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by ``executor`` is used
-            to compute the expectation of the observable.
+            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
+            ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
