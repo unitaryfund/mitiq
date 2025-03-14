@@ -93,6 +93,7 @@ def test_copy_circuit_parallel_gridqubits():
     expected_unitary = cirq.unitary(expected_circuit)
     assert np.allclose(new_unitary, expected_unitary)
 
+
 def test_apply_diagonalizing_gate():
     num_copies = 2
     qubits = cirq.LineQubit.range(2)
