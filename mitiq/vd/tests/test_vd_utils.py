@@ -1,7 +1,11 @@
 import cirq
 import numpy as np
 
-from mitiq.vd.vd_utils import _copy_circuit_parallel, _apply_diagonalizing_gate, _generate_diagonalizing_gate
+from mitiq.vd.vd_utils import (
+    _apply_diagonalizing_gate,
+    _copy_circuit_parallel,
+    _generate_diagonalizing_gate,
+)
 
 
 def test_copy_circuit_parallel_lengths():
