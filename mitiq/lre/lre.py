@@ -10,7 +10,7 @@ from typing import Any, Callable, Optional, Union
 
 import numpy as np
 
-from mitiq import QPROGRAM, Executor, Observable
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.lre.inference import (
     multivariate_richardson_coefficients,
 )
@@ -22,7 +22,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 def execute_with_lre(
     input_circuit: QPROGRAM,
-    executor: Union[Executor, Callable[[QPROGRAM], float]],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     degree: int,
     fold_multiplier: int,
     observable: Optional[Observable] = None,
@@ -94,7 +94,7 @@ def execute_with_lre(
 
 
 def mitigate_executor(
-    executor: Callable[[QPROGRAM], float],
+    executor: Callable[[QPROGRAM], QuantumResult],
     degree: int,
     fold_multiplier: int,
     observable: Optional[Observable] = None,
@@ -169,7 +169,9 @@ def lre_decorator(
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
+) -> Callable[
+    [Callable[[QPROGRAM], QuantumResult]], Callable[[QPROGRAM], float]
+]:
     """Decorator which adds an error-mitigation layer based on
     layerwise richardson extrapolation (LRE).
 
@@ -194,7 +196,7 @@ def lre_decorator(
     """
 
     def decorator(
-        executor: Callable[[QPROGRAM], float],
+        executor: Callable[[QPROGRAM], QuantumResult],
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor,
