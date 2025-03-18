@@ -118,11 +118,10 @@ def _apply_symmetric_observable(
         The matrix or vector with the observable applied.
     """
     z_matrix = np.array([[1.0, 0.0], [0.0, -1.0]])
-
-    if observable is None or (
-        isinstance(observable, np.ndarray)
-        and np.allclose(observable, z_matrix)
-    ):
+    
+    if observable is None or (isinstance(observable, np.ndarray) and np.allclose(
+        observable, z_matrix
+    )):
         # use the default Z observable
         sym_observable_diagonals: List[NDArray[np.complex128]] = []
         for i in range(N_qubits):
@@ -144,13 +143,11 @@ def _apply_symmetric_observable(
                 [observable_i_diagonal for _ in range(2**N_qubits)]
             ).flatten("C")
             # add the symmetric observable
-            sym_observable_diagonals.append(
-                0.5
-                * (
-                    observable_i_diagonal_system1
-                    + observable_i_diagonal_system2
-                )
+            # Create the combined diagonal and explicitly convert to complex128
+            combined_diagonal = 0.5 * (
+                observable_i_diagonal_system1 + observable_i_diagonal_system2
             )
+            sym_observable_diagonals.append(combined_diagonal.astype(np.complex128))
 
         if matrix.ndim == 2:
             return np.array([sod * matrix for sod in sym_observable_diagonals])
@@ -166,11 +163,7 @@ def _apply_symmetric_observable(
             raise ValueError("matrix should be a 2D or 3D ndarray")
 
     else:
-        obs_array = (
-            observable
-            if isinstance(observable, np.ndarray)
-            else np.array(observable)
-        )
+        obs_array = observable if isinstance(observable, np.ndarray) else np.array(observable)
         sym_observable_matrices: List[NDArray[np.complex128]] = []
         for i in range(N_qubits):
             observable_i_matrix = np.kron(
@@ -181,6 +174,6 @@ def _apply_symmetric_observable(
                 np.kron(observable_i_matrix, np.eye(2**N_qubits))
                 + np.kron(np.eye(2**N_qubits), observable_i_matrix)
             )
-            sym_observable_matrices.append(sym_observable_matrix)
+            sym_observable_matrices.append(sym_observable_matrix.astype(np.complex128))
 
         return np.array(sym_observable_matrices) @ matrix
