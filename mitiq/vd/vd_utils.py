@@ -1,9 +1,10 @@
-from typing import List, cast, Optional, Union, Sequence, Any
-from mitiq.observable import Observable
+from typing import List, Optional, Union, cast
 
 import cirq
 import numpy as np
 from numpy.typing import NDArray
+
+from mitiq.observable import Observable
 
 
 def _copy_circuit_parallel(
@@ -62,8 +63,8 @@ def _apply_cyclic_system_permutation(
     """
     Function that shifts the rows of a matrix or vector in such a way,
     that each of the M registers of N_qubit qubits are shifted cyclically.
-    The implementation is identical to left multiplication with repeated swap gates,
-    however this optimisation in considerably faster.
+    The implementation is identical to left multiplication with repeated swap
+    gates, however this optimisation in considerably faster.
 
     Args:
         matrix: The matrix or vector that should be shifted.
@@ -82,7 +83,8 @@ def _apply_cyclic_system_permutation(
         for i in range(0, 2 ** (M * N_qubits), 2**N_qubits)
     ]
 
-    # Some fancy index magic to permute the rows in O(n) time and space (n=2**(M*N_qubits))
+    # Some fancy index magic to permute the rows in O(n) time
+    # and space (n=2**(M*N_qubits))
     idx = np.empty_like(permutation)
     idx[permutation] = np.arange(len(permutation))
 
@@ -93,7 +95,7 @@ def _apply_cyclic_system_permutation(
         matrix[:] = matrix[:, idx]
     else:
         raise TypeError(
-            "matrix must be a 2 dimensional array or a listor array of 2 dimensional arrays"
+            "matrix must be a 2D array or a list or array of 2D arrays"
         )
     return matrix
 
@@ -111,7 +113,8 @@ def _apply_symmetric_observable(
     Args:
         matrix: The matrix or vector that should be shifted.
         N_qubits: The number of qubits in each register.
-        observable: The observable that should be applied. If None, the Z observable is used.
+        observable: The observable that should be applied.
+        If None, the Z observable is used.
         M: The number of registers.
 
     Returns:
@@ -131,15 +134,17 @@ def _apply_symmetric_observable(
                     j
                     for k in range(2 ** (i))
                     for j in [1.0, -1.0]
-                    for l in range(2 ** (N_qubits - i - 1))
+                    for ll in range(2 ** (N_qubits - i - 1))
                 ]
             )
 
-            # turn [a, b, c] into [a,a,a,b,b,b,c,c,c]. This is the same as tensoring the N_qubit identity on the right
+            # turn [a, b, c] into [a,a,a,b,b,b,c,c,c]. This is the same as
+            # tensoring the N_qubit identity on the right
             observable_i_diagonal_system1 = np.array(
                 [observable_i_diagonal for _ in range(2**N_qubits)]
             ).flatten("F")
-            # turn [a,b,c] into [a,b,c,a,b,c,a,b,c]. This is the same as tensoring the N_qubit identity on the left
+            # turn [a,b,c] into [a,b,c,a,b,c,a,b,c]. This is the same as
+            # tensoring the N_qubit identity on the left
             observable_i_diagonal_system2 = np.array(
                 [observable_i_diagonal for _ in range(2**N_qubits)]
             ).flatten("C")
