@@ -95,7 +95,6 @@ def test_copy_circuit_parallel_gridqubits():
 
 
 def test_apply_cyclic_system_permutation():
-    """Test with N_qubits=1, M=2 (4x4 matrix)"""
     # Create an 4x4 matrix with values 1 to 17
     matrix = np.arange(1, 17).reshape(4, 4)
 
@@ -107,7 +106,6 @@ def test_apply_cyclic_system_permutation():
 
 
 def test_edge_case_single_qubit():
-    """Test with N_qubits=1, M=1 (minimal case)"""
     matrix = np.array([[1, 2], [3, 4]])
     # No permutation should happen here
     expected = matrix.copy()
@@ -116,7 +114,6 @@ def test_edge_case_single_qubit():
 
 
 def test_apply_symmetric_observable():
-    """Test applying Z observable to 2D matrix"""
     # For N_qubits=1 and M=2, we're dealing with 4x4 matrices
     matrix = np.arange(1, 17).reshape(4, 4)
 
@@ -139,7 +136,6 @@ def test_apply_symmetric_observable():
 
 
 def test_apply_symmetric_observable_X():
-    """Test applying X observable to 2D matrix"""
     # For N_qubits=1 and M=2, we're dealing with 4x4 matrices
     matrix = np.arange(1, 17).reshape(4, 4)
     observable = np.array([[0, 1], [1, 0]])
