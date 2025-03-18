@@ -2,9 +2,9 @@ import cirq
 import numpy as np
 
 from mitiq.vd.vd_utils import (
-    _copy_circuit_parallel,
     _apply_cyclic_system_permutation,
     _apply_symmetric_observable,
+    _copy_circuit_parallel,
 )
 
 
