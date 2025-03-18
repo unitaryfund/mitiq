@@ -1,8 +1,9 @@
-from typing import List, cast, Optional
+from typing import List, cast, Optional, Union, Sequence, Any
 from mitiq.observable import Observable
 
 import cirq
 import numpy as np
+from numpy.typing import NDArray
 
 
 def _copy_circuit_parallel(
@@ -56,8 +57,8 @@ def _copy_circuit_parallel(
 
 
 def _apply_cyclic_system_permutation(
-    matrix: np.array, N_qubits: int, M: int = 2
-) -> np.array:
+    matrix: NDArray[np.complex128], N_qubits: int, M: int = 2
+) -> NDArray[np.complex128]:
     """
     Function that shifts the rows of a matrix or vector in such a way,
     that each of the M registers of N_qubit qubits are shifted cyclically.
@@ -98,11 +99,11 @@ def _apply_cyclic_system_permutation(
 
 
 def _apply_symmetric_observable(
-    matrix: np.array,
+    matrix: NDArray[np.complex128],
     N_qubits: int,
-    observable: Optional[Observable] = None,
+    observable: Optional[Union[Observable, NDArray[np.complex128]]] = None,
     M: int = 2,
-) -> np.array:
+) -> NDArray[np.complex128]:
     """
     Function that applies a symmetric observable to a matrix or vector.
     The observable is assumed to be the Z observable by default.
@@ -116,11 +117,14 @@ def _apply_symmetric_observable(
     Returns:
         The matrix or vector with the observable applied.
     """
-    if observable is None or np.allclose(
-        observable, np.array([[1.0, 0.0], [0.0, -1.0]])
+    z_matrix = np.array([[1.0, 0.0], [0.0, -1.0]])
+
+    if observable is None or (
+        isinstance(observable, np.ndarray)
+        and np.allclose(observable, z_matrix)
     ):
         # use the default Z observable
-        sym_observable_diagonals = []
+        sym_observable_diagonals: List[NDArray[np.complex128]] = []
         for i in range(N_qubits):
             observable_i_diagonal = np.array(
                 [
@@ -162,10 +166,15 @@ def _apply_symmetric_observable(
             raise ValueError("matrix should be a 2D or 3D ndarray")
 
     else:
-        sym_observable_matrices = []
+        obs_array = (
+            observable
+            if isinstance(observable, np.ndarray)
+            else np.array(observable)
+        )
+        sym_observable_matrices: List[NDArray[np.complex128]] = []
         for i in range(N_qubits):
             observable_i_matrix = np.kron(
-                np.kron(np.eye(2**i), observable),
+                np.kron(np.eye(2**i), obs_array),
                 np.eye(2 ** (N_qubits - i - 1)),
             )
             sym_observable_matrix = 0.5 * (
@@ -174,4 +183,4 @@ def _apply_symmetric_observable(
             )
             sym_observable_matrices.append(sym_observable_matrix)
 
-    return np.array(sym_observable_matrices) @ matrix
+        return np.array(sym_observable_matrices) @ matrix
