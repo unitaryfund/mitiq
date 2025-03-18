@@ -1,7 +1,11 @@
 import cirq
 import numpy as np
 
-from mitiq.vd.vd_utils import _copy_circuit_parallel
+from mitiq.vd.vd_utils import (
+    _copy_circuit_parallel,
+    _apply_cyclic_system_permutation,
+    _apply_symmetric_observable,
+)
 
 
 def test_copy_circuit_parallel_lengths():
@@ -88,3 +92,72 @@ def test_copy_circuit_parallel_gridqubits():
     new_unitary = cirq.unitary(new_circuit)
     expected_unitary = cirq.unitary(expected_circuit)
     assert np.allclose(new_unitary, expected_unitary)
+
+
+def test_apply_cyclic_system_permutation():
+    """Test with N_qubits=1, M=2 (4x4 matrix)"""
+    # Create an 4x4 matrix with values 1 to 17
+    matrix = np.arange(1, 17).reshape(4, 4)
+
+    # Expected result
+    expected = matrix[[0, 2, 1, 3]]
+
+    result = _apply_cyclic_system_permutation(matrix, N_qubits=1)
+    assert np.allclose(result, expected)
+
+
+def test_edge_case_single_qubit():
+    """Test with N_qubits=1, M=1 (minimal case)"""
+    matrix = np.array([[1, 2], [3, 4]])
+    # No permutation should happen here
+    expected = matrix.copy()
+    result = _apply_cyclic_system_permutation(matrix, N_qubits=1, M=1)
+    assert np.allclose(result, expected)
+
+
+def test_apply_symmetric_observable():
+    """Test applying Z observable to 2D matrix"""
+    # For N_qubits=1 and M=2, we're dealing with 4x4 matrices
+    matrix = np.arange(1, 17).reshape(4, 4)
+
+    # Z observable is [[1, 0], [0, -1]]
+    # For N_qubits=1, we expect one output matrix with diagonals scaled
+    # by +1 for |0⟩ state and -1 for |1⟩ state
+    expected = np.array(
+        [
+            [
+                [1.0, 0.0, 0.0, -4.0],
+                [5.0, 0.0, 0.0, -8.0],
+                [9.0, 0.0, 0.0, -12.0],
+                [13.0, 0.0, 0.0, -16.0],
+            ]
+        ]
+    )
+
+    result = _apply_symmetric_observable(matrix, N_qubits=1)
+    assert np.allclose(result, expected)
+
+
+def test_apply_symmetric_observable_X():
+    """Test applying X observable to 2D matrix"""
+    # For N_qubits=1 and M=2, we're dealing with 4x4 matrices
+    matrix = np.arange(1, 17).reshape(4, 4)
+    observable = np.array([[0, 1], [1, 0]])
+
+    # For N_qubits=1, we expect one output matrix with diagonals scaled
+    # by +1 for |0⟩ state and -1 for |1⟩ state
+    expected = np.array(
+        [
+            [
+                [7.0, 8.0, 9.0, 10.0],
+                [7.0, 8.0, 9.0, 10.0],
+                [7.0, 8.0, 9.0, 10.0],
+                [7.0, 8.0, 9.0, 10.0],
+            ]
+        ]
+    )
+
+    result = _apply_symmetric_observable(
+        matrix, N_qubits=1, observable=observable
+    )
+    assert np.allclose(result, expected)
