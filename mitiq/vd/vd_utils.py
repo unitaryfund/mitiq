@@ -94,9 +94,7 @@ def _apply_cyclic_system_permutation(
     elif matrix.ndim == 3:
         matrix[:] = matrix[:, idx]
     else:
-        raise TypeError(
-            "matrix must be a 2D array or a list or array of 2D arrays"
-        )
+        raise TypeError("matrix should be 2D or 3D ndarray")
     return matrix
 
 
@@ -168,7 +166,7 @@ def _apply_symmetric_observable(
                 ]
             )
         else:
-            raise ValueError("matrix should be a 2D or 3D ndarray")
+            raise ValueError("matrix should be 2D or 3D ndarray")
 
     else:
         obs_array = (
