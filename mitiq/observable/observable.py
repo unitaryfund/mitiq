@@ -34,6 +34,16 @@ class Observable:
     def from_pauli_string_collections(
         *pauli_string_collections: PauliStringCollection,
     ) -> "Observable":
+        """Creates an Observable from one or more PauliStringCollection
+            instances.
+
+        Args:
+            pauli_string_collections: One or more collections of Pauli strings
+                used to define the observable.
+
+        Returns:
+            An Observable containing the given Pauli string collections.
+        """
         obs = Observable()
         obs._groups = list(pauli_string_collections)
         obs._ngroups = len(pauli_string_collections)
@@ -93,6 +103,16 @@ class Observable:
         return self._ngroups
 
     def partition(self, seed: Optional[int] = None) -> None:
+        """Partitions the observable's Pauli strings into commuting groups.
+
+        This method groups the PauliStringCollection instances such that each
+        group consists of mutually commuting operators, which can be measured
+        together in a quantum circuit.
+
+        Args:
+            seed: An optional seed for shuffling to ensure deterministic
+                behavior when partitioning.
+        """
         rng = np.random.RandomState(seed)
 
         psets: List[PauliStringCollection] = []
@@ -115,13 +135,36 @@ class Observable:
         self._ngroups = len(self._groups)
 
     def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
+        """Generates measurement circuits for the observable.
+
+        Given a quantum circuit, this method returns a list of circuits where
+        each circuit corresponds to a different group of commuting Pauli
+        strings, which allows measurement in the appropriate basis.
+
+        Args:
+            circuit: The quantum circuit in which the observable should be
+            measured.
+
+        Returns:
+            A list of quantum circuits with the appropriate measurement
+            settings for each group of Pauli strings.
+        """
         return [pset.measure_in(circuit) for pset in self._groups]
 
     def matrix(
         self,
         qubit_indices: Optional[List[int]] = None,
     ) -> npt.NDArray[np.complex64]:
-        """Returns the (potentially very large) matrix of the Observable."""
+        """Returns the (potentially very large) matrix of the Observable.
+
+        Args:
+            qubit_indices: Optional list of qubit indices specifying the order
+            of qubits in the matrix representation. If None, the default
+            ordering from `self.qubit_indices` is used.
+
+        Returns:
+            A NumPy array representing the matrix form of the observable.
+        """
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
         n = len(qubit_indices)
@@ -135,6 +178,19 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
     ) -> complex:
+        """Computes the expectation value of the observable.
+
+        This function executes the given quantum circuit and estimates the
+        expectation value of the observable based on the measurement results.
+
+        Args:
+            circuit: The quantum circuit to be executed.
+            execute: A function that takes a quantum circuit as input and
+            returns a QuantumResult containing measurement outcomes.
+
+        Returns:
+            The expectation value of the observable.
+        """
         from mitiq.executor import Executor  # Avoid circular import.
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
