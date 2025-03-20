@@ -34,7 +34,7 @@ class Observable:
     def from_pauli_string_collections(
         *pauli_string_collections: PauliStringCollection,
     ) -> "Observable":
-        """Creates an Observable from one or more PauliStringCollection
+        """Creates an ``Observable`` from one or more ``PauliStringCollection``
             instances.
 
         Args:
