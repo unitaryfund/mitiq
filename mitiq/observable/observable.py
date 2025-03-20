@@ -180,7 +180,7 @@ class Observable:
     ) -> complex:
         """Computes the expectation value of the observable.
 
-        This function executes the given quantum circuit and estimates the
+        This method executes the given quantum circuit and estimates the
         expectation value of the observable based on the measurement results.
 
         Args:
