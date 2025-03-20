@@ -34,7 +34,7 @@ class Observable:
     def from_pauli_string_collections(
         *pauli_string_collections: PauliStringCollection,
     ) -> "Observable":
-        """Creates an Observable from one or more PauliStringCollection
+        """Creates an ``Observable`` from one or more ``PauliStringCollection``
             instances.
 
         Args:
@@ -184,7 +184,7 @@ class Observable:
     ) -> complex:
         """Computes the expectation value of the observable.
 
-        This function executes the given quantum circuit and estimates the
+        This method executes the given quantum circuit and estimates the
         expectation value of the observable based on the measurement results.
 
         Args:
