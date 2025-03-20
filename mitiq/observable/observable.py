@@ -109,6 +109,10 @@ class Observable:
         group consists of mutually commuting operators, which can be measured
         together in a quantum circuit.
 
+        Note:
+            This method randomizes the way in which the list of
+            paulis is partitioned.
+
         Args:
             seed: An optional seed for shuffling to ensure deterministic
                 behavior when partitioning.
