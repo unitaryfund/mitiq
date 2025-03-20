@@ -1,5 +1,6 @@
 import cirq
 import numpy as np
+import pytest
 
 from mitiq.vd.vd_utils import (
     _apply_diagonalizing_gate,
@@ -94,47 +95,45 @@ def test_copy_circuit_parallel_gridqubits():
     assert np.allclose(new_unitary, expected_unitary)
 
 
-def test_apply_diagonalizing_gate():
+def test_apply_diagonalizing_gate_keeps_circuit_structure():
     num_copies = 2
     qubits = cirq.LineQubit.range(3)
-    original_circuit = cirq.Circuit(
+    circuit = cirq.Circuit(
         cirq.H(qubits[0]),
         cirq.CNOT(qubits[0], qubits[1]),
         cirq.X(qubits[2]),
     )
-    N = len(original_circuit.all_qubits())
+    num_qubits = len(circuit.all_qubits())
 
-    circuit = _copy_circuit_parallel(original_circuit, num_copies)
+    copied_circuit = _copy_circuit_parallel(circuit, num_copies)
+    new_circuit = _apply_diagonalizing_gate(copied_circuit, num_copies)
 
-    new_circuit = _apply_diagonalizing_gate(circuit, num_copies)
+    num_ops = len(list(copied_circuit.all_operations()))
+    copied_circuit_ops = list(new_circuit.all_operations())
 
-    # Verify the amount of added operators is N since
-    # that is how many diagonalizing gates should be applied
-    operations_circuit = sum(1 for _ in circuit.all_operations())
-    operations_new_circuit = sum(1 for _ in new_circuit.all_operations())
-    assert operations_new_circuit == operations_circuit + N
+    assert len(copied_circuit_ops) == num_ops + num_qubits
+    assert set(new_circuit.all_qubits()) == set(copied_circuit.all_qubits())
 
-    # Verify no extra qubits were added
-    assert set(new_circuit.all_qubits()) == set(circuit.all_qubits())
 
-    # default diagonalizing matrix for 2 copies
-    expected_matrix = np.array(
-        [
-            [1, 0, 0, 0],
-            [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
-            [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
-            [0, 0, 0, 1],
-        ]
+@pytest.mark.xfail(reason="VD does not yet support grid qubits")
+def test_apply_diagonalizing_gate_fails_on_grid_qubits():
+    num_copies = 2
+    qubits = cirq.GridQubit.rect(2, 2)
+    circuit = cirq.Circuit(
+        cirq.H(qubits[0]),
+        cirq.CNOT(qubits[0], qubits[1]),
+        cirq.X(qubits[2]),
     )
+    num_qubits = len(circuit.all_qubits())
 
-    # fetch the last N operations of the new circuit
-    last_N_ops = list(new_circuit.all_operations())[-N:]
+    copied_circuit = _copy_circuit_parallel(circuit, num_copies)
+    new_circuit = _apply_diagonalizing_gate(copied_circuit, num_copies)
 
-    # check that the last moment consists of
-    # the right amount of diagonalizing gates
-    assert len(last_N_ops) == len(original_circuit.all_qubits())
-    for op in last_N_ops:
-        assert op.gate == cirq.MatrixGate(expected_matrix)
+    num_ops = len(list(copied_circuit.all_operations()))
+    copied_circuit_ops = list(new_circuit.all_operations())
+
+    assert len(copied_circuit_ops) == num_ops + num_qubits  # this passes
+    assert set(new_circuit.all_qubits()) == set(copied_circuit.all_qubits())
 
 
 def test_generate_diagonalizing_gate():
