@@ -105,9 +105,9 @@ class Observable:
     def partition(self, seed: Optional[int] = None) -> None:
         """Partitions the observable's Pauli strings into commuting groups.
 
-        This method groups the ``PauliStringCollection`` instances such that each
-        group consists of mutually commuting operators, which can be measured
-        together in a quantum circuit.
+        This method groups the ``PauliStringCollection`` instances such that
+        each group consists of mutually commuting operators, which can be
+        measured together in a quantum circuit.
 
         Note:
             This method randomizes the way in which the list of
