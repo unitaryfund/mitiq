@@ -105,7 +105,7 @@ class Executor:
 
         Otherwise, it is considered "serial".
 
-        Batched executors can _run several quantum programs in a single call_.
+        Batched executors can *run several quantum programs in a single call*.
 
         Returns:
             True if the executor is detected as batched, else False.
