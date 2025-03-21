@@ -19,6 +19,7 @@ from typing import (
     Tuple,
     Union,
     cast,
+    get_args,
 )
 
 import numpy as np
@@ -36,6 +37,8 @@ DensityMatrixLike = [
     Sequence[np.ndarray],  # type: ignore
     Tuple[np.ndarray],
     npt.NDArray[np.complex64],
+    list[npt.NDArray[np.complex64]],
+    tuple[npt.NDArray[np.complex64]],
 ]
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
@@ -44,6 +47,8 @@ FloatLike = [
     List[float],
     Sequence[float],
     Tuple[float],
+    list[float],
+    tuple[float],
 ]
 MeasurementResultLike = [
     MeasurementResult,
@@ -51,6 +56,8 @@ MeasurementResultLike = [
     List[MeasurementResult],
     Sequence[MeasurementResult],
     Tuple[MeasurementResult],
+    list[MeasurementResult],
+    tuple[MeasurementResult],
 ]
 
 
@@ -84,10 +91,34 @@ class Executor:
 
     @property
     def can_batch(self) -> bool:
-        return self._executor_return_type in (
-            BatchedType[T]  # type: ignore[index]
-            for BatchedType in [Iterable, List, Sequence, Tuple]
-            for T in QuantumResult.__args__  # type: ignore[attr-defined]
+        """Returns True if the executor is recognized as a "batched executor",
+        else False.
+
+        The executor is detected as "batched" if and only if it is annotated
+        with a return type that is a subclass of ``Iterable``. Common examples
+        include:
+
+        * ``Iterable[QuantumResult]``
+        * ``List[QuantumResult]``/``list[QuantumResult]``
+        * ``Sequence[QuantumResult]``
+        * ``Tuple[QuantumResult]``/``tuple[QuantumResult]``
+
+        Otherwise, it is considered "serial".
+
+        Batched executors can _run several quantum programs in a single call_.
+
+        Returns:
+            True if the executor is detected as batched, else False.
+        """
+        return_type = self._executor_return_type
+
+        if return_type is None:
+            return False
+
+        return return_type in (
+            BatchedType[T]
+            for BatchedType in [Iterable, List, Sequence, Tuple, list, tuple]
+            for T in get_args(QuantumResult)
         )
 
     @property
@@ -317,43 +348,3 @@ class Executor:
         else:
             self._quantum_results.append(result)
             self._executed_circuits.append(to_run)
-
-    @staticmethod
-    def is_batched_executor(
-        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
-    ) -> bool:
-        """Returns True if the input function is recognized as a "batched
-        executor", else False.
-
-        The executor is detected as "batched" if and only if it is annotated
-        with a return type that is one of the following:
-
-        * ``Iterable[QuantumResult]``
-        * ``List[QuantumResult]``
-        * ``Sequence[QuantumResult]``
-        * ``Tuple[QuantumResult]``
-
-        Otherwise, it is considered "serial".
-
-        Batched executors can _run several quantum programs in a single call.
-        See below.
-
-        Args:
-            executor: A "serial executor" (1) or a "batched executor" (2).
-
-                #. A function which inputs a single ``QPROGRAM`` and outputs a
-                   single ``QuantumResult``.
-                #. A function which inputs a list of ``QPROGRAM`` objects and
-                   returns a list of ``QuantumResult`` instances (one for each
-                   ``QPROGRAM``).
-
-        Returns:
-            True if the executor is detected as batched, else False.
-        """
-        executor_annotation = inspect.getfullargspec(executor).annotations
-
-        return executor_annotation.get("return") in (
-            BatchedType[T]  # type: ignore[index]
-            for BatchedType in [Iterable, List, Sequence, Tuple]
-            for T in QuantumResult.__args__  # type: ignore[attr-defined]
-        )
