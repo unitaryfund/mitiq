@@ -170,7 +170,7 @@ def _apply_symmetric_observable(
         obs_array = (
             observable
             if isinstance(observable, np.ndarray)
-            else np.array(observable)
+            else observable.matrix()
         )
         sym_observable_matrices: List[NDArray[np.complex64]] = []
         for i in range(N_qubits):
