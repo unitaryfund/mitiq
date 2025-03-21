@@ -42,7 +42,7 @@ class Observable:
                 used to define the observable.
 
         Returns:
-            An Observable containing the given Pauli string collections.
+            An ``Observable`` containing the given Pauli string collections.
         """
         obs = Observable()
         obs._groups = list(pauli_string_collections)
@@ -105,7 +105,7 @@ class Observable:
     def partition(self, seed: Optional[int] = None) -> None:
         """Partitions the observable's Pauli strings into commuting groups.
 
-        This method groups the PauliStringCollection instances such that each
+        This method groups the ``PauliStringCollection`` instances such that each
         group consists of mutually commuting operators, which can be measured
         together in a quantum circuit.
 
@@ -159,7 +159,7 @@ class Observable:
         self,
         qubit_indices: Optional[List[int]] = None,
     ) -> npt.NDArray[np.complex64]:
-        """Returns the (potentially very large) matrix of the Observable.
+        """Returns the (potentially very large) matrix of the ``Observable``.
 
         Args:
             qubit_indices: Optional list of qubit indices specifying the order
@@ -167,7 +167,7 @@ class Observable:
             ordering from `self.qubit_indices` is used.
 
         Returns:
-            A NumPy array representing the matrix form of the observable.
+            A ``NumPy`` array representing the matrix form of the observable.
         """
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
