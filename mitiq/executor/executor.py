@@ -116,7 +116,7 @@ class Executor:
             return False
 
         return return_type in (
-            BatchedType[T]
+            BatchedType[T]  # type: ignore[index]
             for BatchedType in [Iterable, List, Sequence, Tuple, list, tuple]
             for T in get_args(QuantumResult)
         )
