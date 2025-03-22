@@ -139,9 +139,7 @@ class Observable:
         self._ngroups = len(self._groups)
 
     def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
-        """Generates measurement circuits for the observable.
-
-        Given a quantum circuit, this method returns a list of circuits where
+        """Given a quantum circuit, this method returns a list of circuits where
         each circuit corresponds to a different group of commuting Pauli
         strings, which allows measurement in the appropriate basis.
 
