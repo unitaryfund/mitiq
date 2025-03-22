@@ -6,6 +6,7 @@
 """Defines utilities for efficiently running collections of circuits generated
 by error mitigation techniques to compute expectation values."""
 
+import collections
 import inspect
 import warnings
 from collections import Counter
@@ -117,7 +118,15 @@ class Executor:
 
         return return_type in (
             BatchedType[T]  # type: ignore[index]
-            for BatchedType in [Iterable, List, Sequence, Tuple, list, tuple]
+            for BatchedType in [
+                Iterable,
+                List,
+                Sequence,
+                Tuple,
+                list,
+                tuple,
+                collections.abc.Sequence,
+            ]
             for T in get_args(QuantumResult)
         )
 
