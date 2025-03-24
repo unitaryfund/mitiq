@@ -204,7 +204,7 @@ nb_execution_mode = "cache"
 
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
-    print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
+    print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is set.")
     nb_execution_excludepatterns = ["*pyquil*.ipynb"]
 
 # -- Options for autodoc -----------------------------------------------------
@@ -446,6 +446,7 @@ nbsphinx_thumbnails = {
     "examples/quantum_simulation_1d_ising": "_static/quantum_simulation.png",
     "examples/cdr_qrack": "_static/cdr-qrack.png",
     "examples/loschmidt_echo_revival_zne": "_static/loschmidt_echo_qiskit.png",
+    "examples/pt_zne": "_static/pt_zne.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
