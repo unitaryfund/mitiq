@@ -118,9 +118,9 @@ def _apply_cyclic_system_permutation(
 ) -> NDArray[np.complex64]:
     """
     Function that shifts the rows of a matrix or vector in such a way,
-    that each of the num_registers registers of N_qubit qubits are shifted 
-    cyclically.The implementation is identical to left multiplication 
-    with repeated swap gates, however this optimisation in considerably 
+    that each of the num_registers registers of N_qubit qubits are shifted
+    cyclically.The implementation is identical to left multiplication
+    with repeated swap gates, however this optimisation in considerably
     faster.
 
     Args:
