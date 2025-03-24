@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 
 from mitiq.vd.vd_utils import (
-    _apply_diagonalizing_gate,
     _apply_cyclic_system_permutation,
+    _apply_diagonalizing_gate,
     _apply_symmetric_observable,
     _copy_circuit_parallel,
     _generate_diagonalizing_gate,
