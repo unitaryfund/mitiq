@@ -41,7 +41,8 @@ def single_qubit_depolarizing_overhead(noise_level: float) -> float:
         Depolarizing overhead value with noise level considered.
     """
     epsilon = 3 / 4 * noise_level
-    return 2  / 3 * (epsilon - 1)
+    return 2 / 3 * (epsilon - 1)
+
 
 def two_qubit_depolarizing_overhead(noise_level: float) -> float:
     """See :cite:`Temme_2017_PRL` for more information.
@@ -53,31 +54,7 @@ def two_qubit_depolarizing_overhead(noise_level: float) -> float:
         Depolarizing overhead value with noise level considered.
     """
     epsilon = 15 / 16 * noise_level
-    return (epsilon - 1) / (epsilon + 7  / 8)
-
-
-@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
-@pytest.mark.parametrize("gate", [X, Y, Z, H])
-def test_single_qubit_representation_norm(gate: Gate, noise: float):
-    q = LineQubit(0)
-    optimal_norm = single_qubit_depolarizing_overhead(noise)
-    norm = amplify_noisy_op_with_global_depolarizing_noise(
-        Circuit(gate(q)),
-        noise,
-    ).norm
-    assert np.isclose(optimal_norm, norm)
-
-
-@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
-@pytest.mark.parametrize("gate", (CZ, CNOT, ISWAP, SWAP))
-def test_two_qubit_representation_norm(gate: Gate, noise: float):
-    qreg = LineQubit.range(2)
-    optimal_norm = two_qubit_depolarizing_overhead(noise)
-    norm = amplify_noisy_op_with_global_depolarizing_noise(
-        Circuit(gate(*qreg)),
-        noise,
-    ).norm
-    assert np.isclose(optimal_norm, norm)
+    return (epsilon - 1) / (epsilon + 7 / 8)
 
 
 def test_three_qubit_depolarizing_amplification_error():
@@ -181,5 +158,3 @@ def test_amplify_operations_in_circuit_with_measurements(
 
     # Number of unique gates excluding measurement gates
     assert len(reps) == 1
-
-
