@@ -3,22 +3,16 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-import numpy as np
 import pytest
 from cirq import (
     CCNOT,
     CNOT,
-    CZ,
-    ISWAP,
-    SWAP,
     Circuit,
-    Gate,
     H,
     LineQubit,
     MeasurementGate,
     X,
     Y,
-    Z,
 )
 
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
