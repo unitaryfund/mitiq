@@ -3,9 +3,11 @@ import numpy as np
 import pytest
 
 from mitiq.vd.vd_utils import (
+    _apply_diagonalizing_gate,
     _apply_cyclic_system_permutation,
     _apply_symmetric_observable,
     _copy_circuit_parallel,
+    _generate_diagonalizing_gate,
 )
 
 
@@ -93,6 +95,62 @@ def test_copy_circuit_parallel_gridqubits():
     new_unitary = cirq.unitary(new_circuit)
     expected_unitary = cirq.unitary(expected_circuit)
     assert np.allclose(new_unitary, expected_unitary)
+
+
+def test_apply_diagonalizing_gate_keeps_circuit_structure():
+    num_copies = 2
+    qubits = cirq.LineQubit.range(3)
+    circuit = cirq.Circuit(
+        cirq.H(qubits[0]),
+        cirq.CNOT(qubits[0], qubits[1]),
+        cirq.X(qubits[2]),
+    )
+    num_qubits = len(circuit.all_qubits())
+
+    copied_circuit = _copy_circuit_parallel(circuit, num_copies)
+    new_circuit = _apply_diagonalizing_gate(copied_circuit, num_copies)
+
+    num_ops = len(list(copied_circuit.all_operations()))
+    copied_circuit_ops = list(new_circuit.all_operations())
+
+    assert len(copied_circuit_ops) == num_ops + num_qubits
+    assert set(new_circuit.all_qubits()) == set(copied_circuit.all_qubits())
+
+
+@pytest.mark.xfail(reason="VD does not yet support grid qubits")
+def test_apply_diagonalizing_gate_fails_on_grid_qubits():
+    num_copies = 2
+    qubits = cirq.GridQubit.rect(2, 2)
+    circuit = cirq.Circuit(
+        cirq.H(qubits[0]),
+        cirq.CNOT(qubits[0], qubits[1]),
+        cirq.X(qubits[2]),
+    )
+    num_qubits = len(circuit.all_qubits())
+
+    copied_circuit = _copy_circuit_parallel(circuit, num_copies)
+    new_circuit = _apply_diagonalizing_gate(copied_circuit, num_copies)
+
+    num_ops = len(list(copied_circuit.all_operations()))
+    copied_circuit_ops = list(new_circuit.all_operations())
+
+    assert len(copied_circuit_ops) == num_ops + num_qubits  # this passes
+    assert set(new_circuit.all_qubits()) == set(copied_circuit.all_qubits())
+
+
+def test_generate_diagonalizing_gate():
+    expected_matrix = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, np.sqrt(2) / 2, np.sqrt(2) / 2, 0],
+            [0, np.sqrt(2) / 2, -np.sqrt(2) / 2, 0],
+            [0, 0, 0, 1],
+        ]
+    )
+
+    assert np.allclose(
+        _generate_diagonalizing_gate(2)._matrix, expected_matrix
+    )
 
 
 def test_apply_cyclic_system_permutation():

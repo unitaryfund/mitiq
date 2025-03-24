@@ -6,10 +6,13 @@ import re
 from typing import List
 from unittest.mock import Mock
 
+import numpy as np
 import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
+from mitiq.interface import mitiq_cirq
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.lre import (
     execute_with_lre,
     lre_decorator,
@@ -18,6 +21,7 @@ from mitiq.lre.multivariate_scaling.layerwise_folding import (
     _get_chunks,
     multivariate_layer_scaling,
 )
+from mitiq.observable import Observable, PauliString
 from mitiq.zne.scaling import fold_all, fold_global
 
 # default circuit for all unit tests
@@ -26,13 +30,31 @@ test_cirq = benchmarks.generate_rb_circuits(
     num_cliffords=2,
 )[0]
 
+test_cirq_two_qubits = benchmarks.generate_rb_circuits(
+    n_qubits=2,
+    num_cliffords=2,
+)[0]
+
+obs_x = Observable(PauliString(spec="X"))
+obs_y = Observable(PauliString(spec="Y"))
+obs_z = Observable(PauliString(spec="Z"))
+obs_zz = Observable(PauliString(spec="ZZ"))
+
 
 # default execute function for all unit tests
-def execute(circuit, noise_level=0.025):
+def execute(circuit, noise_level=0.025) -> float:
     """Default executor for all unit tests."""
     noisy_circuit = circuit.with_noise(depolarize(p=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
     return rho[0, 0].real
+
+
+def executor_density_matrix_typed(circuit) -> np.ndarray:
+    return compute_density_matrix(circuit, noise_level=(0,))
+
+
+def executor_density_matrix_batched(circuits) -> List[np.ndarray]:
+    return [executor_density_matrix_typed(circuit) for circuit in circuits]
 
 
 def batched_executor(circuits) -> List[float]:
@@ -45,7 +67,7 @@ ideal_val = execute(test_cirq, noise_level=0)
 
 @pytest.mark.parametrize("degree, fold_multiplier", [(2, 2), (2, 3), (3, 4)])
 def test_lre_exp_value(degree, fold_multiplier):
-    """Verify LRE executors work as expected."""
+    """Verify LRE executors works as expected."""
     lre_exp_val = execute_with_lre(
         test_cirq,
         execute,
@@ -53,6 +75,33 @@ def test_lre_exp_value(degree, fold_multiplier):
         fold_multiplier=fold_multiplier,
     )
     assert abs(lre_exp_val - ideal_val) <= abs(noisy_val - ideal_val)
+
+
+@pytest.mark.parametrize(
+    "circuit, degree, fold_multiplier, observable",
+    [
+        (test_cirq, 2, 3, obs_z),
+        (test_cirq_two_qubits, 1, 2, obs_zz),
+    ],
+)
+def test_lre_exp_value_with_observable(
+    circuit, degree, fold_multiplier, observable
+):
+    """Verify LRE can be used with observables."""
+    test_executor = Executor(mitiq_cirq.compute_density_matrix)
+    lre_exp_val = execute_with_lre(
+        circuit,
+        test_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+        observable=observable,
+    )
+
+    assert isinstance(lre_exp_val, float)
+
+    assert test_executor.calls_to_executor == len(
+        multivariate_layer_scaling(circuit, degree, fold_multiplier)
+    )
 
 
 @pytest.mark.parametrize(
@@ -87,6 +136,33 @@ def test_lre_batched_executor(degree, fold_multiplier):
         test_batched_executor,
         degree=degree,
         fold_multiplier=fold_multiplier,
+    )
+    assert isinstance(lre_exp_val_batched, float)
+
+    assert test_batched_executor.calls_to_executor == 1
+    assert (
+        test_batched_executor.executed_circuits
+        == multivariate_layer_scaling(test_cirq, degree, fold_multiplier)
+    )
+
+
+@pytest.mark.parametrize(
+    "degree, fold_multiplier, observable",
+    [(2, 2, obs_x), (2, 3, obs_y), (3, 4, obs_z)],
+)
+def test_lre_batched_executor_with_observable(
+    degree, fold_multiplier, observable
+):
+    """Verify LRE batch executor with observable works as expected."""
+    test_batched_executor = Executor(
+        executor_density_matrix_batched, max_batch_size=200
+    )
+    lre_exp_val_batched = execute_with_lre(
+        test_cirq,
+        test_batched_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+        observable=observable,
     )
     assert isinstance(lre_exp_val_batched, float)
 
