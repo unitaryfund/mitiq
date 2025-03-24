@@ -58,18 +58,19 @@ def _copy_circuit_parallel(
 
 
 def _apply_cyclic_system_permutation(
-    matrix: NDArray[np.complex64], N_qubits: int, M: int = 2
+    matrix: NDArray[np.complex64], N_qubits: int, num_registers: int = 2
 ) -> NDArray[np.complex64]:
     """
     Function that shifts the rows of a matrix or vector in such a way,
-    that each of the M registers of N_qubit qubits are shifted cyclically.
-    The implementation is identical to left multiplication with repeated swap
-    gates, however this optimisation in considerably faster.
+    that each of the num_registers registers of N_qubit qubits are shifted 
+    cyclically.The implementation is identical to left multiplication 
+    with repeated swap gates, however this optimisation in considerably 
+    faster.
 
     Args:
         matrix: The matrix or vector that should be shifted.
         N_qubits: The number of qubits in each register.
-        M: The number of registers.
+        num_registers: The number of registers.
 
     Returns:
         The matrix or vector with the rows shifted cyclically.
@@ -80,11 +81,11 @@ def _apply_cyclic_system_permutation(
     permutation = [
         j + i
         for j in range(2**N_qubits)
-        for i in range(0, 2 ** (M * N_qubits), 2**N_qubits)
+        for i in range(0, 2 ** (num_registers * N_qubits), 2**N_qubits)
     ]
 
     # Some fancy index magic to permute the rows in O(n) time
-    # and space (n=2**(M*N_qubits))
+    # and space (n=2**(num_registers*N_qubits))
     idx = np.empty_like(permutation)
     idx[permutation] = np.arange(len(permutation))
 
@@ -101,7 +102,6 @@ def _apply_symmetric_observable(
     matrix: NDArray[np.complex64],
     N_qubits: int,
     observable: Optional[Union[Observable, NDArray[np.complex64]]] = None,
-    M: int = 2,
 ) -> NDArray[np.complex64]:
     """
     Function that applies a symmetric observable to a matrix or vector.
@@ -111,7 +111,7 @@ def _apply_symmetric_observable(
         N_qubits: The number of qubits in each register.
         observable: The observable that should be applied.
             If None, the Z observable is used.
-        M: The number of registers.
+        num_registers: The number of registers.
 
     Returns:
         The matrix or vector with the observable applied.
