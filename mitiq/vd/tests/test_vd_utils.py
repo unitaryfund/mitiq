@@ -3,7 +3,9 @@ import numpy as np
 import pytest
 
 from mitiq.vd.vd_utils import (
+    _apply_cyclic_system_permutation,
     _apply_diagonalizing_gate,
+    _apply_symmetric_observable,
     _copy_circuit_parallel,
     _generate_diagonalizing_gate,
 )
@@ -149,3 +151,117 @@ def test_generate_diagonalizing_gate():
     assert np.allclose(
         _generate_diagonalizing_gate(2)._matrix, expected_matrix
     )
+
+
+def test_apply_cyclic_system_permutation():
+    # Check for ndim=2
+    matrix = np.arange(1, 17).reshape(4, 4)
+    expected = matrix[[0, 2, 1, 3]]
+
+    result = _apply_cyclic_system_permutation(matrix, N_qubits=1)
+    assert np.allclose(result, expected)
+
+    # Check for ndim=3
+    tensor = np.arange(1, 65).reshape(4, 4, 4)
+    expected = tensor[:, [0, 2, 1, 3], :]
+
+    result = _apply_cyclic_system_permutation(tensor, N_qubits=1)
+    assert np.allclose(result, expected)
+
+    # Check for ndim>3
+    tensor = np.arange(1, 17).reshape(2, 2, 2, 2)
+
+    with pytest.raises(TypeError, match="matrix should be 2D or 3D ndarray"):
+        _apply_cyclic_system_permutation(tensor, N_qubits=1)
+
+
+def test_edge_case_single_qubit():
+    matrix = np.array([[1, 2], [3, 4]])
+    # No permutation should happen here
+    expected = matrix.copy()
+    result = _apply_cyclic_system_permutation(
+        matrix, N_qubits=1, num_registers=1
+    )
+    assert np.allclose(result, expected)
+
+
+def test_apply_symmetric_observable():
+    # Check for ndim=2
+    matrix = np.arange(1, 17).reshape(4, 4)
+    expected = np.array(
+        [
+            [
+                [1.0, 0.0, 0.0, -4.0],
+                [5.0, 0.0, 0.0, -8.0],
+                [9.0, 0.0, 0.0, -12.0],
+                [13.0, 0.0, 0.0, -16.0],
+            ]
+        ]
+    )
+
+    result = _apply_symmetric_observable(matrix, N_qubits=1)
+    assert np.allclose(result, expected)
+
+    # Check for ndim=3
+    tensor = np.arange(1, 65).reshape(4, 4, 4)
+    expected = np.array(
+        [
+            [
+                [1.0, 0.0, 0.0, -4.0],
+                [5.0, 0.0, 0.0, -8.0],
+                [9.0, 0.0, 0.0, -12.0],
+                [13.0, 0.0, 0.0, -16.0],
+            ],
+            [
+                [17.0, 0.0, 0.0, -20.0],
+                [21.0, 0.0, 0.0, -24.0],
+                [25.0, 0.0, 0.0, -28.0],
+                [29.0, 0.0, 0.0, -32.0],
+            ],
+            [
+                [33.0, 0.0, 0.0, -36.0],
+                [37.0, 0.0, 0.0, -40.0],
+                [41.0, 0.0, 0.0, -44.0],
+                [45.0, 0.0, 0.0, -48.0],
+            ],
+            [
+                [49.0, 0.0, 0.0, -52.0],
+                [53.0, 0.0, 0.0, -56.0],
+                [57.0, 0.0, 0.0, -60.0],
+                [61.0, 0.0, 0.0, -64.0],
+            ],
+        ]
+    )
+
+    result = _apply_symmetric_observable(tensor, N_qubits=1)
+    assert np.allclose(result, expected)
+
+    # Check for ndim>3
+    tensor = np.arange(1, 17).reshape(2, 2, 2, 2)
+
+    with pytest.raises(ValueError, match="matrix should be 2D or 3D ndarray"):
+        _apply_symmetric_observable(tensor, N_qubits=1)
+
+
+def test_apply_symmetric_observable_X():
+    # For N_qubits=1 and M=2, we're dealing with 4x4 matrices
+    matrix = np.arange(1, 17).reshape(4, 4)
+    observable = np.array([[0, 1], [1, 0]])
+
+    # For N_qubits=1, we expect one output matrix with diagonals scaled
+    # by +1 for |0⟩ state and -1 for |1⟩ state
+    expected = np.array(
+        [
+            [
+                [7.0, 8.0, 9.0, 10.0],
+                [7.0, 8.0, 9.0, 10.0],
+                [7.0, 8.0, 9.0, 10.0],
+                [7.0, 8.0, 9.0, 10.0],
+            ]
+        ]
+    )
+
+    result = _apply_symmetric_observable(
+        matrix, N_qubits=1, observable=observable
+    )
+    assert np.allclose(result, expected)
