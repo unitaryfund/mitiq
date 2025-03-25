@@ -1,14 +1,12 @@
-from typing import Callable, Iterable, List, Optional, Union
+from typing import Callable
 
 import cirq
 import numpy as np
 
 from mitiq import (
-    QPROGRAM,
     Executor,
     MeasurementResult,
     Observable,
-    QuantumResult,
 )
 from mitiq.executor.executor import DensityMatrixLike, MeasurementResultLike
 from mitiq.vd.vd_utils import (
