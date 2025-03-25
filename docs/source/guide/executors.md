@@ -123,17 +123,14 @@ Notice in the above output that the executor has been called once for each circu
 
 Several quantum computing services allow running a sequence, or "batch," of circuits at once. This is important for error mitigation when running many circuits to speed up the computation.
 
-+++
-
-To define a batched executor, annotate it with `Sequence[T]`, `List[T]`, `Tuple[T]`, or `Iterable[T]` where `T` is a `QuantumResult`. Here is an example:
+To define a batched executor, annotate it with `Sequence[T]`, `list[T]`, `tuple[T]`, or `Iterable[T]` where `T` is a `QuantumResult`.
+Here is an example:
 
 ```{code-cell} ipython3
-from typing import List
-
 import numpy as np
 
 
-def batch_compute_density_matrix(circuits: List[cirq.Circuit]) -> List[np.ndarray]:
+def batch_compute_density_matrix(circuits: list[cirq.Circuit]) -> list[np.ndarray]:
     return [mitiq_cirq.compute_density_matrix(circuit) for circuit in circuits]
 
 
