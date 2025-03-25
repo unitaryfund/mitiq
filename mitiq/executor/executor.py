@@ -39,6 +39,7 @@ DensityMatrixLike = [
     Tuple[np.ndarray],
     npt.NDArray[np.complex64],
     list[npt.NDArray[np.complex64]],
+    list[np.ndarray],  # type: ignore
     tuple[npt.NDArray[np.complex64]],
 ]
 FloatLike = [
