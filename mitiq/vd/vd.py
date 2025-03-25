@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, List
 
 import cirq
 import numpy as np
@@ -19,7 +19,7 @@ from mitiq.vd.vd_utils import (
 
 def vd_executor(
     circuit: cirq.Circuit, reps: int = 10
-) -> list[MeasurementResult]:
+) -> List[MeasurementResult]:
     results = cirq.sample(circuit, repetitions=reps).measurements
     measurements = []
 
@@ -39,8 +39,8 @@ def vd_executor(
 def execute_with_vd(
     circuit: cirq.Circuit,
     executor: Callable[[cirq.Circuit], MeasurementResult],
-    M: int = 2,
-    K: int = 1000,
+    M: int = 2, # TODO: refactor with num_additional_qubits
+    num_shots: int = 1000,
     observable: Observable | None = None,
 ) -> list[float]:
     """Given a circuit that acts on N qubits, this function returns the
@@ -55,8 +55,9 @@ def execute_with_vd(
             The executor must either return a ``MeasurementResult`` or a list
             thereof ``list[MeasurementResult]``.
         M: The number of copies of rho. Only M=2 is implemented at this moment.
-        K: The number of iterations of the algorithm. Only used if the executor
-            returns a single measurement.
+        num_shots: The number of iterations of the algorithm. Only used if the
+            executor returns a outcomes from a single experiment (i.e. a
+            measurement result).
         observable: The one qubit observable for which the expectation values
             are computed. The default observable is the Pauli Z matrix. At the
             moment using different observables is not supported.
@@ -72,10 +73,10 @@ def execute_with_vd(
     Ei = np.array(list(0 for _ in range(N)))
     D = 0
 
-    # Forcing odd K, this is a workaround so that D (see end of the function)
+    # Forcing odd num_shots, this is a workaround so that D (see end of func)
     # cannot be 0 accidentally
-    if K % 2 == 0:
-        K -= 1
+    if num_shots % 2 == 0:
+        num_shots -= 1
 
     executor_obj = Executor(executor)  # type: ignore[arg-type]
 
@@ -99,7 +100,7 @@ def execute_with_vd(
             new_circuit.append(cirq.measure(cirq.LineQubit(i), key=f"{i}"))
 
         res = executor_obj.run(
-            new_circuit, force_run_all=True, reps=K
+            new_circuit, force_run_all=True, reps=num_shots
         )  # TODO make this reps a **kwargs to allow any executor
 
         self_packed = True
@@ -112,7 +113,7 @@ def execute_with_vd(
             self_packed = False
 
         if len(res) == 1:  # if the executor only returns a single measurement
-            for _ in range(K - 1):  # then we measure K times in total
+            for _ in range(num_shots - 1):  # then we repeat num_shots times
                 if not self_packed:
                     res.append(
                         executor_obj.run(new_circuit, force_run_all=True)
