@@ -27,7 +27,7 @@ def sample_bitstrings(
     particular noise model and some value for the error rate.
 
     Args:
-        circuit: The input Cirq circuit.
+        circuit: The input Cirq circuit with measurements applied.
         noise_model: Input Cirq noise model. Default is amplitude damping.
         noise_level: Noise rate as a tuple of floats.
         sampler: Cirq simulator from which the result will be sampled from.
