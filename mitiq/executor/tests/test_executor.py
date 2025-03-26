@@ -67,7 +67,7 @@ def executor_measurements_typed(circuit) -> MeasurementResult:
     return sample_bitstrings(circuit, noise_level=(0,))
 
 
-def executor_measurements_batched(circuits) -> List[MeasurementResult]:
+def executor_measurements_batched(circuits) -> list[MeasurementResult]:
     return [executor_measurements_typed(circuit) for circuit in circuits]
 
 
@@ -95,12 +95,13 @@ def test_executor_simple():
     assert collector.calls_to_executor == 0
 
 
-def test_executor_is_batched_executor():
-    assert Executor.is_batched_executor(executor_batched)
-    assert not Executor.is_batched_executor(executor_serial_typed)
-    assert not Executor.is_batched_executor(executor_serial)
-    assert not Executor.is_batched_executor(executor_measurements_typed)
-    assert Executor.is_batched_executor(executor_measurements_batched)
+def test_executors_can_batch():
+    assert Executor(executor_batched).can_batch
+    assert not Executor(executor_serial_typed).can_batch
+    assert not Executor(executor_serial).can_batch
+    assert not Executor(executor_measurements_typed).can_batch
+    assert not Executor(executor_density_matrix_typed).can_batch
+    assert Executor(executor_measurements_batched).can_batch
 
 
 def test_executor_non_hermitian_observable():
