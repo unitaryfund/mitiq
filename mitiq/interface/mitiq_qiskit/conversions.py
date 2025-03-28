@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -172,7 +172,7 @@ def _measurement_order(
                     f"supported, but this measurement has {len(qubits)} "
                     f"qubit(s) and {len(cbits)} bit(s). If you think this "
                     f"should be supported and is a bug, please open an issue "
-                    f"at https://github.com/unitaryfund/mitiq."
+                    f"at https://github.com/unitaryfoundation/mitiq."
                 )
             order.append((*qubits, *cbits))
     return order

@@ -28,7 +28,7 @@ To start, relevant modules and libraries are imported. Please ensure that the fo
 +++
 
 ```{note}
-In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`. This enviroment variable sets the maximum on how many qubits can be allocated on a single QEngineCPU instance. More information can be found on the [Qrack README page](https://github.com/unitaryfund/qrack/blob/main/README.md#maximum-allocation-guard).
+In the code below the environmental variable, `QRACK_MAX_CPU_QB`, is set to `-1`. This enviroment variable sets the maximum on how many qubits can be allocated on a single QEngineCPU instance. More information can be found on the [Qrack README page](https://github.com/unitaryfoundation/qrack/blob/main/README.md#maximum-allocation-guard).
 ```
 
 ```{code-cell}
@@ -187,4 +187,4 @@ improvement_factor = unmitigated_error / mitigated_error
 print(f"Improvement factor with CDR: {improvement_factor:.2f}")
 ```
 
-To learn more about CDR, please check the [User Guide](../guide/cdr.md) or the [ZNE and CDR with Cirq: 1D Ising Simulation](./quantum_simulation_1d_ising.md) example. If you have any questions, please do not hesitate to open a [Github discussion](https://github.com/unitaryfund/mitiq/discussions) or reach out to the Mitiq team on [Discord](http://discord.unitary.fund).
+To learn more about CDR, please check the [User Guide](../guide/cdr.md) or the [ZNE and CDR with Cirq: 1D Ising Simulation](./quantum_simulation_1d_ising.md) example. If you have any questions, please do not hesitate to open a [Github discussion](https://github.com/unitaryfoundation/mitiq/discussions) or reach out to the Mitiq team on [Discord](http://discord.unitary.foundation).
