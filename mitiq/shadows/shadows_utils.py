@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 # Portions of this code have been adapted from PennyLane's tutorial
 # on Classical Shadows.
 # Original authors: PennyLane developers: Brian Doolittle, Roeland Wiersema

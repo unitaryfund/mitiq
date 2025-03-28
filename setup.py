@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -47,8 +47,8 @@ setup(
     "computers.",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="Unitary Fund",
-    author_email="info@unitary.fund",
+    author="Unitary Foundation",
+    author_email="info@unitary.foundation",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
@@ -61,11 +61,11 @@ setup(
         "Typing :: Typed",
     ],
     license="GPL v3.0",
-    url="https://unitary.fund",
+    url="https://unitary.foundation",
     project_urls={
-        "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues/",
+        "Bug Tracker": "https://github.com/unitaryfoundation/mitiq/issues/",
         "Documentation": "https://mitiq.readthedocs.io/en/stable/",
-        "Source": "https://github.com/unitaryfund/mitiq/",
+        "Source": "https://github.com/unitaryfoundation/mitiq/",
     },
     python_requires=">=3.10,<3.13",
 )

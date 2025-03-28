@@ -7,7 +7,7 @@ jobs:
   #generate_artifacts:
   # TODO: make docs tarball
   create_release:
-    if: github.repository_owner == 'unitaryfund'
+    if: github.repository_owner == 'unitaryfoundation'
     runs-on: ubuntu-latest
     steps:
       - name: Check out Mitiq

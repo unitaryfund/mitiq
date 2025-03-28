@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -144,9 +144,10 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[cirq.Circuit, str]:
             "This may be because the circuit contains custom gates or Pragmas "
             "(pyQuil). If you think this is a bug or that this circuit should "
             "be supported, you can open an issue at "
-            "https://github.com/unitaryfund/mitiq. \n\n Provided circuit has "
-            f"type {type(circuit)} and is:\n\n{circuit}\n\nCircuit types "
-            f"supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}."
+            "https://github.com/unitaryfoundation/mitiq. \n\n Provided "
+            f"circuit has type {type(circuit)} and is:\n\n{circuit}\n\n "
+            f"Circuit types supported by Mitiq are "
+            "\n{SUPPORTED_PROGRAM_TYPES}."
         )
 
     return mitiq_circuit, input_circuit_type
