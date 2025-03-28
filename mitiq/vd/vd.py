@@ -102,4 +102,4 @@ def execute_with_vd(
 
     results = executor(vd_circuit)
 
-    return combine_results(results)
+    return combine_results(results).tolist()
