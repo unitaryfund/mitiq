@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 # Portions of this code have been adapted from Cirq's qubit characterizations
 # module.
 # Original authors: Cirq developers: Xiao Mi, Dave Bacon, Craig Gidney,

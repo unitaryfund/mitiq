@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -23,7 +23,7 @@ def _raise_braket_to_cirq_error(instr: Instruction) -> None:
     raise ValueError(
         f"Unable to convert the instruction {instr} to Cirq. If you think "
         "this is a bug, you can open an issue on the Mitiq GitHub at "
-        "https://github.com/unitaryfund/mitiq."
+        "https://github.com/unitaryfoundation/mitiq."
     )
 
 
@@ -31,7 +31,7 @@ def _raise_cirq_to_braket_error(op: cirq_ops.Operation) -> None:
     raise ValueError(
         f"Unable to convert {op} to Braket. If you think this is a bug, "
         "you can open an issue on the Mitiq GitHub at"
-        " https://github.com/unitaryfund/mitiq."
+        " https://github.com/unitaryfoundation/mitiq."
     )
 
 

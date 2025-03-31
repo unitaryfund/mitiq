@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build Mitiq
-    if: github.repository_owner == 'unitaryfund'
+    if: github.repository_owner == 'unitaryfoundation'
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq

@@ -314,4 +314,4 @@ plt.legend();
 
 We can see that PEC on average improves the expectation value at each depth. Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard deviation of the PEC values (for the "PEC" line).
 
-For an example of how one applies PEC on quantum hardware consult *Russo et al. arXiv (2022)* {cite}`Russo_2022_Testing` ([arXiv:2210.07194](https://arxiv.org/abs/2210.07194)) and the companion [software repository](https://github.com/unitaryfund/research/tree/main/qem-on-hardware).
+For an example of how one applies PEC on quantum hardware consult *Russo et al. arXiv (2022)* {cite}`Russo_2022_Testing` ([arXiv:2210.07194](https://arxiv.org/abs/2210.07194)) and the companion [software repository](https://github.com/unitaryfoundation/research/tree/main/qem-on-hardware).
