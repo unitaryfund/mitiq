@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy:
-    if: github.repository_owner == 'unitaryfund'
+    if: github.repository_owner == 'unitaryfoundation'
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq

@@ -27,8 +27,8 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = "Mitiq"
-copyright = f"2020 - {datetime.date.today().year}, Tech Team @ Unitary Fund"
-author = "Tech Team @ Unitary Fund"
+copyright = f"2020 - {datetime.date.today().year} Unitary Foundation"
+author = "Tech Team @ Unitary Foundation"
 
 # The full version, including alpha/beta/rc tags
 directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
@@ -233,14 +233,14 @@ linkcheck_ignore = [
     r"https://doi\.org/.*",
     r"https://link\.aps\.org/doi/.*",
     r"https://www\.sciencedirect\.com/science/article/.*",
-    r"https://github.com/unitaryfund/mitiq/compare/.*",
-    r"https://github.com/unitaryfund/mitiq/projects/7",
+    r"https://github.com/unitaryfoundation/mitiq/compare/.*",
+    r"https://github.com/unitaryfoundation/mitiq/projects/7",
 ]
 
 linkcheck_retries = 3
 
 linkcheck_anchors_ignore_for_url = [
-    "https://github.com/unitaryfund/qrack/blob/main/README.md"
+    "https://github.com/unitaryfoundation/qrack/blob/main/README.md"
 ]
 
 
@@ -397,7 +397,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "Source Repository",
-            "url": "https://github.com/unitaryfund/mitiq",
+            "url": "https://github.com/unitaryfoundation/mitiq",
             "icon": "fa-brands fa-github",
             "type": "fontawesome",
         }

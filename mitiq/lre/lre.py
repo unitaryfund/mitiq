@@ -1,4 +1,4 @@
-# Copyright (C) Unitary Fund
+# Copyright (C) Unitary Foundation
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
@@ -10,7 +10,7 @@ from typing import Any, Callable, Optional, Union
 
 import numpy as np
 
-from mitiq import QPROGRAM, Executor
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.lre.inference import (
     multivariate_richardson_coefficients,
 )
@@ -104,9 +104,10 @@ def combine_results(
 
 def execute_with_lre(
     circuit: QPROGRAM,
-    executor: Union[Executor, Callable[[QPROGRAM], float]],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     degree: int,
     fold_multiplier: int,
+    observable: Optional[Observable] = None,
     folding_method: Callable[
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,  # type: ignore [has-type]
@@ -132,6 +133,10 @@ def execute_with_lre(
         degree: Degree of the multivariate polynomial.
         fold_multiplier: Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
+        observable: Observable to compute the expectation value of. If
+            ``None``, the ``executor`` must return an expectation value.
+            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
+            ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
@@ -165,15 +170,16 @@ def execute_with_lre(
             + "multivariate extrapolation."
         )
 
-    lre_exp_values = executor.evaluate(noise_scaled_circuits)
+    lre_exp_values = executor.evaluate(noise_scaled_circuits, observable)
 
     return np.dot(lre_exp_values, linear_combination_coeffs)
 
 
 def mitigate_executor(
-    executor: Callable[[QPROGRAM], float],
+    executor: Callable[[QPROGRAM], QuantumResult],
     degree: int,
     fold_multiplier: int,
+    observable: Optional[Observable] = None,
     folding_method: Callable[
         [Union[Any], float], Union[Any]
     ] = fold_gates_at_random,
@@ -183,11 +189,14 @@ def mitigate_executor(
     error-mitigated with layerwise richardson extrapolation (LRE).
 
     Args:
-        input_circuit: Circuit to be scaled.
-        executor: Executes a circuit and returns a `float`
+        executor: Executes a circuit and returns a `float`.
         degree: Degree of the multivariate polynomial.
         fold_multiplier Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
+        observable: Observable to compute the expectation value of. If
+            ``None``, the ``executor`` must return an expectation value.
+            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
+            ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
@@ -203,29 +212,31 @@ def mitigate_executor(
     if not executor_obj.can_batch:
 
         @wraps(executor)
-        def new_executor(input_circuit: QPROGRAM) -> float:
+        def new_executor(circuit: QPROGRAM) -> float:
             return execute_with_lre(
-                input_circuit,
+                circuit,
                 executor,
                 degree,
                 fold_multiplier,
+                observable,
                 folding_method,
                 num_chunks,
             )
     else:
 
         @wraps(executor)
-        def new_executor(input_circuits: list[QPROGRAM]) -> list[float]:
+        def new_executor(circuits: list[QPROGRAM]) -> list[float]:
             return [
                 execute_with_lre(
-                    input_circuit,
+                    circuit,
                     executor,
                     degree,
                     fold_multiplier,
+                    observable,
                     folding_method,
                     num_chunks,
                 )
-                for input_circuit in input_circuits
+                for circuit in circuits
             ]
 
     return new_executor
@@ -234,20 +245,25 @@ def mitigate_executor(
 def lre_decorator(
     degree: int,
     fold_multiplier: int,
+    observable: Optional[Observable] = None,
     folding_method: Callable[
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,
     num_chunks: Optional[int] = None,
-) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
+) -> Callable[
+    [Callable[[QPROGRAM], QuantumResult]], Callable[[QPROGRAM], float]
+]:
     """Decorator which adds an error-mitigation layer based on
     layerwise richardson extrapolation (LRE).
 
     Args:
-        input_circuit: Circuit to be scaled.
-        executor: Executes a circuit and returns a `float`
         degree: Degree of the multivariate polynomial.
         fold_multiplier Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
+        observable: Observable to compute the expectation value of. If
+            ``None``, the ``executor`` must return an expectation value.
+            Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
+            ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
             :func:`fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
@@ -255,17 +271,19 @@ def lre_decorator(
             the input circuit is unchanged.
 
 
+
     Returns:
         Error-mitigated decorator.
     """
 
     def decorator(
-        executor: Callable[[QPROGRAM], float],
+        executor: Callable[[QPROGRAM], QuantumResult],
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor,
             degree,
             fold_multiplier,
+            observable,
             folding_method,
             num_chunks,
         )

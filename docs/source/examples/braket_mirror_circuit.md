@@ -30,7 +30,7 @@ This requires an AWS account.
 try:
     import mitiq
 except ImportError:
-    !pip install git+https://github.com/unitaryfund/mitiq --quiet
+    !pip install git+https://github.com/unitaryfoundation/mitiq --quiet
 ```
 
 ```{code-cell} ipython3
