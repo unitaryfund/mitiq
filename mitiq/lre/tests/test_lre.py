@@ -6,11 +6,14 @@ import re
 from typing import List
 from unittest.mock import Mock
 
+import numpy as np
 import pytest
 from cirq import DensityMatrixSimulator, depolarize
 
 from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, benchmarks
 from mitiq.lre import (
+    combine_results,
+    construct_circuits,
     execute_with_lre,
     lre_decorator,
 )
@@ -192,3 +195,34 @@ def test_lre_runs_correct_number_of_circuits_when_chunking():
     assert mock_executor.call_count == math.comb(
         degree + len(chunked_circ), degree
     )
+
+
+def test_lre_combine_results():
+    """Verify combine_results returns the same results as calling
+    execute_with_lre"""
+
+    degree, fold_multiplier = 2, 2
+
+    circuits = construct_circuits(test_cirq, degree, fold_multiplier)
+
+    np.random.seed(42)
+
+    def executor(circuit):
+        return np.random.random()
+
+    results = [executor(circuit) for circuit in circuits]
+
+    final_result = combine_results(results, test_cirq, degree, fold_multiplier)
+
+    np.random.seed(42)
+    test_executor = Executor(executor)
+    lre_exp_val = execute_with_lre(
+        test_cirq,
+        test_executor,
+        degree=degree,
+        fold_multiplier=fold_multiplier,
+    )
+
+    assert np.isclose(final_result, lre_exp_val)
+
+    assert len(circuits) == len(test_executor.executed_circuits)

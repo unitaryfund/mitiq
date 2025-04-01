@@ -20,8 +20,90 @@ from mitiq.lre.multivariate_scaling import (
 from mitiq.zne.scaling import fold_gates_at_random
 
 
+def construct_circuits(
+    circuit: QPROGRAM,
+    degree: int,
+    fold_multiplier: int,
+    folding_method: Callable[
+        [QPROGRAM, float], QPROGRAM
+    ] = fold_gates_at_random,  # type: ignore [has-type]
+    num_chunks: Optional[int] = None,
+    scale_method: Callable[
+        [
+            QPROGRAM,
+            int,
+            int,
+            Optional[int],
+            Callable[[QPROGRAM, float], QPROGRAM],
+        ],
+        list[QPROGRAM],
+    ] = multivariate_layer_scaling,
+) -> list[QPROGRAM]:
+    """Given a circuit, degree, fold_multiplier, folding_method, num_chunks,
+       and an optional scale_method with a default of
+       multivariate_layer_scaling, outputs a list of circuits that will be used
+       in LRE.
+
+    Args:
+        circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap value required for unitary folding which
+            is used to generate the scale factor vectors.
+        folding_method: Unitary folding method. Default is
+            :func:`fold_gates_at_random`.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+        scale_method: Currently, only multivariate_layer_scaling is available
+
+        circuit: The input circuit to execute with ZNE.
+        scale_factors: An array of noise scale factors.
+        scale_method: The function for scaling the noise.
+            A list of built-in functions can be found in
+            ``mitiq.lre.multivariate_scaling``.
+
+    Returns:
+        The scaled circuits using the scale_method.
+    """
+    noise_scaled_circuits = scale_method(
+        circuit, degree, fold_multiplier, num_chunks, folding_method
+    )
+    return noise_scaled_circuits
+
+
+def combine_results(
+    results: list[float],
+    circuit: QPROGRAM,
+    degree: int,
+    fold_multiplier: int,
+    num_chunks: Optional[int] = None,
+) -> float:
+    """Computes the error-mitigated expectation value associated to the
+    input results from executing the scaled circuits and using the multivariate
+    richardson coeffecients, via the application of Layerwise Richardson
+    Extrapolation (LRE).
+
+    Args:
+        circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap value required for unitary folding which
+            is used to generate the scale factor vectors.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+        results: An array storing the results of running the scaled circuits.
+
+    Returns:
+        The expectation value estimated with LRE.
+    """
+    linear_combination_coeffs = multivariate_richardson_coefficients(
+        circuit, degree, fold_multiplier, num_chunks
+    )
+    return np.dot(results, linear_combination_coeffs)
+
+
 def execute_with_lre(
-    input_circuit: QPROGRAM,
+    circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], float]],
     degree: int,
     fold_multiplier: int,
@@ -45,7 +127,7 @@ def execute_with_lre(
         instead.
 
     Args:
-        input_circuit: Circuit to be scaled.
+        circuit: Circuit to be scaled.
         executor: Executes a circuit and returns a `float`
         degree: Degree of the multivariate polynomial.
         fold_multiplier: Scaling gap value required for unitary folding which
@@ -65,11 +147,11 @@ def execute_with_lre(
         executor = Executor(executor)
 
     noise_scaled_circuits = multivariate_layer_scaling(
-        input_circuit, degree, fold_multiplier, num_chunks, folding_method
+        circuit, degree, fold_multiplier, num_chunks, folding_method
     )
 
     linear_combination_coeffs = multivariate_richardson_coefficients(
-        input_circuit, degree, fold_multiplier, num_chunks
+        circuit, degree, fold_multiplier, num_chunks
     )
 
     # verify the linear combination coefficients and the calculated expectation
