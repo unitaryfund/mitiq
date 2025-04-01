@@ -17,7 +17,7 @@ DDD works in two main stages: generate noise-scaled circuits by inserting DDD se
 The section [Apply DDD](#apply-ddd) applies the protocol in a single step, and then in the section [Step by step application of DDD](#step-by-step-application-of-ddd), we’ll show how you can apply the technique stepwise.
 
 This workflow can be executed by a single call to {func}`.execute_with_ddd`.
-If more control is needed over the protocol, Mitiq provides {func}`.construct_circuits` and {func}`.ddd.combine_results` to handle the first and second steps respectively.
+If more control is needed over the protocol, Mitiq provides {func}`.ddd.construct_circuits` and {func}`.ddd.combine_results` to handle the first and second steps respectively.
 
 As with all techniques, DDD is compatible with any frontend supported by Mitiq:
 
@@ -118,7 +118,7 @@ the error with DDD is sometimes larger than the unmitigated error.
 
 ## Step by step application of DDD
 
-In this section we demonstrate the use of {func}`.construct_circuits` for those who might want to generate circuits with DDD sequences inserted, and have more control over the protocol.
+In this section we demonstrate the use of {func}`.ddd.construct_circuits` for those who might want to generate circuits with DDD sequences inserted, and have more control over the protocol.
 
 ### Generating circuits with DDD sequences
 
