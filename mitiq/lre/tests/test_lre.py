@@ -197,9 +197,9 @@ def test_lre_runs_correct_number_of_circuits_when_chunking():
     )
 
 
-def test_lre_combine_results():
-    """Verify combine_results returns the same results as calling
-    execute_with_lre"""
+def test_two_stage_lre():
+    """Verify construct_circuits generates the appropriate number of circuits
+    and combine_results returns the same results as calling execute_with_lre"""
 
     degree, fold_multiplier = 2, 2
 
