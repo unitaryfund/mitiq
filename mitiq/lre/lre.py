@@ -28,21 +28,9 @@ def construct_circuits(
         [QPROGRAM, float], QPROGRAM
     ] = fold_gates_at_random,  # type: ignore [has-type]
     num_chunks: Optional[int] = None,
-    scale_method: Callable[
-        [
-            QPROGRAM,
-            int,
-            int,
-            Optional[int],
-            Callable[[QPROGRAM, float], QPROGRAM],
-        ],
-        list[QPROGRAM],
-    ] = multivariate_layer_scaling,
 ) -> list[QPROGRAM]:
-    """Given a circuit, degree, fold_multiplier, folding_method, num_chunks,
-       and an optional scale_method with a default of
-       multivariate_layer_scaling, outputs a list of circuits that will be used
-       in LRE.
+    """Given a circuit, degree, fold_multiplier, folding_method, and
+       num_chunks, outputs a list of circuits that will be used in LRE.
 
     Args:
         circuit: Circuit to be scaled.
@@ -54,18 +42,14 @@ def construct_circuits(
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
-        scale_method: Currently, only multivariate_layer_scaling is available
 
         circuit: The input circuit to execute with ZNE.
         scale_factors: An array of noise scale factors.
-        scale_method: The function for scaling the noise.
-            A list of built-in functions can be found in
-            ``mitiq.lre.multivariate_scaling``.
 
     Returns:
-        The scaled circuits using the scale_method.
+        The scaled circuits using the multivariate_layer_scaling.
     """
-    noise_scaled_circuits = scale_method(
+    noise_scaled_circuits = multivariate_layer_scaling(
         circuit, degree, fold_multiplier, num_chunks, folding_method
     )
     return noise_scaled_circuits
