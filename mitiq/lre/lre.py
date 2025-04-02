@@ -38,14 +38,15 @@ def construct_circuits(
         fold_multiplier: Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
 
 
     Returns:
-        The scaled circuits using the multivariate_layer_scaling.
+        The scaled circuits using the
+        :func:`mitiq.lre.multivariate_scaling.layerwise_folding.multivariate_layer_scaling`.
     """
     noise_scaled_circuits = multivariate_layer_scaling(
         circuit, degree, fold_multiplier, num_chunks, folding_method
@@ -66,6 +67,7 @@ def combine_results(
     Extrapolation (LRE).
 
     Args:
+        results: An array storing the results of running the scaled circuits.
         circuit: Circuit to be scaled.
         degree: Degree of the multivariate polynomial.
         fold_multiplier: Scaling gap value required for unitary folding which
@@ -73,7 +75,6 @@ def combine_results(
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
-        results: An array storing the results of running the scaled circuits.
 
     Returns:
         The expectation value estimated with LRE.
@@ -120,7 +121,7 @@ def execute_with_lre(
             Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
             ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
@@ -180,7 +181,7 @@ def mitigate_executor(
             Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
             ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
@@ -247,7 +248,7 @@ def lre_decorator(
             Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
             ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
