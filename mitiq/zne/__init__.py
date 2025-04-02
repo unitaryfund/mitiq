@@ -7,7 +7,7 @@ from mitiq.zne.zne import (
     execute_with_zne,
     mitigate_executor,
     zne_decorator,
-    scaled_circuits,
+    construct_circuits,
     combine_results,
 )
 from mitiq.zne import scaling

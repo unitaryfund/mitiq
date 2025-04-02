@@ -33,7 +33,7 @@ PEC works in two main stages: generate noise-scaled circuits via inserting quasi
 The section [Run PEC](#run-pec) applies the protocol in a single step, and then in the section [Step by step application of PEC](#step-by-step-application-of-pec), we'll show how you can apply the technique stepwise.
 
 This workflow can be executed by a single call to {func}`.execute_with_pec`.
-If more control is needed over the protocol, Mitiq provides {func}`.generate_sampled_circuits` and {func}`.pec.combine_results` to handle the first and second steps respectively.
+If more control is needed over the protocol, Mitiq provides {func}`.pec.construct_circuits` and {func}`.pec.combine_results` to handle the first and second steps respectively.
 
 As with all techniques, PEC is compatible with any frontend supported by Mitiq:
 
@@ -186,13 +186,13 @@ As printed above, PEC reduced the error compared to the unmitigated case.
 
 ## Step by step application of PEC
 
-This section demonstrates the use of the {func}`.generate_sampled_circuits` for those who want to generate and see a list of sampled circuits based on the given quasi-probability representaions.
+This section demonstrates the use of the {func}`.pec.construct_circuits` for those who want to generate and see a list of sampled circuits based on the given quasi-probability representaions.
 
 ### Generate Sample Circuits
 We will now generate a list of sampled circuits. Note that the number of sampled circuits generated depends on the input provided, which can be seen using the function `len`.
 
 ```{code-cell} ipython3
-sampled_circuits = pec.generate_sampled_circuits(circuit, representations=reps)
+sampled_circuits = pec.construct_circuits(circuit, representations=reps)
 
 print(f"Number of sample circuits:    {len(sampled_circuits)}")
 print(sampled_circuits[0])

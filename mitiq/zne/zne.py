@@ -13,7 +13,7 @@ from mitiq.zne.inference import Factory, RichardsonFactory
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-def scaled_circuits(
+def construct_circuits(
     circuit: QPROGRAM,
     scale_factors: list[float],
     scale_method: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,  # type:ignore [has-type]

@@ -146,7 +146,7 @@ Next for ZNE.
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
-from mitiq.zne.zne import scaled_circuits
+from mitiq.zne import construct_circuits
 
 scale_factors = [1.0, 2.0, 3.0]
 
@@ -154,7 +154,7 @@ avg_num_scaled_circuits_zne = 0.0
 avg_depth_scaled_circuits_zne = 0.0
 
 for circuit in circuits:
-    noise_scaled_circuits_zne = scaled_circuits(
+    noise_scaled_circuits_zne = construct_circuits(
         circuit=circuit,
         scale_factors=[1.0, 2.0, 3.0],
         scale_method=fold_gates_at_random,

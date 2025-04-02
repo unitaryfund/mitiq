@@ -20,8 +20,73 @@ from mitiq.lre.multivariate_scaling import (
 from mitiq.zne.scaling import fold_gates_at_random
 
 
+def construct_circuits(
+    circuit: QPROGRAM,
+    degree: int,
+    fold_multiplier: int,
+    folding_method: Callable[
+        [QPROGRAM, float], QPROGRAM
+    ] = fold_gates_at_random,  # type: ignore [has-type]
+    num_chunks: Optional[int] = None,
+) -> list[QPROGRAM]:
+    """Given a circuit, degree, fold_multiplier, folding_method, and
+       num_chunks, outputs a list of circuits that will be used in LRE.
+
+    Args:
+        circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap value required for unitary folding which
+            is used to generate the scale factor vectors.
+        folding_method: Unitary folding method. Default is
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+
+
+    Returns:
+        The scaled circuits using the
+        :func:`mitiq.lre.multivariate_scaling.layerwise_folding.multivariate_layer_scaling`.
+    """
+    noise_scaled_circuits = multivariate_layer_scaling(
+        circuit, degree, fold_multiplier, num_chunks, folding_method
+    )
+    return noise_scaled_circuits
+
+
+def combine_results(
+    results: list[float],
+    circuit: QPROGRAM,
+    degree: int,
+    fold_multiplier: int,
+    num_chunks: Optional[int] = None,
+) -> float:
+    """Computes the error-mitigated expectation value associated to the
+    input results from executing the scaled circuits and using the multivariate
+    richardson coeffecients, via the application of Layerwise Richardson
+    Extrapolation (LRE).
+
+    Args:
+        results: An array storing the results of running the scaled circuits.
+        circuit: Circuit to be scaled.
+        degree: Degree of the multivariate polynomial.
+        fold_multiplier: Scaling gap value required for unitary folding which
+            is used to generate the scale factor vectors.
+        num_chunks: Number of desired approximately equal chunks. When the
+            number of chunks is the same as the layers in the input circuit,
+            the input circuit is unchanged.
+
+    Returns:
+        The expectation value estimated with LRE.
+    """
+    linear_combination_coeffs = multivariate_richardson_coefficients(
+        circuit, degree, fold_multiplier, num_chunks
+    )
+    return np.dot(results, linear_combination_coeffs)
+
+
 def execute_with_lre(
-    input_circuit: QPROGRAM,
+    circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     degree: int,
     fold_multiplier: int,
@@ -46,8 +111,8 @@ def execute_with_lre(
         instead.
 
     Args:
-        input_circuit: Circuit to be scaled.
-        executor: Executes a circuit and returns a `float`.
+        circuit: Circuit to be scaled.
+        executor: Executes a circuit and returns a `float`
         degree: Degree of the multivariate polynomial.
         fold_multiplier: Scaling gap value required for unitary folding which
             is used to generate the scale factor vectors.
@@ -56,7 +121,7 @@ def execute_with_lre(
             Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
             ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
@@ -70,11 +135,11 @@ def execute_with_lre(
         executor = Executor(executor)
 
     noise_scaled_circuits = multivariate_layer_scaling(
-        input_circuit, degree, fold_multiplier, num_chunks, folding_method
+        circuit, degree, fold_multiplier, num_chunks, folding_method
     )
 
     linear_combination_coeffs = multivariate_richardson_coefficients(
-        input_circuit, degree, fold_multiplier, num_chunks
+        circuit, degree, fold_multiplier, num_chunks
     )
 
     # verify the linear combination coefficients and the calculated expectation
@@ -107,7 +172,6 @@ def mitigate_executor(
     error-mitigated with layerwise richardson extrapolation (LRE).
 
     Args:
-        input_circuit: Circuit to be scaled.
         executor: Executes a circuit and returns a `float`.
         degree: Degree of the multivariate polynomial.
         fold_multiplier Scaling gap value required for unitary folding which
@@ -117,7 +181,7 @@ def mitigate_executor(
             Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
             ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
@@ -131,9 +195,9 @@ def mitigate_executor(
     if not executor_obj.can_batch:
 
         @wraps(executor)
-        def new_executor(input_circuit: QPROGRAM) -> float:
+        def new_executor(circuit: QPROGRAM) -> float:
             return execute_with_lre(
-                input_circuit,
+                circuit,
                 executor,
                 degree,
                 fold_multiplier,
@@ -144,10 +208,10 @@ def mitigate_executor(
     else:
 
         @wraps(executor)
-        def new_executor(input_circuits: list[QPROGRAM]) -> list[float]:
+        def new_executor(circuits: list[QPROGRAM]) -> list[float]:
             return [
                 execute_with_lre(
-                    input_circuit,
+                    circuit,
                     executor,
                     degree,
                     fold_multiplier,
@@ -155,7 +219,7 @@ def mitigate_executor(
                     folding_method,
                     num_chunks,
                 )
-                for input_circuit in input_circuits
+                for circuit in circuits
             ]
 
     return new_executor
@@ -184,7 +248,7 @@ def lre_decorator(
             Otherwise, the ``DensityMatrix`` or ``Bitstrings`` returned by
             ``executor`` is used to compute the expectation of the observable.
         folding_method: Unitary folding method. Default is
-            :func:`fold_gates_at_random`.
+            :func:`mitiq.zne.scaling.folding.fold_gates_at_random`.
         num_chunks: Number of desired approximately equal chunks. When the
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.

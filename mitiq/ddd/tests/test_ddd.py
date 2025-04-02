@@ -13,9 +13,9 @@ from pytest import mark
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Executor
 from mitiq.ddd import (
+    construct_circuits,
     ddd_decorator,
     execute_with_ddd,
-    generate_circuits_with_ddd,
     mitigate_executor,
 )
 from mitiq.ddd.rules import xx, xyxy, yy
@@ -237,7 +237,7 @@ def test_ddd_decorator_with_rule_args():
 def test_num_trials_generates_circuits(num_trials: int):
     """Test that the number of generated circuits follows num_trials."""
 
-    circuits = generate_circuits_with_ddd(
+    circuits = construct_circuits(
         circuit_cirq_a, rule=xx, num_trials=num_trials
     )
 

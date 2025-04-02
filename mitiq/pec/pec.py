@@ -38,7 +38,7 @@ _LARGE_SAMPLE_WARN = (
 )
 
 
-def generate_sampled_circuits(
+def construct_circuits(
     circuit: QPROGRAM,
     representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
@@ -189,7 +189,7 @@ def execute_with_pec(
         ``pec_value``. If ``full_output`` is ``False``, only ``pec_value`` is
         returned.
     """
-    sampled_circuits, signs, norm = generate_sampled_circuits(
+    sampled_circuits, signs, norm = construct_circuits(
         circuit,
         representations,
         precision,

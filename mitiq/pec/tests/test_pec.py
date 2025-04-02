@@ -22,8 +22,8 @@ from mitiq.pec import (
     NoisyOperation,
     OperationRepresentation,
     combine_results,
+    construct_circuits,
     execute_with_pec,
-    generate_sampled_circuits,
     mitigate_executor,
     pec_decorator,
 )
@@ -369,7 +369,7 @@ def test_execute_with_pec_error_scaling(num_samples: int):
 @pytest.mark.parametrize("precision", [0.2, 0.1])
 def test_precision_option_used_in_num_samples(precision):
     """Tests that the 'precision' argument is used to deduce num_samples."""
-    circuits, _, _ = generate_sampled_circuits(
+    circuits, _, _ = construct_circuits(
         oneq_circ,
         representations=pauli_representations,
         precision=precision,
@@ -384,7 +384,7 @@ def test_precision_option_used_in_num_samples(precision):
 def test_precision_ignored_when_num_samples_present():
     """Check precision is ignored when num_samples is given."""
     num_expected_circuits = 123
-    circuits, _, _ = generate_sampled_circuits(
+    circuits, _, _ = construct_circuits(
         oneq_circ,
         representations=pauli_representations,
         precision=0.1,
@@ -400,7 +400,7 @@ def test_precision_ignored_when_num_samples_present():
 def test_bad_precision_argument(bad_value):
     """Tests that if 'precision' is not within (0, 1] an error is raised."""
     with pytest.raises(ValueError, match="The value of 'precision' should"):
-        generate_sampled_circuits(
+        construct_circuits(
             oneq_circ,
             representations=pauli_representations,
             precision=bad_value,
@@ -414,7 +414,7 @@ def test_large_sample_size_warning(mock_sample_circuit):
     mock_sample_circuit.return_value = ([], [], 0.911)
 
     with pytest.warns(LargeSampleWarning):
-        generate_sampled_circuits(
+        construct_circuits(
             oneq_circ,
             representations=[],
             num_samples=100_001,
