@@ -146,7 +146,7 @@ Next for ZNE.
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
-from mitiq.zne.zne import construct_circuits
+from mitiq.zne import construct_circuits
 
 scale_factors = [1.0, 2.0, 3.0]
 
