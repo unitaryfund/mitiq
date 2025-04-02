@@ -43,8 +43,6 @@ def construct_circuits(
             number of chunks is the same as the layers in the input circuit,
             the input circuit is unchanged.
 
-        circuit: The input circuit to execute with ZNE.
-        scale_factors: An array of noise scale factors.
 
     Returns:
         The scaled circuits using the multivariate_layer_scaling.
