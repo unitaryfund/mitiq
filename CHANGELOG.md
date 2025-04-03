@@ -1,5 +1,89 @@
 # Changelog
 
+## Version 0.44.0
+
+([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.43.0...v0.44.0))
+
+### Highlights
+
+🚀 This release introduces the first version of the **Virtual Distillation** (VD) technique in Mitiq, which is now available for use!
+This technique was prototyped and implemented by a team of students at the University of Amsterdam.
+VD uses additional qubits to distill a purer version of the quantum state of interest.
+The implementation is in its early stages so lacks support for all `QPROGRAM` types.
+Currently only programs written in `cirq` are suppoted.
+We welcome feedback and suggestions for improvement.
+
+```py
+from mitiq import vd
+
+vd.execute_with_vd(circuit, execute)
+>>> np.array([0.5, 0.5]) # [<Z_0>, <Z_1>] assuming the circuit acts on 2 qubits
+```
+
+We've also made further enhancements to the **Layerwise Richardson Extrapolation** (LRE) technique, including support for observables and the `mitiq.Executor` class.
+`mitiq.lre` also has two new functions `mitiq.lre.construct_circuits` and `mitiq.lre.combine_results` that allow users to generate circuits and combine results in a more modular way (bringing this module in line with the other error mitigation techniques).
+An example workflow for the two step application LRE is shown below:
+
+```py
+from mitiq import lre
+
+lre_circuits = lre.construct_circuits(circuit, degree, fold_multiplier)
+
+results = execute(lre_circuits)
+
+lre_result = lre.combine_results(results, circuit, degree, fold_multiplier)
+```
+
+### Deprecations
+
+For uniformity across modules within Mitiq we have renamed the folowing functions:
+1. `mitiq.zne.scaled_circuits` -> `mitiq.zne.construct_circuits`
+2. `mitiq.ddd.generate_circuits_with_ddd` -> `mitiq.ddd.construct_circuits`
+3. `mitiq.pec.generate_sampled_circuits` -> `mitiq.pec.construct_circuits`
+
+With this change, you will find the function `mitiq.<module>.construct_circuits` in all of ZNE, PEC, DDD, LRE, and VD.
+
+---
+
+If you're interested in error mitigation, check out our upcoming error resilience workshop in NYC!
+WERQSHOP: Workshop on Error Resilience Quantum computing (https://werq.shop).
+
+---
+
+
+#### ✨ Enhancements
+
+- Modularization uniformity for ZNE, PEC, DDD, and LRE (#2709) [@bdg221]
+- Add main API entry points for virtual distillation (#2658) [@Jegbrz]
+- UFund => UFoundation (#2706) [@natestemen]
+- allow list/tuple constructor in executor typehints (#2700) [@natestemen]
+- Adding utility functions for Virtual Distillation. (#2698) [@FarLab]
+- Auxilliary code for VD to apply a Bi matrix on a circuit (#2650) [@khknopp]
+- Adding support for observables in LRE executors (#2681) [@Shivansh20128]
+- Adding modularized function generate_circuits_with_ddd (#2618) [@Shivansh20128]
+- Allow for Executor class and batched Executors for LRE (#2676) [@bdg221]
+- Adding modularized function generate_sampled_circuits (#2619) [@Shivansh20128]
+- Default scaling method in modularized ZNE function (#2666) [@purva-thakre]
+
+#### 📓 Documentation
+
+- Adding docstrings to Observable class (#2699) [@Shivansh20128]
+- add Virtual Distillation rfc to the contributing page and a new row in the error mitigation techniques in the readme. (#2691) [@FarLab]
+
+#### 📦 Dependency Updates
+
+- Update qiskit-ibm-runtime requirement from ~=0.36.1 to ~=0.37.0 (#2693) [@dependabot]
+- Update qiskit-aer requirement from ~=0.15.1 to ~=0.17.0 (#2694) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.90.2 to ~=1.91.0 (#2697) [@dependabot]
+- Update qiskit requirement from ~=1.4.1 to ~=1.4.2 (#2696) [@dependabot]
+- Bump openfermion from 1.6.1 to 1.7.0 (#2671) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.69.0 to ~=1.90.2 (#2690) [@dependabot]
+- Update qibo requirement from ~=0.2.15 to ~=0.2.16 (#2689) [@dependabot]
+- Update qiskit-ibm-runtime requirement from ~=0.20.0 to ~=0.36.1 (#2314) [@dependabot]
+- Update scipy requirement from <=1.14.1,>=1.10.1 to >=1.10.1,<=1.15.2 (#2673) [@dependabot]
+- Update qiskit requirement from ~=1.3.1 to ~=1.4.1 (#2685) [@dependabot]
+- Update pyquil requirement from ~=3.5.4 to ~=4.11.0 (#2063) [@dependabot]
+
 ## Version 0.43.0
 
 ([Full Changelog](https://github.com/unitaryfund/mitiq/compare/v0.42.0...v0.43.0))
