@@ -10,7 +10,7 @@
 This technique was prototyped and implemented by a team of students at the University of Amsterdam.
 VD uses additional qubits to distill a purer version of the quantum state of interest.
 The implementation is in its early stages so lacks support for all `QPROGRAM` types.
-Currently only programs written in `cirq` are suppoted.
+Currently only programs written in `cirq` are supported.
 We welcome feedback and suggestions for improvement.
 
 ```py
