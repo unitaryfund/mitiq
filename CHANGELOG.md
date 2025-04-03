@@ -43,6 +43,9 @@ For uniformity across modules within Mitiq we have renamed the folowing function
 
 With this change, you will find the function `mitiq.<module>.construct_circuits` in all of ZNE, PEC, DDD, LRE, and VD.
 
+We've also bound the version of `numpy` to be less than `2.0.0` due to some conflicts when using this latest major version.
+We hope to support `numpy` 2.0.0 in a coming release.
+
 ---
 
 If you're interested in error mitigation, check out our upcoming error resilience workshop in NYC!
@@ -72,6 +75,7 @@ WERQSHOP: Workshop on Error Resilience Quantum computing (https://werq.shop).
 
 #### 📦 Dependency Updates
 
+- bound numpy from above (#2712) [@natestemen]
 - Update qiskit-ibm-runtime requirement from ~=0.36.1 to ~=0.37.0 (#2693) [@dependabot]
 - Update qiskit-aer requirement from ~=0.15.1 to ~=0.17.0 (#2694) [@dependabot]
 - Update amazon-braket-sdk requirement from ~=1.90.2 to ~=1.91.0 (#2697) [@dependabot]
