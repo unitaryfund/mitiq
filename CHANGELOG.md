@@ -34,7 +34,7 @@ results = execute(lre_circuits)
 lre_result = lre.combine_results(results, circuit, degree, fold_multiplier)
 ```
 
-### Deprecations
+### 🚨 Breaking Changes
 
 For uniformity across modules within Mitiq we have renamed the folowing functions:
 1. `mitiq.zne.scaled_circuits` -> `mitiq.zne.construct_circuits`
