@@ -114,7 +114,7 @@ def qrack_simulate(circuit: cirq.Circuit, shots=1000) -> float:
 
 CDR requires the use of a quantum device or a noisy simulator. The near-Clifford circuits that are generated from the original circuit are executed on the quantum device or noisy simulator in order to compare against the simulated results.
 
-In this example, a Qiskit 5 Qubit Fake Backend is used. The [Fake5QV1](https://docs.quantum.ibm.com/api/qiskit/qiskit.providers.fake_provider.Fake5QV1) uses configurations and noise settings taken previously from the 5 qubit IBM Quantum Yorktown device. The `qiskit_noisy` function takes the Cirq circuit and uses Mitiq to change it into a Qiskit circuit. After adding measurements, the circuit is run on the fake backend. The expectation value for `00` is then returned.
+In this example, a Qiskit 5 Qubit Fake Backend is used. The `Fake5QV1` uses configurations and noise settings taken previously from the 5 qubit IBM Quantum Yorktown device. The `qiskit_noisy` function takes the Cirq circuit and uses Mitiq to change it into a Qiskit circuit. After adding measurements, the circuit is run on the fake backend. The expectation value for `00` is then returned.
 
 ```{code-cell}
 # Use Qiskit's Fave5QV1 as a noisy simulator
